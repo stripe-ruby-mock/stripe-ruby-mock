@@ -1,0 +1,28 @@
+= stripe-ruby-mock
+
+* {Homepage}[https://github.com/mindeavor/stripe-ruby-mock#readme]
+* {Issues}[https://github.com/mindeavor/stripe-ruby-mock/issues]
+* {Documentation}[http://rubydoc.info/gems/stripe-ruby-mock/frames]
+* {Email}[mailto:gilbertbgarza at gmail.com]
+
+== Description
+
+TODO: Description
+
+== Features
+
+== Examples
+
+  require 'stripe/mock'
+
+== Requirements
+
+== Install
+
+  $ gem install stripe-ruby-mock
+
+== Copyright
+
+Copyright (c) 2013 Gilbert
+
+See LICENSE.txt for details.

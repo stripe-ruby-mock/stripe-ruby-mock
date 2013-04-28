@@ -1,0 +1,4 @@
+lib/**/*.rb
+README.rdoc
+ChangeLog.rdoc
+LICENSE.txt
