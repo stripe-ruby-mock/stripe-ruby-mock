@@ -1,1 +1,0 @@
-require 'stripe/mock/version'

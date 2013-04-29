@@ -1,5 +1,4 @@
 gem 'rspec', '~> 2.4'
 require 'rspec'
-require 'stripe/mock/version'
-
-include Stripe::Mock
+require 'stripe'
+require 'stripe_mock/version'

@@ -1,12 +1,12 @@
 # -*- encoding: utf-8 -*-
 
-require File.expand_path('../lib/stripe/mock/version', __FILE__)
+require File.expand_path('../lib/stripe_mock/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.name          = "stripe-ruby-mock"
-  gem.version       = Stripe::Mock::VERSION
-  gem.summary       = %q{TODO: Summary}
-  gem.description   = %q{TODO: Description}
+  gem.version       = StripeMock::VERSION
+  gem.summary       = %q{TDD with stripe}
+  gem.description   = %q{A drop-in library to test stripe without hitting their servers}
   gem.license       = "MIT"
   gem.authors       = ["Gilbert"]
   gem.email         = "gilbertbgarza@gmail.com"
@@ -17,7 +17,8 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ['lib']
 
-  gem.add_development_dependency 'rdoc', '~> 3.0'
+  gem.add_dependency 'stripe', '~> 1.8.1'
+
   gem.add_development_dependency 'rspec', '~> 2.4'
   gem.add_development_dependency 'rubygems-tasks', '~> 0.2'
 end

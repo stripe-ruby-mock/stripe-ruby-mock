@@ -14,19 +14,6 @@ rescue LoadError => e
 end
 
 begin
-  gem 'rdoc', '~> 3.0'
-  require 'rdoc/task'
-
-  RDoc::Task.new do |rdoc|
-    rdoc.title = "stripe-ruby-mock"
-  end
-rescue LoadError => e
-  warn e.message
-  warn "Run `gem install rdoc` to install 'rdoc/task'."
-end
-task :doc => :rdoc
-
-begin
   gem 'rspec', '~> 2.4'
   require 'rspec/core/rake_task'
 
