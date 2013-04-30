@@ -10,13 +10,23 @@ module StripeMock
         :object => "customer",
         :id => "c_test_customer",
         :active_card => {
-          :type => "Visa",
+          :object => "card",
           :last4 => "4242",
-          :exp_month => 11,
+          :type => "Visa",
+          :exp_month => 12,
+          :exp_year => 2013,
+          :fingerprint => "3TQGpK9JoY1GgXPw",
           :country => "US",
-          :exp_year => 2012,
-          :id => "cc_test_card",
-          :object => "card"
+          :name => "From Here",
+          :address_line1 => nil,
+          :address_line2 => nil,
+          :address_city => nil,
+          :address_state => nil,
+          :address_zip => nil,
+          :address_country => nil,
+          :cvc_check => "pass",
+          :address_line1_check => nil,
+          :address_zip_check => nil
         },
         :created => 1304114758
       }.merge(params)
