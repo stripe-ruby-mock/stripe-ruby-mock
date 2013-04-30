@@ -93,14 +93,17 @@ module StripeMock
           :amount => 7500,
           :trial_period_days => 30,
           :object => "plan",
-          :identifier => plan_id
+          :id => plan_id
         },
         :current_period_start => 1308595038,
+        :cancel_at_period_end => false,
+        :canceled_at => nil,
         :start => 1308595038,
         :object => "subscription",
         :trial_start => 1308595038,
         :trial_end => 1308681468,
-        :customer => "c_test_customer"
+        :customer => "c_test_customer",
+        :quantity => 1
       }
     end
 
