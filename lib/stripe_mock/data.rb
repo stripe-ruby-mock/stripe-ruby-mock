@@ -3,6 +3,8 @@ module StripeMock
 
     def self.test_customer(params)
       {
+        :email => 'stripe_mock@example.com',
+        :description => 'an auto-generated stripe customer data mock',
         :subscription_history => [],
         :bills => [],
         :charges => [],

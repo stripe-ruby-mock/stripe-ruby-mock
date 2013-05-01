@@ -9,8 +9,8 @@
 
 ## Features
 
-* Easily test against stripe errors
 * No stripe server access required
+* Easily test against stripe errors (soon)
 
 ## Description
 
@@ -46,6 +46,7 @@ You can use stripe-ruby-mock with any ruby testing library. Here's a quick dummy
 * Cover all stripe urls/methods
 * Mock stripe error responses
 * Create hash for storing/retrieving stripe objects in-memory
+  * Currently implemented for: **Customers**
 
 ## Copyright
 

@@ -1,29 +1,33 @@
+require 'ostruct'
+
 require 'stripe_mock/version'
 require 'stripe_mock/data'
-require 'stripe_mock/methods'
+require 'stripe_mock/instance'
 
 module StripeMock
 
-  @@init = false
-  @@enabled = false
+  @@first_start = true
+  @@instance = nil
 
   def self.start
-    if @@init == false
-      @@request_method = Stripe.method(:request)
-      @@init = true
+    if @@first_start == true
+      @@original_request_method = Stripe.method(:request)
+      @@first_start = false
     end
-    alias_stripe_method :request, Methods.method(:mock_request)
-    @@enabled = true
+    @@instance = Instance.new
+    alias_stripe_method :request, @@instance.method(:mock_request)
   end
 
   def self.stop
-    return unless @@enabled == true
-    alias_stripe_method :request, @@request_method
-    @@enabled = false
+    return if @@instance.nil?
+    alias_stripe_method :request, @@original_request_method
+    @@instance = nil
   end
 
   def self.alias_stripe_method(new_name, method_object)
     Stripe.define_singleton_method(new_name) {|*args| method_object.call(*args) }
   end
+
+  def self.instance; @@instance; end
 
 end
