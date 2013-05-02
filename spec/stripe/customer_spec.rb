@@ -52,8 +52,13 @@ describe 'Customer API' do
 
   it "should update a stripe customer" do
     original = Stripe::Customer.retrieve("test_customer_update")
+    email = original.email
+
     original.description = 'new desc'
     original.save
+
+    expect(original.email).to eq(email)
+    expect(original.description).to eq('new desc')
 
     customer = Stripe::Customer.retrieve("test_customer_update")
     expect(customer.email).to eq(original.email)
