@@ -23,23 +23,25 @@ without the need to actually hit stripe's servers.
 
 You can use stripe-ruby-mock with any ruby testing library. Here's a quick dummy example with RSpec:
 
-    require 'stripe'
-    require 'stripe_mock'
+```ruby
+require 'stripe'
+require 'stripe_mock'
 
-    describe MyApp do
-      before { StripeMock.start }
-      after { StripeMock.stop }
+describe MyApp do
+  before { StripeMock.start }
+  after { StripeMock.stop }
 
-      it "should create a stripe customer" do
+  it "should create a stripe customer" do
 
-        # This doesn't touch stripe's servers nor the internet!
-        customer = Stripe::Customer.create({
-          email: 'johnny@appleseed.com',
-          card: 'void_card_token'
-        })
-        expect(customer.email).to eq('johnny@appleseed.com')
-      end
-    end
+    # This doesn't touch stripe's servers nor the internet!
+    customer = Stripe::Customer.create({
+      email: 'johnny@appleseed.com',
+      card: 'void_card_token'
+    })
+    expect(customer.email).to eq('johnny@appleseed.com')
+  end
+end
+```
 
 ## TODO
 
