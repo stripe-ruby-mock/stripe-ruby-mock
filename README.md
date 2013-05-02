@@ -1,6 +1,6 @@
 # stripe-ruby-mock
 
-* Homepage: https://github.com/mindeavor/stripe-ruby-mock#readme
+* Homepage: https://github.com/mindeavor/stripe-ruby-mock
 * Issues: https://github.com/mindeavor/stripe-ruby-mock/issues
 
 ## Install
