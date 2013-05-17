@@ -1,6 +1,21 @@
 module StripeMock
   class Instance
 
+    # Handlers are ordered by priority
+    @@handlers = []
+
+    def self.add_handler(route, name)
+      @@handlers << {
+        :route => %r{^#{route}$},
+        :name => name
+      }
+    end
+
+    include StripeMock::RequestHandlers::Charges
+    include StripeMock::RequestHandlers::Customers
+    include StripeMock::RequestHandlers::InvoiceItems
+
+
     attr_reader :charges, :customers
 
     def initialize
@@ -12,33 +27,11 @@ module StripeMock
     def mock_request(method, url, api_key, params={}, headers={})
       return {} if method == :xtest
 
-      # Ordered from most specific to least specific
-      case "#{method} #{url}"
+      method_url = "#{method} #{url}"
+      handler = @@handlers.find {|h| method_url =~ h[:route] }
 
-      when 'post /v1/charges'
-        id = new_id
-        charges[id] = Data.test_charge(params.merge :id => id)
-
-      when 'post /v1/customers'
-        id = new_id
-        customers[id] = Data.test_customer(params.merge :id => id)
-
-      when 'post /v1/invoiceitems'
-        Data.test_invoice(params)
-
-      when %r{post /v1/customers/(.*)/subscription}
-        Data.test_subscription(params[:plan])
-
-      when %r{post /v1/customers/(.*)}
-        customers[$1] ||= Data.test_customer(:id => $1)
-        customers[$1].merge!(params)
-
-      when %r{get /v1/charges/(.*)}
-        charges[$1] ||= Data.test_charge(:id => $1)
-
-      when %r{get /v1/customers/(.*)}
-        customers[$1] ||= Data.test_customer(:id => $1)
-
+      if handler
+        self.send  handler[:name],  handler[:route], method_url, params, headers
       else
         puts "WARNING: Unrecognized method + url: [#{method} #{url}]"
         puts " params: #{params}"
