@@ -1,10 +1,11 @@
 module StripeMock
   class Instance
 
-    attr_reader :customers
+    attr_reader :charges, :customers
 
     def initialize
       @customers = {}
+      @charges = {}
       @id_counter = 0
     end
 
@@ -13,6 +14,10 @@ module StripeMock
 
       # Ordered from most specific to least specific
       case "#{method} #{url}"
+
+      when 'post /v1/charges'
+        id = new_id
+        charges[id] = Data.test_charge(params.merge :id => id)
 
       when 'post /v1/customers'
         id = new_id
@@ -27,6 +32,9 @@ module StripeMock
       when %r{post /v1/customers/(.*)}
         customers[$1] ||= Data.test_customer(:id => $1)
         customers[$1].merge!(params)
+
+      when %r{get /v1/charges/(.*)}
+        charges[$1] ||= Data.test_charge(:id => $1)
 
       when %r{get /v1/customers/(.*)}
         customers[$1] ||= Data.test_customer(:id => $1)
