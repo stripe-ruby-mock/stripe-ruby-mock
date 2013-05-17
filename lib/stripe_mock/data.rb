@@ -44,24 +44,43 @@ module StripeMock
 
     def self.test_charge(params={})
       {
-        :refunded => false,
-        :paid => true,
-        :amount => 100,
-        :card => {
-          :type => "Visa",
-          :last4 => "4242",
-          :exp_month => 11,
-          :country => "US",
-          :exp_year => 2012,
-          :id => "cc_test_card",
-          :object => "card"
+        id: "ch_1fD6uiR9FAA2zc",
+        object: "charge",
+        created: 1366194027,
+        livemode: false,
+        paid: true,
+        amount: 0,
+        currency: "usd",
+        refunded: false,
+        fee: 0,
+        fee_details: [
+        ],
+        card: {
+          object: "card",
+          last4: "4242",
+          type: "Visa",
+          exp_month: 12,
+          exp_year: 2013,
+          fingerprint: "3TQGpK9JoY1GgXPw",
+          country: "US",
+          name: "name",
+          address_line1: nil,
+          address_line2: nil,
+          address_city: nil,
+          address_state: nil,
+          address_zip: nil,
+          address_country: nil,
+          cvc_check: nil,
+          address_line1_check: nil,
+          address_zip_check: nil
         },
-        :id => "ch_test_charge",
-        :reason => "execute_charge",
-        :livemode => false,
-        :currency => "usd",
-        :object => "charge",
-        :created => 1304114826
+        captured: false,
+        failure_message: nil,
+        amount_refunded: 0,
+        customer: nil,
+        invoice: nil,
+        description: nil,
+        dispute: nil
       }.merge(params)
     end
 
