@@ -5,7 +5,7 @@ describe 'Customer API' do
   before { StripeMock.start }
   after  { StripeMock.stop }
 
-  it "should create a stripe customer" do
+  it "creates a stripe customer" do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
       card: 'some_card_token',
@@ -15,7 +15,7 @@ describe 'Customer API' do
     expect(customer.description).to eq('a description')
   end
 
-  it "should store a created stripe customer in memory" do
+  it "stores a created stripe customer in memory" do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
       card: 'some_card_token'
@@ -32,7 +32,7 @@ describe 'Customer API' do
     expect(data[customer2.id][:email]).to eq('bob@bobbers.com')
   end
 
-  it "should retrieve a stripe customer" do
+  it "retrieves a stripe customer" do
     original = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
       card: 'some_card_token'
@@ -43,14 +43,14 @@ describe 'Customer API' do
     expect(customer.email).to eq(original.email)
   end
 
-  it "should retrieve a stripe customer with an id that doesn't exist" do
+  it "retrieves a stripe customer with an id that doesn't exist" do
     customer = Stripe::Customer.retrieve('test_customer_x')
     expect(customer.id).to eq('test_customer_x')
     expect(customer.email).to_not be_nil
     expect(customer.description).to_not be_nil
   end
 
-  it "should update a stripe customer" do
+  it "updates a stripe customer" do
     original = Stripe::Customer.retrieve("test_customer_update")
     email = original.email
 
@@ -65,7 +65,7 @@ describe 'Customer API' do
     expect(customer.description).to eq('new desc')
   end
 
-  it "should update a stripe customer's subscription" do
+  it "updates a stripe customer's subscription" do
     customer = Stripe::Customer.retrieve("test_customer_sub")
     sub = customer.update_subscription({ :plan => 'silver' })
 

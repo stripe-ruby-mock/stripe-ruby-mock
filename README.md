@@ -31,7 +31,7 @@ describe MyApp do
   before { StripeMock.start }
   after { StripeMock.stop }
 
-  it "should create a stripe customer" do
+  it "creates a stripe customer" do
 
     # This doesn't touch stripe's servers nor the internet!
     customer = Stripe::Customer.create({

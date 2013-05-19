@@ -5,7 +5,7 @@ describe 'Invoice Item API' do
   before { StripeMock.start }
   after  { StripeMock.stop }
 
-  it "should create a stripe invoice item" do
+  it "creates a stripe invoice item" do
     invoice_item = Stripe::InvoiceItem.create({
       amount: 1099,
       customer: 1234,

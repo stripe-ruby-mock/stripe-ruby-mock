@@ -5,7 +5,7 @@ describe 'Charge API' do
   before { StripeMock.start }
   after  { StripeMock.stop }
 
-  it "should create a stripe charge item with a card token" do
+  it "creates a stripe charge item with a card token" do
     charge = Stripe::Charge.create(
       amount: 999,
       currency: 'USD',
@@ -18,7 +18,7 @@ describe 'Charge API' do
   end
 
 
-  it "should store a created stripe charge in memory" do
+  it "stores a created stripe charge in memory" do
     charge = Stripe::Charge.create({
       amount: 333,
       currency: 'USD',
@@ -38,7 +38,7 @@ describe 'Charge API' do
   end
 
 
-  it "should retrieve a stripe charge" do
+  it "retrieves a stripe charge" do
     original = Stripe::Charge.create({
       amount: 777,
       currency: 'USD',
@@ -51,7 +51,7 @@ describe 'Charge API' do
   end
 
 
-  it "should retrieve a stripe charge with an id that doesn't exist" do
+  it "retrieves a stripe charge with an id that doesn't exist" do
     charge = Stripe::Charge.retrieve('test_charge_x')
     expect(charge.id).to eq('test_charge_x')
     expect(charge.amount).to_not be_nil
