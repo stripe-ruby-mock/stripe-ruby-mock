@@ -17,15 +17,22 @@ module StripeMock
 
 
     attr_reader :charges, :customers
+    attr_accessor :pending_error
 
     def initialize
       @customers = {}
       @charges = {}
       @id_counter = 0
+      @pending_error = nil
     end
 
     def mock_request(method, url, api_key, params={}, headers={})
       return {} if method == :xtest
+
+      if @pending_error
+        raise @pending_error
+        @pending_error = nil
+      end
 
       method_url = "#{method} #{url}"
       handler = @@handlers.find {|h| method_url =~ h[:route] }
