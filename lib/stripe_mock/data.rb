@@ -198,6 +198,20 @@ module StripeMock
       }
     end
 
+    def self.test_plan(params={})
+      {
+        interval: "month",
+        name: "The Basic Plan",
+        amount: 2300,
+        currency: "usd",
+        id: "2",
+        object: "plan",
+        livemode: false,
+        interval_count: 1,
+        trial_period_days: nil
+      }.merge(params)
+    end
+
     def self.test_recipient(params={})
       {
         :name => "Stripe User",

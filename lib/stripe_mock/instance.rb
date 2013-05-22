@@ -14,14 +14,17 @@ module StripeMock
     include StripeMock::RequestHandlers::Charges
     include StripeMock::RequestHandlers::Customers
     include StripeMock::RequestHandlers::InvoiceItems
+    include StripeMock::RequestHandlers::Plans
 
 
-    attr_reader :charges, :customers
+    attr_reader :charges, :customers, :plans
     attr_accessor :pending_error
 
     def initialize
       @customers = {}
       @charges = {}
+      @plans = {}
+
       @id_counter = 0
       @pending_error = nil
     end
