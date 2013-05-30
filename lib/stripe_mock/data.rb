@@ -297,6 +297,13 @@ module StripeMock
       }
     end
 
+    def self.test_delete_subscription(id)
+      {
+        id: id,
+        deleted: true
+      }
+    end
+
     def self.test_api_error
       {
         :error => {
