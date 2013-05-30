@@ -73,4 +73,11 @@ describe 'Customer API' do
     expect(sub.plan.id).to eq('silver')
   end
 
+  it "cancels a stripe customers subscription" do
+    customer = Stripe::Customer.retrieve("test_customer_sub")
+    sub = customer.cancel_subscription
+
+    expect(sub.deleted).to eq(true)
+  end
+
 end
