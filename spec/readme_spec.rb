@@ -42,4 +42,17 @@ describe 'README examples' do
     end
   end
 
+  it "has built-in card errors" do
+    StripeMock.prepare_card_error(:incorrect_number)
+    StripeMock.prepare_card_error(:invalid_number)
+    StripeMock.prepare_card_error(:invalid_expiry_month)
+    StripeMock.prepare_card_error(:invalid_expiry_year)
+    StripeMock.prepare_card_error(:invalid_cvc)
+    StripeMock.prepare_card_error(:expired_card)
+    StripeMock.prepare_card_error(:incorrect_cvc)
+    StripeMock.prepare_card_error(:card_declined)
+    StripeMock.prepare_card_error(:missing)
+    StripeMock.prepare_card_error(:processing_error)
+  end
+
 end

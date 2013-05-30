@@ -45,7 +45,7 @@ end
 
 ## Mocking Errors
 
-Tired of manually inputting fake credit card numbers to test against errors? Consider it a thing of the past!
+Tired of manually inputting fake credit card numbers to test against errors? Tire no longer!
 
 ```ruby
 it "mocks a declined card error" do
@@ -79,11 +79,28 @@ it "raises a custom error" do
 end
 ```
 
+### Built-In Card Errors
+
+```ruby
+StripeMock.prepare_card_error(:incorrect_number)
+StripeMock.prepare_card_error(:invalid_number)
+StripeMock.prepare_card_error(:invalid_expiry_month)
+StripeMock.prepare_card_error(:invalid_expiry_year)
+StripeMock.prepare_card_error(:invalid_cvc)
+StripeMock.prepare_card_error(:expired_card)
+StripeMock.prepare_card_error(:incorrect_cvc)
+StripeMock.prepare_card_error(:card_declined)
+StripeMock.prepare_card_error(:missing)
+StripeMock.prepare_card_error(:processing_error)
+```
+
+You can see the details of each error in [lib/stripe_mock/api/errors.rb](lib/stripe_mock/api/errors.rb)
+
 ## TODO
 
 * Cover all stripe urls/methods
 * Create hash for storing/retrieving all stripe objects in-memory
-  * Currently implemented for: **Customers** and **Charges**
+  * Currently implemented for: **Customers**, **Charges**, and **Plans**
 
 ## Copyright
 
