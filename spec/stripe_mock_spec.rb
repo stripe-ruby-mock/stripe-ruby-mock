@@ -27,4 +27,14 @@ describe StripeMock do
     StripeMock.stop
   end
 
+  it "throws an error when trying to prepare an error before starting" do
+    expect { StripeMock.prepare_error(StandardError.new) }.to raise_error {|e|
+      expect(e).to be_a(StripeMock::UninitializedInstanceError)
+    }
+
+    expect { StripeMock.prepare_card_error(:card_declined) }.to raise_error {|e|
+      expect(e).to be_a(StripeMock::UninitializedInstanceError)
+    }
+  end
+
 end

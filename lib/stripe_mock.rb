@@ -3,6 +3,9 @@ require 'ostruct'
 require 'stripe_mock/version'
 require 'stripe_mock/data'
 
+require 'stripe_mock/errors/stripe_mock_error'
+require 'stripe_mock/errors/uninitialized_instance_error'
+
 require 'stripe_mock/api/instance'
 require 'stripe_mock/api/errors'
 

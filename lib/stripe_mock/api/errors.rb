@@ -1,13 +1,13 @@
 module StripeMock
 
   def self.prepare_error(stripe_error)
+    raise UninitializedInstanceError if instance.nil?
     instance.pending_error = stripe_error
   end
 
   def self.prepare_card_error(code)
-    return if instance.nil?
     args = card_error_args[code]
-    instance.pending_error = Stripe::CardError.new(*args)
+    self.prepare_error  Stripe::CardError.new(*args)
   end
 
   private
