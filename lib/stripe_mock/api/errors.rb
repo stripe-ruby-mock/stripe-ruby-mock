@@ -7,6 +7,7 @@ module StripeMock
 
   def self.prepare_card_error(code)
     args = card_error_args[code]
+    raise StripeMockError.new("Unrecognized stripe card error code: #{code}") if args.nil?
     self.prepare_error  Stripe::CardError.new(*args)
   end
 

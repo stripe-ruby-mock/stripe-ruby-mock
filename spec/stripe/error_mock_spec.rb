@@ -69,6 +69,12 @@ describe 'Stripe Error Mocking' do
   # Card Error Helper Methods
   # # # # # # # # # # # # # #
 
+  it "raises an error for an unrecognized card error code" do
+    expect { StripeMock.prepare_card_error(:non_existant_error_code) }.to raise_error {|e|
+      expect(e).to be_a(StripeMock::StripeMockError)
+    }
+  end
+
   it "mocks an incorrect number card error" do
     StripeMock.prepare_card_error(:incorrect_number)
     expect_card_error 'incorrect_number', 'number'
