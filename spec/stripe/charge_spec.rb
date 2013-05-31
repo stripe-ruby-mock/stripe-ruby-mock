@@ -50,12 +50,45 @@ describe 'Charge API' do
     expect(charge.amount).to eq(original.amount)
   end
 
-
   it "retrieves a stripe charge with an id that doesn't exist" do
     charge = Stripe::Charge.retrieve('test_charge_x')
     expect(charge.id).to eq('test_charge_x')
     expect(charge.amount).to_not be_nil
     expect(charge.card).to_not be_nil
+  end
+
+  describe 'captured status value' do
+    it "reports captured by default" do
+      charge = Stripe::Charge.create({
+        amount: 777,
+        currency: 'USD',
+        card: 'card_token_abc'
+      })
+
+      expect(charge.captured).to be_true
+    end
+
+    it "reports captured if capture requested" do
+      charge = Stripe::Charge.create({
+        amount: 777,
+        currency: 'USD',
+        card: 'card_token_abc',
+        capture: true
+      })
+
+      expect(charge.captured).to be_true
+    end
+
+    it "reports not captured if capture: false requested" do
+      charge = Stripe::Charge.create({
+        amount: 777,
+        currency: 'USD',
+        card: 'card_token_abc',
+        capture: false
+      })
+
+      expect(charge.captured).to be_false
+    end
   end
 
 end

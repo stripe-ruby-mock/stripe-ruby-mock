@@ -74,7 +74,7 @@ module StripeMock
           address_line1_check: nil,
           address_zip_check: nil
         },
-        captured: false,
+        captured: params.has_key?(:capture) ? params[:capture] : true,
         failure_message: nil,
         amount_refunded: 0,
         customer: nil,
