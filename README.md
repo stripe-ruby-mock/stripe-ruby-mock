@@ -14,7 +14,7 @@
 
 ## Description
 
-** *WARNING: THIS LIBRARY IS INCOMPLETE* **
+** *WARNING: THIS LIBRARY IS INCOMPLETE AND IN ACTIVE DEVELOPMENT* **
 
 At its core, this library overrides [stripe-ruby's](https://github.com/stripe/stripe-ruby)
 request method to skip all http calls and
@@ -101,6 +101,8 @@ You can see the details of each error in [lib/stripe_mock/api/errors.rb](lib/str
 * Cover all stripe urls/methods
 * Create hash for storing/retrieving all stripe objects in-memory
   * Currently implemented for: **Customers**, **Charges**, and **Plans**
+* Throw useful errors that emulate Stripe's. For example:
+  * "You must supply either a card or a customer id" for `Stripe::Charge`
 
 ## Copyright
 
