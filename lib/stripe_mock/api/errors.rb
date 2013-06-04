@@ -14,7 +14,7 @@ module StripeMock
   private
 
   def self.card_error_args
-    @__map = {
+    @__map ||= {
       incorrect_number: ["The card number is incorrect", 'number', 'incorrect_number', 402],
       invalid_number: ["The card number is not a valid credit card number", 'number', 'invalid_number', 402],
       invalid_expiry_month: ["The card's expiration month is invalid", 'exp_month', 'invalid_expiry_month', 402],
