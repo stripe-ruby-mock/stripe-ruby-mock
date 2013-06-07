@@ -1,13 +1,9 @@
 module StripeMock
 
-  @first_start = true
   @instance = nil
+  @original_request_method = Stripe.method(:request)
 
   def self.start
-    if @first_start == true
-      @original_request_method = Stripe.method(:request)
-      @first_start = false
-    end
     @instance = Instance.new
     alias_stripe_method :request, @instance.method(:mock_request)
   end
