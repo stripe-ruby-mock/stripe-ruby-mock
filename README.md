@@ -24,7 +24,6 @@ without the need to actually hit stripe's servers.
 You can use stripe-ruby-mock with any ruby testing library. Here's a quick dummy example with RSpec:
 
 ```ruby
-require 'stripe'
 require 'stripe_mock'
 
 describe MyApp do
@@ -45,7 +44,7 @@ end
 
 ## Mocking Errors
 
-Tired of manually inputting fake credit card numbers to test against errors? Tire no longer!
+Tired of manually inputting fake credit card numbers to test against errors? Tire no more!
 
 ```ruby
 it "mocks a declined card error" do
@@ -96,13 +95,47 @@ StripeMock.prepare_card_error(:processing_error)
 
 You can see the details of each error in [lib/stripe_mock/api/errors.rb](lib/stripe_mock/api/errors.rb)
 
+## Running the Mock Server
+
+Sometimes you want your test stripe data to persist for a bit, such as during integration tests
+running on different processes. In such cases you'll want to start the stripe mock server:
+
+    $ stripe-mock-server # Default port is 4999
+    $ stripe-mock-server 4000
+
+Then, instead of `StripeMock.start`, you'll want to use `StripeMock.start_client`:
+
+```ruby
+describe MyApp do
+  before do
+    StripeMock.start_client
+  end
+
+  after do
+    # NOTE: this WILL NOT clear data from the server
+    StripeMock.stop_client
+  end
+end
+```
+
+This is all essentially the same as using `StripeMock.start`, except that the stripe test
+data is held in its own server process.
+
+Here are some other neat things you can do with the server:
+
+```ruby
+StripeMock.clear_server
+StripeMock.stop_client(true) # Passing `true` automatically calls #clear_server
+StripeMock.get_server_data(:customers) # Also works for :charges, :plans, etc.
+```
+
 ## TODO
 
 * Cover all stripe urls/methods
 * Create hash for storing/retrieving all stripe objects in-memory
   * Currently implemented for: **Customers**, **Charges**, and **Plans**
-* Throw useful errors that emulate Stripe's. For example:
-  * "You must supply either a card or a customer id" for `Stripe::Charge`
+* Throw useful errors that emulate Stripe's
+  * For example: "You must supply either a card or a customer id" for `Stripe::Charge`
 
 ## Copyright
 

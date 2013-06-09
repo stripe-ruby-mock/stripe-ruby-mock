@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+lib = File.expand_path(File.dirname(__FILE__) + '/../lib')
+$LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
+
+args = ARGV.dup
+ARGV.clear
+port = (args.shift || 4999).to_i
+
+require 'stripe_mock'
+require 'stripe_mock/server'
+
+StripeMock.start_server(port)
