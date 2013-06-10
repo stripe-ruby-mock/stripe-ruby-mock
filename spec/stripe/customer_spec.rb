@@ -11,6 +11,7 @@ describe 'Customer API' do
       card: 'some_card_token',
       description: "a description"
     })
+    expect(customer.id).to match(/^test_cus/)
     expect(customer.email).to eq('johnny@appleseed.com')
     expect(customer.description).to eq('a description')
   end

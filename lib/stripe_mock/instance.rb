@@ -59,9 +59,9 @@ module StripeMock
 
     private
 
-    def new_id
+    def new_id(prefix)
       # Stripe ids must be strings
-      (@id_counter += 1).to_s
+      "test_#{prefix}_#{@id_counter += 1}"
     end
 
   end

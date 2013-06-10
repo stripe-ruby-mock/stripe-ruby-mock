@@ -11,7 +11,7 @@ module StripeMock
       end
 
       def new_customer(route, method_url, params, headers)
-        id = new_id
+        id = new_id('cus')
         customers[id] = Data.test_customer(params.merge :id => id)
       end
 

@@ -13,6 +13,7 @@ describe 'Charge API' do
       description: 'card charge'
     )
 
+    expect(charge.id).to match(/^test_ch/)
     expect(charge.amount).to eq(999)
     expect(charge.description).to eq('card charge')
   end

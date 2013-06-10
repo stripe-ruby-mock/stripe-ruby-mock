@@ -8,7 +8,7 @@ module StripeMock
       end
 
       def new_charge(route, method_url, params, headers)
-        id = new_id
+        id = new_id('ch')
         charges[id] = Data.test_charge(params.merge :id => id)
       end
 
