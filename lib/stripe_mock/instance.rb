@@ -18,7 +18,7 @@ module StripeMock
 
 
     attr_reader :charges, :customers, :plans
-    attr_accessor :pending_error
+    attr_accessor :pending_error, :debug
 
     def initialize
       @customers = {}
@@ -27,10 +27,16 @@ module StripeMock
 
       @id_counter = 0
       @pending_error = nil
+      @debug = false
     end
 
     def mock_request(method, url, api_key, params={}, headers={})
       return {} if method == :xtest
+
+      if @debug == true
+        puts "[StripeMock req] #{method} #{url}"
+        puts "                 #{params}"
+      end
 
       if @pending_error
         raise @pending_error
@@ -41,7 +47,9 @@ module StripeMock
       handler = @@handlers.find {|h| method_url =~ h[:route] }
 
       if handler
-        self.send  handler[:name],  handler[:route], method_url, params, headers
+        self.send(handler[:name], handler[:route], method_url, params, headers).tap {|json|
+          puts "[StripeMock res] #{json}" if @debug == true
+        }
       else
         puts "WARNING: Unrecognized method + url: [#{method} #{url}]"
         puts " params: #{params}"

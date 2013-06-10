@@ -22,6 +22,10 @@ module StripeMock
     @client.get_data(key)
   end
 
+  def self.set_server_debug(toggle)
+    @client.set_debug(toggle)
+  end
+
   def self.clear_server
     @client.clear
   rescue Errno::ECONNREFUSED => e

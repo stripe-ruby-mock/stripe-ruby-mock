@@ -47,6 +47,19 @@ describe 'StripeMock Server' do
     server_customer_data = StripeMock.get_server_data(:customers)[customer.id]
     expect(server_customer_data).to_not be_nil
     expect(server_customer_data['email']).to eq('johnny@appleseed.com')
+
+    StripeMock.stop_client
+  end
+
+
+  it "can toggle debug" do
+    StripeMock.start_client
+
+    StripeMock.set_server_debug(true)
+    StripeMock.set_server_debug(false)
+    StripeMock.set_server_debug(true)
+
+    StripeMock.stop_client
   end
 
 
