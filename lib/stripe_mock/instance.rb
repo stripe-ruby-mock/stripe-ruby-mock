@@ -33,6 +33,9 @@ module StripeMock
     def mock_request(method, url, api_key, params={}, headers={})
       return {} if method == :xtest
 
+      # Ensure params hash has symbols as keys
+      params = params.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+
       if @debug == true
         puts "[StripeMock req] #{method} #{url}"
         puts "                 #{params}"
