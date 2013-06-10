@@ -22,5 +22,6 @@ module StripeMock
   end
 
   def self.instance; @instance; end
+  def self.state; @state; end
 
 end
