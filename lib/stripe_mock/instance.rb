@@ -34,7 +34,7 @@ module StripeMock
       return {} if method == :xtest
 
       # Ensure params hash has symbols as keys
-      params = params.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+      params = Stripe::Util.symbolize_names(params)
 
       if @debug == true
         puts "[StripeMock req] #{method} #{url}"
