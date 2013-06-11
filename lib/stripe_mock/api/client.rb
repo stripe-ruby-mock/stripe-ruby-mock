@@ -35,7 +35,7 @@ module StripeMock
   private
 
   def self.redirect_to_mock_server(method, url, api_key, params={}, headers={})
-    @client.mock_request(method, url, api_key, params, headers)
+    Stripe::Util.symbolize_names @client.mock_request(method, url, api_key, params, headers)
   rescue Errno::ECONNREFUSED => e
     raise StripeMock::ServerTimeoutError.new(e)
   rescue StandardError => e
