@@ -29,7 +29,7 @@ module StripeMock
 
     def close!
       @state = 'closed'
-      StripeMock.stop_client(:clear_data => false)
+      StripeMock.stop_client(:clear_server_data => false)
     end
 
     def timeout_wrap

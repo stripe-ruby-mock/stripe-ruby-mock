@@ -117,7 +117,7 @@ describe MyApp do
     # Alternatively:
     #
     # @client.close!
-    # StripeMock.stop_client(:clear_data => true)
+    # StripeMock.stop_client(:clear_server_data => true)
   end
 end
 ```
