@@ -108,12 +108,16 @@ Then, instead of `StripeMock.start`, you'll want to use `StripeMock.start_client
 ```ruby
 describe MyApp do
   before do
-    StripeMock.start_client
+    @client = StripeMock.start_client
   end
 
   after do
-    # NOTE: this WILL NOT clear data from the server
     StripeMock.stop_client
+    #
+    # Alternatively:
+    #
+    # @client.close!
+    # StripeMock.stop_client(:clear_data => true)
   end
 end
 ```
@@ -121,12 +125,17 @@ end
 This is all essentially the same as using `StripeMock.start`, except that the stripe test
 data is held in its own server process.
 
-Here are some other neat things you can do with the server:
+Here are some other neat things you can do with the client:
 
 ```ruby
-StripeMock.clear_server
-StripeMock.stop_client(true) # Passing `true` automatically calls #clear_server
-StripeMock.get_server_data(:customers) # Also works for :charges, :plans, etc.
+@client.state #=> 'ready'
+
+@client.set_server_debug(true)
+@client.get_server_data(:customers) # Also works for :charges, :plans, etc.
+@client.clear_server_data
+
+@client.close!
+@client.state #=> 'closed'
 ```
 
 ## TODO

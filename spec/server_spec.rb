@@ -17,8 +17,11 @@ describe 'StripeMock Server' do
   end
 
 
-  before { StripeMock.start_client }
-  after  { StripeMock.stop_client }
+  before do
+    @client = StripeMock.start_client
+  end
+
+  after { StripeMock.stop_client }
 
 
   it "uses an RPC client for mock requests" do
@@ -38,28 +41,49 @@ describe 'StripeMock Server' do
     customer = Stripe::Customer.create(email: 'johnny@appleseed.com')
     expect(customer.email).to eq('johnny@appleseed.com')
 
-    server_customer_data = StripeMock.get_server_data(:customers)[customer.id]
+    server_customer_data = StripeMock.client.get_server_data(:customers)[customer.id]
     expect(server_customer_data).to_not be_nil
     expect(server_customer_data['email']).to eq('johnny@appleseed.com')
 
     StripeMock.stop_client
     StripeMock.start_client
 
-    server_customer_data = StripeMock.get_server_data(:customers)[customer.id]
+    server_customer_data = StripeMock.client.get_server_data(:customers)[customer.id]
     expect(server_customer_data).to_not be_nil
     expect(server_customer_data['email']).to eq('johnny@appleseed.com')
   end
+
 
   it "returns a response with symbolized hash keys" do
     response = StripeMock.redirect_to_mock_server('get', '/v1/plans/x', 'xxx')
     response.keys.each {|k| expect(k).to be_a(Symbol) }
   end
 
-  it "can toggle debug" do
 
-    StripeMock.set_server_debug(true)
-    StripeMock.set_server_debug(false)
-    StripeMock.set_server_debug(true)
+  it "can toggle debug" do
+    StripeMock.client.set_server_debug(true)
+    StripeMock.client.set_server_debug(false)
+    StripeMock.client.set_server_debug(true)
+  end
+
+
+  it "raises an error when client is stopped" do
+    expect(@client).to be_a StripeMock::Client
+    expect(@client.state).to eq('ready')
+
+    StripeMock.stop_client
+    expect(@client.state).to eq('closed')
+    expect { @client.clear_server_data }.to raise_error StripeMock::ClosedClientConnectionError
+  end
+
+
+  it "raises an error when client connection is closed" do
+    expect(@client).to be_a StripeMock::Client
+    expect(@client.state).to eq('ready')
+
+    @client.close!
+    expect(@client.state).to eq('closed')
+    expect(StripeMock.stop_client).to eq(false)
   end
 
 
