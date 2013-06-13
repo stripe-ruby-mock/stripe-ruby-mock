@@ -101,7 +101,8 @@ Sometimes you want your test stripe data to persist for a bit, such as during in
 running on different processes. In such cases you'll want to start the stripe mock server:
 
     $ stripe-mock-server # Default port is 4999
-    $ stripe-mock-server 4000
+    $ stripe-mock-server -p 4000
+    $ stripe-mock-server --help
 
 Then, instead of `StripeMock.start`, you'll want to use `StripeMock.start_client`:
 

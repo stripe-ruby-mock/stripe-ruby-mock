@@ -6,7 +6,7 @@ describe 'StripeMock Server' do
     Dante::Runner.new('stripe-mock-server').execute(
       :daemonize => true, :pid_path => './stripe-mock-server.pid'
     ){
-      StripeMock.start_server(4999)
+      StripeMock.start_server(port: 4999)
     }
   end
 

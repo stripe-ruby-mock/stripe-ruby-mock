@@ -3,11 +3,11 @@ require 'jimson-temp'
 
 module StripeMock
 
-  def self.start_server(port=4999)
+  def self.start_server(opts)
     server = Jimson::Server.new(Server.new,
-      :host => '0.0.0.0',
-      :port => port,
-      :server => :thin,
+      :host => opts[:host] || '0.0.0.0',
+      :port => opts[:port] || 4999,
+      :server => opts[:server] || :thin,
       :show_errors => true
     )
     server.start
