@@ -100,9 +100,11 @@ You can see the details of each error in [lib/stripe_mock/api/errors.rb](lib/str
 Sometimes you want your test stripe data to persist for a bit, such as during integration tests
 running on different processes. In such cases you'll want to start the stripe mock server:
 
-    $ stripe-mock-server # Default port is 4999
-    $ stripe-mock-server -p 4000
-    $ stripe-mock-server --help
+    # spec_helper.rb
+    #
+    # The mock server will automatically be killed when your tests are done running.
+    #
+    StripeMock.spawn_server
 
 Then, instead of `StripeMock.start`, you'll want to use `StripeMock.start_client`:
 
@@ -138,6 +140,30 @@ Here are some other neat things you can do with the client:
 @client.close!
 @client.state #=> 'closed'
 ```
+
+### Mock Server Options
+
+```ruby
+# NOTE: Shown below are the default options
+StripeMock.default_server_pid_path = './stripe-mock-server.pid'
+
+StripeMock.spawn_server(
+  :pid_path => StripeMock.default_server_pid_path,
+  :host => '0.0.0.0',
+  :port => 4999,
+  :server => :thin
+)
+
+StripeMock.kill_server(StripeMock.default_server_pid_path)
+```
+
+### Mock Server Command
+
+If you need the mock server to continue running even after your tests are done,
+you'll want to use the executable:
+
+    $ stripe-mock-server -p 4000
+    $ stripe-mock-server --help
 
 ## TODO
 
