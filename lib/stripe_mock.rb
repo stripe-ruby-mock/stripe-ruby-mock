@@ -1,5 +1,7 @@
 require 'ostruct'
 require 'jimson-temp'
+require 'dante'
+
 require 'stripe'
 
 require 'stripe_mock/version'
@@ -11,9 +13,11 @@ require 'stripe_mock/errors/server_timeout_error'
 require 'stripe_mock/errors/closed_client_connection_error'
 
 require 'stripe_mock/client'
+require 'stripe_mock/server'
 
 require 'stripe_mock/api/instance'
 require 'stripe_mock/api/client'
+require 'stripe_mock/api/server'
 require 'stripe_mock/api/errors'
 
 require 'stripe_mock/request_handlers/charges.rb'

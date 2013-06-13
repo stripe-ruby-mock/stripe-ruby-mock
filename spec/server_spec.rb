@@ -3,17 +3,11 @@ require 'spec_helper'
 describe 'StripeMock Server' do
 
   before(:all) do
-    Dante::Runner.new('stripe-mock-server').execute(
-      :daemonize => true, :pid_path => './stripe-mock-server.pid'
-    ){
-      StripeMock.start_server(port: 4999)
-    }
+    StripeMock.spawn_server
   end
 
   after(:all) do
-    Dante::Runner.new('stripe-mock-server').execute(
-      :kill => true, :pid_path => './stripe-mock-server.pid'
-    )
+    StripeMock.kill_server
   end
 
 

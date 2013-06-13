@@ -3,18 +3,18 @@ require 'jimson-temp'
 
 module StripeMock
 
-  def self.start_server(opts)
-    server = Jimson::Server.new(Server.new,
-      :host => opts[:host] || '0.0.0.0',
-      :port => opts[:port] || 4999,
-      :server => opts[:server] || :thin,
-      :show_errors => true
-    )
-    server.start
-  end
-
   class Server
     extend Jimson::Handler
+
+    def self.start_new(opts)
+      server = Jimson::Server.new(Server.new,
+        :host => opts[:host] || '0.0.0.0',
+        :port => opts[:port] || 4999,
+        :server => opts[:server] || :thin,
+        :show_errors => true
+      )
+      server.start
+    end
 
     def initialize
       self.clear_data
