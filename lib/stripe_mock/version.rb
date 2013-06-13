@@ -1,4 +1,4 @@
 module StripeMock
   # stripe-ruby-mock version
-  VERSION = "1.8.3.4"
+  VERSION = "1.8.3.5"
 end
