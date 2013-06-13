@@ -73,6 +73,12 @@ describe 'StripeMock Server' do
   end
 
 
+  it "doesn't create multiple clients" do
+    result = StripeMock.start_client
+    expect(result.__id__).to eq(@client.__id__)
+  end
+
+
   it "raises an error when client is stopped" do
     expect(@client).to be_a StripeMock::Client
     expect(@client.state).to eq('ready')
