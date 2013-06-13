@@ -61,6 +61,18 @@ describe 'StripeMock Server' do
   end
 
 
+  it "can set the default server pid path" do
+    expect(StripeMock.default_server_pid_path).to eq('./stripe-mock-server.pid')
+
+    orig = StripeMock.default_server_pid_path
+    StripeMock.default_server_pid_path = 'abc'
+    expect(StripeMock.default_server_pid_path).to eq('abc')
+
+    # Set back to original for #kill_server to work properly
+    StripeMock.default_server_pid_path = orig
+  end
+
+
   it "raises an error when client is stopped" do
     expect(@client).to be_a StripeMock::Client
     expect(@client.state).to eq('ready')
