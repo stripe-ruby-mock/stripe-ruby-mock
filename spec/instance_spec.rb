@@ -1,6 +1,11 @@
 require 'spec_helper'
+require_stripe_examples
 
 describe StripeMock::Instance do
+
+  it_behaves_like_stripe do
+    def test_data_source(type); StripeMock.instance.send(type); end
+  end
 
   before { StripeMock.start }
   after { StripeMock.stop }

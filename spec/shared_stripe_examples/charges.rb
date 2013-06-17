@@ -1,9 +1,6 @@
 require 'spec_helper'
 
-describe 'Charge API' do
-
-  before { StripeMock.start }
-  after  { StripeMock.stop }
+shared_examples 'Charge API' do
 
   it "creates a stripe charge item with a card token" do
     charge = Stripe::Charge.create(
@@ -30,7 +27,7 @@ describe 'Charge API' do
       currency: 'USD',
       card: 'card_token_777'
     })
-    data = StripeMock.instance.charges
+    data = test_data_source(:charges)
     expect(data[charge.id]).to_not be_nil
     expect(data[charge.id][:amount]).to eq(333)
 

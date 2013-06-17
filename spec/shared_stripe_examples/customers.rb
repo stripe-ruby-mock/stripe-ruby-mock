@@ -1,9 +1,6 @@
 require 'spec_helper'
 
-describe 'Customer API' do
-
-  before { StripeMock.start }
-  after  { StripeMock.stop }
+shared_examples 'Customer API' do
 
   it "creates a stripe customer" do
     customer = Stripe::Customer.create({
@@ -25,7 +22,7 @@ describe 'Customer API' do
       email: 'bob@bobbers.com',
       card: 'another_card_token'
     })
-    data = StripeMock.instance.customers
+    data = test_data_source(:customers)
     expect(data[customer.id]).to_not be_nil
     expect(data[customer.id][:email]).to eq('johnny@appleseed.com')
 

@@ -9,10 +9,7 @@ def expect_card_error(code, param)
   }
 end
 
-describe 'Stripe Error Mocking' do
-
-  before { StripeMock.start }
-  after  { StripeMock.stop }
+shared_examples 'Stripe Error Mocking' do
 
   it "mocks a manually gives stripe card error" do
 

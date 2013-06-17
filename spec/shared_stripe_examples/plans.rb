@@ -1,9 +1,6 @@
 require 'spec_helper'
 
-describe 'Plan API' do
-
-  before { StripeMock.start }
-  after  { StripeMock.stop }
+shared_examples 'Plan API' do
 
   it "creates a stripe plan" do
     plan = Stripe::Plan.create(
@@ -40,7 +37,7 @@ describe 'Plan API' do
       :currency => 'USD',
       :interval => 1
     )
-    data = StripeMock.instance.plans
+    data = test_data_source(:plans)
     expect(data[plan.id]).to_not be_nil
     expect(data[plan.id][:amount]).to eq(1100)
 
