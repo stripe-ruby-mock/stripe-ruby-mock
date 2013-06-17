@@ -1,6 +1,11 @@
 require 'spec_helper'
+require_stripe_examples
 
 describe 'StripeMock Server' do
+
+  it_behaves_like_stripe do
+    def test_data_source(type); StripeMock.client.get_server_data(type); end
+  end
 
   before(:all) do
     StripeMock.spawn_server
@@ -37,14 +42,14 @@ describe 'StripeMock Server' do
 
     server_customer_data = StripeMock.client.get_server_data(:customers)[customer.id]
     expect(server_customer_data).to_not be_nil
-    expect(server_customer_data['email']).to eq('johnny@appleseed.com')
+    expect(server_customer_data[:email]).to eq('johnny@appleseed.com')
 
     StripeMock.stop_client
     StripeMock.start_client
 
     server_customer_data = StripeMock.client.get_server_data(:customers)[customer.id]
     expect(server_customer_data).to_not be_nil
-    expect(server_customer_data['email']).to eq('johnny@appleseed.com')
+    expect(server_customer_data[:email]).to eq('johnny@appleseed.com')
   end
 
 

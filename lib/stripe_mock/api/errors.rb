@@ -1,8 +1,13 @@
 module StripeMock
 
   def self.prepare_error(stripe_error)
-    raise UninitializedInstanceError if instance.nil?
-    instance.pending_error = stripe_error
+    if @state == 'local'
+      instance.pending_error = stripe_error
+    elsif @state == 'remote'
+      @remote_state_pending_error = stripe_error
+    else
+      raise UnstartedStateError
+    end
   end
 
   def self.prepare_card_error(code)
