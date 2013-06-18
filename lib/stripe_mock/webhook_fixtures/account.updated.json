@@ -1,0 +1,24 @@
+{
+  "created": 1326853478,
+  "data": {
+    "object": {
+      "charge_enabled": false,
+      "currencies_supported": [
+        "USD"
+      ],
+      "details_submitted": true,
+      "email": "test@stripe.com",
+      "id": "acct_00000000000000",
+      "object": "account",
+      "statement_descriptor": "TEST",
+      "transfer_enabled": false
+    },
+    "previous_attributes": {
+      "details_submitted": false
+    }
+  },
+  "id": "evt_00000000000000",
+  "livemode": false,
+  "object": "event",
+  "type": "account.updated"
+}

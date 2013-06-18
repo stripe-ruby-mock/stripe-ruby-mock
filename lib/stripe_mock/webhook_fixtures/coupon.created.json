@@ -1,0 +1,22 @@
+{
+  "created": 1326853478,
+  "data": {
+    "object": {
+      "amount_off": null,
+      "currency": "usd",
+      "duration": "repeating",
+      "duration_in_months": 3,
+      "id": "25OFF_00000000000000",
+      "livemode": false,
+      "max_redemptions": null,
+      "object": "coupon",
+      "percent_off": 25,
+      "redeem_by": null,
+      "times_redeemed": 0
+    }
+  },
+  "id": "evt_00000000000000",
+  "livemode": false,
+  "object": "event",
+  "type": "coupon.created"
+}

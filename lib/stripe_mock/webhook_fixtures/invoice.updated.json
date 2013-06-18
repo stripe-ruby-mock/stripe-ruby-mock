@@ -1,0 +1,67 @@
+{
+  "created": 1326853478,
+  "data": {
+    "object": {
+      "amount_due": 0,
+      "attempt_count": 0,
+      "attempted": false,
+      "charge": null,
+      "closed": false,
+      "currency": "usd",
+      "customer": "cus_00000000000000",
+      "date": 1371501471,
+      "discount": null,
+      "ending_balance": null,
+      "id": "in_00000000000000",
+      "lines": {
+        "count": 1,
+        "data": [
+          {
+            "amount": 0,
+            "currency": "usd",
+            "description": null,
+            "id": "su_22Dpwn91jC18NU",
+            "livemode": true,
+            "object": "line_item",
+            "period": {
+              "end": 1371760671,
+              "start": 1371501471
+            },
+            "plan": {
+              "amount": 1000,
+              "currency": "usd",
+              "id": "1",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "name": "Cool Plan",
+              "object": "plan",
+              "trial_period_days": 3
+            },
+            "proration": false,
+            "quantity": 1,
+            "type": "subscription"
+          }
+        ],
+        "object": "list",
+        "url": "/v1/invoices/in_22Dp2xXO64B6ce/lines"
+      },
+      "livemode": false,
+      "next_payment_attempt": 1371505071,
+      "object": "invoice",
+      "paid": false,
+      "period_end": 1371501471,
+      "period_start": 1371501471,
+      "starting_balance": 0,
+      "subtotal": 0,
+      "total": 0
+    },
+    "previous_attributes": {
+      "lines": []
+    }
+  },
+  "id": "evt_00000000000000",
+  "livemode": false,
+  "object": "event",
+  "type": "invoice.updated"
+}

@@ -1,0 +1,47 @@
+{
+  "created": 1326853478,
+  "data": {
+    "object": {
+      "cancel_at_period_end": false,
+      "canceled_at": null,
+      "current_period_end": 1371760581,
+      "current_period_start": 1371501381,
+      "customer": "cus_00000000000000",
+      "ended_at": null,
+      "object": "subscription",
+      "plan": {
+        "amount": 1000,
+        "currency": "usd",
+        "id": "1_00000000000000",
+        "interval": "month",
+        "interval_count": 1,
+        "livemode": false,
+        "name": "Cool Plan",
+        "object": "plan",
+        "trial_period_days": 3
+      },
+      "quantity": 1,
+      "start": 1371501381,
+      "status": "trialing",
+      "trial_end": 1371760581,
+      "trial_start": 1371501381
+    },
+    "previous_attributes": {
+      "plan": {
+        "amount": 1000,
+        "currency": "usd",
+        "id": "OLD_PLAN_ID",
+        "interval": "month",
+        "interval_count": 1,
+        "livemode": false,
+        "name": "Old plan",
+        "object": "plan",
+        "trial_period_days": 3
+      }
+    }
+  },
+  "id": "evt_00000000000000",
+  "livemode": false,
+  "object": "event",
+  "type": "customer.subscription.updated"
+}

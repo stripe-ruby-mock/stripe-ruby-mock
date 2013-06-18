@@ -1,0 +1,21 @@
+{
+  "created": 1326853478,
+  "data": {
+    "object": {
+      "amount": 1000,
+      "charge": "ch_00000000000000",
+      "created": 1371500754,
+      "currency": "usd",
+      "evidence": "Here is some evidence",
+      "evidence_due_by": 1373155199,
+      "livemode": false,
+      "object": "dispute",
+      "reason": "general",
+      "status": "won"
+    }
+  },
+  "id": "evt_00000000000000",
+  "livemode": false,
+  "object": "event",
+  "type": "charge.dispute.closed"
+}

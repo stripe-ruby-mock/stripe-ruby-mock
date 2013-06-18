@@ -1,0 +1,34 @@
+{
+  "created": 1326853478,
+  "data": {
+    "object": {
+      "cancel_at_period_end": false,
+      "canceled_at": null,
+      "current_period_end": 1371760585,
+      "current_period_start": 1371501385,
+      "customer": "cus_00000000000000",
+      "ended_at": 1371420375,
+      "object": "subscription",
+      "plan": {
+        "amount": 1000,
+        "currency": "usd",
+        "id": "1_00000000000000",
+        "interval": "month",
+        "interval_count": 1,
+        "livemode": false,
+        "name": "Cool Plan",
+        "object": "plan",
+        "trial_period_days": 3
+      },
+      "quantity": 1,
+      "start": 1371501385,
+      "status": "canceled",
+      "trial_end": 1371760585,
+      "trial_start": 1371501385
+    }
+  },
+  "id": "evt_00000000000000",
+  "livemode": false,
+  "object": "event",
+  "type": "customer.subscription.deleted"
+}

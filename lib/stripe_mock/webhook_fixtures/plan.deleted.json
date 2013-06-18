@@ -1,0 +1,20 @@
+{
+  "created": 1326853478,
+  "data": {
+    "object": {
+      "amount": 1000,
+      "currency": "usd",
+      "id": "1_00000000000000",
+      "interval": "month",
+      "interval_count": 1,
+      "livemode": false,
+      "name": "Cool Plan",
+      "object": "plan",
+      "trial_period_days": 3
+    }
+  },
+  "id": "evt_00000000000000",
+  "livemode": false,
+  "object": "event",
+  "type": "plan.deleted"
+}

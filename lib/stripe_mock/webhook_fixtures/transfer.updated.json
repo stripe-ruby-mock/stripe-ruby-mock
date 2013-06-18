@@ -1,0 +1,26 @@
+{
+  "created": 1326853478,
+  "data": {
+    "object": {
+      "account": null,
+      "amount": 1100,
+      "currency": "usd",
+      "date": 1371513600,
+      "description": "Transfer to test@example.com",
+      "fee": 0,
+      "fee_details": [],
+      "id": "tr_00000000000000",
+      "livemode": true,
+      "object": "transfer",
+      "recipient": "rp_00000000000000",
+      "status": "pending"
+    },
+    "previous_attributes": {
+      "amount": 123
+    }
+  },
+  "id": "evt_00000000000000",
+  "livemode": false,
+  "object": "event",
+  "type": "transfer.updated"
+}
