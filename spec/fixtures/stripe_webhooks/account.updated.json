@@ -1,4 +1,7 @@
 {
   "id": "evt_123",
-  "type": "account.updated"
+  "type": "account.updated",
+  "data": {
+    "object": {}
+  }
 }

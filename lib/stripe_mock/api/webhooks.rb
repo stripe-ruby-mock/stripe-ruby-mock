@@ -15,7 +15,9 @@ module StripeMock
 
     json = Stripe::Util.symbolize_names(json)
     params = Stripe::Util.symbolize_names(params)
-    Stripe::Event.construct_from Util.rmerge(json, params)
+    json[:data][:object] = Util.rmerge(json[:data][:object], params)
+
+    Stripe::Event.construct_from(json)
   end
 
   module Webhooks

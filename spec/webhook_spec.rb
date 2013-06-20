@@ -38,29 +38,19 @@ describe 'Webhook Generation' do
     expect(event).to be_a(Stripe::Event)
   end
 
-  it "takes a hash and deep merges" do
-    event = StripeMock.mock_webhook_event('customer.created', {
-      :data => {
-        :object => {
-          :account_balance => 12345
-        }
-      }
-    })
+  it "takes a hash and deep merges into the data object" do
+    event = StripeMock.mock_webhook_event('customer.created', { :account_balance => 12345 })
     expect(event.data.object.account_balance).to eq(12345)
   end
 
-  it "takes a hash and deep merges arrays" do
+  it "takes a hash and deep merges arrays in the data object" do
     event = StripeMock.mock_webhook_event('invoice.created', {
-      :data => {
-        :object => {
-          :lines => {
-            :data => [
-              { :amount => 555,
-                :plan => { :id => 'wh_test' }
-              }
-            ]
+      :lines => {
+        :data => [
+          { :amount => 555,
+            :plan => { :id => 'wh_test' }
           }
-        }
+        ]
       }
     })
     expect(event.data.object.lines.data.first.amount).to eq(555)
