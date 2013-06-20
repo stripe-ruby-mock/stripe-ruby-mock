@@ -196,13 +196,10 @@ Also, you can override values whenever you create any webhook event:
 
 ```ruby
 it "can override default webhook values" do
+  # NOTE: given hash values get merged directly into event.data.object
   event = StripeMock.mock_webhook_event('customer.created', {
-    :data => {
-      :object => {
-        :id => 'cus_my_custom_value',
-        :email => 'joe@example.com'
-      }
-    }
+    :id => 'cus_my_custom_value',
+    :email => 'joe@example.com'
   })
   # Alternatively:
   # event.data.object.id = 'cus_my_custome_value'
