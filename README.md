@@ -165,6 +165,53 @@ you'll want to use the executable:
     $ stripe-mock-server -p 4000
     $ stripe-mock-server --help
 
+## Mocking Webhooks
+
+If your application handles stripe webhooks, you are most likely retrieving the event from
+stripe and passing the result to a handler. StripeMock helps you by easily mocking that event:
+
+```ruby
+it "mocks a stripe webhook" do
+  event = StripeMock.mock_webhook_event('customer.created')
+
+  customer_object = event.data.object
+  expect(customer_object.id).to_not be_nil
+  expect(customer_object.active_card).to_not be_nil
+  # etc.
+end
+```
+
+### Customizing Webhooks
+
+By default, StripeMock searches in your `spec/fixtures/stripe_webhooks/` folder for your own, custom webhooks.
+If it finds nothing, it falls back to [test events generated through stripe's webhooktester](lib/stripe_mock/webhook_fixtures/).
+
+You can name events whatever you like in your `spec/fixtures/stripe_webhooks/` folder. However, if you try to call a non-existant event that's not in that folder, StripeMock will throw an error.
+
+If you wish to use a different fixture path, you can call set it yourself:
+
+    StripeMock.webhook_fixture_path = './spec/other/folder/'
+
+Also, you can override values whenever you create any webhook event:
+
+```ruby
+it "can override default webhook values" do
+  event = StripeMock.mock_webhook_event('customer.created', {
+    :data => {
+      :object => {
+        :id => 'cus_my_custom_value',
+        :email => 'joe@example.com'
+      }
+    }
+  })
+  # Alternatively:
+  # event.data.object.id = 'cus_my_custome_value'
+  # event.data.object.email = 'joe@example.com'
+  expect(event.data.object.id).to eq('cus_my_custome_value')
+  expect(event.data.object.email).to eq('joe@example.com')
+end
+```
+
 ## TODO
 
 * Cover all stripe urls/methods

@@ -39,7 +39,9 @@ describe 'Webhook Generation' do
   end
 
   it "takes a hash and deep merges into the data object" do
-    event = StripeMock.mock_webhook_event('customer.created', { :account_balance => 12345 })
+    event = StripeMock.mock_webhook_event('customer.created', {
+      :account_balance => 12345
+    })
     expect(event.data.object.account_balance).to eq(12345)
   end
 

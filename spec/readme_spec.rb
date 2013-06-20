@@ -55,4 +55,25 @@ describe 'README examples' do
     StripeMock.prepare_card_error(:processing_error)
   end
 
+  it "mocks a stripe webhook" do
+    event = StripeMock.mock_webhook_event('customer.created')
+
+    customer_object = event.data.object
+    expect(customer_object.id).to_not be_nil
+    expect(customer_object.active_card).to_not be_nil
+    # etc.
+  end
+
+  it "can override default webhook values" do
+    event = StripeMock.mock_webhook_event('customer.created', {
+      :id => 'cus_my_custom_value',
+      :email => 'joe@example.com'
+    })
+    # Alternatively:
+    # event.data.object.id = 'cus_my_custom_value'
+    # event.data.object.email = 'joe@example.com'
+    expect(event.data.object.id).to eq('cus_my_custom_value')
+    expect(event.data.object.email).to eq('joe@example.com')
+  end
+
 end
