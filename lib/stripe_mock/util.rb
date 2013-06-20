@@ -20,4 +20,3 @@ module StripeMock
 
   end
 end
-

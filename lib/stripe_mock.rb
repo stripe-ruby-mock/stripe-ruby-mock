@@ -31,6 +31,12 @@ require 'stripe_mock/request_handlers/plans.rb'
 require 'stripe_mock/instance'
 
 module StripeMock
+
   lib_dir = File.expand_path(File.dirname(__FILE__), '../..')
-  @webhook_fixture_path = File.join(lib_dir, 'stripe_mock/webhook_fixtures')
+  @webhook_fixture_path = './spec/fixtures/stripe_webhooks/'
+  @webhook_fixture_fallback_path = File.join(lib_dir, 'stripe_mock/webhook_fixtures')
+
+  class << self
+    attr_accessor :webhook_fixture_path
+  end
 end

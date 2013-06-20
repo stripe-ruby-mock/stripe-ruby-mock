@@ -1,10 +1,17 @@
 module StripeMock
 
   def self.mock_webhook_event(type, params={})
-    unless Webhooks.event_list.include?(type)
-      raise UnsupportedRequestError.new "Unsupported webhook event `#{type}`"
+
+    fixture_file = File.join(@webhook_fixture_path, "#{type}.json")
+
+    if File.exists?(fixture_file) == false
+      unless Webhooks.event_list.include?(type)
+        raise UnsupportedRequestError.new "Unsupported webhook event `#{type}` (Searched in #{@webhook_fixture_path})"
+      end
+      fixture_file = File.join(@webhook_fixture_fallback_path, "#{type}.json")
     end
-    json = MultiJson.load  File.read  File.join(@webhook_fixture_path, "#{type}.json")
+
+    json = MultiJson.load  File.read(fixture_file)
 
     json = Stripe::Util.symbolize_names(json)
     params = Stripe::Util.symbolize_names(params)
