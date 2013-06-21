@@ -60,9 +60,21 @@ describe 'StripeMock Server' do
 
 
   it "can toggle debug" do
-    StripeMock.client.set_server_debug(true)
-    StripeMock.client.set_server_debug(false)
-    StripeMock.client.set_server_debug(true)
+    StripeMock.toggle_debug(true)
+    expect(@client.server_debug?).to eq(true)
+    StripeMock.toggle_debug(false)
+    expect(@client.server_debug?).to eq(false)
+  end
+
+
+  it "should toggle off debug when mock session ends" do
+    StripeMock.toggle_debug(true)
+
+    StripeMock.stop_client
+    expect(StripeMock.client).to be_nil
+
+    StripeMock.start_client
+    expect(StripeMock.client.server_debug?).to eq(false)
   end
 
 

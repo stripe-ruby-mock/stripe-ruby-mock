@@ -20,4 +20,21 @@ describe StripeMock::Instance do
     expect(res[:name]).to eq('String Plan')
   end
 
+  it "can toggle debug" do
+    StripeMock.toggle_debug(true)
+    expect(StripeMock.instance.debug).to eq(true)
+    StripeMock.toggle_debug(false)
+    expect(StripeMock.instance.debug).to eq(false)
+  end
+
+  it "should toggle off debug when mock session ends" do
+    StripeMock.toggle_debug(true)
+
+    StripeMock.stop
+    expect(StripeMock.instance).to be_nil
+
+    StripeMock.start
+    expect(StripeMock.instance.debug).to eq(false)
+  end
+
 end

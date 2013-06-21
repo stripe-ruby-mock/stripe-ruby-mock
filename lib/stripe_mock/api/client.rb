@@ -17,7 +17,7 @@ module StripeMock
 
     alias_stripe_method :request, @original_request_method
     @client.clear_server_data if opts[:clear_server_data] == true
-    @client.close
+    @client.cleanup
     @client = nil
     true
   end

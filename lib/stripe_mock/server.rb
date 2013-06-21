@@ -36,6 +36,10 @@ module StripeMock
       @instance.debug = toggle
     end
 
+    def debug?
+      @instance.debug
+    end
+
     def ping; true; end
   end
 
