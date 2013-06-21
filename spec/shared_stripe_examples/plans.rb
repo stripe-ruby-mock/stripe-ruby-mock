@@ -68,4 +68,14 @@ shared_examples 'Plan API' do
     expect(plan.interval).to_not be_nil
   end
 
+  it "retrieves all plans" do
+    Stripe::Plan.create({ id: 'Plan One', amount: 54321 })
+    Stripe::Plan.create({ id: 'Plan Two', amount: 98765 })
+
+    all = Stripe::Plan.all
+    expect(all.length).to eq(2)
+    all.map(&:id).should include('Plan One', 'Plan Two')
+    all.map(&:amount).should include(54321, 98765)
+  end
+
 end
