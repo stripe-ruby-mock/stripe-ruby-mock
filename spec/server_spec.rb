@@ -20,7 +20,7 @@ describe 'StripeMock Server' do
     @client = StripeMock.start_client
   end
 
-  after { StripeMock.stop_client }
+  after { StripeMock.stop_client(:clear_server_data => true) }
 
 
   it "uses an RPC client for mock requests" do
@@ -54,7 +54,7 @@ describe 'StripeMock Server' do
 
 
   it "returns a response with symbolized hash keys" do
-    response = StripeMock.redirect_to_mock_server('get', '/v1/plans/x', 'xxx')
+    response, api_key = StripeMock.redirect_to_mock_server('get', '/v1/plans/x', 'xxx')
     response.keys.each {|k| expect(k).to be_a(Symbol) }
   end
 

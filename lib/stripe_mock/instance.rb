@@ -50,13 +50,13 @@ module StripeMock
       handler = @@handlers.find {|h| method_url =~ h[:route] }
 
       if handler
-        self.send(handler[:name], handler[:route], method_url, params, headers).tap {|json|
-          puts "[StripeMock res] #{json}" if @debug == true
-        }
+        res = self.send(handler[:name], handler[:route], method_url, params, headers)
+        puts "[StripeMock res] #{res}" if @debug == true
+        [res, api_key]
       else
         puts "WARNING: Unrecognized method + url: [#{method} #{url}]"
         puts " params: #{params}"
-        {}
+        [{}, api_key]
       end
     end
 

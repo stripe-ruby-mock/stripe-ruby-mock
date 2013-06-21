@@ -15,7 +15,7 @@ describe StripeMock::Instance do
       "id" => "str_abcde",
       :name => "String Plan"
     }
-    res = StripeMock.instance.mock_request('post', '/v1/plans', 'api_key', string_params)
+    res, api_key = StripeMock.instance.mock_request('post', '/v1/plans', 'api_key', string_params)
     expect(res[:id]).to eq('str_abcde')
     expect(res[:name]).to eq('String Plan')
   end
