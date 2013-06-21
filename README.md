@@ -116,11 +116,10 @@ describe MyApp do
 
   after do
     StripeMock.stop_client
-    #
     # Alternatively:
-    #
-    # @client.close!
-    # StripeMock.stop_client(:clear_server_data => true)
+    #   @client.close!
+    # -- Or --
+    #   StripeMock.stop_client(:clear_server_data => true)
   end
 end
 ```
@@ -133,7 +132,6 @@ Here are some other neat things you can do with the client:
 ```ruby
 @client.state #=> 'ready'
 
-@client.set_server_debug(true)
 @client.get_server_data(:customers) # Also works for :charges, :plans, etc.
 @client.clear_server_data
 
@@ -208,6 +206,17 @@ it "can override default webhook values" do
   expect(event.data.object.email).to eq('joe@example.com')
 end
 ```
+
+## Debugging
+
+To enable debug messages:
+
+    StripeMock.toggle_debug(true)
+
+This will **only last for the session**; Once you call `StripeMock.stop` or `StripeMock.stop_client`,
+debug will be toggled off.
+
+If you always want debug to be on (it's quite verbose), you should put this in a `before` block.
 
 ## TODO
 
