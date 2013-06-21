@@ -202,9 +202,9 @@ it "can override default webhook values" do
     :email => 'joe@example.com'
   })
   # Alternatively:
-  # event.data.object.id = 'cus_my_custome_value'
+  # event.data.object.id = 'cus_my_custom_value'
   # event.data.object.email = 'joe@example.com'
-  expect(event.data.object.id).to eq('cus_my_custome_value')
+  expect(event.data.object.id).to eq('cus_my_custom_value')
   expect(event.data.object.email).to eq('joe@example.com')
 end
 ```
