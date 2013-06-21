@@ -48,6 +48,15 @@ shared_examples 'Customer API' do
     expect(customer.description).to_not be_nil
   end
 
+  it "retrieves all customers" do
+    Stripe::Customer.create({ email: 'one@one.com' })
+    Stripe::Customer.create({ email: 'two@two.com' })
+
+    all = Stripe::Customer.all
+    expect(all.length).to eq(2)
+    all.map(&:email).should include('one@one.com', 'two@two.com')
+  end
+
   it "updates a stripe customer" do
     original = Stripe::Customer.retrieve("test_customer_update")
     email = original.email

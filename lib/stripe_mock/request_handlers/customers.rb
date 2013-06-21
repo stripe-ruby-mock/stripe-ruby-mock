@@ -8,6 +8,7 @@ module StripeMock
         klass.add_handler 'delete /v1/customers/(.*)/subscription', :cancel_subscription
         klass.add_handler 'post /v1/customers/(.*)',                :update_customer
         klass.add_handler 'get /v1/customers/(.*)',                 :get_customer
+        klass.add_handler 'get /v1/customers',                      :list_customers
       end
 
       def new_customer(route, method_url, params, headers)
@@ -32,6 +33,10 @@ module StripeMock
       def get_customer(route, method_url, params, headers)
         route =~ method_url
         customers[$1] ||= Data.test_customer(:id => $1)
+      end
+
+      def list_customers(route, method_url, params, headers)
+        customers.values
       end
 
     end
