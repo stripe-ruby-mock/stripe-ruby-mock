@@ -12,7 +12,14 @@ module StripeMock
     end
 
     def mock_request(method, url, api_key, params={}, headers={})
-      timeout_wrap { @pipe.mock_request(method, url, api_key, params, headers) }
+      timeout_wrap do
+        @pipe.mock_request(method, url, api_key, params, headers).tap {|result|
+          response, api_key = result
+          if response.is_a?(Hash) && response['error_raised'] == 'invalid_request'
+            raise Stripe::InvalidRequestError.new(*response['error_params'])
+          end
+        }
+      end
     end
 
     def get_server_data(key)
@@ -30,6 +37,14 @@ module StripeMock
 
     def server_debug?
       timeout_wrap { @pipe.debug? }
+    end
+
+    def set_server_strict(toggle)
+      timeout_wrap { @pipe.set_strict(toggle) }
+    end
+
+    def server_strict?
+      timeout_wrap { @pipe.strict? }
     end
 
     def clear_server_data
@@ -54,9 +69,6 @@ module StripeMock
       raise
     rescue Errno::ECONNREFUSED => e
       raise StripeMock::ServerTimeoutError.new(e)
-    rescue StandardError => e
-      puts "Unexpected StripeMock Client Error: #{e.inspect}"
-      {}
     end
   end
 

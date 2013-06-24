@@ -18,7 +18,7 @@ module StripeMock
 
 
     attr_reader :charges, :customers, :plans
-    attr_accessor :pending_error, :debug
+    attr_accessor :pending_error, :debug, :strict
 
     def initialize
       @customers = {}
@@ -28,6 +28,7 @@ module StripeMock
       @id_counter = 0
       @pending_error = nil
       @debug = false
+      @strict = true
     end
 
     def mock_request(method, url, api_key, params={}, headers={})
@@ -61,6 +62,14 @@ module StripeMock
     end
 
     private
+
+    def assert_existance(type, id, obj)
+      return unless @strict == true
+
+      if obj.nil?
+        raise Stripe::InvalidRequestError.new("No such #{type}: #{id}", type.to_s, 400)
+      end
+    end
 
     def new_id(prefix)
       # Stripe ids must be strings

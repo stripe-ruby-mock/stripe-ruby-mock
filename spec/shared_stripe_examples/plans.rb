@@ -57,16 +57,27 @@ shared_examples 'Plan API' do
   end
 
 
-  it "retrieves a stripe plan with an id that doesn't exist" do
-    plan = Stripe::Plan.retrieve('test_charge_x')
+  it "updates a stripe plan" do
+    Stripe::Plan.create(id: 'super_member', amount: 111)
 
-    expect(plan.id).to eq('test_charge_x')
-    expect(plan.amount).to_not be_nil
-    expect(plan.name).to_not be_nil
+    plan = Stripe::Plan.retrieve('super_member')
+    expect(plan.amount).to eq(111)
 
-    expect(plan.currency).to_not be_nil
-    expect(plan.interval).to_not be_nil
+    plan.amount = 789
+    plan.save
+    plan = Stripe::Plan.retrieve('super_member')
+    expect(plan.amount).to eq(789)
   end
+
+
+  it "cannot retrieve a stripe plan that doesn't exist" do
+    expect { Stripe::Plan.retrieve('nope') }.to raise_error {|e|
+      expect(e).to be_a Stripe::InvalidRequestError
+      expect(e.param).to eq('plan')
+      expect(e.http_status).to eq(400)
+    }
+  end
+
 
   it "retrieves all plans" do
     Stripe::Plan.create({ id: 'Plan One', amount: 54321 })
@@ -76,6 +87,23 @@ shared_examples 'Plan API' do
     expect(all.length).to eq(2)
     all.map(&:id).should include('Plan One', 'Plan Two')
     all.map(&:amount).should include(54321, 98765)
+  end
+
+
+  context "With strict mode toggled off" do
+
+    before { StripeMock.toggle_strict(false) }
+
+    it "can retrieve a stripe plan with an id that doesn't exist" do
+      plan = Stripe::Plan.retrieve('test_charge_x')
+
+      expect(plan.id).to eq('test_charge_x')
+      expect(plan.amount).to_not be_nil
+      expect(plan.name).to_not be_nil
+
+      expect(plan.currency).to_not be_nil
+      expect(plan.interval).to_not be_nil
+    end
   end
 
 end

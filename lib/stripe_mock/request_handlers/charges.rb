@@ -14,6 +14,7 @@ module StripeMock
 
       def get_charge(route, method_url, params, headers)
         route =~ method_url
+        assert_existance :charge, $1, charges[$1]
         charges[$1] ||= Data.test_charge(:id => $1)
       end
 

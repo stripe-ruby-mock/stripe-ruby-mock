@@ -48,12 +48,27 @@ shared_examples 'Charge API' do
     expect(charge.amount).to eq(original.amount)
   end
 
-  it "retrieves a stripe charge with an id that doesn't exist" do
-    charge = Stripe::Charge.retrieve('test_charge_x')
-    expect(charge.id).to eq('test_charge_x')
-    expect(charge.amount).to_not be_nil
-    expect(charge.card).to_not be_nil
+  it "cannot retrieve a charge that doesn't exist" do
+    expect { Stripe::Charge.retrieve('nope') }.to raise_error {|e|
+      expect(e).to be_a Stripe::InvalidRequestError
+      expect(e.param).to eq('charge')
+      expect(e.http_status).to eq(400)
+    }
   end
+
+
+  context "With strict mode toggled off" do
+
+    before { StripeMock.toggle_strict(false) }
+
+    it "retrieves a stripe charge with an id that doesn't exist" do
+      charge = Stripe::Charge.retrieve('test_charge_x')
+      expect(charge.id).to eq('test_charge_x')
+      expect(charge.amount).to_not be_nil
+      expect(charge.card).to_not be_nil
+    end
+  end
+
 
   describe 'captured status value' do
     it "reports captured by default" do

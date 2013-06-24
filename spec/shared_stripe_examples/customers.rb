@@ -41,11 +41,12 @@ shared_examples 'Customer API' do
     expect(customer.email).to eq(original.email)
   end
 
-  it "retrieves a stripe customer with an id that doesn't exist" do
-    customer = Stripe::Customer.retrieve('test_customer_x')
-    expect(customer.id).to eq('test_customer_x')
-    expect(customer.email).to_not be_nil
-    expect(customer.description).to_not be_nil
+  it "cannot retrieve a customer that doesn't exist" do
+    expect { Stripe::Customer.retrieve('nope') }.to raise_error {|e|
+      expect(e).to be_a Stripe::InvalidRequestError
+      expect(e.param).to eq('customer')
+      expect(e.http_status).to eq(400)
+    }
   end
 
   it "retrieves all customers" do
@@ -58,7 +59,7 @@ shared_examples 'Customer API' do
   end
 
   it "updates a stripe customer" do
-    original = Stripe::Customer.retrieve("test_customer_update")
+    original = Stripe::Customer.create(id: 'test_customer_update')
     email = original.email
 
     original.description = 'new desc'
@@ -73,7 +74,8 @@ shared_examples 'Customer API' do
   end
 
   it "updates a stripe customer's subscription" do
-    customer = Stripe::Customer.retrieve("test_customer_sub")
+    plan = Stripe::Plan.create(id: 'silver')
+    customer = Stripe::Customer.create(id: 'test_customer_sub')
     sub = customer.update_subscription({ :plan => 'silver' })
 
     expect(sub.object).to eq('subscription')
@@ -81,10 +83,30 @@ shared_examples 'Customer API' do
   end
 
   it "cancels a stripe customer's subscription" do
-    customer = Stripe::Customer.retrieve("test_customer_sub")
+    customer = Stripe::Customer.create(id: 'test_customer_sub')
     sub = customer.cancel_subscription
 
     expect(sub.deleted).to eq(true)
+  end
+
+  it "cannot reference a plan that does not exist" do
+    customer = Stripe::Customer.create(id: 'test_customer_sub')
+    expect {
+      customer.update_subscription(plan: 'imagination')
+    }.to raise_error Stripe::InvalidRequestError
+  end
+
+
+  context "With strict mode toggled off" do
+
+    before { StripeMock.toggle_strict(false) }
+
+    it "retrieves a stripe customer with an id that doesn't exist" do
+      customer = Stripe::Customer.retrieve('test_customer_x')
+      expect(customer.id).to eq('test_customer_x')
+      expect(customer.email).to_not be_nil
+      expect(customer.description).to_not be_nil
+    end
   end
 
 end

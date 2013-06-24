@@ -21,7 +21,14 @@ module StripeMock
     end
 
     def mock_request(*args)
-      @instance.mock_request(*args)
+      begin
+        @instance.mock_request(*args)
+      rescue Stripe::InvalidRequestError => e
+        {
+          :error_raised => 'invalid_request',
+          :error_params => [e.message, e.param, e.http_status, e.http_body, e.json_body]
+        }
+      end
     end
 
     def get_data(key)
@@ -36,10 +43,12 @@ module StripeMock
       @instance.debug = toggle
     end
 
-    def debug?
-      @instance.debug
+    def set_strict(toggle)
+      @instance.strict = toggle
     end
 
+    def debug?; @instance.debug; end
+    def strict?; @instance.strict; end
     def ping; true; end
   end
 

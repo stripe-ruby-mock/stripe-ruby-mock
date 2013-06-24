@@ -12,26 +12,33 @@ module StripeMock
       end
 
       def new_customer(route, method_url, params, headers)
-        id = new_id('cus')
-        customers[id] = Data.test_customer(params.merge :id => id)
+        params[:id] ||= new_id('cus')
+        customers[ params[:id] ] = Data.test_customer(params)
       end
 
       def new_subscription(route, method_url, params, headers)
+        route =~ method_url
+        assert_existance :customer, $1, customers[$1]
+        assert_existance :plan, params[:plan], plans[ params[:plan] ]
         Data.test_subscription(params[:plan])
       end
 
       def cancel_subscription(route, method_url, params, headers)
+        route =~ method_url
+        assert_existance :customer, $1, customers[$1]
         Data.test_delete_subscription(params[:id])
       end
 
       def update_customer(route, method_url, params, headers)
         route =~ method_url
+        assert_existance :customer, $1, customers[$1]
         customers[$1] ||= Data.test_customer(:id => $1)
         customers[$1].merge!(params)
       end
 
       def get_customer(route, method_url, params, headers)
         route =~ method_url
+        assert_existance :customer, $1, customers[$1]
         customers[$1] ||= Data.test_customer(:id => $1)
       end
 
