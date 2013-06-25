@@ -25,11 +25,13 @@ module StripeMock
   private
 
   def self.redirect_to_mock_server(method, url, api_key, params={}, headers={})
-    if @remote_state_pending_error
-      raise @remote_state_pending_error
-      @remote_state_pending_error = nil
+    handler = Instance.handler_for_method_url("#{method} #{url}")
+    mock_error = client.error_queue.error_for_handler_name(handler[:name])
+    if mock_error
+      client.error_queue.dequeue
+      raise mock_error
     end
-    Stripe::Util.symbolize_names @client.mock_request(method, url, api_key, params, headers)
+    Stripe::Util.symbolize_names client.mock_request(method, url, api_key, params, headers)
   end
 
 end

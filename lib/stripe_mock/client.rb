@@ -1,7 +1,7 @@
 module StripeMock
 
   class Client
-    attr_reader :port, :state
+    attr_reader :port, :state, :error_queue
 
     def initialize(port)
       @port = port
@@ -9,6 +9,7 @@ module StripeMock
       # Ensure client can connect to server
       timeout_wrap { @pipe.ping }
       @state = 'ready'
+      @error_queue = ErrorQueue.new
     end
 
     def mock_request(method, url, api_key, params={}, headers={})

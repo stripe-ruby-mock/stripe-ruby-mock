@@ -42,39 +42,20 @@ describe MyApp do
 end
 ```
 
-## Mocking Errors
+## Mocking Card Errors
 
 Tired of manually inputting fake credit card numbers to test against errors? Tire no more!
 
 ```ruby
 it "mocks a declined card error" do
-  # Prepares an error for the next stripe request
+  # Prepares an error for the next create charge request
   StripeMock.prepare_card_error(:card_declined)
 
-  begin
-    # Note: The next request of ANY type will raise your prepared error
-    Stripe::Charge.create()
-  rescue Stripe::CardError => error
-    expect(error.http_status).to eq(402)
-    expect(error.code).to eq('card_declined')
-  end
-end
-```
-
-You can also set your own custom Stripe error using `prepare_error`:
-
-```ruby
-it "raises a custom error" do
-  custom_error = Stripe::AuthenticationError.new('Did not provide favourite colour', 400)
-  StripeMock.prepare_error(custom_error)
-
-  begin
-    # Note: The next request of ANY type will raise your prepared error
-    Stripe::Invoice.create()
-  rescue Stripe::AuthenticationError => error
-    expect(error.http_status).to eq(400)
-    expect(error.message).to eq('Did not provide favourite colour')
-  end
+  expect { Stripe::Charge.create }.to raise_error {|e|
+    expect(e).to be_a Stripe::CardError
+    expect(e.http_status).to eq(402)
+    expect(e.code).to eq('card_declined')
+  }
 end
 ```
 
@@ -94,6 +75,28 @@ StripeMock.prepare_card_error(:processing_error)
 ```
 
 You can see the details of each error in [lib/stripe_mock/api/errors.rb](lib/stripe_mock/api/errors.rb)
+
+### Custom Errors
+
+To raise an error on a specific type of request, take a look at the [request handlers folder](lib/stripe_mock/request_handlers/) and pass a method name to `StripeMock.prepare_error`.
+
+If you wanted to raise an error for creating a new customer, for instance, you would do the following:
+
+```ruby
+it "raises a custom error for specific actions" do
+  custom_error = StandardError.new("Please knock first.")
+
+  StripeMock.prepare_error(custom_error, :new_customer)
+
+  expect { Stripe::Charge.create }.to_not raise_error
+  expect { Stripe::Customer.create }.to raise_error {|e|
+    expect(e).to be_a StandardError
+    expect(e.message).to eq("Please knock first.")
+  }
+end
+```
+
+In the above example, `:new_customer` is the name of a method from [customers.rb](lib/stripe_mock/request_handlers/customers.rb).
 
 ## Running the Mock Server
 
@@ -186,7 +189,7 @@ If it finds nothing, it falls back to [test events generated through stripe's we
 
 You can name events whatever you like in your `spec/fixtures/stripe_webhooks/` folder. However, if you try to call a non-existant event that's not in that folder, StripeMock will throw an error.
 
-If you wish to use a different fixture path, you can call set it yourself:
+If you wish to use a different fixture path, you can set it yourself:
 
     StripeMock.webhook_fixture_path = './spec/other/folder/'
 

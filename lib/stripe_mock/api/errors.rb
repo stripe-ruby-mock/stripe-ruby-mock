@@ -1,10 +1,12 @@
 module StripeMock
 
-  def self.prepare_error(stripe_error)
+  def self.prepare_error(stripe_error, *handler_names)
+    handler_names.push(:all) if handler_names.count == 0
+
     if @state == 'local'
-      instance.pending_error = stripe_error
+      instance.error_queue.queue(stripe_error, handler_names)
     elsif @state == 'remote'
-      @remote_state_pending_error = stripe_error
+      client.error_queue.queue(stripe_error, handler_names)
     else
       raise UnstartedStateError
     end
@@ -13,10 +15,11 @@ module StripeMock
   def self.prepare_card_error(code)
     args = CardErrors.argument_map[code]
     raise StripeMockError.new("Unrecognized stripe card error code: #{code}") if args.nil?
-    self.prepare_error  Stripe::CardError.new(*args)
+    self.prepare_error  Stripe::CardError.new(*args), :new_charge
   end
 
   module CardErrors
+
     def self.argument_map
       @__map ||= {
         incorrect_number: ["The card number is incorrect", 'number', 'incorrect_number', 402],

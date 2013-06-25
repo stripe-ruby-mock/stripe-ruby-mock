@@ -16,30 +16,14 @@ describe 'README examples' do
 
 
   it "mocks a declined card error" do
-    # Prepares an error for the next stripe request
+    # Prepares an error for the next create charge request
     StripeMock.prepare_card_error(:card_declined)
 
-    begin
-      # Note: The next request of ANY type will raise your prepared error
-      Stripe::Charge.create()
-    rescue Stripe::CardError => error
-      expect(error.http_status).to eq(402)
-      expect(error.code).to eq('card_declined')
-    end
-  end
-
-
-  it "raises a custom error" do
-    custom_error = Stripe::AuthenticationError.new('Did not provide favourite colour', 400)
-    StripeMock.prepare_error(custom_error)
-
-    begin
-      # Note: The next request of ANY type will raise your prepared error
-      Stripe::Invoice.create()
-    rescue Stripe::AuthenticationError => error
-      expect(error.http_status).to eq(400)
-      expect(error.message).to eq('Did not provide favourite colour')
-    end
+    expect { Stripe::Charge.create }.to raise_error {|e|
+      expect(e).to be_a Stripe::CardError
+      expect(e.http_status).to eq(402)
+      expect(e.code).to eq('card_declined')
+    }
   end
 
   it "has built-in card errors" do

@@ -11,14 +11,18 @@ module StripeMock
       }
     end
 
+    def self.handler_for_method_url(method_url)
+      @@handlers.find {|h| method_url =~ h[:route] }
+    end
+
     include StripeMock::RequestHandlers::Charges
     include StripeMock::RequestHandlers::Customers
     include StripeMock::RequestHandlers::InvoiceItems
     include StripeMock::RequestHandlers::Plans
 
 
-    attr_reader :charges, :customers, :plans
-    attr_accessor :pending_error, :debug, :strict
+    attr_reader :charges, :customers, :plans, :error_queue
+    attr_accessor :debug, :strict
 
     def initialize
       @customers = {}
@@ -26,7 +30,7 @@ module StripeMock
       @plans = {}
 
       @id_counter = 0
-      @pending_error = nil
+      @error_queue = ErrorQueue.new
       @debug = false
       @strict = true
     end
@@ -42,15 +46,14 @@ module StripeMock
         puts "                 #{params}"
       end
 
-      if @pending_error
-        raise @pending_error
-        @pending_error = nil
-      end
-
       method_url = "#{method} #{url}"
-      handler = @@handlers.find {|h| method_url =~ h[:route] }
+      handler = Instance.handler_for_method_url(method_url)
+      mock_error = @error_queue.error_for_handler_name(handler[:name])
 
-      if handler
+      if handler && mock_error
+        @error_queue.dequeue
+        raise mock_error
+      elsif handler
         res = self.send(handler[:name], handler[:route], method_url, params, headers)
         puts "[StripeMock res] #{res}" if @debug == true
         [res, api_key]

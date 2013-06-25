@@ -11,8 +11,7 @@ end
 
 shared_examples 'Stripe Error Mocking' do
 
-  it "mocks a manually gives stripe card error" do
-
+  it "mocks a manually given stripe card error" do
     error = Stripe::CardError.new('Test Msg', 'param_name', 'bad_code', 444, 'body', 'json body')
     StripeMock.prepare_error(error)
 
@@ -47,11 +46,10 @@ shared_examples 'Stripe Error Mocking' do
 
 
   it "mocks a manually gives stripe invalid auth error" do
-
     error = Stripe::AuthenticationError.new('Bad Auth', 499, 'abody', 'json abody')
     StripeMock.prepare_error(error)
 
-    expect { Stripe::Invoice.create() }.to raise_error {|e|
+    expect { Stripe::Plan.create() }.to raise_error {|e|
       expect(e).to be_a(Stripe::AuthenticationError)
       expect(e.message).to eq('Bad Auth')
 
@@ -62,6 +60,17 @@ shared_examples 'Stripe Error Mocking' do
   end
 
 
+  it "raises a custom error for specific actions" do
+    custom_error = StandardError.new("Please knock first.")
+    StripeMock.prepare_error(custom_error, :new_customer)
+
+    expect { Stripe::Charge.create }.to_not raise_error
+    expect { Stripe::Customer.create }.to raise_error {|e|
+      expect(e).to be_a StandardError
+      expect(e.message).to eq("Please knock first.")
+    }
+  end
+
   # # # # # # # # # # # # # #
   # Card Error Helper Methods
   # # # # # # # # # # # # # #
@@ -70,6 +79,12 @@ shared_examples 'Stripe Error Mocking' do
     expect { StripeMock.prepare_card_error(:non_existant_error_code) }.to raise_error {|e|
       expect(e).to be_a(StripeMock::StripeMockError)
     }
+  end
+
+  it "only raises a card error when a card charge is attempted" do
+    StripeMock.prepare_card_error(:card_declined)
+    expect { Stripe::Customer.create(id: 'x') }.to_not raise_error
+    expect { Stripe::Charge.create() }.to raise_error Stripe::CardError
   end
 
   it "mocks an incorrect number card error" do
