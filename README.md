@@ -11,6 +11,7 @@
 
 * No stripe server access required
 * Easily test against stripe errors
+* Mock and customize stripe webhooks
 
 ## Description
 
