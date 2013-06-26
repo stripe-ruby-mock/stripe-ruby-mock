@@ -1,11 +1,11 @@
 module StripeMock
   module Util
 
-    def self.rmerge(hash_one, hash_two)
-      return hash_two if hash_one.nil?
-      return nil if hash_two.nil?
+    def self.rmerge(desh_hash, source_hash)
+      return source_hash if desh_hash.nil?
+      return nil if source_hash.nil?
 
-      hash_one.merge(hash_two) do |key, oldval, newval|
+      desh_hash.merge(source_hash) do |key, oldval, newval|
         if oldval.is_a?(Array) && newval.is_a?(Array)
           oldval.zip(newval).map {|elems|
             elems[1].nil? ? elems[0] : rmerge(elems[0], elems[1])
