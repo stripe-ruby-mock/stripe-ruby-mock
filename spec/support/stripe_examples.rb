@@ -1,10 +1,10 @@
 
 def require_stripe_examples
-  require 'shared_stripe_examples/charges'
-  require 'shared_stripe_examples/customers'
-  require 'shared_stripe_examples/error_mocks'
-  require 'shared_stripe_examples/invoice_items'
-  require 'shared_stripe_examples/plans'
+  require 'shared_stripe_examples/charge_examples'
+  require 'shared_stripe_examples/customer_examples'
+  require 'shared_stripe_examples/error_mock_examples'
+  require 'shared_stripe_examples/invoice_item_examples'
+  require 'shared_stripe_examples/plan_examples'
 end
 
 def it_behaves_like_stripe(&block)
