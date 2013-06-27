@@ -4,7 +4,7 @@ module StripeMock
 
       def Customers.included(klass)
         klass.add_handler 'post /v1/customers',                     :new_customer
-        klass.add_handler 'post /v1/customers/(.*)/subscription',   :new_subscription
+        klass.add_handler 'post /v1/customers/(.*)/subscription',   :update_subscription
         klass.add_handler 'delete /v1/customers/(.*)/subscription', :cancel_subscription
         klass.add_handler 'post /v1/customers/(.*)',                :update_customer
         klass.add_handler 'get /v1/customers/(.*)',                 :get_customer
@@ -16,11 +16,13 @@ module StripeMock
         customers[ params[:id] ] = Data.test_customer(params)
       end
 
-      def new_subscription(route, method_url, params, headers)
+      def update_subscription(route, method_url, params, headers)
         route =~ method_url
         assert_existance :customer, $1, customers[$1]
-        assert_existance :plan, params[:plan], plans[ params[:plan] ]
-        Data.test_subscription(params[:plan])
+        plan = plans[ params[:plan] ]
+        assert_existance :plan, params[:plan], plan
+
+        Data.test_subscription(plan: plan)
       end
 
       def cancel_subscription(route, method_url, params, headers)

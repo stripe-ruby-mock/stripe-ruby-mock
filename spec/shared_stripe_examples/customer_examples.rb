@@ -80,6 +80,7 @@ shared_examples 'Customer API' do
 
     expect(sub.object).to eq('subscription')
     expect(sub.plan.id).to eq('silver')
+    expect(sub.plan.to_hash).to eq(plan.to_hash)
   end
 
   it "cancels a stripe customer's subscription" do

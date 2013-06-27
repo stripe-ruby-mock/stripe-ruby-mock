@@ -115,8 +115,8 @@ module StripeMock
     end
 
     #FIXME nested overrides would be better than hardcoding plan_id
-    def self.test_subscription(plan_id="gold")
-      {
+    def self.test_subscription(params={})
+      StripeMock::Util.rmerge({
         :current_period_end => 1308681468,
         :status => "trialing",
         :plan => {
@@ -124,7 +124,7 @@ module StripeMock
           :amount => 7500,
           :trial_period_days => 30,
           :object => "plan",
-          :id => plan_id
+          :id => '__test_plan_id__'
         },
         :current_period_start => 1308595038,
         :cancel_at_period_end => false,
@@ -135,7 +135,7 @@ module StripeMock
         :trial_end => 1308681468,
         :customer => "c_test_customer",
         :quantity => 1
-      }
+      }, params)
     end
 
     def self.test_invoice(params={})
