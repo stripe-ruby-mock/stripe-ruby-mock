@@ -66,11 +66,12 @@ module StripeMock
 
     private
 
-    def assert_existance(type, id, obj)
+    def assert_existance(type, id, obj, message=nil)
       return unless @strict == true
 
       if obj.nil?
-        raise Stripe::InvalidRequestError.new("No such #{type}: #{id}", type.to_s, 400)
+        msg = message || "No such #{type}: #{id}"
+        raise Stripe::InvalidRequestError.new(msg, type.to_s, 400)
       end
     end
 

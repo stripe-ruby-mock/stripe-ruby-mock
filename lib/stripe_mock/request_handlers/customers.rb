@@ -18,17 +18,29 @@ module StripeMock
 
       def update_subscription(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :customer, $1, customers[$1]
+
+        customer = customers[$1]
+        assert_existance :customer, $1, customer
         plan = plans[ params[:plan] ]
         assert_existance :plan, params[:plan], plan
 
-        Data.test_subscription(plan: plan)
+        sub = Data.test_subscription plan: plan, id: new_id('su')
+        customer[:subscription] = sub
       end
 
       def cancel_subscription(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :customer, $1, customers[$1]
-        Data.test_delete_subscription(params[:id])
+
+        customer = customers[$1]
+        assert_existance :customer, $1, customer
+
+        sub = customer[:subscription]
+        assert_existance nil, nil, sub, "No active subscription for customer: #{$1}"
+
+        plan = plans[ sub[:plan][:id] ]
+        assert_existance :plan, params[:plan], plan
+
+        Data.test_delete_subscription(id: sub[:id])
       end
 
       def update_customer(route, method_url, params, headers)

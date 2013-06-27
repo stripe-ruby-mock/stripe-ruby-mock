@@ -297,11 +297,10 @@ module StripeMock
       }
     end
 
-    def self.test_delete_subscription(id)
+    def self.test_delete_subscription(params={})
       {
-        id: id,
         deleted: true
-      }
+      }.merge(params)
     end
 
     def self.test_api_error

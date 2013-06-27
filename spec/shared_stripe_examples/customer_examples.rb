@@ -81,19 +81,35 @@ shared_examples 'Customer API' do
     expect(sub.object).to eq('subscription')
     expect(sub.plan.id).to eq('silver')
     expect(sub.plan.to_hash).to eq(plan.to_hash)
+
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+    expect(customer.subscription).to_not be_nil
+    expect(customer.subscription.id).to eq(sub.id)
+    expect(customer.subscription.plan.id).to eq('silver')
   end
 
   it "cancels a stripe customer's subscription" do
+    plan = Stripe::Plan.create(id: 'the truth')
     customer = Stripe::Customer.create(id: 'test_customer_sub')
-    sub = customer.cancel_subscription
+    sub = customer.update_subscription({ :plan => 'the truth' })
 
-    expect(sub.deleted).to eq(true)
+    result = customer.cancel_subscription
+    expect(result.deleted).to eq(true)
+    expect(result.id).to eq(sub.id)
   end
 
-  it "cannot reference a plan that does not exist" do
+  it "cannot update to a plan that does not exist" do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     expect {
       customer.update_subscription(plan: 'imagination')
+    }.to raise_error Stripe::InvalidRequestError
+  end
+
+  it "cannot cancel a plan that does not exist" do
+    StripeMock.toggle_debug(true)
+    customer = Stripe::Customer.create(id: 'test_customer_sub')
+    expect {
+      customer.cancel_subscription(plan: 'imagination')
     }.to raise_error Stripe::InvalidRequestError
   end
 
