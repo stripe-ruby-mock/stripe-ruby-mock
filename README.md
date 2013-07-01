@@ -108,6 +108,7 @@ running on different processes. In such cases you'll want to start the stripe mo
     #
     # The mock server will automatically be killed when your tests are done running.
     #
+    require 'thin'
     StripeMock.spawn_server
 
 Then, instead of `StripeMock.start`, you'll want to use `StripeMock.start_client`:
