@@ -1,4 +1,3 @@
-require 'thin'
 require 'jimson-temp'
 
 module StripeMock
