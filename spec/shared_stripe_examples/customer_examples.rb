@@ -106,7 +106,6 @@ shared_examples 'Customer API' do
   end
 
   it "cannot cancel a plan that does not exist" do
-    StripeMock.toggle_debug(true)
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     expect {
       customer.cancel_subscription(plan: 'imagination')
