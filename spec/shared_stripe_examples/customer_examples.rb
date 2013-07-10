@@ -39,6 +39,7 @@ shared_examples 'Customer API' do
 
     expect(customer.id).to eq(original.id)
     expect(customer.email).to eq(original.email)
+    expect(customer.subscription).to be_nil
   end
 
   it "cannot retrieve a customer that doesn't exist" do

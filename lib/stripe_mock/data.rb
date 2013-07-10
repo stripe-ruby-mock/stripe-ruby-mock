@@ -3,43 +3,36 @@ module StripeMock
 
     def self.test_customer(params)
       {
-        :email => 'stripe_mock@example.com',
-        :description => 'an auto-generated stripe customer data mock',
-        :subscription_history => [],
-        :bills => [],
-        :charges => [],
-        :livemode => false,
-        :object => "customer",
-        :id => "c_test_customer",
-        :active_card => {
-          :object => "card",
-          :last4 => "4242",
-          :type => "Visa",
-          :exp_month => 12,
-          :exp_year => 2013,
-          :fingerprint => "3TQGpK9JoY1GgXPw",
-          :country => "US",
-          :name => "From Here",
-          :address_line1 => nil,
-          :address_line2 => nil,
-          :address_city => nil,
-          :address_state => nil,
-          :address_zip => nil,
-          :address_country => nil,
-          :cvc_check => "pass",
-          :address_line1_check => nil,
-          :address_zip_check => nil
+        email: 'stripe_mock@example.com',
+        description: 'an auto-generated stripe customer data mock',
+        object: "customer",
+        created: 1372126710,
+        id: "cus_24vuDSooAnB087",
+        livemode: false,
+        active_card: {
+          object: "card",
+          last4: "4242",
+          type: "Visa",
+          exp_month: 12,
+          exp_year: 2013,
+          fingerprint: "wXWJT135mEK107G8",
+          country: "US",
+          name: "Vetty Vet",
+          address_line1: nil,
+          address_line2: nil,
+          address_city: nil,
+          address_state: nil,
+          address_zip: nil,
+          address_country: nil,
+          cvc_check: "pass",
+          address_line1_check: nil,
+          address_zip_check: nil
         },
-        :created => 1304114758
+        delinquent: false,
+        subscription: nil,
+        discount: nil,
+        account_balance: 0
       }.merge(params)
-    end
-
-    def self.test_customer_array
-      {
-        :data => [test_customer, test_customer, test_customer],
-        :object => 'list',
-        :url => '/v1/customers'
-      }
     end
 
     def self.test_charge(params={})
