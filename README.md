@@ -231,6 +231,16 @@ If you always want debug to be on (it's quite verbose), you should put this in a
 * Throw useful errors that emulate Stripe's
   * For example: "You must supply either a card or a customer id" for `Stripe::Charge`
 
+## Developing stripe-ruby-mock
+
+To run the tests:
+
+    $ rspec
+
+Patches are welcome and greatly appreciated! If you're contributing to fix a problem,
+be sure to write tests that illustrate the problem being fixed.
+This will help ensure that the problem remains fixed in future updates.
+
 ## Copyright
 
 Copyright (c) 2013 Gilbert
