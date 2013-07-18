@@ -47,16 +47,16 @@ module StripeMock
       end
 
       method_url = "#{method} #{url}"
-      handler = Instance.handler_for_method_url(method_url)
-      mock_error = @error_queue.error_for_handler_name(handler[:name])
 
-      if handler && mock_error
-        @error_queue.dequeue
-        raise mock_error
-      elsif handler
-        res = self.send(handler[:name], handler[:route], method_url, params, headers)
-        puts "[StripeMock res] #{res}" if @debug == true
-        [res, api_key]
+      if handler = Instance.handler_for_method_url(method_url)
+        if mock_error = @error_queue.error_for_handler_name(handler[:name])
+          @error_queue.dequeue
+          raise mock_error
+        else
+          res = self.send(handler[:name], handler[:route], method_url, params, headers)
+          puts "[StripeMock res] #{res}" if @debug == true
+          [res, api_key]
+        end
       else
         puts "WARNING: Unrecognized method + url: [#{method} #{url}]"
         puts " params: #{params}"
