@@ -13,6 +13,7 @@ module StripeMock
 
       def new_customer(route, method_url, params, headers)
         params[:id] ||= new_id('cus')
+        params[:card_id] = new_id('cc') if params.delete(:card)
         customers[ params[:id] ] = Data.test_customer(params)
       end
 
@@ -46,8 +47,24 @@ module StripeMock
       def update_customer(route, method_url, params, headers)
         route =~ method_url
         assert_existance :customer, $1, customers[$1]
-        customers[$1] ||= Data.test_customer(:id => $1)
-        customers[$1].merge!(params)
+
+        card_id = new_id('cc') if params.delete(:card)
+        cus = customers[$1] ||= Data.test_customer(:id => $1)
+        cus.merge!(params)
+
+        if card_id
+          new_card = Data.test_card(id: card_id, customer: cus[:id])
+
+          if cus[:cards][:count] == 0
+            cus[:cards][:count] += 1
+          else
+            cus[:cards][:data].delete_if {|card| card[:id] == cus[:default_card]}
+          end
+          cus[:cards][:data] << new_card
+          cus[:default_card] = new_card[:id]
+        end
+
+        cus
       end
 
       def get_customer(route, method_url, params, headers)

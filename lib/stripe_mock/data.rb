@@ -2,36 +2,28 @@ module StripeMock
   module Data
 
     def self.test_customer(params)
+      cus_id = params[:id] || "test_cus_default"
+      card_id = params.delete(:card_id)
+      cards = []
+      cards << test_card(id: card_id, customer: cus_id) if card_id
       {
         email: 'stripe_mock@example.com',
         description: 'an auto-generated stripe customer data mock',
         object: "customer",
         created: 1372126710,
-        id: "cus_24vuDSooAnB087",
+        id: cus_id,
         livemode: false,
-        active_card: {
-          object: "card",
-          last4: "4242",
-          type: "Visa",
-          exp_month: 12,
-          exp_year: 2013,
-          fingerprint: "wXWJT135mEK107G8",
-          country: "US",
-          name: "Vetty Vet",
-          address_line1: nil,
-          address_line2: nil,
-          address_city: nil,
-          address_state: nil,
-          address_zip: nil,
-          address_country: nil,
-          cvc_check: "pass",
-          address_line1_check: nil,
-          address_zip_check: nil
-        },
         delinquent: false,
         subscription: nil,
         discount: nil,
-        account_balance: 0
+        account_balance: 0,
+        cards: {
+          object: "list",
+          count: cards.count,
+          url: "/v1/customers/#{cus_id}/cards",
+          data: cards
+        },
+        default_card: card_id
       }.merge(params)
     end
 
@@ -87,13 +79,25 @@ module StripeMock
 
     def self.test_card(params={})
       {
-        :type => "Visa",
-        :last4 => "4242",
-        :exp_month => 11,
-        :country => "US",
-        :exp_year => 2012,
-        :id => "cc_test_card",
-        :object => "card"
+        id: "test_cc_default",
+        object: "card",
+        last4: "4242",
+        type: "Visa",
+        exp_month: 4,
+        exp_year: 2013,
+        fingerprint: "wXWJT135mEK107G8",
+        customer: "test_cus_default",
+        country: "US",
+        name: "Johnny App",
+        address_line1: nil,
+        address_line2: nil,
+        address_city: nil,
+        address_state: nil,
+        address_zip: nil,
+        address_country: nil,
+        cvc_check: nil,
+        address_line1_check: nil,
+        address_zip_check: nil
       }.merge(params)
     end
 

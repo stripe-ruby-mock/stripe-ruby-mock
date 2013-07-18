@@ -2,7 +2,7 @@ require 'spec_helper'
 
 shared_examples 'Customer API' do
 
-  it "creates a stripe customer" do
+  it "creates a stripe customer with a default card" do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
       card: 'some_card_token',
@@ -11,6 +11,27 @@ shared_examples 'Customer API' do
     expect(customer.id).to match(/^test_cus/)
     expect(customer.email).to eq('johnny@appleseed.com')
     expect(customer.description).to eq('a description')
+
+    expect(customer.cards.count).to eq(1)
+    expect(customer.cards.data.length).to eq(1)
+    expect(customer.default_card).to_not be_nil
+    expect(customer.default_card).to eq customer.cards.data.first.id
+
+    expect { customer.card }.to raise_error
+  end
+
+  it "creates a stripe customer without a card" do
+    customer = Stripe::Customer.create({
+      email: 'cardless@appleseed.com',
+      description: "no card"
+    })
+    expect(customer.id).to match(/^test_cus/)
+    expect(customer.email).to eq('cardless@appleseed.com')
+    expect(customer.description).to eq('no card')
+
+    expect(customer.cards.count).to eq(0)
+    expect(customer.cards.data.length).to eq(0)
+    expect(customer.default_card).to be_nil
   end
 
   it "stores a created stripe customer in memory" do
@@ -39,6 +60,7 @@ shared_examples 'Customer API' do
 
     expect(customer.id).to eq(original.id)
     expect(customer.email).to eq(original.email)
+    expect(customer.default_card).to eq(original.default_card)
     expect(customer.subscription).to be_nil
   end
 
@@ -72,6 +94,22 @@ shared_examples 'Customer API' do
     customer = Stripe::Customer.retrieve("test_customer_update")
     expect(customer.email).to eq(original.email)
     expect(customer.description).to eq('new desc')
+  end
+
+  it "updates a stripe customer's card" do
+    original = Stripe::Customer.create(id: 'test_customer_update', card: 'token')
+    card = original.cards.data.first
+    expect(original.default_card).to eq(card.id)
+    expect(original.cards.count).to eq(1)
+
+    original.card = 'new_token'
+    original.save
+
+    new_card = original.cards.data.first
+    expect(original.cards.count).to eq(1)
+    expect(original.default_card).to eq(new_card.id)
+
+    expect(new_card.id).to_not eq(card.id)
   end
 
   it "updates a stripe customer's subscription" do
