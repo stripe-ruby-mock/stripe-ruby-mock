@@ -24,7 +24,7 @@ module StripeMock
         plan = plans[ params[:plan] ]
         assert_existance :plan, params[:plan], plan
 
-        sub = Data.test_subscription plan: plan, id: new_id('su')
+        sub = Data.test_subscription id: new_id('su'), plan: plan, customer: $1
         customer[:subscription] = sub
       end
 

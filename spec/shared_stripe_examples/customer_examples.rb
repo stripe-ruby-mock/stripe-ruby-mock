@@ -87,6 +87,7 @@ shared_examples 'Customer API' do
     expect(customer.subscription).to_not be_nil
     expect(customer.subscription.id).to eq(sub.id)
     expect(customer.subscription.plan.id).to eq('silver')
+    expect(customer.subscription.customer).to eq(customer.id)
   end
 
   it "cancels a stripe customer's subscription" do
