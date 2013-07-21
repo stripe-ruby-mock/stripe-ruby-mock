@@ -20,6 +20,15 @@ describe StripeMock::Instance do
     expect(res[:name]).to eq('String Plan')
   end
 
+  it "exits gracefully on an unrecognized handler url" do
+    dummy_params = {
+      "id" => "str_12345",
+      "name" => "PLAN"
+    }
+
+    expect { res, api_key = StripeMock.instance.mock_request('post', '/v1/unrecongnized_method', 'api_key', dummy_params) }.to_not raise_error
+  end
+
   it "can toggle debug" do
     StripeMock.toggle_debug(true)
     expect(StripeMock.instance.debug).to eq(true)
