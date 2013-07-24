@@ -87,6 +87,18 @@ shared_examples 'Stripe Error Mocking' do
     expect { Stripe::Charge.create() }.to raise_error Stripe::CardError
   end
 
+  it "mocks a card error with a given handler" do
+    StripeMock.prepare_card_error(:incorrect_cvc, :new_customer)
+    expect { Stripe::Charge.create() }.to_not raise_error
+
+    expect { Stripe::Customer.create() }.to raise_error {|e|
+      expect(e).to be_a(Stripe::CardError)
+      expect(e.http_status).to eq(402)
+      expect(e.code).to eq('incorrect_cvc')
+      expect(e.param).to eq('cvc')
+    }
+  end
+
   it "mocks an incorrect number card error" do
     StripeMock.prepare_card_error(:incorrect_number)
     expect_card_error 'incorrect_number', 'number'

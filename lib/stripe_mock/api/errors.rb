@@ -12,10 +12,12 @@ module StripeMock
     end
   end
 
-  def self.prepare_card_error(code)
+  def self.prepare_card_error(code, *handler_names)
+    handler_names.push(:new_charge) if handler_names.count == 0
+
     args = CardErrors.argument_map[code]
     raise StripeMockError.new("Unrecognized stripe card error code: #{code}") if args.nil?
-    self.prepare_error  Stripe::CardError.new(*args), :new_charge
+    self.prepare_error  Stripe::CardError.new(*args), *handler_names
   end
 
   module CardErrors
