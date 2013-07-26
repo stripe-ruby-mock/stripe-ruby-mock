@@ -1,11 +1,9 @@
 module StripeMock
   module Data
 
-    def self.test_customer(params)
+    def self.test_customer(cards, params)
       cus_id = params[:id] || "test_cus_default"
-      card_id = params.delete(:card_id)
-      cards = []
-      cards << test_card(id: card_id, customer: cus_id) if card_id
+      cards.each {|card| card[:customer] = cus_id}
       {
         email: 'stripe_mock@example.com',
         description: 'an auto-generated stripe customer data mock',
@@ -23,7 +21,7 @@ module StripeMock
           url: "/v1/customers/#{cus_id}/cards",
           data: cards
         },
-        default_card: card_id
+        default_card: nil
       }.merge(params)
     end
 

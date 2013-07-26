@@ -13,8 +13,12 @@ module StripeMock
 
       def new_customer(route, method_url, params, headers)
         params[:id] ||= new_id('cus')
-        params[:card_id] = new_id('cc') if params.delete(:card)
-        customers[ params[:id] ] = Data.test_customer(params)
+        cards = []
+        if params[:card]
+          cards << get_card_by_token(params.delete(:card))
+          params[:default_card] = cards.first[:id]
+        end
+        customers[ params[:id] ] = Data.test_customer(cards, params)
       end
 
       def update_subscription(route, method_url, params, headers)
@@ -49,7 +53,7 @@ module StripeMock
         assert_existance :customer, $1, customers[$1]
 
         card_id = new_id('cc') if params.delete(:card)
-        cus = customers[$1] ||= Data.test_customer(:id => $1)
+        cus = customers[$1] ||= Data.test_customer([], :id => $1)
         cus.merge!(params)
 
         if card_id
@@ -70,7 +74,7 @@ module StripeMock
       def get_customer(route, method_url, params, headers)
         route =~ method_url
         assert_existance :customer, $1, customers[$1]
-        customers[$1] ||= Data.test_customer(:id => $1)
+        customers[$1] ||= Data.test_customer([], :id => $1)
       end
 
       def list_customers(route, method_url, params, headers)

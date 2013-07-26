@@ -46,6 +46,10 @@ module StripeMock
       @instance.strict = toggle
     end
 
+    def generate_card_token(card_params)
+      @instance.generate_card_token(card_params)
+    end
+
     def debug?; @instance.debug; end
     def strict?; @instance.strict; end
     def ping; true; end
