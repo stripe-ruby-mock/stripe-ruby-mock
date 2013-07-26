@@ -60,4 +60,13 @@ describe 'README examples' do
     expect(event.data.object.email).to eq('joe@example.com')
   end
 
+  it "generates a stripe card token" do
+    card_token = StripeMock.generate_card_token(last4: "9191", exp_year: 1984)
+
+    cus = Stripe::Customer.create(card: card_token)
+    card = cus.cards.data.first
+    expect(card.last4).to eq("9191")
+    expect(card.exp_year).to eq(1984)
+  end
+
 end

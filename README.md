@@ -214,6 +214,22 @@ it "can override default webhook values" do
 end
 ```
 
+## Generating Card Tokens
+
+Sometimes you need to check if your code reads a stripe card correctly. If so, you can specifically
+assign card data to a generated card token:
+
+```ruby
+it "generates a stripe card token" do
+  card_token = StripeMock.generate_card_token(last4: "9191", exp_year: 1984)
+
+  cus = Stripe::Customer.create(card: card_token)
+  card = cus.cards.data.first
+  expect(card.last4).to eq("9191")
+  expect(card.exp_year).to eq(1984)
+end
+```
+
 ## Debugging
 
 To enable debug messages:
