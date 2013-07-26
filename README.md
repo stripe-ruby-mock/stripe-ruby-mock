@@ -5,7 +5,9 @@
 
 ## Install
 
-    $ gem install stripe-ruby-mock
+In your gemfile:
+
+    gem 'stripe-ruby-mock', '>= 1.8.4.4'
 
 ## Features
 
