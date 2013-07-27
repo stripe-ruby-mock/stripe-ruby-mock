@@ -52,7 +52,7 @@ shared_examples 'Charge API' do
     expect { Stripe::Charge.retrieve('nope') }.to raise_error {|e|
       expect(e).to be_a Stripe::InvalidRequestError
       expect(e.param).to eq('charge')
-      expect(e.http_status).to eq(400)
+      expect(e.http_status).to eq(404)
     }
   end
 

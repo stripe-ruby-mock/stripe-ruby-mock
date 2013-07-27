@@ -74,10 +74,24 @@ shared_examples 'Plan API' do
     expect { Stripe::Plan.retrieve('nope') }.to raise_error {|e|
       expect(e).to be_a Stripe::InvalidRequestError
       expect(e.param).to eq('plan')
-      expect(e.http_status).to eq(400)
+      expect(e.http_status).to eq(404)
     }
   end
 
+  it "deletes a stripe plan" do
+    Stripe::Plan.create(id: 'super_member', amount: 111)
+
+    plan = Stripe::Plan.retrieve('super_member')
+    expect(plan).to_not be_nil
+
+    plan.delete
+
+    expect { Stripe::Plan.retrieve('super_member') }.to raise_error {|e|
+      expect(e).to be_a Stripe::InvalidRequestError
+      expect(e.param).to eq('plan')
+      expect(e.http_status).to eq(404)
+    }
+  end
 
   it "retrieves all plans" do
     Stripe::Plan.create({ id: 'Plan One', amount: 54321 })
