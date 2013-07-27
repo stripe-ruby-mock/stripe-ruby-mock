@@ -214,6 +214,19 @@ it "can override default webhook values" do
 end
 ```
 
+## Subscriptions
+
+When you are updating a subscription make sure you create a mock plan otherwise the subscription won't be updated.
+
+```ruby
+Stripe::Plan.create(id: 'test')
+Stripe::Plan.create(id: 'test-two')
+Stripe::Plan.create(id: 'test-three')
+stripe_customer.update_subscription(plan: "test-three")
+```
+
+If you try the above without creating the stripe plans, it won't work.
+
 ## Generating Card Tokens
 
 Sometimes you need to check if your code reads a stripe card correctly. If so, you can specifically
