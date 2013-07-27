@@ -68,7 +68,7 @@ shared_examples 'Customer API' do
     expect { Stripe::Customer.retrieve('nope') }.to raise_error {|e|
       expect(e).to be_a Stripe::InvalidRequestError
       expect(e.param).to eq('customer')
-      expect(e.http_status).to eq(400)
+      expect(e.http_status).to eq(404)
     }
   end
 

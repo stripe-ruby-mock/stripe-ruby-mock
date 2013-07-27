@@ -87,7 +87,7 @@ module StripeMock
 
       if obj.nil?
         msg = message || "No such #{type}: #{id}"
-        raise Stripe::InvalidRequestError.new(msg, type.to_s, 400)
+        raise Stripe::InvalidRequestError.new(msg, type.to_s, 404)
       end
     end
 

@@ -74,7 +74,7 @@ shared_examples 'Plan API' do
     expect { Stripe::Plan.retrieve('nope') }.to raise_error {|e|
       expect(e).to be_a Stripe::InvalidRequestError
       expect(e.param).to eq('plan')
-      expect(e.http_status).to eq(400)
+      expect(e.http_status).to eq(404)
     }
   end
 
@@ -89,7 +89,7 @@ shared_examples 'Plan API' do
     expect { Stripe::Plan.retrieve('super_member') }.to raise_error {|e|
       expect(e).to be_a Stripe::InvalidRequestError
       expect(e.param).to eq('plan')
-      expect(e.http_status).to eq(400)
+      expect(e.http_status).to eq(404)
     }
   end
 
