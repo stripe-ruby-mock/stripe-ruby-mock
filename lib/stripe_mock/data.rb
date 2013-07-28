@@ -1,7 +1,7 @@
 module StripeMock
   module Data
 
-    def self.test_customer(cards, params)
+    def self.mock_customer(cards, params)
       cus_id = params[:id] || "test_cus_default"
       cards.each {|card| card[:customer] = cus_id}
       {
@@ -25,7 +25,7 @@ module StripeMock
       }.merge(params)
     end
 
-    def self.test_charge(params={})
+    def self.mock_charge(params={})
       {
         id: "ch_1fD6uiR9FAA2zc",
         object: "charge",
@@ -67,7 +67,7 @@ module StripeMock
       }.merge(params)
     end
 
-    def self.test_charge_array
+    def self.mock_charge_array
       {
         :data => [test_charge, test_charge, test_charge],
         :object => 'list',
@@ -75,7 +75,7 @@ module StripeMock
       }
     end
 
-    def self.test_card(params={})
+    def self.mock_card(params={})
       {
         id: "test_cc_default",
         object: "card",
@@ -99,7 +99,7 @@ module StripeMock
       }.merge(params)
     end
 
-    def self.test_coupon(params={})
+    def self.mock_coupon(params={})
       {
         :duration => 'repeating',
         :duration_in_months => 3,
@@ -110,7 +110,7 @@ module StripeMock
     end
 
     #FIXME nested overrides would be better than hardcoding plan_id
-    def self.test_subscription(params={})
+    def self.mock_subscription(params={})
       StripeMock::Util.rmerge({
         :current_period_end => 1308681468,
         :status => "trialing",
@@ -133,7 +133,7 @@ module StripeMock
       }, params)
     end
 
-    def self.test_invoice(params={})
+    def self.mock_invoice(params={})
       {
         :id => 'in_test_invoice',
         :object => 'invoice',
@@ -173,7 +173,7 @@ module StripeMock
       }.merge(params)
     end
 
-    def self.test_paid_invoice
+    def self.mock_paid_invoice
       test_invoice.merge({
           :attempt_count => 1,
           :attempted => true,
@@ -185,7 +185,7 @@ module StripeMock
         })
     end
 
-    def self.test_invoice_customer_array
+    def self.mock_invoice_customer_array
       {
         :data => [test_invoice],
         :object => 'list',
@@ -193,7 +193,7 @@ module StripeMock
       }
     end
 
-    def self.test_plan(params={})
+    def self.mock_plan(params={})
       {
         interval: "month",
         name: "The Basic Plan",
@@ -207,7 +207,7 @@ module StripeMock
       }.merge(params)
     end
 
-    def self.test_recipient(params={})
+    def self.mock_recipient(params={})
       {
         :name => "Stripe User",
         :type => "individual",
@@ -225,7 +225,7 @@ module StripeMock
       }.merge(params)
     end
 
-    def self.test_recipient_array
+    def self.mock_recipient_array
       {
         :data => [test_recipient, test_recipient, test_recipient],
         :object => 'list',
@@ -233,7 +233,7 @@ module StripeMock
       }
     end
 
-    def self.test_transfer(params={})
+    def self.mock_transfer(params={})
       {
         :status => 'pending',
         :amount => 100,
@@ -254,7 +254,7 @@ module StripeMock
       }.merge(params)
     end
 
-    def self.test_transfer_array
+    def self.mock_transfer_array
       {
         :data => [test_transfer, test_transfer, test_transfer],
         :object => 'list',
@@ -262,7 +262,7 @@ module StripeMock
       }
     end
 
-    def self.test_invalid_api_key_error
+    def self.mock_invalid_api_key_error
       {
         "error" => {
           "type" => "invalid_request_error",
@@ -271,7 +271,7 @@ module StripeMock
       }
     end
 
-    def self.test_invalid_exp_year_error
+    def self.mock_invalid_exp_year_error
       {
         "error" => {
           "code" => "invalid_expiry_year",
@@ -282,7 +282,7 @@ module StripeMock
       }
     end
 
-    def self.test_missing_id_error
+    def self.mock_missing_id_error
       {
         :error => {
           :param => "id",
@@ -292,13 +292,13 @@ module StripeMock
       }
     end
 
-    def self.test_delete_subscription(params={})
+    def self.mock_delete_subscription(params={})
       {
         deleted: true
       }.merge(params)
     end
 
-    def self.test_api_error
+    def self.mock_api_error
       {
         :error => {
           :type => "api_error"
@@ -306,7 +306,7 @@ module StripeMock
       }
     end
 
-    def self.test_delete_discount_response
+    def self.mock_delete_discount_response
       {
         :deleted => true,
         :id => "di_test_coupon"
