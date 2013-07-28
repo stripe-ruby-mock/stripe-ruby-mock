@@ -68,13 +68,13 @@ module StripeMock
     def generate_card_token(card_params)
       token = new_id 'tok'
       card_params[:id] = new_id 'cc'
-      @card_tokens[token] = Data.test_card(card_params)
+      @card_tokens[token] = Data.mock_card(card_params)
       token
     end
 
     def get_card_by_token(token)
       if token.nil? || @card_tokens[token].nil?
-        Data.test_card :id => new_id('cc')
+        Data.mock_card :id => new_id('cc')
       else
         @card_tokens.delete(token)
       end

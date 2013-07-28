@@ -12,20 +12,20 @@ module StripeMock
 
       def new_plan(route, method_url, params, headers)
         params[:id] ||= new_id('plan')
-        plans[ params[:id] ] = Data.test_plan(params)
+        plans[ params[:id] ] = Data.mock_plan(params)
       end
 
       def update_plan(route, method_url, params, headers)
         route =~ method_url
         assert_existance :plan, $1, plans[$1]
-        plans[$1] ||= Data.test_plan(:id => $1)
+        plans[$1] ||= Data.mock_plan(:id => $1)
         plans[$1].merge!(params)
       end
 
       def get_plan(route, method_url, params, headers)
         route =~ method_url
         assert_existance :plan, $1, plans[$1]
-        plans[$1] ||= Data.test_plan(:id => $1)
+        plans[$1] ||= Data.mock_plan(:id => $1)
       end
 
       def delete_plan(route, method_url, params, headers)
