@@ -42,6 +42,8 @@ module StripeMock
         sub = customer[:subscription]
         assert_existance nil, nil, sub, "No active subscription for customer: #{$1}"
 
+        customer[:subscription] = nil
+
         plan = plans[ sub[:plan][:id] ]
         assert_existance :plan, params[:plan], plan
 

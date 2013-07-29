@@ -136,6 +136,8 @@ shared_examples 'Customer API' do
     result = customer.cancel_subscription
     expect(result.deleted).to eq(true)
     expect(result.id).to eq(sub.id)
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+    expect(customer.subscription).to be_nil
   end
 
   it "cannot update to a plan that does not exist" do
