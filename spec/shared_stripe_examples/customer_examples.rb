@@ -114,7 +114,7 @@ shared_examples 'Customer API' do
 
   it "updates a stripe customer's subscription" do
     plan = Stripe::Plan.create(id: 'silver')
-    customer = Stripe::Customer.create(id: 'test_customer_sub')
+    customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk')
     sub = customer.update_subscription({ :plan => 'silver' })
 
     expect(sub.object).to eq('subscription')
@@ -128,9 +128,52 @@ shared_examples 'Customer API' do
     expect(customer.subscription.customer).to eq(customer.id)
   end
 
+  it "throws an error when subscribing a customer with no card" do
+    plan = Stripe::Plan.create(id: 'enterprise', amount: 499)
+    customer = Stripe::Customer.create(id: 'cardless')
+
+    expect { customer.update_subscription({ :plan => 'enterprise' }) }.to raise_error {|e|
+      expect(e).to be_a Stripe::InvalidRequestError
+      expect(e.http_status).to eq(400)
+      expect(e.message).to_not be_nil
+    }
+  end
+
+  it "subscribes a customer with no card to a free plan" do
+    plan = Stripe::Plan.create(id: 'free_tier', amount: 0)
+    customer = Stripe::Customer.create(id: 'cardless')
+    sub = customer.update_subscription({ :plan => 'free_tier' })
+
+    expect(sub.object).to eq('subscription')
+    expect(sub.plan.id).to eq('free_tier')
+    expect(sub.plan.to_hash).to eq(plan.to_hash)
+
+    customer = Stripe::Customer.retrieve('cardless')
+    expect(customer.subscription).to_not be_nil
+    expect(customer.subscription.id).to eq(sub.id)
+    expect(customer.subscription.plan.id).to eq('free_tier')
+    expect(customer.subscription.customer).to eq(customer.id)
+  end
+
+  it "subscribes a customer with no card to a plan with a free trial" do
+    plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+    customer = Stripe::Customer.create(id: 'cardless')
+    sub = customer.update_subscription({ :plan => 'trial' })
+
+    expect(sub.object).to eq('subscription')
+    expect(sub.plan.id).to eq('trial')
+    expect(sub.plan.to_hash).to eq(plan.to_hash)
+
+    customer = Stripe::Customer.retrieve('cardless')
+    expect(customer.subscription).to_not be_nil
+    expect(customer.subscription.id).to eq(sub.id)
+    expect(customer.subscription.plan.id).to eq('trial')
+    expect(customer.subscription.customer).to eq(customer.id)
+  end
+
   it "cancels a stripe customer's subscription" do
     plan = Stripe::Plan.create(id: 'the truth')
-    customer = Stripe::Customer.create(id: 'test_customer_sub')
+    customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk')
     sub = customer.update_subscription({ :plan => 'the truth' })
 
     result = customer.cancel_subscription

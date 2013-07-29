@@ -26,8 +26,14 @@ module StripeMock
 
         customer = customers[$1]
         assert_existance :customer, $1, customer
+
         plan = plans[ params[:plan] ]
         assert_existance :plan, params[:plan], plan
+
+        # Ensure customer has card to charge if plan has no trial and is not free
+        if customer[:default_card].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0
+          raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
+        end
 
         sub = Data.mock_subscription id: new_id('su'), plan: plan, customer: $1
         customer[:subscription] = sub
