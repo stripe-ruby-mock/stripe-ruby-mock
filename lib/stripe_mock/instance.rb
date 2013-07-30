@@ -42,20 +42,20 @@ module StripeMock
       # Ensure params hash has symbols as keys
       params = Stripe::Util.symbolize_names(params)
 
-      if @debug == true
-        puts "[StripeMock req] #{method} #{url}"
-        puts "                 #{params}"
-      end
-
       method_url = "#{method} #{url}"
 
       if handler = Instance.handler_for_method_url(method_url)
+        if @debug == true
+          puts "[StripeMock req]::#{handler[:name]} #{method} #{url}"
+          puts "                  #{params}"
+        end
+
         if mock_error = @error_queue.error_for_handler_name(handler[:name])
           @error_queue.dequeue
           raise mock_error
         else
           res = self.send(handler[:name], handler[:route], method_url, params, headers)
-          puts "[StripeMock res] #{res}" if @debug == true
+          puts "           [res]  #{res}" if @debug == true
           [res, api_key]
         end
       else
