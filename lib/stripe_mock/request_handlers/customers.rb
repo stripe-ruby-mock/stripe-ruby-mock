@@ -60,18 +60,18 @@ module StripeMock
         route =~ method_url
         assert_existance :customer, $1, customers[$1]
 
-        card_id = new_id('cc') if params.delete(:card)
         cus = customers[$1] ||= Data.mock_customer([], :id => $1)
         cus.merge!(params)
 
-        if card_id
-          new_card = Data.mock_card(id: card_id, customer: cus[:id])
+        if params[:card]
+          new_card = get_card_by_token(params.delete(:card))
 
           if cus[:cards][:count] == 0
             cus[:cards][:count] += 1
           else
             cus[:cards][:data].delete_if {|card| card[:id] == cus[:default_card]}
           end
+
           cus[:cards][:data] << new_card
           cus[:default_card] = new_card[:id]
         end
