@@ -2,7 +2,7 @@ require 'spec_helper'
 
 shared_examples 'Customer API' do
 
-  it "creates a stripe customer with a default card" do
+  it "creates a stripe customer with a default and active card" do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
       card: 'some_card_token',
@@ -16,6 +16,8 @@ shared_examples 'Customer API' do
     expect(customer.cards.data.length).to eq(1)
     expect(customer.default_card).to_not be_nil
     expect(customer.default_card).to eq customer.cards.data.first.id
+    expect(customer.active_card).to_not be_nil
+    expect(customer.active_card.to_hash).to eq customer.cards.data.first.to_hash
 
     expect { customer.card }.to raise_error
   end
@@ -32,6 +34,7 @@ shared_examples 'Customer API' do
     expect(customer.cards.count).to eq(0)
     expect(customer.cards.data.length).to eq(0)
     expect(customer.default_card).to be_nil
+    expect(customer.active_card).to be_nil
   end
 
   it "stores a created stripe customer in memory" do
@@ -61,6 +64,7 @@ shared_examples 'Customer API' do
     expect(customer.id).to eq(original.id)
     expect(customer.email).to eq(original.email)
     expect(customer.default_card).to eq(original.default_card)
+    expect(customer.active_card.to_hash).to eq(original.active_card.to_hash)
     expect(customer.subscription).to be_nil
   end
 

@@ -21,7 +21,8 @@ module StripeMock
           url: "/v1/customers/#{cus_id}/cards",
           data: cards
         },
-        default_card: nil
+        default_card: nil,
+        active_card: cards.find{ |c| c[:id] == params[:default_card] }
       }.merge(params)
     end
 
