@@ -13,6 +13,7 @@ shared_examples 'Charge API' do
     expect(charge.id).to match(/^test_ch/)
     expect(charge.amount).to eq(999)
     expect(charge.description).to eq('card charge')
+    expect(charge.captured).to eq(true)
   end
 
 
@@ -113,9 +114,10 @@ shared_examples 'Charge API' do
         capture: false
       })
 
-      ret = charge.capture
+      returned_charge = charge.capture
       expect(charge.captured).to be_true
-      expect ret.to_eq charge
+      expect(returned_charge.id).to eq(charge.id)
+      expect(returned_charge.captured).to be_true
     end
   end
 end
