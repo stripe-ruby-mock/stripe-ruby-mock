@@ -104,4 +104,18 @@ shared_examples 'Charge API' do
     end
   end
 
+  describe "two-step charge (auth, then capture)" do
+    it "changes captured status upon #capture" do
+      charge = Stripe::Charge.create({
+        amount: 777,
+        currency: 'USD',
+        card: 'card_token_abc',
+        capture: false
+      })
+
+      ret = charge.capture
+      expect(charge.captured).to be_true
+      expect ret.to_eq charge
+    end
+  end
 end
