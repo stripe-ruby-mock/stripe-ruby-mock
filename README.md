@@ -17,7 +17,7 @@ In your gemfile:
 
 ## Description
 
-** *WARNING: THIS LIBRARY IS INCOMPLETE AND IN ACTIVE DEVELOPMENT* **
+** *WARNING: This library does not cover all Stripe API endpoints. If you need one that's missing, please create an issue for it.* **
 
 At its core, this library overrides [stripe-ruby's](https://github.com/stripe/stripe-ruby)
 request method to skip all http calls and
@@ -244,9 +244,7 @@ If you always want debug to be on (it's quite verbose), you should put this in a
 ## TODO
 
 * Cover all stripe urls/methods
-* Create hash for storing/retrieving all stripe objects in-memory
-  * Currently implemented for: **Customers**, **Charges**, and **Plans**
-* Throw useful errors that emulate Stripe's
+* Throw useful errors that emulate Stripe's requirements
   * For example: "You must supply either a card or a customer id" for `Stripe::Charge`
 
 ## Developing stripe-ruby-mock
