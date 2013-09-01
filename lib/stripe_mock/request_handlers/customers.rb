@@ -4,6 +4,7 @@ module StripeMock
 
       def Customers.included(klass)
         klass.add_handler 'post /v1/customers',                     :new_customer
+        klass.add_handler 'post /v1/customers/(.*)/cards',          :store_card
         klass.add_handler 'post /v1/customers/(.*)/subscription',   :update_subscription
         klass.add_handler 'delete /v1/customers/(.*)/subscription', :cancel_subscription
         klass.add_handler 'post /v1/customers/(.*)',                :update_customer
@@ -19,6 +20,18 @@ module StripeMock
           params[:default_card] = cards.first[:id]
         end
         customers[ params[:id] ] = Data.mock_customer(cards, params)
+      end
+
+      def store_card(route, method_url, params, headers)
+        route =~ method_url
+        assert_existance :customer, $1, customers[$1]
+
+        cus = customers[$1] ||= Data.mock_customer([], :id => $1)
+
+        card = get_card_by_token(params.delete(:card))
+
+        cus[:cards][:count] += 1
+        cus[:cards][:data] << card
       end
 
       def update_subscription(route, method_url, params, headers)
