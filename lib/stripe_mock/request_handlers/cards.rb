@@ -18,8 +18,16 @@ module StripeMock
 
 
       private
-      def add_card_from_token(cus, token)
-        new_card = get_card_by_token(token)
+      def card_from_params(attrs_or_token)
+        if attrs_or_token.is_a? Hash
+          attrs_or_token = generate_card_token(attrs_or_token)
+        end
+        get_card_by_token(attrs_or_token)
+      end
+
+      def add_card_from_token(cus, attrs_or_token)
+        new_card = card_from_params(attrs_or_token)
+        new_card[:customer] = cus[:id]
 
         if cus[:cards][:count] == 0
           cus[:cards][:count] += 1
