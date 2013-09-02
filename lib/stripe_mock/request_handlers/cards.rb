@@ -3,7 +3,7 @@ module StripeMock
     module Cards
 
       def Cards.included(klass)
-        klass.add_handler 'post /v1/customers/(.*)/cards',          :create_card
+        klass.add_handler 'post /v1/customers/(.*)/cards', :create_card
       end
 
       def create_card(route, method_url, params, headers)
