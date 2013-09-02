@@ -1,4 +1,4 @@
-# stripe-ruby-mock [![Build Status](https://travis-ci.org/GeorgeErickson/stripe-ruby-mock.png?branch=master)](https://travis-ci.org/GeorgeErickson/stripe-ruby-mock)
+# stripe-ruby-mock [![Build Status](https://travis-ci.org/rebelidealist/stripe-ruby-mock.png?branch=master)](https://travis-ci.org/rebelidealist/stripe-ruby-mock)
 
 * Homepage: https://github.com/rebelidealist/stripe-ruby-mock
 * Issues: https://github.com/rebelidealist/stripe-ruby-mock/issues
