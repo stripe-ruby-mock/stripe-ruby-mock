@@ -210,4 +210,9 @@ shared_examples 'Customer API' do
     end
   end
 
+  it 'stores a card when using customer.cards.create' do
+    customer = Stripe::Customer.create(id: 'test_customer_sub')
+    card_token = StripeMock.generate_card_token(last4: "1133", exp_month: 11, exp_year: 2099)
+    customer.cards.create(card: card_token)
+  end
 end
