@@ -65,14 +65,7 @@ module StripeMock
 
         if params[:card]
           new_card = get_card_by_token(params.delete(:card))
-
-          if cus[:cards][:count] == 0
-            cus[:cards][:count] += 1
-          else
-            cus[:cards][:data].delete_if {|card| card[:id] == cus[:default_card]}
-          end
-
-          cus[:cards][:data] << new_card
+          add_card_to_customer(new_card, cus)
           cus[:default_card] = new_card[:id]
         end
 
