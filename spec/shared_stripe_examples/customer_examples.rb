@@ -197,6 +197,11 @@ shared_examples 'Customer API' do
     }.to raise_error Stripe::InvalidRequestError
   end
 
+  it "deletes a customer" do
+    customer = Stripe::Customer.create(id: 'test_customer_sub')
+    customer = customer.delete
+    expect(customer.deleted).to be_true
+  end
 
   context "With strict mode toggled off" do
 
