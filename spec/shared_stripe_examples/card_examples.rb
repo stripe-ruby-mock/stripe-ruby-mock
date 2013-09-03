@@ -31,16 +31,16 @@ shared_examples 'Card API' do
 
     expect(card.customer).to eq('test_customer_sub')
     expect(card.last4).to eq("4242")
-    expect(card.exp_month).to eq("11")
-    expect(card.exp_year).to eq("3031")
+    expect(card.exp_month).to eq(11)
+    expect(card.exp_year).to eq(3031)
 
     customer = Stripe::Customer.retrieve('test_customer_sub')
     expect(customer.cards.count).to eq(1)
     card = customer.cards.data.first
     expect(card.customer).to eq('test_customer_sub')
     expect(card.last4).to eq("4242")
-    expect(card.exp_month).to eq("11")
-    expect(card.exp_year).to eq("3031")
+    expect(card.exp_month).to eq(11)
+    expect(card.exp_year).to eq(3031)
   end
 
   it 'create does not change the customers default card' do

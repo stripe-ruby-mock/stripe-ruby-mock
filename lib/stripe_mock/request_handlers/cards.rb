@@ -18,11 +18,19 @@ module StripeMock
 
       private
 
+      def validate_card(card)
+        [:exp_month, :exp_year].each do |field|
+          card[field] = card[field].to_i
+        end
+        card
+      end
+
       def card_from_params(attrs_or_token)
         if attrs_or_token.is_a? Hash
           attrs_or_token = generate_card_token(attrs_or_token)
         end
-        get_card_by_token(attrs_or_token)
+        card = get_card_by_token(attrs_or_token)
+        validate_card(card)
       end
     end
   end
