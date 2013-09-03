@@ -203,7 +203,6 @@ shared_examples 'Customer API' do
     expect(customer.deleted).to be_true
   end
 
-
   context "With strict mode toggled off" do
 
     before { StripeMock.toggle_strict(false) }
