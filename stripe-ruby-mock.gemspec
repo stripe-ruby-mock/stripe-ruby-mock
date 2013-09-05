@@ -3,7 +3,7 @@
 require File.expand_path('../lib/stripe_mock/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.name          = "stripe-ruby-mock"
+  gem.name          = "mustwin-stripe-ruby-mock"
   gem.version       = StripeMock::VERSION
   gem.summary       = %q{TDD with stripe}
   gem.description   = %q{A drop-in library to test stripe without hitting their servers}
