@@ -16,6 +16,7 @@ module StripeMock
     end
 
     include StripeMock::RequestHandlers::Charges
+    include StripeMock::RequestHandlers::Cards
     include StripeMock::RequestHandlers::Customers
     include StripeMock::RequestHandlers::InvoiceItems
     include StripeMock::RequestHandlers::Plans
@@ -78,6 +79,20 @@ module StripeMock
       else
         @card_tokens.delete(token)
       end
+    end
+
+    def add_card_to_customer(card, cus)
+      card[:customer] = cus[:id]
+
+      if cus[:cards][:count] == 0
+        cus[:cards][:count] += 1
+      else
+        cus[:cards][:data].delete_if {|card| card[:id] == cus[:default_card]}
+      end
+
+      cus[:cards][:data] << card
+
+      card
     end
 
     private
