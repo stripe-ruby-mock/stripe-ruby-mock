@@ -191,16 +191,21 @@ end
 By default, StripeMock searches in your `spec/fixtures/stripe_webhooks/` folder for your own, custom webhooks.
 If it finds nothing, it falls back to [test events generated through stripe's webhooktester](lib/stripe_mock/webhook_fixtures/).
 
-You can name events whatever you like in your `spec/fixtures/stripe_webhooks/` folder. However, if you try to call a non-existant event that's not in that folder, StripeMock will throw an error.
+For example, you could create a file in `spec/fixtures/stripe_webhooks/invoice.created.with-sub.json`, copy/paste the default from [the default invoice.created.json](lib/stripe_mock/webhook_fixtures/invoice.created.json), and customize it to your needs.
 
-If you wish to use a different fixture path, you can set it yourself:
-
-    StripeMock.webhook_fixture_path = './spec/other/folder/'
-
-Also, you can override values whenever you create any webhook event:
+Then you can use that webook directly in your specs:
 
 ```ruby
-it "can override default webhook values" do
+it "can use a custom webhook fixture" do
+  event = StripeMock.mock_webhook_event('invoice.created.with-sub')
+  # etc.
+end
+```
+
+You can alse override values on the fly:
+
+```ruby
+it "can override webhook values" do
   # NOTE: given hash values get merged directly into event.data.object
   event = StripeMock.mock_webhook_event('customer.created', {
     :id => 'cus_my_custom_value',
@@ -213,6 +218,12 @@ it "can override default webhook values" do
   expect(event.data.object.email).to eq('joe@example.com')
 end
 ```
+
+You can name events whatever you like in your `spec/fixtures/stripe_webhooks/` folder. However, if you try to call a non-standard event that's doesn't exist in that folder, StripeMock will throw an error.
+
+If you wish to use a different fixture path, you can set it yourself:
+
+    StripeMock.webhook_fixture_path = './spec/other/folder/'
 
 ## Generating Card Tokens
 
