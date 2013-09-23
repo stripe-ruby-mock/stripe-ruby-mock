@@ -8,6 +8,7 @@ module StripeMock
         klass.add_handler 'post /v1/charges/(.*)/capture',  :capture_charge
         klass.add_handler 'post /v1/recipients',            :new_recipient
         klass.add_handler 'get /v1/recipients/(.*)',        :get_recipient
+        klass.add_handler  'post /v1/customers/(.*)/cards',  :new_card
       end
 
       def new_charge(route, method_url, params, headers)
@@ -39,6 +40,11 @@ module StripeMock
         route =~ method_url
         assert_existance :recipient, $1, recipients[$1]
         recipients[$1] ||= Data.mock_recipient(:id => $1)
+      end
+
+      def new_card(route, method_url, params, headers)
+        id = new_id('card')
+        cards[id] = Data.mock_card(params.merge :id => id)
       end
     end
   end
