@@ -16,6 +16,7 @@ module StripeMock
     end
 
     include StripeMock::RequestHandlers::Charges
+    include StripeMock::RequestHandlers::Recipients
     include StripeMock::RequestHandlers::Customers
     include StripeMock::RequestHandlers::InvoiceItems
     include StripeMock::RequestHandlers::Plans

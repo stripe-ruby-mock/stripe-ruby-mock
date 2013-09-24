@@ -4,6 +4,7 @@ module StripeMock
 
       def Customers.included(klass)
         klass.add_handler 'post /v1/customers',                     :new_customer
+        klass.add_handler  'post /v1/customers/(.*)/cards',         :new_card
         klass.add_handler 'post /v1/customers/(.*)/subscription',   :update_subscription
         klass.add_handler 'delete /v1/customers/(.*)/subscription', :cancel_subscription
         klass.add_handler 'post /v1/customers/(.*)',                :update_customer
@@ -100,6 +101,17 @@ module StripeMock
 
       def list_customers(route, method_url, params, headers)
         customers.values
+      end
+
+      def new_card(route, method_url, params, headers)
+        route =~ method_url
+        id        = new_id('card')
+        cus       = customers[$1]
+        card      = Data.mock_card(params.merge :id => id, :customer => $1)
+        cards[id] = card
+        cus[:cards][:count] += 1
+        cus[:cards][:data] << card
+        cards[id] = card
       end
 
     end

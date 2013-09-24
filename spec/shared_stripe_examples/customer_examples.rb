@@ -34,6 +34,18 @@ shared_examples 'Customer API' do
     expect(customer.default_card).to be_nil
   end
 
+  it "can create a card on a stripe customer" do
+    customer = Stripe::Customer.create({
+      email: 'anothercardless@appleseed.com',
+      description: "no card"
+    })
+
+    expect do
+      customer.cards.create(card: 'some_card_token')
+    end.to change{ customer.cards.data.length }.by(1)
+
+  end
+
   it "stores a created stripe customer in memory" do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
