@@ -31,6 +31,7 @@ require 'stripe_mock/api/debug'
 
 require 'stripe_mock/request_handlers/charges.rb'
 require 'stripe_mock/request_handlers/recipients.rb'
+require 'stripe_mock/request_handlers/cards.rb'
 require 'stripe_mock/request_handlers/customers.rb'
 require 'stripe_mock/request_handlers/invoice_items.rb'
 require 'stripe_mock/request_handlers/plans.rb'
