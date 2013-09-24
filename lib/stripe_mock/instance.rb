@@ -16,19 +16,22 @@ module StripeMock
     end
 
     include StripeMock::RequestHandlers::Charges
+    include StripeMock::RequestHandlers::Recipients
     include StripeMock::RequestHandlers::Cards
     include StripeMock::RequestHandlers::Customers
     include StripeMock::RequestHandlers::InvoiceItems
     include StripeMock::RequestHandlers::Plans
 
 
-    attr_reader :charges, :customers, :plans, :error_queue
+    attr_reader :charges, :customers, :plans, :error_queue, :recipients
     attr_accessor :debug, :strict
 
     def initialize
       @customers = {}
+      @recipients = {}
       @charges = {}
       @plans = {}
+      @recipient_tokens = {}
       @card_tokens = {}
 
       @id_counter = 0
@@ -64,6 +67,13 @@ module StripeMock
         puts " params: #{params}"
         [{}, api_key]
       end
+    end
+
+    def generate_recipient_token(recipient_params)
+      token = new_id 'tok'
+      recipient_params[:id] = new_id 'rec'
+      @recipient_tokens[token] = Data.mock_card(recipient_params)
+      token
     end
 
     def generate_card_token(card_params)

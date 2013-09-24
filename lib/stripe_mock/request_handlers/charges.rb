@@ -27,7 +27,6 @@ module StripeMock
         charge[:captured] = true
         charge
       end
-
     end
   end
 end
