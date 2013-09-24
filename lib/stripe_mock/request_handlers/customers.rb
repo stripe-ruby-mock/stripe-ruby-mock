@@ -108,10 +108,9 @@ module StripeMock
         id        = new_id('card')
         cus       = customers[$1]
         card      = Data.mock_card(params.merge :id => id, :customer => $1)
-        cards[id] = card
         cus[:cards][:count] += 1
         cus[:cards][:data] << card
-        cards[id] = card
+        card
       end
 
     end
