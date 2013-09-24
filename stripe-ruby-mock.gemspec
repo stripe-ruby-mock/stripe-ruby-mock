@@ -3,14 +3,14 @@
 require File.expand_path('../lib/stripe_mock/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.name          = "mustwin-stripe-ruby-mock"
+  gem.name          = "stripe-ruby-mock"
   gem.version       = StripeMock::VERSION
   gem.summary       = %q{TDD with stripe}
   gem.description   = %q{A drop-in library to test stripe without hitting their servers}
   gem.license       = "MIT"
   gem.authors       = ["Gilbert"]
   gem.email         = "gilbertbgarza@gmail.com"
-  gem.homepage      = "https://github.com/MustWin/stripe-ruby-mock"
+  gem.homepage      = "https://github.com/rebelidealist/stripe-ruby-mock"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
