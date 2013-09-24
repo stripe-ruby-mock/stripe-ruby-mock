@@ -22,13 +22,12 @@ module StripeMock
     include StripeMock::RequestHandlers::Plans
 
 
-    attr_reader :charges, :customers, :plans, :error_queue, :recipients, :cards
+    attr_reader :charges, :customers, :plans, :error_queue, :recipients
     attr_accessor :debug, :strict
 
     def initialize
       @customers = {}
       @recipients = {}
-      @cards = {}
       @charges = {}
       @plans = {}
       @recipient_tokens = {}
