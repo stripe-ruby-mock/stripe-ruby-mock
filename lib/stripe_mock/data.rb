@@ -67,6 +67,21 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_refund(params={})
+      mock_charge.merge({
+        refunded: true,
+        refunds: [
+          {
+            amount: params[:amount],
+            currency: "usd",
+            created: 1380208998,
+            object: "refund",
+            balance_transaction: "txn_2dyYXXP90MN26R"
+          }
+        ]
+      })
+    end
+
     def self.mock_charge_array
       {
         :data => [test_charge, test_charge, test_charge],
@@ -312,6 +327,5 @@ module StripeMock
         :id => "di_test_coupon"
       }
     end
-
   end
 end
