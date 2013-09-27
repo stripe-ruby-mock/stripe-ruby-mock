@@ -32,9 +32,8 @@ shared_examples 'Bank Account Token Mocking' do
       email: 'blah@domain.co',
       bank_account: bank_token
     })
-    account = recipient['active_account']
-    expect(account['last4']).to eq("7777")
-    expect(account['bank_name']).to eq("Bank Token Mocking")
+    expect(recipient.active_account.last4).to eq("7777")
+    expect(recipient.active_account.bank_name).to eq("Bank Token Mocking")
   end
 
 end
