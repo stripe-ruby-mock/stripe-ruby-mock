@@ -16,11 +16,11 @@ module StripeMock
     end
 
     include StripeMock::RequestHandlers::Charges
-    include StripeMock::RequestHandlers::Recipients
     include StripeMock::RequestHandlers::Cards
     include StripeMock::RequestHandlers::Customers
     include StripeMock::RequestHandlers::InvoiceItems
     include StripeMock::RequestHandlers::Plans
+    include StripeMock::RequestHandlers::Recipients
 
 
     attr_reader :charges, :customers, :plans, :error_queue, :recipients
