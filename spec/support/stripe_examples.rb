@@ -1,5 +1,6 @@
 
 def require_stripe_examples
+  require 'shared_stripe_examples/bank_token_examples'
   require 'shared_stripe_examples/card_token_examples'
   require 'shared_stripe_examples/card_examples'
   require 'shared_stripe_examples/charge_examples'
@@ -11,6 +12,7 @@ def require_stripe_examples
 end
 
 def it_behaves_like_stripe(&block)
+  it_behaves_like 'Bank Account Token Mocking', &block
   it_behaves_like 'Card Token Mocking', &block
   it_behaves_like 'Card API', &block
   it_behaves_like 'Charge API', &block

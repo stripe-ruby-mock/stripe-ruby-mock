@@ -31,7 +31,7 @@ module StripeMock
       @recipients = {}
       @charges = {}
       @plans = {}
-      @recipient_tokens = {}
+      @bank_tokens = {}
       @card_tokens = {}
 
       @id_counter = 0
@@ -69,10 +69,10 @@ module StripeMock
       end
     end
 
-    def generate_recipient_token(recipient_params)
+    def generate_bank_token(bank_params)
       token = new_id 'tok'
-      recipient_params[:id] = new_id 'rec'
-      @recipient_tokens[token] = Data.mock_card(recipient_params)
+      bank_params[:id] = new_id 'rec'
+      @bank_tokens[token] = Data.mock_card(bank_params)
       token
     end
 

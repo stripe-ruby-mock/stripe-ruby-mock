@@ -48,8 +48,8 @@ module StripeMock
       timeout_wrap { @pipe.strict? }
     end
 
-    def generate_recipient_token(recipient_params)
-      timeout_wrap { @pipe.generate_recipient_token(recipient_params) }
+    def generate_bank_token(recipient_params)
+      timeout_wrap { @pipe.generate_bank_token(recipient_params) }
     end
 
     def generate_card_token(card_params)
