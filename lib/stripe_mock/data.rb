@@ -114,6 +114,18 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_bank_account(params={})
+      {
+        object: "bank_account",
+        bank_name: "STRIPEMOCK TEST BANK",
+        last4: "6789",
+        country: "US",
+        currency: "usd",
+        validated: false,
+        fingerprint: "aBcFinGerPrINt123"
+      }.merge(params)
+    end
+
     def self.mock_coupon(params={})
       {
         :duration => 'repeating',
