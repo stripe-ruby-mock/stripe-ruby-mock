@@ -9,7 +9,11 @@ module StripeMock
 
       def new_recipient(route, method_url, params, headers)
         id = new_id('rp')
+        if params[:bank_account]
+          params[:active_account] = get_bank_by_token(params.delete(:bank_account))
+        end
         recipients[id] = Data.mock_recipient(params.merge :id => id)
+        recipients[id]
       end
 
       def get_recipient(route, method_url, params, headers)

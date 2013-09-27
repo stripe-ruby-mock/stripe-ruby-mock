@@ -24,6 +24,7 @@ module StripeMock
 
 
     attr_reader :charges, :customers, :plans, :error_queue, :recipients
+    attr_reader :bank_tokens
     attr_accessor :debug, :strict
 
     def initialize
@@ -70,9 +71,8 @@ module StripeMock
     end
 
     def generate_bank_token(bank_params)
-      token = new_id 'tok'
-      bank_params[:id] = new_id 'rec'
-      @bank_tokens[token] = Data.mock_card(bank_params)
+      token = new_id 'btok'
+      @bank_tokens[token] = Data.mock_bank_account(bank_params)
       token
     end
 
@@ -81,6 +81,14 @@ module StripeMock
       card_params[:id] = new_id 'cc'
       @card_tokens[token] = Data.mock_card(card_params)
       token
+    end
+
+    def get_bank_by_token(token)
+      if token.nil? || @bank_tokens[token].nil?
+        Data.mock_bank_account
+      else
+        @bank_tokens.delete(token)
+      end
     end
 
     def get_card_by_token(token)
