@@ -1,20 +1,20 @@
 {
   "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "plan.created",
+  "object": "event",
   "data": {
     "object": {
-      "amount": 1000,
-      "currency": "usd",
-      "id": "1_00000000000000",
       "interval": "month",
-      "interval_count": 1,
-      "livemode": false,
-      "name": "Cool Plan",
+      "name": "Member's Club",
+      "amount": 100,
+      "currency": "usd",
+      "id": "fkx0AFo_00000000000000",
       "object": "plan",
-      "trial_period_days": 3
+      "livemode": false,
+      "interval_count": 1,
+      "trial_period_days": null
     }
-  },
-  "id": "evt_00000000000000",
-  "livemode": false,
-  "object": "event",
-  "type": "plan.created"
+  }
 }

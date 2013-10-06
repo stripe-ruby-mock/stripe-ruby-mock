@@ -44,7 +44,7 @@ describe 'README examples' do
 
     customer_object = event.data.object
     expect(customer_object.id).to_not be_nil
-    expect(customer_object.active_card).to_not be_nil
+    expect(customer_object.default_card).to_not be_nil
     # etc.
   end
 

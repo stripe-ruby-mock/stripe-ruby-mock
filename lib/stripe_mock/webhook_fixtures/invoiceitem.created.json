@@ -1,21 +1,21 @@
 {
   "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "invoiceitem.created",
+  "object": "event",
   "data": {
     "object": {
-      "amount": 1000,
+      "object": "invoiceitem",
+      "id": "ii_00000000000000",
+      "date": 1372126711,
+      "amount": 2500,
+      "livemode": false,
+      "proration": false,
       "currency": "usd",
       "customer": "cus_00000000000000",
-      "date": 1371501563,
-      "description": "My First Invoice Item (created for API docs)",
-      "id": "ii_00000000000000",
-      "invoice": null,
-      "livemode": false,
-      "object": "invoiceitem",
-      "proration": false
+      "description": "Plan: Veteran's Club Signup Fee Plan Id: 4",
+      "invoice": "in_00000000000000"
     }
-  },
-  "id": "evt_00000000000000",
-  "livemode": false,
-  "object": "event",
-  "type": "invoiceitem.created"
+  }
 }
