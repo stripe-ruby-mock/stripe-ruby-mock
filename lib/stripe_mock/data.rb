@@ -39,6 +39,7 @@ module StripeMock
         fee_details: [
         ],
         card: {
+          "id": "card_2bSfQz48scm65H",
           object: "card",
           last4: "4242",
           type: "Visa",
