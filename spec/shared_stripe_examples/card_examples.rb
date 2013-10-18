@@ -56,10 +56,6 @@ shared_examples 'Card API' do
     let!(:customer) { Stripe::Customer.create(id: 'test_customer_sub') }
     let!(:card_token) { StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
     let!(:card) { customer.cards.create(card: card_token) }
-    
-    before(:each) do
-      StripeMock.toggle_debug(true)
-    end
 
     it "retrieves a customers card" do
       retrieved = customer.cards.retrieve(card.id)
