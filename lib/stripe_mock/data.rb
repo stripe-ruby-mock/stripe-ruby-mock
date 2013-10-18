@@ -78,7 +78,8 @@ module StripeMock
             object: "refund",
             balance_transaction: "txn_2dyYXXP90MN26R"
           }
-        ]
+        ],
+        amount_refunded: params[:amount]
       })
     end
 
