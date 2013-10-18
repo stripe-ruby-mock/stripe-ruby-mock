@@ -51,4 +51,23 @@ shared_examples 'Card API' do
     customer = Stripe::Customer.retrieve('test_customer_sub')
     expect(customer.default_card).to be_nil
   end
+
+  context "retrieval and deletion" do
+    let!(:customer) { Stripe::Customer.create(id: 'test_customer_sub') }
+    let!(:card_token) { StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
+    let!(:card) { customer.cards.create(card: card_token) }
+
+    it "retrieves a customers card" do
+      retrieved = customer.cards.retrieve(card.id)
+      expect(retrieved.to_s).to eq(card.to_s)
+    end
+
+    it "deletes a customers card" do
+      card.delete
+      expect(customer.cards.data).to be_empty
+    end
+
+    it "updates the default card if deleted"
+    
+  end
 end
