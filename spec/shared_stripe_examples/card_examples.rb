@@ -62,9 +62,10 @@ shared_examples 'Card API' do
       expect(retrieved.to_s).to eq(card.to_s)
     end
 
-    it "deletes a customers card" do
+    focused "deletes a customers card" do
       card.delete
-      expect(customer.cards.data).to be_empty
+      retrieved_cus = Stripe::Customer.retrieve(customer.id)
+      expect(retrieved_cus.cards.data).to be_empty
     end
 
     it "updates the default card if deleted"

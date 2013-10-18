@@ -36,8 +36,8 @@ module StripeMock
         card = get_customer_card(customer, $2)
         assert_existance :card, $2, card
         card = { id: $2, deleted: true }
-        customer[:cards][:data].map!{|cc| 
-          cc[:id] == card[:id] ? card : cc
+        customer[:cards][:data].reject!{|cc| 
+          cc[:id] == card[:id]
         }
         card
       end
