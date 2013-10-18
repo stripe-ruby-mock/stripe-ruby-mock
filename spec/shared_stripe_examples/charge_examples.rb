@@ -133,5 +133,6 @@ shared_examples 'Charge API' do
 
     expect(charge.refunded).to eq(true)
     expect(charge.refunds.first.amount).to eq(999)
+    expect(charge.amount_refunded).to eq(999)
   end
 end
