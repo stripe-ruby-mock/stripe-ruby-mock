@@ -99,6 +99,10 @@ module StripeMock
       end
     end
 
+    def get_customer_card(customer, token)
+      customer[:cards][:data].find{|cc| cc[:id] == token }
+    end
+    
     def add_card_to_customer(card, cus)
       card[:customer] = cus[:id]
 
