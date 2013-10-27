@@ -12,7 +12,7 @@ module StripeMock
       def new_charge(route, method_url, params, headers)
         id = new_id('ch')
         charges[id] = Data.mock_charge(params.merge :id => id)
-        assert_existance :charge, $1, (charges[id][:card] || charges[id][:customer])
+        assert_existance :charge, id, (charges[id][:card] || charges[id][:customer])
         charges[id]
       end
 
