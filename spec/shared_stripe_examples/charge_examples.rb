@@ -32,7 +32,7 @@ shared_examples 'Charge API' do
 
   it "cannot create a stripe charge item without either a card token or a customer token" do
     expect {
-      charge = Stripe::Charge.create(
+      Stripe::Charge.create(
         amount: 999,
         currency: 'USD',
         card: nil,
