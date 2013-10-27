@@ -16,6 +16,35 @@ shared_examples 'Charge API' do
     expect(charge.captured).to eq(true)
   end
 
+  it "creates a stripe charge item with a customer token" do
+    charge = Stripe::Charge.create(
+      amount: 999,
+      currency: 'USD',
+      customer: 'card_token_abcde',
+      description: 'card charge'
+    )
+
+    expect(charge.id).to match(/^test_ch/)
+    expect(charge.amount).to eq(999)
+    expect(charge.description).to eq('card charge')
+    expect(charge.captured).to eq(true)
+  end
+
+  it "cannot create a stripe charge item without either a card token or a customer token" do
+    expect {
+      charge = Stripe::Charge.create(
+        amount: 999,
+        currency: 'USD',
+        card: nil,
+        description: 'card charge'
+      )
+    }.to raise_error {|e|
+      expect(e).to be_a Stripe::InvalidRequestError
+      expect(e.param).to eq('charge')
+      expect(e.http_status).to eq(404)
+    }
+  end
+
 
   it "stores a created stripe charge in memory" do
     charge = Stripe::Charge.create({
