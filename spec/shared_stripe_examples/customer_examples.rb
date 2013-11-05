@@ -34,6 +34,16 @@ shared_examples 'Customer API' do
     expect(customer.default_card).to be_nil
   end
 
+  it 'creates a customer with a plan' do
+    plan = Stripe::Plan.create(id: 'silver')
+    customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', :plan => 'silver')
+
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+    expect(customer.subscription).to_not be_nil
+    expect(customer.subscription.plan.id).to eq('silver')
+    expect(customer.subscription.customer).to eq(customer.id)
+  end
+
   it "stores a created stripe customer in memory" do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
