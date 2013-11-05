@@ -203,6 +203,19 @@ shared_examples 'Customer API' do
     expect(customer.deleted).to be_true
   end
 
+  it "sets card" do
+    plan = Stripe::Plan.create(id: 'small')
+    customer = Stripe::Customer.create(id: 'test_customer_sub')
+    customer.update_subscription(card: 'tk', :plan => 'small')
+
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+
+    expect(customer.cards.count).to eq(1)
+    expect(customer.cards.data.length).to eq(1)
+    expect(customer.default_card).to_not be_nil
+    expect(customer.default_card).to eq customer.cards.data.first.id
+  end
+
   context "With strict mode toggled off" do
 
     before { StripeMock.toggle_strict(false) }
