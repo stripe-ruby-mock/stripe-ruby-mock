@@ -19,6 +19,19 @@ module StripeMock
           cards << get_card_by_token(params.delete(:card))
           params[:default_card] = cards.first[:id]
         end
+
+        if params[:plan]
+          plan = plans[ params[:plan] ]
+          assert_existance :plan, params[:plan], plan
+
+          if params[:default_card].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0
+            raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
+          end
+
+          sub = Data.mock_subscription id: new_id('su'), plan: plan, customer: params[:id]
+          params[:subscription] = sub
+        end
+
         customers[ params[:id] ] = Data.mock_customer(cards, params)
       end
 
