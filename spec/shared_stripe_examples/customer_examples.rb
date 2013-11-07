@@ -34,6 +34,35 @@ shared_examples 'Customer API' do
     expect(customer.default_card).to be_nil
   end
 
+  it 'creates a customer with a plan' do
+    plan = Stripe::Plan.create(id: 'silver')
+    customer = Stripe::Customer.create(id: 'test_cus_plan', card: 'tk', :plan => 'silver')
+
+    customer = Stripe::Customer.retrieve('test_cus_plan')
+    expect(customer.subscription).to_not be_nil
+    expect(customer.subscription.plan.id).to eq('silver')
+    expect(customer.subscription.customer).to eq(customer.id)
+  end
+
+  it 'cannot create a customer with a plan that does not exist' do
+    expect {
+      customer = Stripe::Customer.create(id: 'test_cus_no_plan', card: 'tk', :plan => 'non-existant')
+    }.to raise_error {|e|
+      expect(e).to be_a(Stripe::InvalidRequestError)
+      expect(e.message).to eq('No such plan: non-existant')
+    }
+  end
+
+  it 'cannot create a customer with an exsting plan, but no card token' do
+    plan = Stripe::Plan.create(id: 'p')
+    expect {
+      customer = Stripe::Customer.create(id: 'test_cus_no_plan', :plan => 'p')
+    }.to raise_error {|e|
+      expect(e).to be_a(Stripe::InvalidRequestError)
+      expect(e.message).to eq('You must supply a valid card')
+    }
+  end
+
   it "stores a created stripe customer in memory" do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
