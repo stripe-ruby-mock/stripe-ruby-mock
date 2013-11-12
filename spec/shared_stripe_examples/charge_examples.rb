@@ -36,7 +36,6 @@ shared_examples 'Charge API' do
     expect(data[charge2.id][:amount]).to eq(777)
   end
 
-
   it "retrieves a stripe charge" do
     original = Stripe::Charge.create({
       amount: 777,
@@ -57,6 +56,13 @@ shared_examples 'Charge API' do
     }
   end
 
+  it "stores charges for a customer in memory" do
+    customer = Stripe::Customer.create(email: 'johnny@appleseed.com')
+    charge = Stripe::Charge.create(customer: customer.id)
+    other_charge = Stripe::Charge.create
+
+    expect(customer.charges.map(&:id)).to eq([charge.id])
+  end
 
   context "With strict mode toggled off" do
 
