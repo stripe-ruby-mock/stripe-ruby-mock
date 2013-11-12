@@ -16,7 +16,16 @@ module StripeMock
       end
 
       def get_charges(route, method_url, params, headers)
-        charges.delete_if { |k,v| v[:customer] != params[:customer] }.values
+        params[:offset] ||= 0
+        params[:count] ||= 10
+
+        clone = charges.clone
+
+        if params[:customer]
+          clone.delete_if { |k,v| v[:customer] != params[:customer] }
+        end
+
+        clone.values[params[:offset], params[:count]]
       end
 
       def get_charge(route, method_url, params, headers)
