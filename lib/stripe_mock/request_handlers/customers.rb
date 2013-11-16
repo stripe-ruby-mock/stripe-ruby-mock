@@ -68,12 +68,19 @@ module StripeMock
         sub = customer[:subscription]
         assert_existance nil, nil, sub, "No active subscription for customer: #{$1}"
 
-        customer[:subscription] = nil
-
         plan = plans[ sub[:plan][:id] ]
         assert_existance :plan, params[:plan], plan
 
-        Data.mock_delete_subscription(id: sub[:id])
+        if params[:at_period_end] == true
+          status = 'active'
+          cancel_at_period_end = true
+        else
+          status = 'canceled'
+          cancel_at_period_end = false
+        end
+
+        sub = Data.mock_subscription id: sub[:id], plan: plan, customer: $1, status: status, cancel_at_period_end: cancel_at_period_end
+        customer[:subscription] = sub
       end
 
       def update_customer(route, method_url, params, headers)
