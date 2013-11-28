@@ -24,8 +24,8 @@ module StripeMock
     include StripeMock::RequestHandlers::Recipients
 
 
-    attr_reader :charges, :customers, :plans, :error_queue, :recipients,
-                :invoices
+    attr_reader :charges, :customers, :invoices, :plans, :error_queue,
+                :recipients
     attr_reader :bank_tokens
     attr_accessor :debug, :strict
 
