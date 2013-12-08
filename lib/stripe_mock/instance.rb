@@ -24,23 +24,23 @@ module StripeMock
     include StripeMock::RequestHandlers::Recipients
 
 
-    attr_reader :charges, :customers, :invoices, :plans, :error_queue,
-                :recipients
-    attr_reader :bank_tokens
-    attr_accessor :debug, :strict
+    attr_reader :bank_tokens, :charges, :customers,
+                :invoices, :plans, :recipients
+
+    attr_accessor :error_queue, :debug, :strict
 
     def initialize
-      @customers = {}
-      @recipients = {}
-      @charges = {}
-      @plans = {}
-      @invoices = {}
       @bank_tokens = {}
       @card_tokens = {}
+      @customers = {}
+      @charges = {}
+      @invoices = {}
+      @plans = {}
+      @recipients = {}
 
-      @id_counter = 0
-      @error_queue = ErrorQueue.new
       @debug = false
+      @error_queue = ErrorQueue.new
+      @id_counter = 0
       @strict = true
     end
 
