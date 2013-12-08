@@ -54,6 +54,10 @@ module StripeMock
       @instance.generate_bank_token(recipient_params)
     end
 
+    def generate_event(event_data)
+      @instance.generate_event(event_data)
+    end
+
     def debug?; @instance.debug; end
     def strict?; @instance.strict; end
     def ping; true; end

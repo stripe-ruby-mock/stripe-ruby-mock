@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Webhook Generation' do
+shared_examples 'Webhook Events API' do
 
   it "matches the list of webhooks with the folder of fixtures" do
     events = StripeMock::Webhooks.event_list.to_set
@@ -15,7 +15,7 @@ describe 'Webhook Generation' do
   it "first looks in spec/fixtures/stripe_webhooks/ for fixtures by default" do
     event = StripeMock.mock_webhook_event('account.updated')
     expect(event).to be_a(Stripe::Event)
-    expect(event.id).to eq('evt_123')
+    expect(event.id).to match /^test_evt_[0-9]+/
     expect(event.type).to eq('account.updated')
   end
 
@@ -26,16 +26,49 @@ describe 'Webhook Generation' do
   end
 
   it "allows configuring the project fixture folder" do
+    original_path = StripeMock.webhook_fixture_path
+
     StripeMock.webhook_fixture_path = './spec/_dummy/webhooks/'
     expect(StripeMock.webhook_fixture_path).to eq('./spec/_dummy/webhooks/')
 
     event = StripeMock.mock_webhook_event('dummy.event')
     expect(event.val).to eq('success')
+
+    StripeMock.webhook_fixture_path = original_path
   end
 
-  it "generates an event" do
+  it "generates an event and stores it in memory" do
     event = StripeMock.mock_webhook_event('customer.created')
     expect(event).to be_a(Stripe::Event)
+    expect(event.id).to_not be_nil
+
+    data = test_data_source(:events)
+    expect(data[event.id]).to_not be_nil
+    expect(data[event.id][:id]).to eq(event.id)
+    expect(data[event.id][:type]).to eq('customer.created')
+  end
+
+  it "generates an id for a new event" do
+    event_a = StripeMock.mock_webhook_event('customer.created')
+    event_b = StripeMock.mock_webhook_event('customer.created')
+    expect(event_a.id).to_not be_nil
+    expect(event_a.id).to_not eq(event_b.id)
+
+    data = test_data_source(:events)
+    expect(data[event_a.id]).to_not be_nil
+    expect(data[event_a.id][:id]).to eq(event_a.id)
+
+    expect(data[event_b.id]).to_not be_nil
+    expect(data[event_b.id][:id]).to eq(event_b.id)
+  end
+
+  it "retrieves an eveng using the event resource" do
+    webhook_event = StripeMock.mock_webhook_event('plan.created')
+    expect(webhook_event.id).to_not be_nil
+
+    event = Stripe::Event.retrieve(webhook_event.id)
+    expect(event).to_not be_nil
+    expect(event.type).to eq 'plan.created'
   end
 
   it "takes a hash and deep merges into the data object" do

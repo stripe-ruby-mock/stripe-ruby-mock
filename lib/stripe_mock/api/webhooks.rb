@@ -16,8 +16,17 @@ module StripeMock
     json = Stripe::Util.symbolize_names(json)
     params = Stripe::Util.symbolize_names(params)
     json[:data][:object] = Util.rmerge(json[:data][:object], params)
+    json.delete(:id)
 
-    Stripe::Event.construct_from(json)
+    if @state == 'local'
+      event_data = instance.generate_event(json)
+    elsif @state == 'remote'
+      event_data = client.generate_event(json)
+    else
+      raise UnstartedStateError
+    end
+
+    Stripe::Event.construct_from(event_data)
   end
 
   module Webhooks

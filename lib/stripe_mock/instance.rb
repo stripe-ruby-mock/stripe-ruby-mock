@@ -18,13 +18,14 @@ module StripeMock
     include StripeMock::RequestHandlers::Charges
     include StripeMock::RequestHandlers::Cards
     include StripeMock::RequestHandlers::Customers
+    include StripeMock::RequestHandlers::Events
     include StripeMock::RequestHandlers::Invoices
     include StripeMock::RequestHandlers::InvoiceItems
     include StripeMock::RequestHandlers::Plans
     include StripeMock::RequestHandlers::Recipients
 
 
-    attr_reader :bank_tokens, :charges, :customers,
+    attr_reader :bank_tokens, :charges, :customers, :events,
                 :invoices, :plans, :recipients
 
     attr_accessor :error_queue, :debug, :strict
@@ -34,6 +35,7 @@ module StripeMock
       @card_tokens = {}
       @customers = {}
       @charges = {}
+      @events = {}
       @invoices = {}
       @plans = {}
       @recipients = {}
@@ -84,6 +86,11 @@ module StripeMock
       card_params[:id] = new_id 'cc'
       @card_tokens[token] = Data.mock_card(card_params)
       token
+    end
+
+    def generate_event(event_data)
+      event_data[:id] ||= new_id 'evt'
+      @events[ event_data[:id] ] = event_data
     end
 
     def get_bank_by_token(token)

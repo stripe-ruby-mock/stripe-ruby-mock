@@ -10,6 +10,7 @@ def require_stripe_examples
   require 'shared_stripe_examples/invoice_item_examples'
   require 'shared_stripe_examples/plan_examples'
   require 'shared_stripe_examples/recipient_examples'
+  require 'shared_stripe_examples/webhook_event_examples'
 end
 
 def it_behaves_like_stripe(&block)
@@ -23,4 +24,5 @@ def it_behaves_like_stripe(&block)
   it_behaves_like 'Plan API', &block
   it_behaves_like 'Recipient API', &block
   it_behaves_like 'Stripe Error Mocking', &block
+  it_behaves_like 'Webhook Events API', &block
 end
