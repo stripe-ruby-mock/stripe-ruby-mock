@@ -11,7 +11,8 @@ module StripeMock
 
       def new_charge(route, method_url, params, headers)
         id = new_id('ch')
-        params[:card] = get_card_by_token(params[:card]) if params[:card].is_a?(String)
+        params[:card] = get_card_by_token(params[:card]) if params[:card].is_a?(String) ||
+                                                            params[:customer].is_a?(String)
         charges[id] = Data.mock_charge(params.merge(:id => id))
       end
 
