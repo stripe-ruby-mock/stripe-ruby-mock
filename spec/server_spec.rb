@@ -11,11 +11,6 @@ describe 'StripeMock Server' do
     StripeMock.spawn_server
   end
 
-  after(:all) do
-    StripeMock.kill_server
-  end
-
-
   before do
     @client = StripeMock.start_client
   end

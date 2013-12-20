@@ -7,7 +7,7 @@ module StripeMock
       @port = port
       @pipe = Jimson::Client.new("http://0.0.0.0:#{port}")
       # Ensure client can connect to server
-      timeout_wrap { @pipe.ping }
+      timeout_wrap(5) { @pipe.ping }
       @state = 'ready'
       @error_queue = ErrorQueue.new
     end
@@ -75,13 +75,27 @@ module StripeMock
       @state = 'closed'
     end
 
-    def timeout_wrap
-      raise ClosedClientConnectionError if @state == 'closed'
-      yield
-    rescue ClosedClientConnectionError
-      raise
-    rescue Errno::ECONNREFUSED => e
-      raise StripeMock::ServerTimeoutError.new(e)
+    def timeout_wrap(tries=1)
+      original_tries = tries
+      begin
+        raise ClosedClientConnectionError if @state == 'closed'
+        yield
+      rescue ClosedClientConnectionError
+        raise
+      rescue Errno::ECONNREFUSED => e
+        tries -= 1
+        if tries > 0
+          if tries == original_tries - 1
+            print "Waiting for StripeMock Server.."
+          else
+            print '.'
+          end
+          sleep 1
+          retry
+        else
+          raise StripeMock::ServerTimeoutError.new(e)
+        end
+      end
     end
   end
 

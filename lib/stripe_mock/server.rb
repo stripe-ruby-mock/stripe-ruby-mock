@@ -6,6 +6,7 @@ module StripeMock
     extend Jimson::Handler
 
     def self.start_new(opts)
+      puts "Starting StripeMock server on port #{opts[:port] || 4999}"
       server = Jimson::Server.new(Server.new,
         :host => opts[:host] || '0.0.0.0',
         :port => opts[:port] || 4999,

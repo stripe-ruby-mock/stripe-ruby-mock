@@ -2,4 +2,7 @@ language: ruby
 rvm:
   - 1.9.3
   - 2.0.0
+before_script:
+  - "sudo touch /var/log/stripe-mock-server.log"
+  - "sudo chown travis /var/log/stripe-mock-server.log"
 script: "bundle exec rake"
