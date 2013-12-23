@@ -77,20 +77,20 @@ module StripeMock
 
     def generate_bank_token(bank_params)
       token = new_id 'btok'
-      @bank_tokens[token] = Data.mock_bank_account(bank_params)
+      @bank_tokens[token] = Data.mock_bank_account bank_params
       token
     end
 
     def generate_card_token(card_params)
       token = new_id 'tok'
       card_params[:id] = new_id 'cc'
-      @card_tokens[token] = Data.mock_card(card_params)
+      @card_tokens[token] = Data.mock_card symbolize_names(card_params)
       token
     end
 
     def generate_event(event_data)
       event_data[:id] ||= new_id 'evt'
-      @events[ event_data[:id] ] = event_data
+      @events[ event_data[:id] ] = symbolize_names(event_data)
     end
 
     def get_bank_by_token(token)
@@ -141,6 +141,10 @@ module StripeMock
     def new_id(prefix)
       # Stripe ids must be strings
       "test_#{prefix}_#{@id_counter += 1}"
+    end
+
+    def symbolize_names(hash)
+      Stripe::Util.symbolize_names(hash)
     end
 
   end
