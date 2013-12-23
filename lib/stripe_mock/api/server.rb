@@ -22,7 +22,7 @@ module StripeMock
   end
 
   def self.kill_server(pid_path=nil)
-    puts "Y WE KILL NO"
+    puts "Killing server at #{pid_path}"
     path = pid_path || @default_pid_path
     Dante::Runner.new('stripe-mock-server').execute(:kill => true, :pid_path => path)
   end
