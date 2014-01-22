@@ -1,6 +1,24 @@
 module StripeMock
   module Data
 
+    def self.mock_account
+      {
+        id: 'acct_254EeH4YHiYvObBL',
+        email: 'stripe_mock@example.com',
+        statement_descriptor: nil,
+        display_name: nil,
+        details_submitted: false,
+        charge_enabled: false,
+        transfer_enabled: false,
+        currencies_supported: [
+          'usd'
+        ],
+        default_currency: 'usd',
+        country: 'US',
+        object: 'account'
+      }
+    end
+
     def self.mock_customer(cards, params)
       cus_id = params[:id] || "test_cus_default"
       cards.each {|card| card[:customer] = cus_id}

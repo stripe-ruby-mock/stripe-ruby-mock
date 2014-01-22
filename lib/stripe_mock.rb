@@ -29,6 +29,7 @@ require 'stripe_mock/api/webhooks'
 require 'stripe_mock/api/strict'
 require 'stripe_mock/api/debug'
 
+require 'stripe_mock/request_handlers/account.rb'
 require 'stripe_mock/request_handlers/charges.rb'
 require 'stripe_mock/request_handlers/cards.rb'
 require 'stripe_mock/request_handlers/customers.rb'
