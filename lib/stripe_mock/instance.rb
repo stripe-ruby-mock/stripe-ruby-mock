@@ -23,10 +23,11 @@ module StripeMock
     include StripeMock::RequestHandlers::InvoiceItems
     include StripeMock::RequestHandlers::Plans
     include StripeMock::RequestHandlers::Recipients
+    include StripeMock::RequestHandlers::Tokens
 
 
     attr_reader :bank_tokens, :charges, :customers, :events,
-                :invoices, :plans, :recipients
+                :invoices, :plans, :recipients, :tokens
 
     attr_accessor :error_queue, :debug, :strict
 

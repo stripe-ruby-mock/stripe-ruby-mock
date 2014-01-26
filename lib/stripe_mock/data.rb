@@ -261,6 +261,34 @@ module StripeMock
       }
     end
 
+    def self.mock_token(params={})
+      {
+        :id => 'tok_default',
+        :livemode => false,
+        :used => false,
+        :object => 'token',
+        :type => 'card',
+        :card => {
+          :id => 'card_default',
+          :object => 'card',
+          :last4 => '2222',
+          :type => 'Visa',
+          :exp_month => 9,
+          :exp_year => 2017,
+          :fingerprint => 'JRRLXGh38NiYygM7',
+          :customer => nil,
+          :country => 'US',
+          :name => nil,
+          :address_line1 => nil,
+          :address_line2 => nil,
+          :address_city => nil,
+          :address_state => nil,
+          :address_zip => nil,
+          :address_country => nil
+        }
+      }.merge(params) # problem, not a deep merge
+    end
+
     def self.mock_transfer(params={})
       {
         :status => 'pending',
