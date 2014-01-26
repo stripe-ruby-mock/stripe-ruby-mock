@@ -27,7 +27,7 @@ module StripeMock
 
 
     attr_reader :bank_tokens, :charges, :customers, :events,
-                :invoices, :plans, :recipients, :tokens
+                :invoices, :plans, :recipients
 
     attr_accessor :error_queue, :debug, :strict
 
