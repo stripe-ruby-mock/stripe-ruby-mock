@@ -36,5 +36,16 @@ shared_examples 'Bank Account Token Mocking' do
     expect(recipient.active_account.bank_name).to eq("Bank Token Mocking")
   end
 
-end
+  it "retrieves a created token" do
+    bank_token = StripeMock.generate_bank_token(
+      :bank_name => "Cha-ching Banking",
+      :last4 => "3939"
+    )
+    token = Stripe::Token.retrieve(bank_token)
 
+    expect(token.id).to eq(bank_token)
+    expect(token.bank_account.last4).to eq("3939")
+    expect(token.bank_account.bank_name).to eq("Cha-ching Banking")
+  end
+
+end

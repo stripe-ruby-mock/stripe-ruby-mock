@@ -26,6 +26,16 @@ shared_examples 'Card Token Mocking' do
       expect(card.exp_month).to eq(11)
       expect(card.exp_year).to eq(2099)
     end
+
+    it "retrieves a created token" do
+      card_token = StripeMock.generate_card_token(last4: "2323", exp_month: 33, exp_year: 2222)
+      token = Stripe::Token.retrieve(card_token)
+
+      expect(token.id).to eq(card_token)
+      expect(token.card.last4).to eq("2323")
+      expect(token.card.exp_month).to eq(33)
+      expect(token.card.exp_year).to eq(2222)
+    end
   end
 
   describe 'Stripe::Token' do
@@ -47,7 +57,7 @@ shared_examples 'Card Token Mocking' do
       expect(card.exp_year).to eq(2017)
     end
 
-    it "generated and reads a card token for update customer" do
+    it "generates and reads a card token for update customer" do
       card_token = Stripe::Token.create({
         card: {
           number: "1111222233334444",
