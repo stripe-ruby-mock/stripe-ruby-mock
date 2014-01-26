@@ -28,9 +28,10 @@ shared_examples 'Card Token Mocking' do
     end
   end
 
-  describe 'Stripe::Token', :pending => true do
+  describe 'Stripe::Token' do
 
     it "generates and reads a card token for create customer" do
+
       card_token = Stripe::Token.create({
         card: {
           number: "4222222222222222",
@@ -39,7 +40,7 @@ shared_examples 'Card Token Mocking' do
         }
       })
 
-      cus = Stripe::Customer.create(card: card_token)
+      cus = Stripe::Customer.create(card: card_token.id)
       card = cus.cards.data.first
       expect(card.last4).to eq("2222")
       expect(card.exp_month).to eq(9)
@@ -56,7 +57,7 @@ shared_examples 'Card Token Mocking' do
       })
 
       cus = Stripe::Customer.create()
-      cus.card = card_token
+      cus.card = card_token.id
       cus.save
 
       card = cus.cards.data.first
