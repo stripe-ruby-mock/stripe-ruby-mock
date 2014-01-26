@@ -286,7 +286,7 @@ module StripeMock
           :address_zip => nil,
           :address_country => nil
         }
-      }.merge(params) # problem, not a deep merge
+      }.merge(params)
     end
 
     def self.mock_transfer(params={})
