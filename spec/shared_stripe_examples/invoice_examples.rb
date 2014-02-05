@@ -51,4 +51,20 @@ shared_examples 'Invoice API' do
     end
   end
 
+  context "paying an invoice" do
+    before do
+      @invoice = Stripe::Invoice.create
+      @invoice.pay
+    end
+    
+    it 'updates attempted and paid flags' do
+      expect(@invoice.attempted).to be_true
+      expect(@invoice.paid).to be_true
+    end
+    
+    it 'sets the charge attribute' do
+      expect(@invoice.charge).to be_a String
+      expect(@invoice.charge.length).to be > 0 
+    end
+  end
 end
