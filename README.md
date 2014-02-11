@@ -2,6 +2,7 @@
 
 * Homepage: https://github.com/rebelidealist/stripe-ruby-mock
 * Issues: https://github.com/rebelidealist/stripe-ruby-mock/issues
+* **CHAT**: https://gitter.im/rebelidealist/stripe-ruby-mock
 
 ## Install
 
