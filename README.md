@@ -263,7 +263,8 @@ If you always want debug to be on (it's quite verbose), you should put this in a
 
 To run the tests:
 
-    $ rspec
+    $ bundle install
+    $ bundle exec rspec
 
 Patches are welcome and greatly appreciated! If you're contributing to fix a problem,
 be sure to write tests that illustrate the problem being fixed.
