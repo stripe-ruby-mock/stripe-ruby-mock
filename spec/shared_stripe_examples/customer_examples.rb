@@ -39,9 +39,12 @@ shared_examples 'Customer API' do
     customer = Stripe::Customer.create(id: 'test_cus_plan', card: 'tk', :plan => 'silver')
 
     customer = Stripe::Customer.retrieve('test_cus_plan')
-    expect(customer.subscription).to_not be_nil
-    expect(customer.subscription.plan.id).to eq('silver')
-    expect(customer.subscription.customer).to eq(customer.id)
+    expect(customer.subscriptions.count).to eq(1)
+    expect(customer.subscriptions.data.length).to eq(1)
+
+    expect(customer.subscriptions).to_not be_nil
+    expect(customer.subscriptions.first.plan.id).to eq('silver')
+    expect(customer.subscriptions.first.customer).to eq(customer.id)
   end
 
   it 'cannot create a customer with a plan that does not exist' do
@@ -90,7 +93,8 @@ shared_examples 'Customer API' do
     expect(customer.id).to eq(original.id)
     expect(customer.email).to eq(original.email)
     expect(customer.default_card).to eq(original.default_card)
-    expect(customer.subscription).to be_nil
+    expect(customer.subscriptions.count).to eq(0)
+    expect(customer.subscriptions.data).to be_empty
   end
 
   it "cannot retrieve a customer that doesn't exist" do
