@@ -29,7 +29,14 @@ module StripeMock
             raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
           end
 
-          sub = Data.mock_subscription id: new_id('su'), plan: plan, customer: params[:id]
+          sub_params = { id: new_id('su'), plan: plan, customer: params[:id] }
+          if plan[:trial_period_days].nil?
+            sub_params.merge!({status: 'active', trial_start: nil, trial_end: nil})
+          else
+            sub_params.merge!({status: 'trialing', trial_start: Time.now.to_i, trial_end: (Time.now + plan[:trial_period_days]).to_i })
+          end
+
+          sub = Data.mock_subscription sub_params
           add_subscription_to_customer(sub, customers[params[:id]] )
         end
 
