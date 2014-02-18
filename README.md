@@ -80,6 +80,25 @@ StripeMock.prepare_card_error(:processing_error)
 
 You can see the details of each error in [lib/stripe_mock/api/errors.rb](lib/stripe_mock/api/errors.rb)
 
+### Specifying Card Errors
+
+By default, `prepare_card_error` only triggers for `:new_charge`, the event that happens when you run `Charge.create`. More explicitly, this is what happens by default:
+
+```ruby
+StripeMock.prepare_card_error(:card_declined, :new_charge)
+```
+
+If you want the error to trigger on a different event, you need to replace `:new_charge` with a different event. For example:
+
+```ruby
+StripeMock.prepare_card_error(:card_declined, :create_card)
+customer = Stripe::Customer.create
+# This line throws the card error
+customer.cards.create
+```
+
+`:new_charge` and `:create_card` are names of methods in the [StripeMock request handlers](lib/stripe_mock/request_handlers). You can also set `StripeMock.debug(true)` to see the event name for each Stripe request made in your tests.
+
 ### Custom Errors
 
 To raise an error on a specific type of request, take a look at the [request handlers folder](lib/stripe_mock/request_handlers/) and pass a method name to `StripeMock.prepare_error`.
