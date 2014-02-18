@@ -282,8 +282,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "cancels a stripe customer's subscription at period end" do
-      truth = Stripe::Plan.create(id: 'the truth')
-      customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', plan: "the truth")
+      truth = Stripe::Plan.create(id: 'the_truth')
+      customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', plan: "the_truth")
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
       result = sub.delete(at_period_end: true)
@@ -302,6 +302,20 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.ended_at).to be_nil
       expect(customer.subscriptions.data.first.canceled_at).to_not be_nil
     end
+  end
+
+  it "doesn't change status of subscription when cancelling at period end" do
+    trial = Stripe::Plan.create(id: 'trial', trial_period_days: 14)
+    customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', plan: "trial")
+
+    sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
+    result = sub.delete(at_period_end: true)
+
+    expect(result.status).to eq('trialing')
+
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+
+    expect(customer.subscriptions.data.first.status).to eq('trialing')
   end
 
   context "retrieve multiple subscriptions" do
