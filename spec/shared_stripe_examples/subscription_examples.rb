@@ -5,10 +5,11 @@ shared_examples 'Customer Subscriptions' do
   it "updates a stripe customer's subscription" do
     plan = Stripe::Plan.create(id: 'silver')
     customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk')
-    sub = customer.update_subscription({ :plan => 'silver' })
+    sub = customer.update_subscription({ :plan => 'silver', :quantity => 3 })
 
     expect(sub.object).to eq('subscription')
     expect(sub.plan.id).to eq('silver')
+    expect(sub.plan.quantity).to eq(3)
     expect(sub.plan.to_hash).to eq(plan.to_hash)
 
     customer = Stripe::Customer.retrieve('test_customer_sub')
