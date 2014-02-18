@@ -106,7 +106,6 @@ module StripeMock
 
         cancel_params = { canceled_at: Time.now.to_i }
         if params[:at_period_end] == true
-          status = subscription[:status]
           cancel_params[:cancel_at_period_end] = true
         else
           cancel_params[:status] = "canceled"
