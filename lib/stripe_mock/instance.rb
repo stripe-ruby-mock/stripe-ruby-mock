@@ -134,11 +134,21 @@ module StripeMock
       customer[:subscriptions][:data].find{|sub| sub[:id] == sub_id }
     end
 
-    def add_subscription_to_customer(subscription, cus)
-      subscription[:customer] = cus[:id]
+    def add_subscription_to_customer(plan, cus)
+      params = { id: new_id('su'), plan: plan, customer: cus[:id] }
+
+      if plan[:trial_period_days].nil?
+        params.merge!({status: 'active', trial_start: nil, trial_end: nil})
+      else
+        params.merge!({status: 'trialing', trial_start: Time.now.to_i, trial_end: (Time.now + plan[:trial_period_days]).to_i })
+      end
+
+      subscription = Data.mock_subscription params
+
       cus[:subscriptions] = Data.mock_subscriptions_array(url: "/v1/customers/#{cus[:id]}/subscriptions") unless cus[:subscriptions]
       cus[:subscriptions][:count] = (cus[:subscriptions][:count] ? cus[:subscriptions][:count]+1 : 1 )
       cus[:subscriptions][:data] << subscription
+      subscription
     end
 
     private
