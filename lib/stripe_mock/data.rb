@@ -12,7 +12,6 @@ module StripeMock
         id: cus_id,
         livemode: false,
         delinquent: false,
-        subscription: nil,
         discount: nil,
         account_balance: 0,
         cards: {
@@ -152,6 +151,7 @@ module StripeMock
         :current_period_start => 1308595038,
         :cancel_at_period_end => false,
         :canceled_at => nil,
+        :ended_at => nil,
         :start => 1308595038,
         :object => "subscription",
         :trial_start => 1308595038,
@@ -219,6 +219,15 @@ module StripeMock
         :object => 'list',
         :url => '/v1/invoices?customer=test_customer'
       }
+    end
+
+    def self.mock_subscriptions_array(params={})
+      {
+        :data => [],
+        :count => 0,
+        :object => "list",
+        :url => '/v1/customers/test_customer/subscriptions',
+      }.merge(params)
     end
 
     def self.mock_plan(params={})

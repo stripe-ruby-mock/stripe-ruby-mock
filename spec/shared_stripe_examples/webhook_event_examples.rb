@@ -81,18 +81,18 @@ shared_examples 'Webhook Events API' do
   it "takes a hash and deep merges arrays in the data object" do
     event = StripeMock.mock_webhook_event('invoice.created', {
       :lines => {
-        :data => [
+        :subscriptions => [
           { :amount => 555,
             :plan => { :id => 'wh_test' }
           }
         ]
       }
     })
-    expect(event.data.object.lines.data.first.amount).to eq(555)
-    expect(event.data.object.lines.data.first.plan.id).to eq('wh_test')
+    expect(event.data.object.lines.subscriptions.first.amount).to eq(555)
+    expect(event.data.object.lines.subscriptions.first.plan.id).to eq('wh_test')
     # Ensure data from invoice.created.json is still present
-    expect(event.data.object.lines.data.first.type).to eq('subscription')
-    expect(event.data.object.lines.data.first.plan.currency).to eq('usd')
+    expect(event.data.object.lines.subscriptions.first.type).to eq('subscription')
+    expect(event.data.object.lines.subscriptions.first.plan.currency).to eq('usd')
   end
 
   it "can generate all events" do

@@ -17,6 +17,7 @@ module StripeMock
 
     include StripeMock::RequestHandlers::Charges
     include StripeMock::RequestHandlers::Cards
+    include StripeMock::RequestHandlers::Subscriptions # must be before Customers
     include StripeMock::RequestHandlers::Customers
     include StripeMock::RequestHandlers::Events
     include StripeMock::RequestHandlers::Invoices
@@ -27,7 +28,7 @@ module StripeMock
 
 
     attr_reader :bank_tokens, :charges, :customers, :events,
-                :invoices, :plans, :recipients
+                :invoices, :plans, :recipients, :subscriptions
 
     attr_accessor :error_queue, :debug, :strict
 
@@ -40,6 +41,7 @@ module StripeMock
       @invoices = {}
       @plans = {}
       @recipients = {}
+      @subscriptions = {}
 
       @debug = false
       @error_queue = ErrorQueue.new
@@ -126,6 +128,27 @@ module StripeMock
       cus[:cards][:data] << card
 
       card
+    end
+
+    def get_customer_subscription(customer, sub_id)
+      customer[:subscriptions][:data].find{|sub| sub[:id] == sub_id }
+    end
+
+    def add_subscription_to_customer(plan, cus)
+      params = { id: new_id('su'), plan: plan, customer: cus[:id] }
+
+      if plan[:trial_period_days].nil?
+        params.merge!({status: 'active', trial_start: nil, trial_end: nil})
+      else
+        params.merge!({status: 'trialing', trial_start: Time.now.to_i, trial_end: (Time.now + plan[:trial_period_days]).to_i })
+      end
+
+      subscription = Data.mock_subscription params
+
+      cus[:subscriptions] = Data.mock_subscriptions_array(url: "/v1/customers/#{cus[:id]}/subscriptions") unless cus[:subscriptions]
+      cus[:subscriptions][:count] = (cus[:subscriptions][:count] ? cus[:subscriptions][:count]+1 : 1 )
+      cus[:subscriptions][:data] << subscription
+      subscription
     end
 
     private
