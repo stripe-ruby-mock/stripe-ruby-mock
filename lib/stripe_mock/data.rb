@@ -132,8 +132,15 @@ module StripeMock
         :duration => 'repeating',
         :duration_in_months => 3,
         :percent_off => 25,
+        :amount_off => nil,
+        :currency => nil,
         :id => "co_test_coupon",
-        :object => "coupon"
+        :object => "coupon",
+        :max_redemptions => nil,
+        :redeem_by => nil,
+        :times_redeemed => 0,
+        :valid => true,
+        :metadata => {},
       }.merge(params)
     end
 

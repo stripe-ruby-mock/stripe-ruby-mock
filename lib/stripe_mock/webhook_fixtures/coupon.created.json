@@ -16,7 +16,8 @@
       "redeem_by": null,
       "max_redemptions": null,
       "times_redeemed": 0,
-      "duration_in_months": 3
+      "duration_in_months": 3,
+      "valid": true
     }
   }
 }
