@@ -19,6 +19,7 @@ module StripeMock
     include StripeMock::RequestHandlers::Cards
     include StripeMock::RequestHandlers::Subscriptions # must be before Customers
     include StripeMock::RequestHandlers::Customers
+    include StripeMock::RequestHandlers::Coupons
     include StripeMock::RequestHandlers::Events
     include StripeMock::RequestHandlers::Invoices
     include StripeMock::RequestHandlers::InvoiceItems
@@ -27,7 +28,7 @@ module StripeMock
     include StripeMock::RequestHandlers::Tokens
 
 
-    attr_reader :bank_tokens, :charges, :customers, :events,
+    attr_reader :bank_tokens, :charges, :coupons, :customers, :events,
                 :invoices, :plans, :recipients, :subscriptions
 
     attr_accessor :error_queue, :debug, :strict
@@ -37,6 +38,7 @@ module StripeMock
       @card_tokens = {}
       @customers = {}
       @charges = {}
+      @coupons = {}
       @events = {}
       @invoices = {}
       @plans = {}
