@@ -5,11 +5,10 @@ shared_examples 'Customer Subscriptions' do
   it "updates a stripe customer's subscription" do
     plan = Stripe::Plan.create(id: 'silver')
     customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk')
-    sub = customer.update_subscription({ :plan => 'silver', :quantity => 3 })
+    sub = customer.update_subscription({ :plan => 'silver' })
 
     expect(sub.object).to eq('subscription')
     expect(sub.plan.id).to eq('silver')
-    expect(sub.plan.quantity).to eq(3)
     expect(sub.plan.to_hash).to eq(plan.to_hash)
 
     customer = Stripe::Customer.retrieve('test_customer_sub')
@@ -17,6 +16,16 @@ shared_examples 'Customer Subscriptions' do
     expect(customer.subscription.id).to eq(sub.id)
     expect(customer.subscription.plan.id).to eq('silver')
     expect(customer.subscription.customer).to eq(customer.id)
+  end
+
+  it "updates plan details" do
+    plan = Stripe::Plan.create(id: 'copper')
+    customer = Stripe::Customer.create(id: 'test_customer_sub2', card: 'tk')
+    sub = customer.update_subscription({ :plan => 'copper', :quantity => 3 })
+
+    expect(sub.object).to eq('subscription')
+    expect(sub.plan.id).to eq('copper')
+    expect(sub.plan.quantity).to eq(3)
   end
 
   it "throws an error when subscribing a customer with no card" do
