@@ -8,7 +8,7 @@
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '>= 1.10.1.1'
+    gem 'stripe-ruby-mock', '~> 1.10.1'
 
 ## Features
 
