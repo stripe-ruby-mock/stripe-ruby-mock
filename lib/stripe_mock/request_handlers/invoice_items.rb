@@ -7,7 +7,7 @@ module StripeMock
       end
 
       def new_invoice_item(route, method_url, params, headers)
-        Data.mock_invoice(params)
+        Data.mock_invoice_item(params)
       end
 
     end

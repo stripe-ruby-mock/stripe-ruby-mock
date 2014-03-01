@@ -56,15 +56,89 @@ shared_examples 'Invoice API' do
       @invoice = Stripe::Invoice.create
       @invoice.pay
     end
-    
+
     it 'updates attempted and paid flags' do
       expect(@invoice.attempted).to be_true
       expect(@invoice.paid).to be_true
     end
-    
+
     it 'sets the charge attribute' do
       expect(@invoice.charge).to be_a String
-      expect(@invoice.charge.length).to be > 0 
+      expect(@invoice.charge.length).to be > 0
     end
+  end
+
+  context "retrieving upcoming invoice" do
+    before do
+      @customer = Stripe::Customer.create(email: 'johnny@appleseed.com', card: 'some_card_token')
+    end
+
+    it 'fails without parameters' do
+      expect { Stripe::Invoice.upcoming() }.to raise_error {|e|
+        expect(e).to be_a(ArgumentError) }
+    end
+
+    it 'fails without a valid customer in strict mode' do
+      expect { Stripe::Invoice.upcoming(customer: 'whatever') }.to raise_error {|e|
+        expect(e).to be_a(Stripe::InvalidRequestError)
+        expect(e.message).to eq('No such customer: whatever') }
+    end
+
+    it 'fails without a customer parameter' do
+      expect { Stripe::Invoice.upcoming(gazebo: 'raindance') }.to raise_error {|e|
+        expect(e).to be_a(Stripe::InvalidRequestError)
+        expect(e.http_status).to eq(400)
+        expect(e.message).to eq('Missing required param: customer') }
+    end
+
+    it 'fails without a subscription' do
+      expect { Stripe::Invoice.upcoming(customer: @customer.id) }.to raise_error {|e|
+        expect(e).to be_a(Stripe::InvalidRequestError)
+        expect(e.http_status).to eq(404)
+        expect(e.message).to eq("No upcoming invoices for customer: #{@customer.id}") }
+    end
+
+    it 'works when customer has a subscription' do
+      @plan = Stripe::Plan.create()
+      @subscription = @customer.subscriptions.create(plan: @plan.id)
+      @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
+
+      expect(@upcoming).to be_a Stripe::Invoice
+      expect(@upcoming.total).to eq(@upcoming.lines.data[0].amount)
+      expect(@upcoming.period_start + 2592000).to eq(@upcoming.period_end) # 2592000 = 30 days
+      expect(@upcoming.period_end).to eq(@upcoming.lines.data[0].period.start)
+      expect(@upcoming.period_end + 2592000).to eq(@upcoming.lines.data[0].period.end) # 2592000 = 30 days
+      expect(@upcoming.next_payment_attempt).to eq(@upcoming.period_end + 3600) # 3600 = 1 hour
+      expect(@upcoming.subscription).to eq(@subscription.id)
+    end
+
+    it 'calculates the right offset period' do
+      @oddplan = Stripe::Plan.create(interval: "week", interval_count: 11)
+      @subscription = @customer.subscriptions.create(plan: @oddplan.id)
+      @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
+
+      expect(@upcoming.period_end).to eq(@upcoming.lines.data[0].period.start)
+      expect(@upcoming.period_start + 6652800).to eq(@upcoming.period_end) # 6652800 = 11 weeks
+      expect(@upcoming.period_end).to eq(@upcoming.lines.data[0].period.start)
+      expect(@upcoming.period_end + 6652800).to eq(@upcoming.lines.data[0].period.end) # 6652800 = 11 weeks
+      expect(@upcoming.next_payment_attempt).to eq(@upcoming.period_end + 3600) # 3600 = 1 hour
+    end
+
+    it 'chooses the most recent of multiple subscriptions' do
+      @shortplan = Stripe::Plan.create(interval: "week") # 1 week sub
+      @plainplan = Stripe::Plan.create()                 # 1 month sub
+      @longplan  = Stripe::Plan.create(interval: "year") # 1 year sub
+
+      @plainsub = @customer.subscriptions.create(plan: @plainplan.id)
+      @shortsub = @customer.subscriptions.create(plan: @shortplan.id)
+      @longsub  = @customer.subscriptions.create(plan: @longplan.id)
+
+      @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
+
+      expect(@upcoming.period_start + 604800).to eq(@upcoming.period_end) # 604800 = 1 week
+      expect(@upcoming.period_end + 604800).to eq(@upcoming.lines.data[0].period.end) # 604800 = 1 week
+      expect(@upcoming.subscription).to eq(@shortsub.id)
+    end
+
   end
 end

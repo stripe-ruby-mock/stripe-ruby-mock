@@ -137,12 +137,12 @@ module StripeMock
     end
 
     def add_subscription_to_customer(plan, cus)
-      params = { id: new_id('su'), plan: plan, customer: cus[:id] }
+      params = { id: new_id('su'), plan: plan, customer: cus[:id], current_period_start: Time.now.to_i, current_period_end: get_ending_time(Time.now.to_i, plan) }
 
       if plan[:trial_period_days].nil?
         params.merge!({status: 'active', trial_start: nil, trial_end: nil})
       else
-        params.merge!({status: 'trialing', trial_start: Time.now.to_i, trial_end: (Time.now + plan[:trial_period_days]).to_i })
+        params.merge!({status: 'trialing', trial_start: Time.now.to_i, trial_end: (Time.now.to_i + plan[:trial_period_days]*86400) })
       end
 
       subscription = Data.mock_subscription params
@@ -161,6 +161,15 @@ module StripeMock
       if obj.nil?
         msg = message || "No such #{type}: #{id}"
         raise Stripe::InvalidRequestError.new(msg, type.to_s, 404)
+      end
+    end
+
+    def get_ending_time(start_time, plan)
+      case plan[:interval]
+        when "week"  then start_time + (604800 * (plan[:interval_count] || 1))
+        when "month" then start_time + (2592000 * (plan[:interval_count] || 1))
+        when "year"  then start_time + (31536000 * (plan[:interval_count] || 1))
+        else start_time
       end
     end
 

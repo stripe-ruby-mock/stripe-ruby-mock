@@ -84,6 +84,7 @@ shared_examples 'Customer Subscriptions' do
 
       expect(sub.object).to eq('subscription')
       expect(sub.plan).to eq('trial')
+      expect(sub.trial_end - sub.trial_start).to eq(14 * 86400)
 
       customer = Stripe::Customer.retrieve('cardless')
       expect(customer.subscriptions.data).to_not be_empty
