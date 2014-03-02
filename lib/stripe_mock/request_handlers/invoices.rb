@@ -43,6 +43,7 @@ module StripeMock
       end
 
       def upcoming_invoice(route, method_url, params, headers)
+        route =~ method_url
         raise Stripe::InvalidRequestError.new('Missing required param: customer', nil, 400) if params[:customer].nil?
 
         customer = customers[params[:customer]]
@@ -72,7 +73,7 @@ module StripeMock
           quantity: 1,
           period: {
             start: subscription[:current_period_end],
-            end: get_ending_time(subscription[:current_period_end], subscription[:plan])
+            end: get_ending_time(subscription[:current_period_start], subscription[:plan], 2)
           })
       end
 

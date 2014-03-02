@@ -136,13 +136,14 @@ module StripeMock
       customer[:subscriptions][:data].find{|sub| sub[:id] == sub_id }
     end
 
-    def add_subscription_to_customer(plan, cus)
-      params = { id: new_id('su'), plan: plan, customer: cus[:id], current_period_start: Time.now.to_i, current_period_end: get_ending_time(Time.now.to_i, plan) }
+    def add_subscription_to_customer(plan, cus, start_time = nil)
+      start_time ||= Time.now.utc.to_i
+      params = { id: new_id('su'), plan: plan, customer: cus[:id], current_period_start: start_time, current_period_end: get_ending_time(start_time, plan) }
 
       if plan[:trial_period_days].nil?
         params.merge!({status: 'active', trial_start: nil, trial_end: nil})
       else
-        params.merge!({status: 'trialing', trial_start: Time.now.to_i, trial_end: (Time.now.to_i + plan[:trial_period_days]*86400) })
+        params.merge!({status: 'trialing', trial_start: Time.now.utc.to_i, trial_end: (Time.now.utc.to_i + plan[:trial_period_days]*86400) })
       end
 
       subscription = Data.mock_subscription params
@@ -164,12 +165,18 @@ module StripeMock
       end
     end
 
-    def get_ending_time(start_time, plan)
+    # intervals variable is set to 1 when calculating current_period_end from current_period_start & plan
+    # intervals variable is set to 2 when calculating Stripe::Invoice.upcoming end from current_period_start & plan
+    def get_ending_time(start_time, plan, intervals = 1)
       case plan[:interval]
-        when "week"  then start_time + (604800 * (plan[:interval_count] || 1))
-        when "month" then start_time + (2592000 * (plan[:interval_count] || 1))
-        when "year"  then start_time + (31536000 * (plan[:interval_count] || 1))
-        else start_time
+        when "week"
+          start_time + (604800 * (plan[:interval_count] || 1) * intervals)
+        when "month"
+          (Time.at(start_time).to_datetime >> ((plan[:interval_count] || 1) * intervals)).to_time.to_i
+        when "year"
+          (Time.at(start_time).to_datetime >> (12 * intervals)).to_time.to_i # max period is 1 year
+        else
+          start_time
       end
     end
 

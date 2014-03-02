@@ -105,23 +105,22 @@ shared_examples 'Invoice API' do
 
       expect(@upcoming).to be_a Stripe::Invoice
       expect(@upcoming.total).to eq(@upcoming.lines.data[0].amount)
-      expect(@upcoming.period_start + 2592000).to eq(@upcoming.period_end) # 2592000 = 30 days
       expect(@upcoming.period_end).to eq(@upcoming.lines.data[0].period.start)
-      expect(@upcoming.period_end + 2592000).to eq(@upcoming.lines.data[0].period.end) # 2592000 = 30 days
-      expect(@upcoming.next_payment_attempt).to eq(@upcoming.period_end + 3600) # 3600 = 1 hour
+      expect(Time.at(@upcoming.period_start).to_datetime >> 1).to eq(Time.at(@upcoming.period_end).to_datetime) # +1 month
+      expect(Time.at(@upcoming.period_end).to_datetime >> 1).to eq(Time.at(@upcoming.lines.data[0].period.end).to_datetime) # +1 month
+      expect(@upcoming.next_payment_attempt).to eq(@upcoming.period_end + 3600) # +1 hour
       expect(@upcoming.subscription).to eq(@subscription.id)
     end
 
-    it 'calculates the right offset period' do
+    it 'sets the start and end of billing periods correctly when plan has an interval_count' do
       @oddplan = Stripe::Plan.create(interval: "week", interval_count: 11)
       @subscription = @customer.subscriptions.create(plan: @oddplan.id)
       @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
 
+      expect(@upcoming.period_start + 6652800).to eq(@upcoming.period_end) # 6652800 = +11 weeks
       expect(@upcoming.period_end).to eq(@upcoming.lines.data[0].period.start)
-      expect(@upcoming.period_start + 6652800).to eq(@upcoming.period_end) # 6652800 = 11 weeks
-      expect(@upcoming.period_end).to eq(@upcoming.lines.data[0].period.start)
-      expect(@upcoming.period_end + 6652800).to eq(@upcoming.lines.data[0].period.end) # 6652800 = 11 weeks
-      expect(@upcoming.next_payment_attempt).to eq(@upcoming.period_end + 3600) # 3600 = 1 hour
+      expect(@upcoming.period_end + 6652800).to eq(@upcoming.lines.data[0].period.end) # 6652800 = +11 weeks
+      expect(@upcoming.next_payment_attempt).to eq(@upcoming.period_end + 3600) # +1 hour
     end
 
     it 'chooses the most recent of multiple subscriptions' do
@@ -138,6 +137,75 @@ shared_examples 'Invoice API' do
       expect(@upcoming.period_start + 604800).to eq(@upcoming.period_end) # 604800 = 1 week
       expect(@upcoming.period_end + 604800).to eq(@upcoming.lines.data[0].period.end) # 604800 = 1 week
       expect(@upcoming.subscription).to eq(@shortsub.id)
+    end
+
+    context 'calculates month and year offsets correctly' do
+
+      it 'for one month plan on the 1st' do
+        @plan = Stripe::Plan.create()
+        @sub = @customer.subscriptions.create(plan: @plan.id, current_period_start: Time.utc(2014,1,1,12).to_i)
+        @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
+
+        expect(Time.at(@upcoming.period_start)).to               eq(Time.utc(2014,1,1,12))
+        expect(Time.at(@upcoming.period_end)).to                 eq(Time.utc(2014,2,1,12))
+        expect(Time.at(@upcoming.lines.data[0].period.start)).to eq(Time.utc(2014,2,1,12))
+        expect(Time.at(@upcoming.lines.data[0].period.end)).to   eq(Time.utc(2014,3,1,12))
+      end
+
+      it 'for one year plan on the 1st' do
+        @plan = Stripe::Plan.create(interval: "year")
+        @sub = @customer.subscriptions.create(plan: @plan.id, current_period_start: Time.utc(2012,1,1,12).to_i)
+        @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
+
+        expect(Time.at(@upcoming.period_start)).to               eq(Time.utc(2012,1,1,12))
+        expect(Time.at(@upcoming.period_end)).to                 eq(Time.utc(2013,1,1,12))
+        expect(Time.at(@upcoming.lines.data[0].period.start)).to eq(Time.utc(2013,1,1,12))
+        expect(Time.at(@upcoming.lines.data[0].period.end)).to   eq(Time.utc(2014,1,1,12))
+      end
+
+      it 'for one month plan on the 31st' do
+        @plan = Stripe::Plan.create()
+        @sub = @customer.subscriptions.create(plan: @plan.id, current_period_start: Time.utc(2014,1,31,12).to_i)
+        @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
+
+        expect(Time.at(@upcoming.period_start)).to               eq(Time.utc(2014,1,31,12))
+        expect(Time.at(@upcoming.period_end)).to                 eq(Time.utc(2014,2,28,12))
+        expect(Time.at(@upcoming.lines.data[0].period.start)).to eq(Time.utc(2014,2,28,12))
+        expect(Time.at(@upcoming.lines.data[0].period.end)).to   eq(Time.utc(2014,3,31,12))
+      end
+
+      it 'for one year plan on feb. 29th' do
+        @plan = Stripe::Plan.create(interval: "year")
+        @sub = @customer.subscriptions.create(plan: @plan.id, current_period_start: Time.utc(2012,2,29,12).to_i)
+        @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
+
+        expect(Time.at(@upcoming.period_start)).to               eq(Time.utc(2012,2,29,12))
+        expect(Time.at(@upcoming.period_end)).to                 eq(Time.utc(2013,2,28,12))
+        expect(Time.at(@upcoming.lines.data[0].period.start)).to eq(Time.utc(2013,2,28,12))
+        expect(Time.at(@upcoming.lines.data[0].period.end)).to   eq(Time.utc(2014,2,28,12))
+      end
+
+      it 'for two month plan on dec. 31st' do
+        @plan = Stripe::Plan.create(interval_count: 2)
+        @sub = @customer.subscriptions.create(plan: @plan.id, current_period_start: Time.utc(2013,12,31,12).to_i)
+        @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
+
+        expect(Time.at(@upcoming.period_start)).to               eq(Time.utc(2013,12,31,12))
+        expect(Time.at(@upcoming.period_end)).to                 eq(Time.utc(2014, 2,28,12))
+        expect(Time.at(@upcoming.lines.data[0].period.start)).to eq(Time.utc(2014, 2,28,12))
+        expect(Time.at(@upcoming.lines.data[0].period.end)).to   eq(Time.utc(2014, 4,30,12))
+      end
+
+      it 'for three month plan on nov. 30th' do
+        @plan = Stripe::Plan.create(interval_count: 3)
+        @sub = @customer.subscriptions.create(plan: @plan.id, current_period_start: Time.utc(2013,11,30,12).to_i)
+        @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
+
+        expect(Time.at(@upcoming.period_start)).to               eq(Time.utc(2013,11,30,12))
+        expect(Time.at(@upcoming.period_end)).to                 eq(Time.utc(2014, 2,28,12))
+        expect(Time.at(@upcoming.lines.data[0].period.start)).to eq(Time.utc(2014, 2,28,12))
+        expect(Time.at(@upcoming.lines.data[0].period.end)).to   eq(Time.utc(2014, 5,30,12))
+      end
     end
 
   end

@@ -22,7 +22,7 @@ module StripeMock
         # Ensure customer has card to charge if plan has no trial and is not free
         verify_card_present(customer, plan)
 
-        subscription = add_subscription_to_customer(plan, customer)
+        subscription = add_subscription_to_customer(plan, customer, params[:current_period_start])
 
         # oddly, subscription returned from 'create_subscription' does not expand plan
         subscription.merge(plan: params[:plan])
@@ -95,13 +95,13 @@ module StripeMock
         subscription = get_customer_subscription(customer, $2)
         assert_existance :subscription, $2, subscription
 
-        cancel_params = { canceled_at: Time.now.to_i }
+        cancel_params = { canceled_at: Time.now.utc.to_i }
         if params[:at_period_end] == true
           cancel_params[:cancel_at_period_end] = true
         else
           cancel_params[:status] = "canceled"
           cancel_params[:cancel_at_period_end] = false
-          cancel_params[:ended_at] = Time.now.to_i
+          cancel_params[:ended_at] = Time.now.utc.to_i
         end
 
         subscription.merge!(cancel_params)
