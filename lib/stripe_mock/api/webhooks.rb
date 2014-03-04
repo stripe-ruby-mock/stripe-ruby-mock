@@ -19,9 +19,9 @@ module StripeMock
     json.delete(:id)
 
     if @state == 'local'
-      event_data = instance.generate_event(json)
+      event_data = instance.generate_webhook_event(json)
     elsif @state == 'remote'
-      event_data = client.generate_event(json)
+      event_data = client.generate_webhook_event(json)
     else
       raise UnstartedStateError
     end

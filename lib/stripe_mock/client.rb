@@ -56,8 +56,8 @@ module StripeMock
       timeout_wrap { @pipe.generate_card_token(card_params) }
     end
 
-    def generate_event(event_data)
-      timeout_wrap { Stripe::Util.symbolize_names @pipe.generate_event(event_data) }
+    def generate_webhook_event(event_data)
+      timeout_wrap { Stripe::Util.symbolize_names @pipe.generate_webhook_event(event_data) }
     end
 
     def clear_server_data

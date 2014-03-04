@@ -1,6 +1,8 @@
 module StripeMock
   class Instance
 
+    include StripeMock::RequestHandlers::Helpers
+
     # Handlers are ordered by priority
     @@handlers = []
 
@@ -80,78 +82,9 @@ module StripeMock
       end
     end
 
-    def generate_bank_token(bank_params)
-      token = new_id 'btok'
-      @bank_tokens[token] = Data.mock_bank_account bank_params
-      token
-    end
-
-    def generate_card_token(card_params)
-      token = new_id 'tok'
-      card_params[:id] = new_id 'cc'
-      @card_tokens[token] = Data.mock_card symbolize_names(card_params)
-      token
-    end
-
-    def generate_event(event_data)
+    def generate_webhook_event(event_data)
       event_data[:id] ||= new_id 'evt'
       @events[ event_data[:id] ] = symbolize_names(event_data)
-    end
-
-    def get_bank_by_token(token)
-      if token.nil? || @bank_tokens[token].nil?
-        Data.mock_bank_account
-      else
-        @bank_tokens.delete(token)
-      end
-    end
-
-    def get_card_by_token(token)
-      if token.nil? || @card_tokens[token].nil?
-        Data.mock_card :id => new_id('cc')
-      else
-        @card_tokens.delete(token)
-      end
-    end
-
-    def get_customer_card(customer, token)
-      customer[:cards][:data].find{|cc| cc[:id] == token }
-    end
-
-    def add_card_to_customer(card, cus)
-      card[:customer] = cus[:id]
-
-      if cus[:cards][:count] == 0
-        cus[:cards][:count] += 1
-      else
-        cus[:cards][:data].delete_if {|card| card[:id] == cus[:default_card]}
-      end
-
-      cus[:cards][:data] << card
-
-      card
-    end
-
-    def get_customer_subscription(customer, sub_id)
-      customer[:subscriptions][:data].find{|sub| sub[:id] == sub_id }
-    end
-
-    def add_subscription_to_customer(plan, cus, start_time = nil)
-      start_time ||= Time.now.utc.to_i
-      params = { id: new_id('su'), plan: plan, customer: cus[:id], current_period_start: start_time, current_period_end: get_ending_time(start_time, plan) }
-
-      if plan[:trial_period_days].nil?
-        params.merge!({status: 'active', trial_start: nil, trial_end: nil})
-      else
-        params.merge!({status: 'trialing', trial_start: Time.now.utc.to_i, trial_end: (Time.now.utc.to_i + plan[:trial_period_days]*86400) })
-      end
-
-      subscription = Data.mock_subscription params
-
-      cus[:subscriptions] = Data.mock_subscriptions_array(url: "/v1/customers/#{cus[:id]}/subscriptions") unless cus[:subscriptions]
-      cus[:subscriptions][:count] = (cus[:subscriptions][:count] ? cus[:subscriptions][:count]+1 : 1 )
-      cus[:subscriptions][:data] << subscription
-      subscription
     end
 
     private
@@ -162,21 +95,6 @@ module StripeMock
       if obj.nil?
         msg = message || "No such #{type}: #{id}"
         raise Stripe::InvalidRequestError.new(msg, type.to_s, 404)
-      end
-    end
-
-    # intervals variable is set to 1 when calculating current_period_end from current_period_start & plan
-    # intervals variable is set to 2 when calculating Stripe::Invoice.upcoming end from current_period_start & plan
-    def get_ending_time(start_time, plan, intervals = 1)
-      case plan[:interval]
-        when "week"
-          start_time + (604800 * (plan[:interval_count] || 1) * intervals)
-        when "month"
-          (Time.at(start_time).to_datetime >> ((plan[:interval_count] || 1) * intervals)).to_time.to_i
-        when "year"
-          (Time.at(start_time).to_datetime >> (12 * intervals)).to_time.to_i # max period is 1 year
-        else
-          start_time
       end
     end
 
