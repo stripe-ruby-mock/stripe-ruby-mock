@@ -11,11 +11,12 @@
       "period_start": 1378082075,
       "period_end": 1380674075,
       "lines": {
-        "invoiceitems": [],
-        "prorations": [],
-        "subscriptions": [
+        "count": 1,
+        "object": "list",
+        "url": "/v1/invoices/in_00000000000000/lines",
+        "data": [
           {
-            "id": "su_2hkskhhOSfPr47",
+            "id": "su_00000000000000",
             "object": "line_item",
             "type": "subscription",
             "livemode": true,
@@ -36,9 +37,11 @@
               "object": "plan",
               "livemode": false,
               "interval_count": 1,
-              "trial_period_days": null
+              "trial_period_days": null,
+              "metadata": {}
             },
-            "description": null
+            "description": null,
+            "metadata": null
           }
         ]
       },
@@ -58,7 +61,10 @@
       "next_payment_attempt": null,
       "charge": "ch_00000000000000",
       "discount": null,
-      "application_fee": null
+      "application_fee": null,
+      "subscription": "sub_00000000000000",
+      "metadata": {},
+      "description": null
     },
     "previous_attributes": {
       "lines": []
