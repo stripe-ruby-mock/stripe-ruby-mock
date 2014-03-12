@@ -53,6 +53,11 @@ module StripeMock
   @webhook_fixture_fallback_path = File.join(lib_dir, 'stripe_mock/webhook_fixtures')
 
   class << self
+    attr_accessor :global_id_prefix
     attr_accessor :webhook_fixture_path
+
+    def global_id_prefix
+      @global_id_prefix || "test_"
+    end
   end
 end

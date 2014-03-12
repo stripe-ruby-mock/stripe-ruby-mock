@@ -46,4 +46,13 @@ describe StripeMock::Instance do
     expect(StripeMock.instance.debug).to eq(false)
   end
 
+  it "uses the default global id prefix" do
+    expect(StripeMock.global_id_prefix).to eq("test_")
+  end
+
+  it "uses the a set global id prefix" do
+    StripeMock.global_id_prefix = ""
+    expect(StripeMock.global_id_prefix).to eq("")
+    StripeMock.global_id_prefix = nil
+  end
 end
