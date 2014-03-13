@@ -17,15 +17,16 @@ shared_examples 'Extra Features' do
     customer = Stripe::Customer.create
     expect(customer.id).to match /^cus/
 
-    # Support nil
-    StripeMock.global_id_prefix = nil
-    expect(StripeMock.global_id_prefix).to be_nil
+    # Support false
+    StripeMock.global_id_prefix = false
+    expect(StripeMock.global_id_prefix).to eq("")
 
     customer = Stripe::Customer.create
     expect(customer.id).to match /^cus/
   end
 
   it "has a default global id prefix" do
+    StripeMock.global_id_prefix = nil
     expect(StripeMock.global_id_prefix).to eq("test_")
     customer = Stripe::Customer.create
     expect(customer.id).to match /^test_cus/
