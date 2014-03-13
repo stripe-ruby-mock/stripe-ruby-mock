@@ -56,15 +56,23 @@ module StripeMock
     attr_accessor :webhook_fixture_path
 
     def global_id_prefix
-			case @global_id_prefix
-				when false then ""
-				when nil then "test_"
-				else @global_id_prefix
+      if StripeMock.client
+        StripeMock.client.server_global_id_prefix
+      else
+        case @global_id_prefix
+          when false then ""
+          when nil then "test_"
+          else @global_id_prefix
+        end
       end
     end
 
     def global_id_prefix=(value)
-			@global_id_prefix = value
+      if StripeMock.client
+        StripeMock.client.set_server_global_id_prefix(value)
+      else
+        @global_id_prefix = value
+      end
     end
   end
 end

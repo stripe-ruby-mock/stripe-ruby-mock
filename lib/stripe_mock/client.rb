@@ -48,6 +48,14 @@ module StripeMock
       timeout_wrap { @pipe.strict? }
     end
 
+    def set_server_global_id_prefix(value)
+      timeout_wrap { @pipe.set_global_id_prefix(value) }
+    end
+
+    def server_global_id_prefix
+      timeout_wrap { @pipe.global_id_prefix }
+    end
+
     def generate_bank_token(recipient_params)
       timeout_wrap { @pipe.generate_bank_token(recipient_params) }
     end
