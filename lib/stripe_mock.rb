@@ -22,12 +22,14 @@ require 'stripe_mock/server'
 require 'stripe_mock/api/instance'
 require 'stripe_mock/api/client'
 require 'stripe_mock/api/server'
-require 'stripe_mock/api/card_tokens'
+
 require 'stripe_mock/api/bank_tokens'
-require 'stripe_mock/api/errors'
-require 'stripe_mock/api/webhooks'
-require 'stripe_mock/api/strict'
+require 'stripe_mock/api/card_tokens'
 require 'stripe_mock/api/debug'
+require 'stripe_mock/api/errors'
+require 'stripe_mock/api/global_id_prefix'
+require 'stripe_mock/api/strict'
+require 'stripe_mock/api/webhooks'
 
 require 'stripe_mock/request_handlers/helpers/card_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/subscription_helpers.rb'
@@ -54,25 +56,5 @@ module StripeMock
 
   class << self
     attr_accessor :webhook_fixture_path
-
-    def global_id_prefix
-      if StripeMock.client
-        StripeMock.client.server_global_id_prefix
-      else
-        case @global_id_prefix
-          when false then ""
-          when nil then "test_"
-          else @global_id_prefix
-        end
-      end
-    end
-
-    def global_id_prefix=(value)
-      if StripeMock.client
-        StripeMock.client.set_server_global_id_prefix(value)
-      else
-        @global_id_prefix = value
-      end
-    end
   end
 end
