@@ -100,7 +100,7 @@ module StripeMock
 
     def new_id(prefix)
       # Stripe ids must be strings
-      "test_#{prefix}_#{@id_counter += 1}"
+      "#{StripeMock.global_id_prefix}#{prefix}_#{@id_counter += 1}"
     end
 
     def symbolize_names(hash)

@@ -47,6 +47,14 @@ module StripeMock
       @instance.strict = toggle
     end
 
+    def set_global_id_prefix(value)
+      StripeMock.global_id_prefix = value
+    end
+
+    def global_id_prefix
+      StripeMock.global_id_prefix
+    end
+
     def generate_card_token(card_params)
       @instance.generate_card_token(card_params)
     end

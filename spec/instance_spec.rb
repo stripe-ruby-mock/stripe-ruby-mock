@@ -45,5 +45,4 @@ describe StripeMock::Instance do
     StripeMock.start
     expect(StripeMock.instance.debug).to eq(false)
   end
-
 end

@@ -7,6 +7,7 @@ def require_stripe_examples
   require 'shared_stripe_examples/coupon_examples'
   require 'shared_stripe_examples/customer_examples'
   require 'shared_stripe_examples/error_mock_examples'
+  require 'shared_stripe_examples/extra_features_examples'
   require 'shared_stripe_examples/invoice_examples'
   require 'shared_stripe_examples/invoice_item_examples'
   require 'shared_stripe_examples/plan_examples'
@@ -22,6 +23,7 @@ def it_behaves_like_stripe(&block)
   it_behaves_like 'Charge API', &block
   it_behaves_like 'Coupon API', &block
   it_behaves_like 'Customer API', &block
+  it_behaves_like 'Extra Features', &block
   it_behaves_like 'Invoice API', &block
   it_behaves_like 'Invoice Item API', &block
   it_behaves_like 'Plan API', &block
