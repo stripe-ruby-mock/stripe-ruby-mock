@@ -272,6 +272,18 @@ debug will be toggled off.
 
 If you always want debug to be on (it's quite verbose), you should put this in a `before` block.
 
+## Miscellaneous Features
+
+You may have noticed that all generated Stripe ids start with `test_`. If you want to remove this:
+
+```ruby
+# Turns off test_ prefix
+StripeMock.global_id_prefix = false
+
+# Or you can set your own
+StripeMock.global_id_prefix = 'my_app_'
+```
+
 ## TODO
 
 * Cover all stripe urls/methods
