@@ -4,6 +4,16 @@ shared_examples 'Card Token Mocking' do
 
   describe 'Direct Token Creation' do
 
+    it "generates and reads a card token for create charge" do
+      card_token = StripeMock.generate_card_token(last4: "2244", exp_month: 33, exp_year: 2255)
+
+      charge = Stripe::Charge.create(amount: 500, card: card_token)
+      card = charge.card
+      expect(card.last4).to eq("2244")
+      expect(card.exp_month).to eq(33)
+      expect(card.exp_year).to eq(2255)
+    end
+
     it "generates and reads a card token for create customer" do
       card_token = StripeMock.generate_card_token(last4: "9191", exp_month: 99, exp_year: 3005)
 
@@ -14,7 +24,7 @@ shared_examples 'Card Token Mocking' do
       expect(card.exp_year).to eq(3005)
     end
 
-    it "generated and reads a card token for update customer" do
+    it "generates and reads a card token for update customer" do
       card_token = StripeMock.generate_card_token(last4: "1133", exp_month: 11, exp_year: 2099)
 
       cus = Stripe::Customer.create()
