@@ -21,6 +21,13 @@ module StripeMock
         params[:subscriptions] = Data.mock_subscriptions_array(url: "/v1/customers/#{params[:id]}/subscriptions")
         customers[ params[:id] ] = Data.mock_customer(cards, params)
 
+        if params[:coupon]
+          coupon = coupons[ params[:coupon] ]
+          assert_existance :coupon, params[:coupon], coupon
+
+          add_coupon_to_customer(customers[params[:id]], coupon)
+        end
+
         if params[:plan]
           plan = plans[ params[:plan] ]
           assert_existance :plan, params[:plan], plan

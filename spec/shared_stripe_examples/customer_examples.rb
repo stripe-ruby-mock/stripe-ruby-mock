@@ -66,6 +66,26 @@ shared_examples 'Customer API' do
     }
   end
 
+  it 'creates a customer with a coupon discount' do
+    coupon = Stripe::Coupon.create(id: "10PERCENT")
+
+    customer =
+      Stripe::Customer.create(id: 'test_cus_coupon', coupon: '10PERCENT')
+
+    customer = Stripe::Customer.retrieve('test_cus_coupon')
+    expect(customer.discount).to_not be_nil
+    expect(customer.discount.coupon).to_not be_nil
+  end
+
+  it 'cannot create a customer with a coupon that does not exist' do
+    expect{
+      customer = Stripe::Customer.create(id: 'test_cus_no_coupon', coupon: '5OFF')
+    }.to raise_error {|e|
+      expect(e).to be_a(Stripe::InvalidRequestError)
+      expect(e.message).to eq('No such coupon: 5OFF')
+    }
+  end
+
   it "stores a created stripe customer in memory" do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
