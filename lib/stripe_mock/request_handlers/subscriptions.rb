@@ -47,7 +47,7 @@ module StripeMock
 
         subscription_list = Data.mock_subscriptions_array url: "/v1/customers/#{customer[:id]}/subscriptions", count: customer[:subscriptions][:data].length
         
-        subscriptions = customer.is_a?(Hash) ? customer[:subscriptions][:data] : customer.subscriptions 
+        subscriptions = customer.is_a?(Hash) ? customer[:subscriptions][:data] : customer.subscriptions
 
         subscriptions.each do |subscription|
           subscription_list[:data] << subscription

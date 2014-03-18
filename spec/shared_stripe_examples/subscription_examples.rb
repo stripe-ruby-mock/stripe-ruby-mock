@@ -319,6 +319,12 @@ shared_examples 'Customer Subscriptions' do
     expect(customer.subscriptions.data.first.status).to eq('trialing')
   end
 
+  it "should not throw error when returning no subscriptions" do
+    customer = Stripe::Customer.create(id: 'test_customer_sub')
+
+    expect(customer.subscriptions.all).to_not raise_error(NoMethodError)
+  end
+
   context "retrieve multiple subscriptions" do
 
     it "retrieves a list of multiple subscriptions" do
