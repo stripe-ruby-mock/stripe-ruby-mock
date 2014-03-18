@@ -46,7 +46,10 @@ module StripeMock
         assert_existance :customer, $1, customer
 
         subscription_list = Data.mock_subscriptions_array url: "/v1/customers/#{customer[:id]}/subscriptions", count: customer[:subscriptions][:data].length
-        customer.subscriptions.each do |subscription|
+        
+        subscriptions = customer.is_a?(Hash) ? customer[:subscriptions][:data] : customer.subscriptions
+
+        subscriptions.each do |subscription|
           subscription_list[:data] << subscription
         end
         subscription_list
