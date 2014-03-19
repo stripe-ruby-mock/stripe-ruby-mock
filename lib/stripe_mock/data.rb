@@ -20,6 +20,12 @@ module StripeMock
           url: "/v1/customers/#{cus_id}/cards",
           data: cards
         },
+        subscriptions: {
+          object: "list",
+          count: 0,
+          url: "/v1/customers/#{cus_id}/subscriptions",
+          data: []
+        },
         default_card: nil
       }.merge(params)
     end
@@ -257,15 +263,6 @@ module StripeMock
         :object => 'list',
         :url => '/v1/invoices?customer=test_customer'
       }
-    end
-
-    def self.mock_subscriptions_array(params={})
-      {
-        :data => [],
-        :count => 0,
-        :object => "list",
-        :url => '/v1/customers/test_customer/subscriptions',
-      }.merge(params)
     end
 
     def self.mock_plan(params={})

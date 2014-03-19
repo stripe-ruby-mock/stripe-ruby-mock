@@ -18,7 +18,6 @@ module StripeMock
 
         subscription = Data.mock_subscription params
 
-        cus[:subscriptions] = Data.mock_subscriptions_array(url: "/v1/customers/#{cus[:id]}/subscriptions") unless cus[:subscriptions]
         cus[:subscriptions][:count] = (cus[:subscriptions][:count] ? cus[:subscriptions][:count]+1 : 1 )
         cus[:subscriptions][:data] << subscription
         subscription

@@ -329,7 +329,7 @@ shared_examples 'Customer Subscriptions' do
 
       customer = Stripe::Customer.retrieve('test_customer_sub')
 
-      list = customer.subscriptions
+      list = customer.subscriptions.all
 
       expect(list.object).to eq("list")
       expect(list.count).to eq(2)
@@ -340,6 +340,17 @@ shared_examples 'Customer Subscriptions' do
 
       expect(list.data.last.object).to eq("subscription")
       expect(list.data.last.plan.to_hash).to eq(paid.to_hash)
+    end
+
+    it "retrieves an empty list if there's no subscriptions" do
+      Stripe::Customer.create(id: 'no_subs')
+      customer = Stripe::Customer.retrieve('no_subs')
+
+      list = customer.subscriptions.all
+
+      expect(list.object).to eq("list")
+      expect(list.count).to eq(0)
+      expect(list.data.length).to eq(0)
     end
   end
 
