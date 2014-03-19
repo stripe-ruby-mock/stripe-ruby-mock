@@ -13,12 +13,12 @@ module StripeMock
       def new_customer(route, method_url, params, headers)
         params[:id] ||= new_id('cus')
         cards = []
+
         if params[:card]
           cards << get_card_by_token(params.delete(:card))
           params[:default_card] = cards.first[:id]
         end
 
-        params[:subscriptions] = Data.mock_subscriptions_array(url: "/v1/customers/#{params[:id]}/subscriptions")
         customers[ params[:id] ] = Data.mock_customer(cards, params)
 
         if params[:plan]

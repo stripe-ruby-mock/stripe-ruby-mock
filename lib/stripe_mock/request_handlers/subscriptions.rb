@@ -45,11 +45,7 @@ module StripeMock
         customer = customers[$1]
         assert_existance :customer, $1, customer
 
-        subscription_list = Data.mock_subscriptions_array url: "/v1/customers/#{customer[:id]}/subscriptions", count: customer[:subscriptions][:data].length
-        customer.subscriptions.each do |subscription|
-          subscription_list[:data] << subscription
-        end
-        subscription_list
+        customer[:subscriptions]
       end
 
       def update_subscription(route, method_url, params, headers)
