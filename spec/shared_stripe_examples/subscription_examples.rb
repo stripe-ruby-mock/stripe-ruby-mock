@@ -114,6 +114,67 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
       expect(customer.subscriptions.data.first.customer).to eq(customer.id)
     end
+
+    it "overrides trial length when trial end is set" do
+      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      customer = Stripe::Customer.create(id: 'short_trial')
+      trial_end = Time.now.utc.to_i + 3600
+
+      sub = customer.subscriptions.create({ plan: 'trial', trial_end: trial_end })
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.plan).to eq('trial')
+      expect(sub.current_period_end).to eq(trial_end)
+      expect(sub.trial_end).to eq(trial_end)
+    end
+
+    it "returns without a trial when trial_end is set to 'now'" do
+      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      customer = Stripe::Customer.create(id: 'no_trial', card: 'tk')
+
+      sub = customer.subscriptions.create({ plan: 'trial', trial_end: "now" })
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.plan).to eq('trial')
+      expect(sub.status).to eq('active')
+      expect(sub.trial_start).to be_nil
+      expect(sub.trial_end).to be_nil
+    end
+
+    it "raises error when trial_end is not an integer or 'now'" do
+      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      customer = Stripe::Customer.create(id: 'cus_trial')
+
+      expect { customer.subscriptions.create({ plan: 'trial', trial_end: "gazebo" }) }.to raise_error {|e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.http_status).to eq(400)
+        expect(e.message).to eq("Invalid timestamp: must be an integer")
+      }
+    end
+
+    it "raises error when trial_end is set to a time in the past" do
+      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      customer = Stripe::Customer.create(id: 'past_trial')
+      trial_end = Time.now.utc.to_i - 3600
+
+      expect { customer.subscriptions.create({ plan: 'trial', trial_end: trial_end }) }.to raise_error {|e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.http_status).to eq(400)
+        expect(e.message).to eq("Invalid timestamp: must be an integer Unix timestamp in the future")
+      }
+    end
+
+    it "raises error when trial_end is set to a time more than five years in the future" do
+      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      customer = Stripe::Customer.create(id: 'long_trial')
+      trial_end = Time.now.utc.to_i + 31557600*5 + 3600 # 5 years + 1 hour
+
+      expect { customer.subscriptions.create({ plan: 'trial', trial_end: trial_end }) }.to raise_error {|e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.http_status).to eq(400)
+        expect(e.message).to eq("Invalid timestamp: can be no more than five years in the future")
+      }
+    end
   end
 
   context "updating a subscription" do
@@ -255,6 +316,69 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.cards.data.length).to eq(1)
       expect(customer.default_card).to_not be_nil
       expect(customer.default_card).to eq customer.cards.data.first.id
+    end
+
+    it "overrides trial length when trial end is set" do
+      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      customer = Stripe::Customer.create(id: 'test_trial_end', plan: 'trial')
+
+      sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
+
+      trial_end = Time.now.utc.to_i + 3600
+      sub.trial_end = trial_end
+      sub.save
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.trial_end).to eq(trial_end)
+      expect(sub.current_period_end).to eq(trial_end)
+    end
+
+    it "returns without a trial when trial_end is set to 'now'" do
+      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      customer = Stripe::Customer.create(id: 'test_trial_end', plan: 'trial')
+
+      sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
+
+      sub.trial_end = "now"
+      sub.save
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.plan).to eq('trial')
+      expect(sub.status).to eq('active')
+      expect(sub.trial_start).to be_nil
+      expect(sub.trial_end).to be_nil
+    end
+
+    it "changes an active subscription to a trial when trial_end is set" do
+      plan = Stripe::Plan.create(id: 'no_trial', amount: 999)
+      customer = Stripe::Customer.create(id: 'test_trial_end', plan: 'no_trial', card: 'tk')
+
+      sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
+
+      trial_end = Time.now.utc.to_i + 3600
+      sub.trial_end = trial_end
+      sub.save
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.plan).to eq('no_trial')
+      expect(sub.status).to eq('trialing')
+      expect(sub.trial_end).to eq(trial_end)
+      expect(sub.current_period_end).to eq(trial_end)
+    end
+
+
+    it "raises error when trial_end is not an integer or 'now'" do
+      plan = Stripe::Plan.create(id: 'no_trial', amount: 999)
+      customer = Stripe::Customer.create(id: 'test_trial_end', plan: 'no_trial', card: 'tk')
+
+      sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
+      sub.trial_end = "gazebo"
+
+      expect { sub.save }.to raise_error {|e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.http_status).to eq(400)
+        expect(e.message).to eq("Invalid timestamp: must be an integer")
+      }
     end
   end
 

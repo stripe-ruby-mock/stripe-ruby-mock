@@ -47,6 +47,75 @@ shared_examples 'Customer API' do
     expect(customer.subscriptions.first.customer).to eq(customer.id)
   end
 
+  context "create customer" do
+
+    it "with a trial when trial_end is set" do
+      plan = Stripe::Plan.create(id: 'no_trial', amount: 999)
+      trial_end = Time.now.utc.to_i + 3600
+      customer = Stripe::Customer.create(id: 'test_cus_trial_end', card: 'tk', plan: 'no_trial', trial_end: trial_end)
+
+      customer = Stripe::Customer.retrieve('test_cus_trial_end')
+      expect(customer.subscriptions.count).to eq(1)
+      expect(customer.subscriptions.data.length).to eq(1)
+
+      expect(customer.subscriptions).to_not be_nil
+      expect(customer.subscriptions.first.plan.id).to eq('no_trial')
+      expect(customer.subscriptions.first.status).to eq('trialing')
+      expect(customer.subscriptions.first.current_period_end).to eq(trial_end)
+      expect(customer.subscriptions.first.trial_end).to eq(trial_end)
+    end
+
+    it 'overrides trial period length when trial_end is set' do
+      plan = Stripe::Plan.create(id: 'silver', amount: 999, trial_period_days: 14)
+      trial_end = Time.now.utc.to_i + 3600
+      customer = Stripe::Customer.create(id: 'test_cus_trial_end', card: 'tk', plan: 'silver', trial_end: trial_end)
+
+      customer = Stripe::Customer.retrieve('test_cus_trial_end')
+      expect(customer.subscriptions.count).to eq(1)
+      expect(customer.subscriptions.data.length).to eq(1)
+
+      expect(customer.subscriptions).to_not be_nil
+      expect(customer.subscriptions.first.plan.id).to eq('silver')
+      expect(customer.subscriptions.first.current_period_end).to eq(trial_end)
+      expect(customer.subscriptions.first.trial_end).to eq(trial_end)
+    end
+
+    it "returns no trial when trial_end is set to 'now'" do
+      plan = Stripe::Plan.create(id: 'silver', amount: 999, trial_period_days: 14)
+      customer = Stripe::Customer.create(id: 'test_cus_trial_end', card: 'tk', plan: 'silver', trial_end: "now")
+
+      customer = Stripe::Customer.retrieve('test_cus_trial_end')
+      expect(customer.subscriptions.count).to eq(1)
+      expect(customer.subscriptions.data.length).to eq(1)
+
+      expect(customer.subscriptions).to_not be_nil
+      expect(customer.subscriptions.first.plan.id).to eq('silver')
+      expect(customer.subscriptions.first.status).to eq('active')
+      expect(customer.subscriptions.first.trial_start).to be_nil
+      expect(customer.subscriptions.first.trial_end).to be_nil
+    end
+
+    it "returns an error if trial_end is set to a past time" do
+      plan = Stripe::Plan.create(id: 'silver', amount: 999)
+      expect {
+        Stripe::Customer.create(id: 'test_cus_trial_end', card: 'tk', plan: 'silver', trial_end: Time.now.utc.to_i - 3600)
+      }.to raise_error {|e|
+        expect(e).to be_a(Stripe::InvalidRequestError)
+        expect(e.message).to eq('Invalid timestamp: must be an integer Unix timestamp in the future')
+      }
+    end
+
+    it "returns an error if trial_end is set without a plan" do
+      expect {
+        Stripe::Customer.create(id: 'test_cus_trial_end', card: 'tk', trial_end: "now")
+      }.to raise_error {|e|
+        expect(e).to be_a(Stripe::InvalidRequestError)
+        expect(e.message).to eq('Received unknown parameter: trial_end')
+      }
+    end
+
+  end
+
   it 'cannot create a customer with a plan that does not exist' do
     expect {
       customer = Stripe::Customer.create(id: 'test_cus_no_plan', card: 'tk', :plan => 'non-existant')
