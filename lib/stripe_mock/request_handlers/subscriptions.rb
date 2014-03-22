@@ -22,7 +22,9 @@ module StripeMock
         # Ensure customer has card to charge if plan has no trial and is not free
         verify_card_present(customer, plan)
 
-        subscription = add_subscription_to_customer(plan, customer, params[:current_period_start])
+        subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')) })
+        subscription.merge!(custom_subscription_params(plan, customer, params))
+        add_subscription_to_customer(customer, subscription)
 
         # oddly, subscription returned from 'create_subscription' does not expand plan
         subscription.merge(plan: params[:plan])
@@ -63,17 +65,14 @@ module StripeMock
         end
 
         # expand the plan for addition to the customer object
-        if params[:plan]
-          plan_name = params[:plan]
-          plan = plans[plan_name]
-          assert_existance :plan, params[:plan], plan
-          params[:plan] = plan
-        end
+        plan_name = params[:plan] || subscription[:plan][:id]
+        plan = plans[plan_name]
 
-        # Ensure customer has card to charge if plan has no trial and is not free
+        assert_existance :plan, plan_name, plan
+        params[:plan] = plan if params[:plan]
         verify_card_present(customer, plan)
 
-        subscription.merge!(params)
+        subscription.merge!(custom_subscription_params(plan, customer, params))
 
         # delete the old subscription, replace with the new subscription
         customer[:subscriptions][:data].reject! { |sub| sub[:id] == subscription[:id] }
