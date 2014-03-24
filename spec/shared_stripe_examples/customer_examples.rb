@@ -138,15 +138,19 @@ shared_examples 'Customer API' do
     original = Stripe::Customer.create(id: 'test_customer_update')
     email = original.email
 
+    coupon = Stripe::Coupon.create(id: "10PERCENT")
     original.description = 'new desc'
+    original.coupon      = coupon.id
     original.save
 
     expect(original.email).to eq(email)
     expect(original.description).to eq('new desc')
+    expect(original.discount.coupon).to be_a Stripe::Coupon
 
     customer = Stripe::Customer.retrieve("test_customer_update")
     expect(customer.email).to eq(original.email)
     expect(customer.description).to eq('new desc')
+    expect(customer.discount.coupon).to be_a Stripe::Coupon
   end
 
   it "updates a stripe customer's card" do

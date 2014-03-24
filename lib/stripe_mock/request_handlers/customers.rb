@@ -55,6 +55,13 @@ module StripeMock
           cus[:default_card] = new_card[:id]
         end
 
+        if params[:coupon]
+          coupon = coupons[ params[:coupon] ]
+          assert_existance :coupon, params[:coupon], coupon
+
+          add_coupon_to_customer(cus, coupon)
+        end
+
         cus
       end
 
