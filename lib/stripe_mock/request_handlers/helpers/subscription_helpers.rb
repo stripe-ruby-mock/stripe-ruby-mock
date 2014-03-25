@@ -24,12 +24,12 @@ module StripeMock
       end
 
       def add_subscription_to_customer(cus, sub)
-        cus[:subscriptions][:count] = (cus[:subscriptions][:count] ? cus[:subscriptions][:count]+1 : 1 )
+        cus[:subscriptions][:count] = (cus[:subscriptions][:count] || 0) + 1
         cus[:subscriptions][:data] << sub
       end
 
-      # intervals variable is set to 1 when calculating current_period_end from current_period_start & plan
-      # intervals variable is set to 2 when calculating Stripe::Invoice.upcoming end from current_period_start & plan
+      # `intervals` is set to 1 when calculating current_period_end from current_period_start & plan
+      # `intervals` is set to 2 when calculating Stripe::Invoice.upcoming end from current_period_start & plan
       def get_ending_time(start_time, plan, intervals = 1)
         case plan[:interval]
           when "week"
