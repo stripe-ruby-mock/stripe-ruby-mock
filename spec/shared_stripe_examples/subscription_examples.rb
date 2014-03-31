@@ -26,6 +26,23 @@ shared_examples 'Customer Subscriptions' do
 
     end
 
+    it "correctly sets quantity and application_fee_percent" do
+      Stripe::Plan.create(
+        :amount => 2500,
+        :interval => 'month',
+        :name => 'Test plan',
+        :currency => 'usd',
+        :id => 'silver',
+        :statement_description => "testPlan"
+      )
+      customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk')
+
+      subscription = customer.subscriptions.create({
+        :plan => "silver", quantity: 2, application_fee_percent: 10})
+      expect(subscription.quantity).to eq(2)
+      expect(subscription.application_fee_percent).to eq(10)
+    end
+
     it "adds additional subscription to customer with existing subscription" do
       silver =  Stripe::Plan.create(id: 'silver')
       gold =    Stripe::Plan.create(id: 'gold')
