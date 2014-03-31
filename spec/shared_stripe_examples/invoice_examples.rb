@@ -107,7 +107,7 @@ shared_examples 'Invoice API' do
       expect(@upcoming.total).to eq(@upcoming.lines.data[0].amount)
       expect(@upcoming.period_end).to eq(@upcoming.lines.data[0].period.start)
       expect(Time.at(@upcoming.period_start).to_datetime >> 1).to eq(Time.at(@upcoming.period_end).to_datetime) # +1 month
-      expect(Time.at(@upcoming.period_end).to_datetime >> 1).to eq(Time.at(@upcoming.lines.data[0].period.end).to_datetime) # +1 month
+      expect(Time.at(@upcoming.period_start).to_datetime >> 2).to eq(Time.at(@upcoming.lines.data[0].period.end).to_datetime) # +1 month
       expect(@upcoming.next_payment_attempt).to eq(@upcoming.period_end + 3600) # +1 hour
       expect(@upcoming.subscription).to eq(@subscription.id)
     end
