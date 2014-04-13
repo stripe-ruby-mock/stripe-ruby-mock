@@ -19,6 +19,12 @@ module StripeMock
         plan = plans[params[:plan]]
         assert_existance :plan, params[:plan], plan
 
+        if params[:card]
+          new_card = get_card_by_token(params.delete(:card))
+          add_card_to_customer(new_card, customer)
+          customer[:default_card] = new_card[:id]
+        end
+
         # Ensure customer has card to charge if plan has no trial and is not free
         verify_card_present(customer, plan)
 
