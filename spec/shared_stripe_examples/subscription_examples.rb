@@ -66,6 +66,22 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.last.customer).to eq(customer.id)
     end
 
+    it "subscribes a cardless customer when specifing a card token" do
+      plan = Stripe::Plan.create(id: 'enterprise', amount: 499)
+      customer = Stripe::Customer.create(id: 'cardless')
+
+      sub = customer.subscriptions.create({ :plan => 'enterprise', :card => 'card_token' })
+      customer = Stripe::Customer.retrieve('cardless')
+
+      expect(customer.subscriptions.data.first.id).to eq(sub.id)
+      expect(customer.subscriptions.data.first.customer).to eq(customer.id)
+
+      expect(customer.cards.count).to eq(1)
+      expect(customer.cards.data.length).to eq(1)
+      expect(customer.default_card).to_not be_nil
+      expect(customer.default_card).to eq customer.cards.data.first.id
+    end
+
     it "throws an error when plan does not exist" do
       customer = Stripe::Customer.create(id: 'cardless')
 
