@@ -66,7 +66,7 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.last.customer).to eq(customer.id)
     end
 
-    it "it subscribes a cardless customer when specifing a card token" do
+    it "subscribes a cardless customer when specifing a card token" do
       plan = Stripe::Plan.create(id: 'enterprise', amount: 499)
       customer = Stripe::Customer.create(id: 'cardless')
 
