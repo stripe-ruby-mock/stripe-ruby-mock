@@ -22,8 +22,9 @@ module StripeMock
         customers[ params[:id] ] = Data.mock_customer(cards, params)
 
         if params[:plan]
-          plan = plans[ params[:plan] ]
-          assert_existance :plan, params[:plan], plan
+          plan_id = params[:plan].to_s
+          plan = plans[plan_id]
+          assert_existance :plan, plan_id, plan
 
           if params[:default_card].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0
             raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)

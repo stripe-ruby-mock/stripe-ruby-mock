@@ -47,6 +47,20 @@ shared_examples 'Customer API' do
     expect(customer.subscriptions.first.customer).to eq(customer.id)
   end
 
+  it "creates a customer with a plan (string/symbol agnostic)" do
+    plan = Stripe::Plan.create(id: 'string_id')
+    customer = Stripe::Customer.create(id: 'test_cus_plan', card: 'tk', :plan => :string_id)
+
+    customer = Stripe::Customer.retrieve('test_cus_plan')
+    expect(customer.subscriptions.first.plan.id).to eq('string_id')
+
+    plan = Stripe::Plan.create(:id => :sym_id)
+    customer = Stripe::Customer.create(id: 'test_cus_plan', card: 'tk', :plan => 'sym_id')
+
+    customer = Stripe::Customer.retrieve('test_cus_plan')
+    expect(customer.subscriptions.first.plan.id).to eq('sym_id')
+  end
+
   context "create customer" do
 
     it "with a trial when trial_end is set" do
