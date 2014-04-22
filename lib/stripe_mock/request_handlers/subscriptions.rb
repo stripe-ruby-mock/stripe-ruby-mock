@@ -78,6 +78,11 @@ module StripeMock
         params[:plan] = plan if params[:plan]
         verify_card_present(customer, plan)
 
+        if subscription[:cancel_at_period_end]
+          subscription[:cancel_at_period_end] = false
+          subscription[:canceled_at] = nil
+        end
+
         subscription.merge!(custom_subscription_params(plan, customer, params))
 
         # delete the old subscription, replace with the new subscription
