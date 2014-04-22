@@ -460,6 +460,27 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.ended_at).to be_nil
       expect(customer.subscriptions.data.first.canceled_at).to_not be_nil
     end
+
+    it "resumes an at period end cancelled subscription" do
+      truth = Stripe::Plan.create(id: 'the_truth')
+      customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', plan: "the_truth")
+
+      sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
+      result = sub.delete(at_period_end: true)
+
+      sub.plan = 'the_truth'
+      sub.save
+
+      customer = Stripe::Customer.retrieve('test_customer_sub')
+      expect(customer.subscriptions.data).to_not be_empty
+      expect(customer.subscriptions.count).to eq(1)
+      expect(customer.subscriptions.data.length).to eq(1)
+
+      expect(customer.subscriptions.data.first.status).to eq('active')
+      expect(customer.subscriptions.data.first.cancel_at_period_end).to be_false
+      expect(customer.subscriptions.data.first.ended_at).to be_nil
+      expect(customer.subscriptions.data.first.canceled_at).to be_nil
+    end
   end
 
   it "doesn't change status of subscription when cancelling at period end" do
