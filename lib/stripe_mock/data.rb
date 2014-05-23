@@ -63,12 +63,18 @@ module StripeMock
           address_zip_check: nil
         },
         captured: params.has_key?(:capture) ? params.delete(:capture) : true,
+        refunds: [
+        ],
+        balance_transaction: "txn_2dyYXXP90MN26R",
         failure_message: nil,
+        failure_code: nil,
         amount_refunded: 0,
         customer: nil,
         invoice: nil,
         description: nil,
-        dispute: nil
+        dispute: nil,
+        metadata: {
+        }
       }.merge(params)
     end
 
