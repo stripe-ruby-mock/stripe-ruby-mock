@@ -97,7 +97,7 @@ customer = Stripe::Customer.create
 customer.cards.create
 ```
 
-`:new_charge` and `:create_card` are names of methods in the [StripeMock request handlers](lib/stripe_mock/request_handlers). You can also set `StripeMock.debug(true)` to see the event name for each Stripe request made in your tests.
+`:new_charge` and `:create_card` are names of methods in the [StripeMock request handlers](lib/stripe_mock/request_handlers). You can also set `StripeMock.toggle_debug(true)` to see the event name for each Stripe request made in your tests.
 
 ### Custom Errors
 
