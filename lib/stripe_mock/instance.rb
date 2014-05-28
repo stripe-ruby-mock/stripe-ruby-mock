@@ -105,7 +105,7 @@ module StripeMock
     end
 
     def new_balance_transaction(prefix)
-      # Stripe ids must be strings
+      # balance transaction ids must be strings
       "#{StripeMock.global_id_prefix}#{prefix}_#{@balance_transaction_counter += 1}"
     end
 
