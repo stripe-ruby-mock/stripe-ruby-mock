@@ -51,7 +51,7 @@ module StripeMock
       def refund_charge(route, method_url, params, headers)
         get_charge(route, method_url, params, headers)
         route =~ method_url
-        Data.mock_refund(params.merge charges[$1])
+        Data.mock_refund :charge => charges[$1], :refund => params.merge(:balance_transaction => new_balance_transaction('txn'))
       end
 
     end
