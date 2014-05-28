@@ -79,7 +79,7 @@ module StripeMock
     end
 
     def self.mock_refund(params={})
-      mock_charge.merge({
+      params.merge({
         refunded: true,
         refunds: [
           {
