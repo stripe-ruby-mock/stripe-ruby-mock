@@ -26,6 +26,14 @@ describe StripeMock::Util do
     expect(result).to eq({ x: [ {a: 0}, {a: 0, b: 2}, {c: 3} ] })
   end
 
+  it "does not truncate the array when merging" do
+    dest = { x: [ {a: 1}, {b: 2} ] }
+    source = { x: [ nil, nil, {c: 3} ] }
+    result = StripeMock::Util.rmerge(dest, source)
+
+    expect(result).to eq({ x: [ {a: 1}, {b: 2}, {c: 3} ] })
+  end
+
   it "treats an array nil element as a skip op" do
     dest = { x: [ {a: 1}, {b: 2}, {c: 3} ] }
     source = { x: [ nil, nil, {c: 0} ] }
