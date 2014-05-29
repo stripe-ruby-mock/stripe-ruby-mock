@@ -7,6 +7,7 @@ module StripeMock
 
       desh_hash.merge(source_hash) do |key, oldval, newval|
         if oldval.is_a?(Array) && newval.is_a?(Array)
+          oldval.fill(nil, oldval.length...newval.length)
           oldval.zip(newval).map {|elems|
             elems[1].nil? ? elems[0] : rmerge(elems[0], elems[1])
           }
