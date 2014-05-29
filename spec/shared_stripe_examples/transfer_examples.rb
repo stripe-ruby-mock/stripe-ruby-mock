@@ -25,7 +25,7 @@ shared_examples 'Transfer API' do
 
   it "canceles a stripe transfer " do
     original = Stripe::Transfer.create(amount:  "100", currency: "usd")
-    res, api_key = StripeMock.instance.mock_request(:post, "/v1/transfers/#{original.id}/cancel", 'api_key', {})
+    res, api_key = Stripe.request(:post, "/v1/transfers/#{original.id}/cancel", 'api_key', {})
 
     expect(res[:status]).to eq("canceled")
   end
