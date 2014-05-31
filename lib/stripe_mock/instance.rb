@@ -50,6 +50,7 @@ module StripeMock
       @debug = false
       @error_queue = ErrorQueue.new
       @id_counter = 0
+      @balance_transaction_counter = 0
       @strict = true
     end
 
@@ -101,6 +102,11 @@ module StripeMock
     def new_id(prefix)
       # Stripe ids must be strings
       "#{StripeMock.global_id_prefix}#{prefix}_#{@id_counter += 1}"
+    end
+
+    def new_balance_transaction(prefix)
+      # balance transaction ids must be strings
+      "#{StripeMock.global_id_prefix}#{prefix}_#{@balance_transaction_counter += 1}"
     end
 
     def symbolize_names(hash)

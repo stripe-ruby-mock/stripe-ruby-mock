@@ -56,6 +56,24 @@ shared_examples 'Charge API' do
     }
   end
 
+  it "creates a unique balance transaction" do
+    charge1 = Stripe::Charge.create(
+      amount: 999,
+      currency: 'USD',
+      card: 'card_token_abcde',
+      description: 'card charge'
+    )
+
+    charge2 = Stripe::Charge.create(
+      amount: 999,
+      currency: 'USD',
+      card: 'card_token_abcde',
+      description: 'card charge'
+    )
+
+    expect(charge1.balance_transaction).not_to eq(charge2.balance_transaction)
+  end
+
   context "retrieving a list of charges" do
     before do
       @customer = Stripe::Customer.create(email: 'johnny@appleseed.com')
@@ -146,18 +164,4 @@ shared_examples 'Charge API' do
     end
   end
 
-  it "refunds a stripe charge item" do
-    charge = Stripe::Charge.create(
-      amount: 999,
-      currency: 'USD',
-      card: 'card_token_abcde',
-      description: 'card charge'
-    )
-
-    charge = charge.refund(amount: 999)
-
-    expect(charge.refunded).to eq(true)
-    expect(charge.refunds.first.amount).to eq(999)
-    expect(charge.amount_refunded).to eq(999)
-  end
 end
