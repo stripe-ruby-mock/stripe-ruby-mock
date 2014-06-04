@@ -426,17 +426,13 @@ shared_examples 'Customer Subscriptions' do
 
       expect(result.status).to eq('canceled')
       expect(result.cancel_at_period_end).to be_false
+      expect(result.canceled_at).to_not be_nil
       expect(result.id).to eq(sub.id)
 
       customer = Stripe::Customer.retrieve('test_customer_sub')
-      expect(customer.subscriptions.data).to_not be_empty
-      expect(customer.subscriptions.count).to eq(1)
-      expect(customer.subscriptions.data.length).to eq(1)
-
-      expect(customer.subscriptions.data.first.status).to eq('canceled')
-      expect(customer.subscriptions.data.first.cancel_at_period_end).to be_false
-      expect(customer.subscriptions.data.first.ended_at).to_not be_nil
-      expect(customer.subscriptions.data.first.canceled_at).to_not be_nil
+      expect(customer.subscriptions.data).to be_empty
+      expect(customer.subscriptions.count).to eq(0)
+      expect(customer.subscriptions.data.length).to eq(0)
     end
 
     it "cancels a stripe customer's subscription at period end" do

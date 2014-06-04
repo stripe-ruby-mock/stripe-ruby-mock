@@ -102,7 +102,8 @@ module StripeMock
         assert_existance :subscription, $2, subscription
 
         cancel_params = { canceled_at: Time.now.utc.to_i }
-        if params[:at_period_end] == true
+        cancelled_at_period_end = (params[:at_period_end] == true)
+        if cancelled_at_period_end
           cancel_params[:cancel_at_period_end] = true
         else
           cancel_params[:status] = "canceled"
@@ -112,11 +113,10 @@ module StripeMock
 
         subscription.merge!(cancel_params)
 
-        customer[:subscriptions][:data].reject!{|sub|
-          sub[:id] == subscription[:id]
-        }
+        unless cancelled_at_period_end
+          delete_subscription_from_customer customer, subscription
+        end
 
-        customer[:subscriptions][:data] << subscription
         subscription
       end
 

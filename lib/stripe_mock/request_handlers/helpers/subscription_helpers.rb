@@ -30,6 +30,13 @@ module StripeMock
         cus[:subscriptions][:data] << sub
       end
 
+      def delete_subscription_from_customer(cus, subscription)
+        cus[:subscriptions][:data].reject!{|sub|
+          sub[:id] == subscription[:id]
+        }
+        cus[:subscriptions][:count] -=1
+      end
+
       # `intervals` is set to 1 when calculating current_period_end from current_period_start & plan
       # `intervals` is set to 2 when calculating Stripe::Invoice.upcoming end from current_period_start & plan
       def get_ending_time(start_time, plan, intervals = 1)
