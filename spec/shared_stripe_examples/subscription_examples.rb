@@ -417,19 +417,19 @@ shared_examples 'Customer Subscriptions' do
 
   context "cancelling a subscription" do
 
-    it "cancels a stripe customer's subscription" do
-      truth = Stripe::Plan.create(id: 'the truth')
-      customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', plan: "the truth")
+    it "cancels a stripe customer's subscription", :live => true do
+      truth = stripe_helper.create_plan(id: 'the truth')
+      customer = Stripe::Customer.create(card: stripe_helper.generate_card_token, plan: "the truth")
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
-      result = sub.delete()
+      result = sub.delete
 
       expect(result.status).to eq('canceled')
       expect(result.cancel_at_period_end).to be_false
       expect(result.canceled_at).to_not be_nil
       expect(result.id).to eq(sub.id)
 
-      customer = Stripe::Customer.retrieve('test_customer_sub')
+      customer = Stripe::Customer.retrieve(customer.id)
       expect(customer.subscriptions.data).to be_empty
       expect(customer.subscriptions.count).to eq(0)
       expect(customer.subscriptions.data.length).to eq(0)
