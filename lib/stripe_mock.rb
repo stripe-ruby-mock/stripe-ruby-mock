@@ -29,6 +29,7 @@ require 'stripe_mock/api/debug'
 require 'stripe_mock/api/errors'
 require 'stripe_mock/api/global_id_prefix'
 require 'stripe_mock/api/strict'
+require 'stripe_mock/api/test_helpers'
 require 'stripe_mock/api/webhooks'
 
 require 'stripe_mock/request_handlers/helpers/card_helpers.rb'
@@ -47,6 +48,10 @@ require 'stripe_mock/request_handlers/recipients.rb'
 require 'stripe_mock/request_handlers/subscriptions.rb'
 require 'stripe_mock/request_handlers/tokens.rb'
 require 'stripe_mock/instance'
+
+require 'stripe_mock/test_strategies/base.rb'
+require 'stripe_mock/test_strategies/mock.rb'
+require 'stripe_mock/test_strategies/live.rb'
 
 module StripeMock
 
