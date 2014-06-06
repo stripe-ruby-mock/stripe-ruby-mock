@@ -51,7 +51,7 @@ describe 'StripeMock Server', :mock_server => true do
 
 
   it "returns a response with symbolized hash keys" do
-    Stripe::Plan.create(id: 'x')
+    stripe_helper.create_plan(id: 'x')
     response, api_key = StripeMock.redirect_to_mock_server('get', '/v1/plans/x', 'xxx')
     response.keys.each {|k| expect(k).to be_a(Symbol) }
   end

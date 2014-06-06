@@ -4,7 +4,7 @@ shared_examples 'Customer Subscriptions' do
 
   context "creating a new subscription" do
     it "adds a new subscription to customer with none" do
-      plan = Stripe::Plan.create(id: 'silver', name: 'Silver Plan', amount: 4999)
+      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999)
       customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk')
 
       expect(customer.subscriptions.data).to be_empty
@@ -44,8 +44,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "adds additional subscription to customer with existing subscription" do
-      silver =  Stripe::Plan.create(id: 'silver')
-      gold =    Stripe::Plan.create(id: 'gold')
+      silver =  stripe_helper.create_plan(id: 'silver')
+      gold =    stripe_helper.create_plan(id: 'gold')
       customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', plan: 'gold')
 
       sub = customer.subscriptions.create({ :plan => 'silver' })
@@ -67,7 +67,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "subscribes a cardless customer when specifing a card token" do
-      plan = Stripe::Plan.create(id: 'enterprise', amount: 499)
+      plan = stripe_helper.create_plan(id: 'enterprise', amount: 499)
       customer = Stripe::Customer.create(id: 'cardless')
 
       sub = customer.subscriptions.create({ :plan => 'enterprise', :card => 'card_token' })
@@ -96,7 +96,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "throws an error when subscribing a customer with no card" do
-      plan = Stripe::Plan.create(id: 'enterprise', amount: 499)
+      plan = stripe_helper.create_plan(id: 'enterprise', amount: 499)
       customer = Stripe::Customer.create(id: 'cardless')
 
       expect { customer.subscriptions.create({ :plan => 'enterprise' }) }.to raise_error {|e|
@@ -110,7 +110,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "subscribes a customer with no card to a plan with a free trial" do
-      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'cardless')
 
       sub = customer.subscriptions.create({ :plan => 'trial' })
@@ -130,7 +130,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "subscribes a customer with no card to a free plan" do
-      plan = Stripe::Plan.create(id: 'free_tier', amount: 0)
+      plan = stripe_helper.create_plan(id: 'free_tier', amount: 0)
       customer = Stripe::Customer.create(id: 'cardless')
 
       sub = customer.subscriptions.create({ :plan => 'free_tier' })
@@ -149,7 +149,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "overrides trial length when trial end is set" do
-      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'short_trial')
       trial_end = Time.now.utc.to_i + 3600
 
@@ -162,7 +162,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "returns without a trial when trial_end is set to 'now'" do
-      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'no_trial', card: 'tk')
 
       sub = customer.subscriptions.create({ plan: 'trial', trial_end: "now" })
@@ -175,7 +175,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "raises error when trial_end is not an integer or 'now'" do
-      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'cus_trial')
 
       expect { customer.subscriptions.create({ plan: 'trial', trial_end: "gazebo" }) }.to raise_error {|e|
@@ -186,7 +186,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "raises error when trial_end is set to a time in the past" do
-      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'past_trial')
       trial_end = Time.now.utc.to_i - 3600
 
@@ -198,7 +198,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "raises error when trial_end is set to a time more than five years in the future" do
-      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'long_trial')
       trial_end = Time.now.utc.to_i + 31557600*5 + 3600 # 5 years + 1 hour
 
@@ -213,8 +213,8 @@ shared_examples 'Customer Subscriptions' do
   context "updating a subscription" do
 
     it "updates a stripe customer's existing subscription" do
-      silver = Stripe::Plan.create(id: 'silver')
-      gold = Stripe::Plan.create(id: 'gold')
+      silver = stripe_helper.create_plan(id: 'silver')
+      gold = stripe_helper.create_plan(id: 'gold')
       customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', plan: 'silver')
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -235,7 +235,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "throws an error when plan does not exist" do
-      free = Stripe::Plan.create(id: 'free', amount: 0)
+      free = stripe_helper.create_plan(id: 'free', amount: 0)
       customer = Stripe::Customer.create(id: 'cardless', plan: 'free')
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -254,7 +254,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "throws an error when subscription does not exist" do
-      free = Stripe::Plan.create(id: 'free', amount: 0)
+      free = stripe_helper.create_plan(id: 'free', amount: 0)
       customer = Stripe::Customer.create(id: 'cardless', plan: 'free')
 
       expect { customer.subscriptions.retrieve("gazebo") }.to raise_error {|e|
@@ -270,8 +270,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "throws an error when updating a customer with no card" do
-      free = Stripe::Plan.create(id: 'free', amount: 0)
-      paid = Stripe::Plan.create(id: 'enterprise', amount: 499)
+      free = stripe_helper.create_plan(id: 'free', amount: 0)
+      paid = stripe_helper.create_plan(id: 'enterprise', amount: 499)
       customer = Stripe::Customer.create(id: 'cardless', plan: 'free')
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -290,8 +290,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "updates a customer with no card to a plan with a free trial" do
-      free = Stripe::Plan.create(id: 'free', amount: 0)
-      trial = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      free = stripe_helper.create_plan(id: 'free', amount: 0)
+      trial = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'cardless', plan: 'free')
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -312,8 +312,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "updates a customer with no card to a free plan" do
-      free = Stripe::Plan.create(id: 'free', amount: 0)
-      gratis = Stripe::Plan.create(id: 'gratis', amount: 0)
+      free = stripe_helper.create_plan(id: 'free', amount: 0)
+      gratis = stripe_helper.create_plan(id: 'gratis', amount: 0)
       customer = Stripe::Customer.create(id: 'cardless', plan: 'free')
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -334,8 +334,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "sets a card when updating a customer's subscription" do
-      free = Stripe::Plan.create(id: 'free', amount: 0)
-      paid = Stripe::Plan.create(id: 'paid', amount: 499)
+      free = stripe_helper.create_plan(id: 'free', amount: 0)
+      paid = stripe_helper.create_plan(id: 'paid', amount: 499)
       customer = Stripe::Customer.create(id: 'test_customer_sub', plan: 'free')
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -352,7 +352,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "overrides trial length when trial end is set" do
-      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'test_trial_end', plan: 'trial')
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -367,7 +367,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "returns without a trial when trial_end is set to 'now'" do
-      plan = Stripe::Plan.create(id: 'trial', amount: 999, trial_period_days: 14)
+      plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'test_trial_end', plan: 'trial')
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -383,7 +383,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "changes an active subscription to a trial when trial_end is set" do
-      plan = Stripe::Plan.create(id: 'no_trial', amount: 999)
+      plan = stripe_helper.create_plan(id: 'no_trial', amount: 999)
       customer = Stripe::Customer.create(id: 'test_trial_end', plan: 'no_trial', card: 'tk')
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -401,7 +401,7 @@ shared_examples 'Customer Subscriptions' do
 
 
     it "raises error when trial_end is not an integer or 'now'" do
-      plan = Stripe::Plan.create(id: 'no_trial', amount: 999)
+      plan = stripe_helper.create_plan(id: 'no_trial', amount: 999)
       customer = Stripe::Customer.create(id: 'test_trial_end', plan: 'no_trial', card: 'tk')
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -436,7 +436,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "cancels a stripe customer's subscription at period end" do
-      truth = Stripe::Plan.create(id: 'the_truth')
+      truth = stripe_helper.create_plan(id: 'the_truth')
       customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', plan: "the_truth")
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -458,7 +458,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "resumes an at period end cancelled subscription" do
-      truth = Stripe::Plan.create(id: 'the_truth')
+      truth = stripe_helper.create_plan(id: 'the_truth')
       customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', plan: "the_truth")
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -480,7 +480,7 @@ shared_examples 'Customer Subscriptions' do
   end
 
   it "doesn't change status of subscription when cancelling at period end" do
-    trial = Stripe::Plan.create(id: 'trial', trial_period_days: 14)
+    trial = stripe_helper.create_plan(id: 'trial', trial_period_days: 14)
     customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', plan: "trial")
 
     sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
@@ -496,8 +496,8 @@ shared_examples 'Customer Subscriptions' do
   context "retrieve multiple subscriptions" do
 
     it "retrieves a list of multiple subscriptions" do
-      free = Stripe::Plan.create(id: 'free', amount: 0)
-      paid = Stripe::Plan.create(id: 'paid', amount: 499)
+      free = stripe_helper.create_plan(id: 'free', amount: 0)
+      paid = stripe_helper.create_plan(id: 'paid', amount: 499)
       customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk', plan: "free")
       customer.subscriptions.create({ :plan => 'paid' })
 

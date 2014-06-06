@@ -2,7 +2,7 @@ module StripeMock
   module TestStrategies
     class Base
 
-      def plan_params(params={})
+      def create_plan_params(params={})
         {
           :id => 'stripe_mock_default_plan_id',
           :name => 'StripeMock Default Plan ID',

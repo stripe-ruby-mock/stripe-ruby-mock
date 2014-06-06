@@ -11,7 +11,7 @@ module StripeMock
       end
 
       def new_plan(route, method_url, params, headers)
-        params[:id] = ( params[:id] || new_id('plan') ).to_s
+        validate_create_plan_params(params)
         plans[ params[:id] ] = Data.mock_plan(params)
       end
 

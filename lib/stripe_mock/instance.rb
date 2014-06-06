@@ -2,6 +2,7 @@ module StripeMock
   class Instance
 
     include StripeMock::RequestHandlers::Helpers
+    include StripeMock::RequestHandlers::ParamValidators
 
     # Handlers are ordered by priority
     @@handlers = []
@@ -52,6 +53,9 @@ module StripeMock
       @id_counter = 0
       @balance_transaction_counter = 0
       @strict = true
+
+      # This is basically a cache for ParamValidators
+      @base_strategy = TestStrategies::Base.new
     end
 
     def mock_request(method, url, api_key, params={}, headers={})

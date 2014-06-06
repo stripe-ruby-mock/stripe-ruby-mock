@@ -47,9 +47,7 @@ shared_examples 'Plan API' do
 
 
   it "retrieves a stripe plan" do
-    original = Stripe::Plan.create({
-      amount: 1331
-    })
+    original = stripe_helper.create_plan(amount: 1331)
     plan = Stripe::Plan.retrieve(original.id)
 
     expect(plan.id).to eq(original.id)
@@ -58,7 +56,7 @@ shared_examples 'Plan API' do
 
 
   it "updates a stripe plan" do
-    Stripe::Plan.create(id: 'super_member', amount: 111)
+    stripe_helper.create_plan(id: 'super_member', amount: 111)
 
     plan = Stripe::Plan.retrieve('super_member')
     expect(plan.amount).to eq(111)
@@ -79,7 +77,7 @@ shared_examples 'Plan API' do
   end
 
   it "deletes a stripe plan" do
-    Stripe::Plan.create(id: 'super_member', amount: 111)
+    stripe_helper.create_plan(id: 'super_member', amount: 111)
 
     plan = Stripe::Plan.retrieve('super_member')
     expect(plan).to_not be_nil
@@ -94,8 +92,8 @@ shared_examples 'Plan API' do
   end
 
   it "retrieves all plans" do
-    Stripe::Plan.create({ id: 'Plan One', amount: 54321 })
-    Stripe::Plan.create({ id: 'Plan Two', amount: 98765 })
+    stripe_helper.create_plan(id: 'Plan One', amount: 54321)
+    stripe_helper.create_plan(id: 'Plan Two', amount: 98765)
 
     all = Stripe::Plan.all
     expect(all.length).to eq(2)
@@ -117,6 +115,30 @@ shared_examples 'Plan API' do
 
       expect(plan.currency).to_not be_nil
       expect(plan.interval).to_not be_nil
+    end
+  end
+
+  describe "Validation" do
+    let(:params) { stripe_helper.create_plan_params }
+    let(:subject) { Stripe::Plan.create(params) }
+
+    describe "Required Parameters" do
+      after do
+        params.delete(@name)
+        expect { subject }.to raise_error(Stripe::InvalidRequestError, "Missing required param: #{@name}")
+      end
+
+      it("requires a name") { @name = :name }
+      it("requires an amount") { @name = :amount }
+      it("requires a currency") { @name = :currency }
+      it("requires an interval") { @name = :interval }
+    end
+
+    describe "Uniqueness" do
+      it "validates for uniqueness" do
+        Stripe::Plan.create(params)
+        expect { subject }.to raise_error(Stripe::InvalidRequestError, "Plan already exists.")
+      end
     end
   end
 

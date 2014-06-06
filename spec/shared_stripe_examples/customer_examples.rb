@@ -35,7 +35,7 @@ shared_examples 'Customer API' do
   end
 
   it 'creates a customer with a plan' do
-    plan = Stripe::Plan.create(id: 'silver')
+    plan = stripe_helper.create_plan(id: 'silver')
     customer = Stripe::Customer.create(id: 'test_cus_plan', card: 'tk', :plan => 'silver')
 
     customer = Stripe::Customer.retrieve('test_cus_plan')
@@ -48,13 +48,13 @@ shared_examples 'Customer API' do
   end
 
   it "creates a customer with a plan (string/symbol agnostic)" do
-    plan = Stripe::Plan.create(id: 'string_id')
+    plan = stripe_helper.create_plan(id: 'string_id')
     customer = Stripe::Customer.create(id: 'test_cus_plan', card: 'tk', :plan => :string_id)
 
     customer = Stripe::Customer.retrieve('test_cus_plan')
     expect(customer.subscriptions.first.plan.id).to eq('string_id')
 
-    plan = Stripe::Plan.create(:id => :sym_id)
+    plan = stripe_helper.create_plan(:id => :sym_id)
     customer = Stripe::Customer.create(id: 'test_cus_plan', card: 'tk', :plan => 'sym_id')
 
     customer = Stripe::Customer.retrieve('test_cus_plan')
@@ -64,7 +64,7 @@ shared_examples 'Customer API' do
   context "create customer" do
 
     it "with a trial when trial_end is set" do
-      plan = Stripe::Plan.create(id: 'no_trial', amount: 999)
+      plan = stripe_helper.create_plan(id: 'no_trial', amount: 999)
       trial_end = Time.now.utc.to_i + 3600
       customer = Stripe::Customer.create(id: 'test_cus_trial_end', card: 'tk', plan: 'no_trial', trial_end: trial_end)
 
@@ -80,7 +80,7 @@ shared_examples 'Customer API' do
     end
 
     it 'overrides trial period length when trial_end is set' do
-      plan = Stripe::Plan.create(id: 'silver', amount: 999, trial_period_days: 14)
+      plan = stripe_helper.create_plan(id: 'silver', amount: 999, trial_period_days: 14)
       trial_end = Time.now.utc.to_i + 3600
       customer = Stripe::Customer.create(id: 'test_cus_trial_end', card: 'tk', plan: 'silver', trial_end: trial_end)
 
@@ -95,7 +95,7 @@ shared_examples 'Customer API' do
     end
 
     it "returns no trial when trial_end is set to 'now'" do
-      plan = Stripe::Plan.create(id: 'silver', amount: 999, trial_period_days: 14)
+      plan = stripe_helper.create_plan(id: 'silver', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'test_cus_trial_end', card: 'tk', plan: 'silver', trial_end: "now")
 
       customer = Stripe::Customer.retrieve('test_cus_trial_end')
@@ -110,7 +110,7 @@ shared_examples 'Customer API' do
     end
 
     it "returns an error if trial_end is set to a past time" do
-      plan = Stripe::Plan.create(id: 'silver', amount: 999)
+      plan = stripe_helper.create_plan(id: 'silver', amount: 999)
       expect {
         Stripe::Customer.create(id: 'test_cus_trial_end', card: 'tk', plan: 'silver', trial_end: Time.now.utc.to_i - 3600)
       }.to raise_error {|e|
@@ -140,7 +140,7 @@ shared_examples 'Customer API' do
   end
 
   it 'cannot create a customer with an exsting plan, but no card token' do
-    plan = Stripe::Plan.create(id: 'p')
+    plan = stripe_helper.create_plan(id: 'p')
     expect {
       customer = Stripe::Customer.create(id: 'test_cus_no_plan', :plan => 'p')
     }.to raise_error {|e|
