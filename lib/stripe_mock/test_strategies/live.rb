@@ -13,16 +13,6 @@ module StripeMock
         Stripe::Plan.create plan_params(params)
       end
 
-      def plan_params(params={})
-        {
-          :id => 'live_stripe_mock_default_plan_id',
-          :name => '[Live] StripeMock Default Plan ID',
-          :amount => 1337,
-          :currency => 'usd',
-          :interval => 'month'
-        }.merge(params)
-      end
-
     end
   end
 end

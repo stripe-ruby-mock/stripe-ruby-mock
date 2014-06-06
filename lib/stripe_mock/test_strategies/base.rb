@@ -2,6 +2,16 @@ module StripeMock
   module TestStrategies
     class Base
 
+      def plan_params(params={})
+        {
+          :id => 'stripe_mock_default_plan_id',
+          :name => 'StripeMock Default Plan ID',
+          :amount => 1337,
+          :currency => 'usd',
+          :interval => 'month'
+        }.merge(params)
+      end
+
       def generate_card_token(card_params={})
         stripe_token = Stripe::Token.create(
           :card => {
