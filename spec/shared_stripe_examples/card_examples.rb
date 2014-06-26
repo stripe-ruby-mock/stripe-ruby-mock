@@ -92,4 +92,41 @@ shared_examples 'Card API' do
     end
   end
 
+  context "retrieve multiple cards" do
+
+    it "retrieves a list of multiple cards" do
+      customer = Stripe::Customer.create(id: 'test_customer_card')
+
+      card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+      card1 = customer.cards.create(card: card_token)
+      card_token = StripeMock.generate_card_token(last4: "1124", exp_month: 12, exp_year: 2098)
+      card2 = customer.cards.create(card: card_token)
+
+      customer = Stripe::Customer.retrieve('test_customer_card')
+
+      list = customer.cards.all
+
+      expect(list.object).to eq("list")
+      expect(list.count).to eq(2)
+      expect(list.data.length).to eq(2)
+
+      expect(list.data.first.object).to eq("card")
+      expect(list.data.first.to_hash).to eq(card1.to_hash)
+
+      expect(list.data.last.object).to eq("card")
+      expect(list.data.last.to_hash).to eq(card2.to_hash)
+    end
+
+    it "retrieves an empty list if there's no subscriptions" do
+      Stripe::Customer.create(id: 'no_cards')
+      customer = Stripe::Customer.retrieve('no_cards')
+
+      list = customer.cards.all
+
+      expect(list.object).to eq("list")
+      expect(list.count).to eq(0)
+      expect(list.data.length).to eq(0)
+    end
+  end
+
 end
