@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 shared_examples 'Refund API' do
-  
+
   it "refunds a stripe charge item" do
     charge = Stripe::Charge.create(
       amount: 999,
@@ -13,7 +13,7 @@ shared_examples 'Refund API' do
     charge = charge.refund(amount: 999)
 
     expect(charge.refunded).to eq(true)
-    expect(charge.refunds.first.amount).to eq(999)
+    expect(charge.refunds.data.first.amount).to eq(999)
     expect(charge.amount_refunded).to eq(999)
   end
 
@@ -39,6 +39,6 @@ shared_examples 'Refund API' do
     )
     refund = charge.refund
 
-    expect(charge.balance_transaction).not_to eq(refund.refunds.first.balance_transaction)
+    expect(charge.balance_transaction).not_to eq(refund.refunds.data.first.balance_transaction)
   end
 end
