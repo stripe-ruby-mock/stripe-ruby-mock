@@ -47,7 +47,8 @@
             "currency": "usd",
             "created": 1381080103,
             "object": "refund",
-            "balance_transaction": "txn_2hkjgg43ucu7K1"
+            "balance_transaction": "txn_2hkjgg43ucu7K1",
+            "id": "re_00000000000000"
           }
         ]
       },

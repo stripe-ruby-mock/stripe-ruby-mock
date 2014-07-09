@@ -92,7 +92,8 @@ module StripeMock
               currency: "usd",
               created: 1380208998,
               object: "refund",
-              balance_transaction: params[:refund][:balance_transaction]
+              balance_transaction: params[:refund][:balance_transaction],
+              id: params[:refund][:id]
             }
           ]
         },
