@@ -37,9 +37,9 @@
         "address_zip_check": null
       },
       "captured": true,
-      "refunds": [
+      "refunds": {
 
-      ],
+      },
       "balance_transaction": "txn_00000000000000",
       "failure_message": null,
       "failure_code": null,

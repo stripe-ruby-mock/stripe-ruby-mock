@@ -64,8 +64,8 @@ module StripeMock
           address_zip_check: nil
         },
         captured: params.has_key?(:capture) ? params.delete(:capture) : true,
-        refunds: [
-        ],
+        refunds: {
+        },
         balance_transaction: "txn_2dyYXXP90MN26R",
         failure_message: nil,
         failure_code: nil,
@@ -82,15 +82,20 @@ module StripeMock
     def self.mock_refund(params={})
       mock_charge(params[:charge]).merge({
         refunded: true,
-        refunds: [
-          {
-            amount: params[:refund][:amount],
-            currency: "usd",
-            created: 1380208998,
-            object: "refund",
-            balance_transaction: params[:refund][:balance_transaction]
-          }
-        ],
+        refunds: {
+          object: "list",
+          total_count: 1,
+          has_more: false,
+          data: [
+            {
+              amount: params[:refund][:amount],
+              currency: "usd",
+              created: 1380208998,
+              object: "refund",
+              balance_transaction: params[:refund][:balance_transaction]
+            }
+          ]
+        },
         amount_refunded: params[:refund][:amount]
       })
     end
