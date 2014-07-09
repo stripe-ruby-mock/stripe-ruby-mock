@@ -20,7 +20,8 @@
         "last4": "4242",
         "name": "1231",
         "object": "card",
-        "type": "Visa"
+        "type": "Visa",
+        "brand": "Visa"
       },
       "created": 1359947599,
       "delinquent": false,
