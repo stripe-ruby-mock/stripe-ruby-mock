@@ -7,7 +7,7 @@ module StripeMock
   end
 
   def self.set_test_strategy(strategy)
-    @__test_strat = case strategy
+    @__test_strat = case strategy.to_sym
     when :mock then TestStrategies::Mock
     when :live then TestStrategies::Live
     else raise "Invalid test helper stragety: #{stragety.inspect}"
