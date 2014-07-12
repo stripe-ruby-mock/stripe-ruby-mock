@@ -13,6 +13,7 @@ Dir["./spec/support/**/*.rb"].each {|f| require f}
 RSpec.configure do |c|
 
   if c.filter_manager.inclusions.keys.include?(:live)
+    puts "Running **live** tests against Stripe..."
     StripeMock.set_test_strategy(:live)
     c.filter_run_excluding :mock_server => true
 
