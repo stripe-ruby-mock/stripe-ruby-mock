@@ -8,9 +8,21 @@ module StripeMock
       end
 
       def create_token(route, method_url, params, headers)
-        # "Sanitize" card number
-        params[:card][:last4] = params[:card][:number][-4,4]
-        token_id = generate_card_token(params[:card])
+        if params[:customer].nil? && params[:card].nil?
+          raise Stripe::InvalidRequestError.new('You must supply either a card, customer, or bank account to create a token.', nil, 400)
+        end
+
+        if params[:card]
+          # "Sanitize" card number
+          params[:card][:last4] = params[:card][:number][-4,4]
+          customer_card = params[:card]
+        else
+          customer = customers[params[:customer]]
+          assert_existance :customer, params[:customer], customer
+          customer_card = get_customer_card(customer, customer[:default_card])
+        end
+
+        token_id = generate_card_token(customer_card)
         card = @card_tokens[token_id]
 
         Data.mock_token(params.merge :id => token_id, :card => card)

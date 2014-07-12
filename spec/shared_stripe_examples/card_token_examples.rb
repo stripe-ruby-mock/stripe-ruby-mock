@@ -85,6 +85,32 @@ shared_examples 'Card Token Mocking' do
       expect(card.exp_month).to eq(11)
       expect(card.exp_year).to eq(2019)
     end
+
+    it "generates a card token created from customer" do
+      card_token = Stripe::Token.create({
+        card: {
+          number: "1111222233334444",
+          exp_month: 11,
+          exp_year: 2019
+        }
+      })
+
+      cus = Stripe::Customer.create()
+      cus.card = card_token.id
+      cus.save
+
+      card_token = Stripe::Token.create({
+        customer: cus.id
+      })
+
+      expect(card_token.object).to eq("token")
+    end
+
+    it "throws an error if neither card nor customer are provided" do
+      expect { Stripe::Token.create }.to raise_error(
+        Stripe::InvalidRequestError, /must supply either a card, customer/
+      )
+    end
   end
 
 end
