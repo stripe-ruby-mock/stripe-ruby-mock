@@ -3,7 +3,7 @@ require_stripe_examples
 
 describe StripeMock::Instance do
 
-  let(:stripe_helper) { StripeMock.get_test_helpers }
+  let(:stripe_helper) { StripeMock.create_test_helper }
 
   it_behaves_like_stripe do
     def test_data_source(type); StripeMock.instance.send(type); end

@@ -37,4 +37,38 @@ describe StripeMock do
     }
   end
 
+  describe "Test Helper Strategies" do
+    before { StripeMock.instance_variable_set("@__test_strat", nil) }
+
+    it "uses mock by default" do
+      helper = StripeMock.create_test_helper
+      expect(helper).to be_a StripeMock::TestStrategies::Mock
+    end
+
+    it "can specify which strategy to use" do
+      # StripeMock.set_test_helper_strategy
+      helper = StripeMock.create_test_helper(:live)
+      expect(helper).to be_a StripeMock::TestStrategies::Live
+
+      helper = StripeMock.create_test_helper(:mock)
+      expect(helper).to be_a StripeMock::TestStrategies::Mock
+    end
+
+    it "throws an error on an unknown strategy" do
+      expect { StripeMock.create_test_helper(:lol) }.to raise_error
+    end
+
+    it "can configure the default strategy" do
+      StripeMock.set_default_test_helper_strategy(:live)
+      helper = StripeMock.create_test_helper
+      expect(helper).to be_a StripeMock::TestStrategies::Live
+    end
+
+    it "can overrige a set default strategy" do
+      StripeMock.set_default_test_helper_strategy(:live)
+      helper = StripeMock.create_test_helper(:mock)
+      expect(helper).to be_a StripeMock::TestStrategies::Mock
+    end
+  end
+
 end
