@@ -17,16 +17,16 @@ shared_examples 'Refund API' do
     expect(charge.amount_refunded).to eq(999)
   end
 
-  it "creates a stripe refund with the charge ID" do
+  it "creates a stripe refund with the charge ID", :live => true do
     charge = Stripe::Charge.create(
       amount: 999,
       currency: 'USD',
-      card: 'card_token_abcde',
+      card: stripe_helper.generate_card_token,
       description: 'card charge'
     )
     refund = charge.refund
 
-    expect(charge.id).to match(/^test_ch/)
+    expect(charge.id).to match(/^(test_)?ch/)
     expect(refund.id).to eq(charge.id)
   end
 
