@@ -58,12 +58,12 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.count).to eq(2)
       expect(customer.subscriptions.data.length).to eq(2)
 
-      expect(customer.subscriptions.data.first.plan.to_hash).to eq(gold.to_hash)
-      expect(customer.subscriptions.data.first.customer).to eq(customer.id)
-
-      expect(customer.subscriptions.data.last.id).to eq(sub.id)
-      expect(customer.subscriptions.data.last.plan.to_hash).to eq(silver.to_hash)
+      expect(customer.subscriptions.data.last.plan.to_hash).to eq(gold.to_hash)
       expect(customer.subscriptions.data.last.customer).to eq(customer.id)
+
+      expect(customer.subscriptions.data.first.id).to eq(sub.id)
+      expect(customer.subscriptions.data.first.plan.to_hash).to eq(silver.to_hash)
+      expect(customer.subscriptions.data.first.customer).to eq(customer.id)
     end
 
     it "subscribes a cardless customer when specifing a card token" do
@@ -513,11 +513,11 @@ shared_examples 'Customer Subscriptions' do
       expect(list.count).to eq(2)
       expect(list.data.length).to eq(2)
 
-      expect(list.data.first.object).to eq("subscription")
-      expect(list.data.first.plan.to_hash).to eq(free.to_hash)
-
       expect(list.data.last.object).to eq("subscription")
-      expect(list.data.last.plan.to_hash).to eq(paid.to_hash)
+      expect(list.data.last.plan.to_hash).to eq(free.to_hash)
+
+      expect(list.data.first.object).to eq("subscription")
+      expect(list.data.first.plan.to_hash).to eq(paid.to_hash)
     end
 
     it "retrieves an empty list if there's no subscriptions" do
