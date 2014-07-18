@@ -32,8 +32,7 @@ module StripeMock
         subscription.merge!(custom_subscription_params(plan, customer, params))
         add_subscription_to_customer(customer, subscription)
 
-        # oddly, subscription returned from 'create_subscription' does not expand plan
-        subscription.merge(plan: params[:plan])
+        subscription
       end
 
       def retrieve_subscription(route, method_url, params, headers)
@@ -89,8 +88,7 @@ module StripeMock
         customer[:subscriptions][:data].reject! { |sub| sub[:id] == subscription[:id] }
         customer[:subscriptions][:data] << subscription
 
-        # oddly, subscription returned from 'create_subscription' does not expand plan
-        subscription.merge(plan: plan_name)
+        subscription
       end
 
       def cancel_subscription(route, method_url, params, headers)

@@ -13,7 +13,7 @@ shared_examples 'Customer Subscriptions' do
       sub = customer.subscriptions.create({ :plan => 'silver' })
 
       expect(sub.object).to eq('subscription')
-      expect(sub.plan).to eq('silver')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
 
       customer = Stripe::Customer.retrieve('test_customer_sub')
       expect(customer.subscriptions.data).to_not be_empty
@@ -51,7 +51,7 @@ shared_examples 'Customer Subscriptions' do
       sub = customer.subscriptions.create({ :plan => 'silver' })
 
       expect(sub.object).to eq('subscription')
-      expect(sub.plan).to eq('silver')
+      expect(sub.plan.to_hash).to eq(silver.to_hash)
 
       customer = Stripe::Customer.retrieve('test_customer_sub')
       expect(customer.subscriptions.data).to_not be_empty
@@ -116,7 +116,7 @@ shared_examples 'Customer Subscriptions' do
       sub = customer.subscriptions.create({ :plan => 'trial' })
 
       expect(sub.object).to eq('subscription')
-      expect(sub.plan).to eq('trial')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
       expect(sub.trial_end - sub.trial_start).to eq(14 * 86400)
 
       customer = Stripe::Customer.retrieve('cardless')
@@ -136,7 +136,7 @@ shared_examples 'Customer Subscriptions' do
       sub = customer.subscriptions.create({ :plan => 'free_tier' })
 
       expect(sub.object).to eq('subscription')
-      expect(sub.plan).to eq('free_tier')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
 
       customer = Stripe::Customer.retrieve('cardless')
       expect(customer.subscriptions.data).to_not be_empty
@@ -156,7 +156,7 @@ shared_examples 'Customer Subscriptions' do
       sub = customer.subscriptions.create({ plan: 'trial', trial_end: trial_end })
 
       expect(sub.object).to eq('subscription')
-      expect(sub.plan).to eq('trial')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
       expect(sub.current_period_end).to eq(trial_end)
       expect(sub.trial_end).to eq(trial_end)
     end
@@ -168,7 +168,7 @@ shared_examples 'Customer Subscriptions' do
       sub = customer.subscriptions.create({ plan: 'trial', trial_end: "now" })
 
       expect(sub.object).to eq('subscription')
-      expect(sub.plan).to eq('trial')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
       expect(sub.status).to eq('active')
       expect(sub.trial_start).to be_nil
       expect(sub.trial_end).to be_nil
@@ -222,7 +222,7 @@ shared_examples 'Customer Subscriptions' do
       sub.save
 
       expect(sub.object).to eq('subscription')
-      expect(sub.plan).to eq('gold')
+      expect(sub.plan.to_hash).to eq(gold.to_hash)
 
       customer = Stripe::Customer.retrieve('test_customer_sub')
       expect(customer.subscriptions.data).to_not be_empty
@@ -299,7 +299,7 @@ shared_examples 'Customer Subscriptions' do
       sub.save
 
       expect(sub.object).to eq('subscription')
-      expect(sub.plan).to eq('trial')
+      expect(sub.plan.to_hash).to eq(trial.to_hash)
 
       customer = Stripe::Customer.retrieve('cardless')
       expect(customer.subscriptions.data).to_not be_empty
@@ -321,7 +321,7 @@ shared_examples 'Customer Subscriptions' do
       sub.save
 
       expect(sub.object).to eq('subscription')
-      expect(sub.plan).to eq('gratis')
+      expect(sub.plan.to_hash).to eq(gratis.to_hash)
 
       customer = Stripe::Customer.retrieve('cardless')
       expect(customer.subscriptions.data).to_not be_empty
@@ -376,7 +376,7 @@ shared_examples 'Customer Subscriptions' do
       sub.save
 
       expect(sub.object).to eq('subscription')
-      expect(sub.plan).to eq('trial')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
       expect(sub.status).to eq('active')
       expect(sub.trial_start).to be_nil
       expect(sub.trial_end).to be_nil
@@ -393,7 +393,7 @@ shared_examples 'Customer Subscriptions' do
       sub.save
 
       expect(sub.object).to eq('subscription')
-      expect(sub.plan).to eq('no_trial')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
       expect(sub.status).to eq('trialing')
       expect(sub.trial_end).to eq(trial_end)
       expect(sub.current_period_end).to eq(trial_end)
