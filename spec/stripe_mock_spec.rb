@@ -46,7 +46,6 @@ describe StripeMock do
     end
 
     it "can specify which strategy to use" do
-      # StripeMock.set_test_helper_strategy
       helper = StripeMock.create_test_helper(:live)
       expect(helper).to be_a StripeMock::TestStrategies::Live
 

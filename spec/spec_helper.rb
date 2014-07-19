@@ -14,7 +14,7 @@ RSpec.configure do |c|
 
   if c.filter_manager.inclusions.keys.include?(:live)
     puts "Running **live** tests against Stripe..."
-    StripeMock.set_test_helper_strategy(:live)
+    StripeMock.set_default_test_helper_strategy(:live)
     c.filter_run_excluding :mock_server => true
 
     c.before(:each) do
