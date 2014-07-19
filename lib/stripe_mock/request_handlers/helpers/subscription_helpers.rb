@@ -27,7 +27,7 @@ module StripeMock
 
       def add_subscription_to_customer(cus, sub)
         cus[:subscriptions][:count] = (cus[:subscriptions][:count] || 0) + 1
-        cus[:subscriptions][:data] << sub
+        cus[:subscriptions][:data].unshift sub
       end
 
       def delete_subscription_from_customer(cus, subscription)
