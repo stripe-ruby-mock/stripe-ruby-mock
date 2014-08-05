@@ -325,7 +325,7 @@ module StripeMock
           :object => 'card',
           :last4 => '2222',
           :brand => 'Visa',
-          :funding: "credit",
+          :funding => 'credit',
           :exp_month => 9,
           :exp_year => 2017,
           :fingerprint => 'JRRLXGh38NiYygM7',
