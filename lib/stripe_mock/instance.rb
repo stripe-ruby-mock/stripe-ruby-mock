@@ -1,6 +1,8 @@
 module StripeMock
   class Instance
 
+    include StripeMock::RequestHandlers::Helpers
+
     # Handlers are ordered by priority
     @@handlers = []
 
@@ -18,16 +20,20 @@ module StripeMock
     include StripeMock::RequestHandlers::Account
     include StripeMock::RequestHandlers::Charges
     include StripeMock::RequestHandlers::Cards
+    include StripeMock::RequestHandlers::Subscriptions # must be before Customers
     include StripeMock::RequestHandlers::Customers
+    include StripeMock::RequestHandlers::Coupons
     include StripeMock::RequestHandlers::Events
     include StripeMock::RequestHandlers::Invoices
     include StripeMock::RequestHandlers::InvoiceItems
     include StripeMock::RequestHandlers::Plans
     include StripeMock::RequestHandlers::Recipients
+    include StripeMock::RequestHandlers::Tokens
 
 
-    attr_reader :account, :bank_tokens, :charges, :customers, :events,
-                :invoices, :plans, :recipients
+    attr_reader :account, :bank_tokens, :charges, :coupons, :customers, :events,
+                :invoices, :plans, :recipients, :subscriptions
+
 
     attr_accessor :error_queue, :debug, :strict
 
@@ -37,14 +43,17 @@ module StripeMock
       @card_tokens = {}
       @customers = {}
       @charges = {}
+      @coupons = {}
       @events = {}
       @invoices = {}
       @plans = {}
       @recipients = {}
+      @subscriptions = {}
 
       @debug = false
       @error_queue = ErrorQueue.new
       @id_counter = 0
+      @balance_transaction_counter = 0
       @strict = true
     end
 
@@ -77,56 +86,9 @@ module StripeMock
       end
     end
 
-    def generate_bank_token(bank_params)
-      token = new_id 'btok'
-      @bank_tokens[token] = Data.mock_bank_account bank_params
-      token
-    end
-
-    def generate_card_token(card_params)
-      token = new_id 'tok'
-      card_params[:id] = new_id 'cc'
-      @card_tokens[token] = Data.mock_card symbolize_names(card_params)
-      token
-    end
-
-    def generate_event(event_data)
+    def generate_webhook_event(event_data)
       event_data[:id] ||= new_id 'evt'
       @events[ event_data[:id] ] = symbolize_names(event_data)
-    end
-
-    def get_bank_by_token(token)
-      if token.nil? || @bank_tokens[token].nil?
-        Data.mock_bank_account
-      else
-        @bank_tokens.delete(token)
-      end
-    end
-
-    def get_card_by_token(token)
-      if token.nil? || @card_tokens[token].nil?
-        Data.mock_card :id => new_id('cc')
-      else
-        @card_tokens.delete(token)
-      end
-    end
-
-    def get_customer_card(customer, token)
-      customer[:cards][:data].find{|cc| cc[:id] == token }
-    end
-
-    def add_card_to_customer(card, cus)
-      card[:customer] = cus[:id]
-
-      if cus[:cards][:count] == 0
-        cus[:cards][:count] += 1
-      else
-        cus[:cards][:data].delete_if {|card| card[:id] == cus[:default_card]}
-      end
-
-      cus[:cards][:data] << card
-
-      card
     end
 
     private
@@ -142,7 +104,12 @@ module StripeMock
 
     def new_id(prefix)
       # Stripe ids must be strings
-      "test_#{prefix}_#{@id_counter += 1}"
+      "#{StripeMock.global_id_prefix}#{prefix}_#{@id_counter += 1}"
+    end
+
+    def new_balance_transaction(prefix)
+      # balance transaction ids must be strings
+      "#{StripeMock.global_id_prefix}#{prefix}_#{@balance_transaction_counter += 1}"
     end
 
     def symbolize_names(hash)

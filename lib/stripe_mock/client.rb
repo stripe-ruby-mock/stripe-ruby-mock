@@ -48,6 +48,14 @@ module StripeMock
       timeout_wrap { @pipe.strict? }
     end
 
+    def set_server_global_id_prefix(value)
+      timeout_wrap { @pipe.set_global_id_prefix(value) }
+    end
+
+    def server_global_id_prefix
+      timeout_wrap { @pipe.global_id_prefix }
+    end
+
     def generate_bank_token(recipient_params)
       timeout_wrap { @pipe.generate_bank_token(recipient_params) }
     end
@@ -56,8 +64,8 @@ module StripeMock
       timeout_wrap { @pipe.generate_card_token(card_params) }
     end
 
-    def generate_event(event_data)
-      timeout_wrap { Stripe::Util.symbolize_names @pipe.generate_event(event_data) }
+    def generate_webhook_event(event_data)
+      timeout_wrap { Stripe::Util.symbolize_names @pipe.generate_webhook_event(event_data) }
     end
 
     def clear_server_data

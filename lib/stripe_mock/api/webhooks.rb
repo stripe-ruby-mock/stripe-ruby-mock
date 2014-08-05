@@ -19,9 +19,9 @@ module StripeMock
     json.delete(:id)
 
     if @state == 'local'
-      event_data = instance.generate_event(json)
+      event_data = instance.generate_webhook_event(json)
     elsif @state == 'remote'
-      event_data = client.generate_event(json)
+      event_data = client.generate_webhook_event(json)
     else
       raise UnstartedStateError
     end
@@ -41,6 +41,9 @@ module StripeMock
         'charge.dispute.created',
         'charge.dispute.updated',
         'charge.dispute.closed',
+        'customer.card.created',
+        'customer.card.deleted',
+        'customer.card.updated',
         'customer.created',
         'customer.updated',
         'customer.deleted',

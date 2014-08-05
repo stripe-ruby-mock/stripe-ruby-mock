@@ -1,13 +1,14 @@
-# stripe-ruby-mock [![Build Status](https://travis-ci.org/rebelidealist/stripe-ruby-mock.png?branch=master)](https://travis-ci.org/rebelidealist/stripe-ruby-mock)
+# stripe-ruby-mock [![Build Status](https://travis-ci.org/rebelidealist/stripe-ruby-mock.png?branch=master)](https://travis-ci.org/rebelidealist/stripe-ruby-mock) [![Gitter chat](https://badges.gitter.im/rebelidealist/stripe-ruby-mock.png)](https://gitter.im/rebelidealist/stripe-ruby-mock)
 
 * Homepage: https://github.com/rebelidealist/stripe-ruby-mock
 * Issues: https://github.com/rebelidealist/stripe-ruby-mock/issues
+* **CHAT**: https://gitter.im/rebelidealist/stripe-ruby-mock
 
 ## Install
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '>= 1.8.7.4'
+    gem 'stripe-ruby-mock', '~> 1.10.1.7'
 
 ## Features
 
@@ -78,6 +79,25 @@ StripeMock.prepare_card_error(:processing_error)
 ```
 
 You can see the details of each error in [lib/stripe_mock/api/errors.rb](lib/stripe_mock/api/errors.rb)
+
+### Specifying Card Errors
+
+By default, `prepare_card_error` only triggers for `:new_charge`, the event that happens when you run `Charge.create`. More explicitly, this is what happens by default:
+
+```ruby
+StripeMock.prepare_card_error(:card_declined, :new_charge)
+```
+
+If you want the error to trigger on a different event, you need to replace `:new_charge` with a different event. For example:
+
+```ruby
+StripeMock.prepare_card_error(:card_declined, :create_card)
+customer = Stripe::Customer.create
+# This line throws the card error
+customer.cards.create
+```
+
+`:new_charge` and `:create_card` are names of methods in the [StripeMock request handlers](lib/stripe_mock/request_handlers). You can also set `StripeMock.toggle_debug(true)` to see the event name for each Stripe request made in your tests.
 
 ### Custom Errors
 
@@ -252,6 +272,18 @@ debug will be toggled off.
 
 If you always want debug to be on (it's quite verbose), you should put this in a `before` block.
 
+## Miscellaneous Features
+
+You may have noticed that all generated Stripe ids start with `test_`. If you want to remove this:
+
+```ruby
+# Turns off test_ prefix
+StripeMock.global_id_prefix = false
+
+# Or you can set your own
+StripeMock.global_id_prefix = 'my_app_'
+```
+
 ## TODO
 
 * Cover all stripe urls/methods
@@ -262,7 +294,8 @@ If you always want debug to be on (it's quite verbose), you should put this in a
 
 To run the tests:
 
-    $ rspec
+    $ bundle install
+    $ bundle exec rspec
 
 Patches are welcome and greatly appreciated! If you're contributing to fix a problem,
 be sure to write tests that illustrate the problem being fixed.

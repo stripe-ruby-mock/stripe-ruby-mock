@@ -47,6 +47,14 @@ module StripeMock
       @instance.strict = toggle
     end
 
+    def set_global_id_prefix(value)
+      StripeMock.global_id_prefix = value
+    end
+
+    def global_id_prefix
+      StripeMock.global_id_prefix
+    end
+
     def generate_card_token(card_params)
       @instance.generate_card_token(card_params)
     end
@@ -55,8 +63,8 @@ module StripeMock
       @instance.generate_bank_token(recipient_params)
     end
 
-    def generate_event(event_data)
-      @instance.generate_event(event_data)
+    def generate_webhook_event(event_data)
+      @instance.generate_webhook_event(event_data)
     end
 
     def debug?; @instance.debug; end
