@@ -36,6 +36,7 @@ require 'stripe_mock/request_handlers/helpers/subscription_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/token_helpers.rb'
 
 require 'stripe_mock/request_handlers/charges.rb'
+require 'stripe_mock/request_handlers/refunds.rb'
 require 'stripe_mock/request_handlers/cards.rb'
 require 'stripe_mock/request_handlers/customers.rb'
 require 'stripe_mock/request_handlers/coupons.rb'
