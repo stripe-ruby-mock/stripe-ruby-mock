@@ -3,9 +3,9 @@ require 'spec_helper'
 shared_examples 'Customer Subscriptions' do
 
   context "creating a new subscription" do
-    it "adds a new subscription to customer with none" do
+    it "adds a new subscription to customer with none", :live => true do
       plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999)
-      customer = Stripe::Customer.create(id: 'test_customer_sub', card: 'tk')
+      customer = Stripe::Customer.create(card: stripe_helper.generate_card_token)
 
       expect(customer.subscriptions.data).to be_empty
       expect(customer.subscriptions.count).to eq(0)
@@ -13,9 +13,11 @@ shared_examples 'Customer Subscriptions' do
       sub = customer.subscriptions.create({ :plan => 'silver' })
 
       expect(sub.object).to eq('subscription')
+      puts "SUB PLAN: #{sub.plan.class}"
+      puts "PLAN: #{plan.class}"
       expect(sub.plan.to_hash).to eq(plan.to_hash)
 
-      customer = Stripe::Customer.retrieve('test_customer_sub')
+      customer = Stripe::Customer.retrieve(customer.id)
       expect(customer.subscriptions.data).to_not be_empty
       expect(customer.subscriptions.count).to eq(1)
       expect(customer.subscriptions.data.length).to eq(1)
