@@ -13,8 +13,6 @@ shared_examples 'Customer Subscriptions' do
       sub = customer.subscriptions.create({ :plan => 'silver' })
 
       expect(sub.object).to eq('subscription')
-      puts "SUB PLAN: #{sub.plan.class}"
-      puts "PLAN: #{plan.class}"
       expect(sub.plan.to_hash).to eq(plan.to_hash)
 
       customer = Stripe::Customer.retrieve(customer.id)
