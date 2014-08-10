@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 shared_examples "Multiple Customer Cards" do
-  xit "handles multiple cards" do
+  it "handles multiple cards" do
     tok1 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4242424242420001"
     tok2 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4242424242420002"
 

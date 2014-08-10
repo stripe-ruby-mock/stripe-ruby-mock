@@ -6,13 +6,13 @@ module StripeMock
         customer[:cards][:data].find{|cc| cc[:id] == token }
       end
 
-      def add_card_to_customer(card, cus)
+      def add_card_to_customer(card, cus, replace_current=false)
         card[:customer] = cus[:id]
 
-        if cus[:cards][:count] == 0
-          cus[:cards][:count] += 1
-        else
+        if replace_current
           cus[:cards][:data].delete_if {|card| card[:id] == cus[:default_card]}
+        else
+          cus[:cards][:count] += 1
         end
 
         cus[:cards][:data] << card
