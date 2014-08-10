@@ -68,6 +68,7 @@ module StripeMock
 
       if handler = Instance.handler_for_method_url(method_url)
         if @debug == true
+          puts "- - - - " * 8
           puts "[StripeMock req]::#{handler[:name]} #{method} #{url}"
           puts "                  #{params}"
         end
