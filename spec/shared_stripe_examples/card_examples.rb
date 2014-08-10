@@ -43,13 +43,17 @@ shared_examples 'Card API' do
     expect(card.exp_year).to eq(3031)
   end
 
-  it 'create does not change the customers default card' do
-    customer = Stripe::Customer.create(id: 'test_customer_sub')
-    card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
-    card = customer.cards.create(card: card_token)
+  it "creates a single card with a generated card token", :live => true do
+    customer = Stripe::Customer.create
+    expect(customer.cards.count).to eq 0
 
-    customer = Stripe::Customer.retrieve('test_customer_sub')
-    expect(customer.default_card).to be_nil
+    customer.cards.create :card => stripe_helper.generate_card_token
+    # Yes, stripe-ruby does not actually add the new card to the customer instance
+    expect(customer.cards.count).to eq 0
+
+    customer2 = Stripe::Customer.retrieve(customer.id)
+    expect(customer2.cards.count).to eq 1
+    expect(customer2.default_card).to eq customer2.cards.first.id
   end
 
   context "retrieval and deletion" do

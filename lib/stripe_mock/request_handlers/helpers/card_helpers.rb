@@ -16,6 +16,7 @@ module StripeMock
         end
 
         cus[:cards][:data] << card
+        cus[:default_card] = card[:id] if cus[:cards][:count] == 1
 
         card
       end
