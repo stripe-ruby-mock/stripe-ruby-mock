@@ -333,6 +333,7 @@ StripeMock.global_id_prefix = 'my_app_'
 * Cover all stripe urls/methods
 * Throw useful errors that emulate Stripe's requirements
   * For example: "You must supply either a card or a customer id" for `Stripe::Charge`
+* Fingerprinting for other resources besides Cards
 
 ## Developing stripe-ruby-mock
 

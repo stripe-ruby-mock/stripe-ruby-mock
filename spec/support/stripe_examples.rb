@@ -1,6 +1,7 @@
 
 def require_stripe_examples
   Dir["./spec/shared_stripe_examples/**/*.rb"].each {|f| require f}
+  Dir["./spec/integration_examples/**/*.rb"].each {|f| require f}
 end
 
 def it_behaves_like_stripe(&block)
@@ -19,4 +20,7 @@ def it_behaves_like_stripe(&block)
   it_behaves_like 'Stripe Error Mocking', &block
   it_behaves_like 'Customer Subscriptions', &block
   it_behaves_like 'Webhook Events API', &block
+
+  # Integration tests
+  it_behaves_like 'Multiple Customer Cards'
 end

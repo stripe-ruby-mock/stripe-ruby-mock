@@ -14,6 +14,7 @@ module StripeMock
 
         if params[:card]
           # "Sanitize" card number
+          params[:card][:fingerprint] = StripeMock::Util.fingerprint(params[:card][:number])
           params[:card][:last4] = params[:card][:number][-4,4]
           customer_card = params[:card]
         else
