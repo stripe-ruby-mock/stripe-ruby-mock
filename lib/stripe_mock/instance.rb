@@ -15,7 +15,15 @@ module StripeMock
     end
 
     def self.handler_for_method_url(method_url)
-      @@handlers.find {|h| method_url =~ h[:route] && h[:version] == StripeMock.version }
+      api_version_date = Date.strptime(StripeMock.version, '%Y-%m-%d')
+      default_handler = @@handlers.find {|h| method_url =~ h[:route] }
+
+      # Try to find a handler closest to the current version of the API
+      handlers = @@handlers.select {|h|
+        method_url =~ h[:route] && !h[:version].nil? && Date.strptime(h[:version], '%Y-%m-%d') <= api_version_date
+      }.sort_by {|h| h[:version]}
+
+      handlers.first || default_handler
     end
 
     include StripeMock::RequestHandlers::Charges

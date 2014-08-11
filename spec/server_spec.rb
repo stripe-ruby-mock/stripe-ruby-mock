@@ -8,7 +8,7 @@ describe 'StripeMock Server' do
   end
 
   before(:all) do
-    StripeMock.spawn_server
+    StripeMock.spawn_server(:'api-version' => StripeMock::FIRST_VERSION_DATE)
   end
 
   before do
