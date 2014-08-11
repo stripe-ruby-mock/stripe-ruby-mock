@@ -58,8 +58,8 @@ shared_examples 'Invoice API' do
     end
 
     it 'updates attempted and paid flags' do
-      expect(@invoice.attempted).to be_true
-      expect(@invoice.paid).to be_true
+      expect(@invoice.attempted).to eq(true)
+      expect(@invoice.paid).to eq(true)
     end
 
     it 'sets the charge attribute' do
