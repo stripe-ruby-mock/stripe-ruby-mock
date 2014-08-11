@@ -54,8 +54,10 @@ module StripeMock
   lib_dir = File.expand_path(File.dirname(__FILE__), '../..')
   @webhook_fixture_path = './spec/fixtures/stripe_webhooks/'
   @webhook_fixture_fallback_path = File.join(lib_dir, 'stripe_mock/webhook_fixtures')
+  @version = nil
 
   class << self
     attr_accessor :webhook_fixture_path
+    attr_accessor :version
   end
 end

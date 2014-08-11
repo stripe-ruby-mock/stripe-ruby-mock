@@ -6,15 +6,16 @@ module StripeMock
     # Handlers are ordered by priority
     @@handlers = []
 
-    def self.add_handler(route, name)
+    def self.add_handler(route, name, version=nil)
       @@handlers << {
         :route => %r{^#{route}$},
-        :name => name
+        :name => name,
+        :version => version
       }
     end
 
     def self.handler_for_method_url(method_url)
-      @@handlers.find {|h| method_url =~ h[:route] }
+      @@handlers.find {|h| method_url =~ h[:route] && h[:version] == StripeMock.version }
     end
 
     include StripeMock::RequestHandlers::Charges
