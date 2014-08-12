@@ -2,20 +2,22 @@ module StripeMock
   module RequestHandlers
     module Helpers
 
-      def get_customer_card(customer, token)
-        customer[:cards][:data].find{|cc| cc[:id] == token }
+      def get_card(object, token)
+        object[:cards][:data].find{|cc| cc[:id] == token }
       end
 
-      def add_card_to_customer(card, cus)
-        card[:customer] = cus[:id]
+      def add_card_to_object(type, card, object, replace_current=false)
+        card[type] = object[:id]
 
-        if cus[:cards][:count] == 0
-          cus[:cards][:count] += 1
+        if replace_current
+          object[:cards][:data].delete_if {|card| card[:id] == object[:default_card]}
+          object[:default_card] = card[:id]
         else
-          cus[:cards][:data].delete_if {|card| card[:id] == cus[:default_card]}
+          object[:cards][:count] += 1
         end
 
-        cus[:cards][:data] << card
+        object[:default_card] = card[:id] if object[:cards][:count] < 1
+        object[:cards][:data] << card
 
         card
       end
