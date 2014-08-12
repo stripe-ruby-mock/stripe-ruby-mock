@@ -12,6 +12,11 @@ module StripeMock
         if params[:bank_account]
           params[:active_account] = get_bank_by_token(params.delete(:bank_account))
         end
+        if params[:card]
+          params[:cards] = [] if !params[:cards]
+          params[:cards] << get_card_by_token(params.delete(:card))
+          params[:default_card] = params[:cards].last[:id]
+        end
         recipients[id] = Data.mock_recipient(params.merge :id => id)
         recipients[id]
       end
