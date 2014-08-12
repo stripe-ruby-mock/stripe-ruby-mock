@@ -307,7 +307,38 @@ module StripeMock
           :object => "bank_account"
         },
         :created => 1304114758,
-        :verified => true
+        :verified => true,
+        :cards => {
+          :object => "list",
+          :total_count => 1,
+          :has_more => false,
+          :url => "/v1/recipients/rp_test_recipient/cards",
+          :data => [
+            {
+              :id => "card_test",
+              :object => "card",
+              :last4 => "5556",
+              :brand => "Visa",
+              :funding => "debit",
+              :exp_month => 12,
+              :exp_year => 2025,
+              :fingerprint => "IuTysyfrpz2k3eb1",
+              :country => "US",
+              :name => "Name",
+              :address_line1 => nil,
+              :address_line2 => nil,
+              :address_city => nil,
+              :address_state => nil,
+              :address_zip => "12345",
+              :address_country => nil,
+              :cvc_check => "pass",
+              :address_line1_check => "pass",
+              :address_zip_check => "pass",
+              :recipient => "rp_test_recipient"
+            }
+          ]
+        },
+        :default_card => "card_test"
       }.merge(params)
     end
 
