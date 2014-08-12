@@ -18,7 +18,7 @@ module StripeMock
         assert_existance :customer, $1, customer
 
         card = card_from_params(params[:card])
-        add_card_to_customer(card, customer)
+        add_card_to_object(:customer, card, customer)
       end
 
       def retrieve_cards(route, method_url, params, headers)
@@ -37,7 +37,7 @@ module StripeMock
 
         customer = customers[$1]
         assert_existance :customer, $1, customer
-        card = get_customer_card(customer, $2)
+        card = get_card(customer, $2)
         assert_existance :card, $2, card
         card
       end
@@ -57,7 +57,7 @@ module StripeMock
 
         customer = customers[$1]
         assert_existance :customer, $1, customer
-        card = get_customer_card(customer, $2)
+        card = get_card(customer, $2)
         assert_existance :card, $2, card
         card = { id: $2, deleted: true }
         customer[:cards][:data].reject!{|cc|
@@ -71,7 +71,7 @@ module StripeMock
 
         customer = customers[$1]
         assert_existance :customer, $1, customer
-        card = get_customer_card(customer, $2)
+        card = get_card(customer, $2)
         assert_existance :card, $2, card
         card.merge!(params)
         card
