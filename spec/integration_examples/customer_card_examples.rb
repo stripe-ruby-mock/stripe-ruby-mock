@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 shared_examples "Multiple Customer Cards" do
-  it "handles multiple cards" do
-    tok1 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4242424242420001"
-    tok2 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4242424242420002"
+  it "handles multiple cards", :live => true do
+    tok1 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4242424242424242"
+    tok2 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4012888888881881"
 
     cus = Stripe::Customer.create(:email => 'alice@bob.com', :card => tok1.id)
     default_card = cus.cards.first
@@ -14,7 +14,7 @@ shared_examples "Multiple Customer Cards" do
     expect(cus.default_card).to eq default_card.id
   end
 
-  it "gives the same two card numbers the same fingerprints" do
+  it "gives the same two card numbers the same fingerprints", :live => true do
     tok1 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4242424242424242"
     tok2 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4242424242424242"
 
@@ -27,9 +27,9 @@ shared_examples "Multiple Customer Cards" do
     expect(card).to_not be_nil
   end
 
-  it "gives different card numbers different fingerprints" do
-    tok1 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4242424242420001"
-    tok2 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4242424242420002"
+  it "gives different card numbers different fingerprints", :live => true do
+    tok1 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4242424242424242"
+    tok2 = Stripe::Token.retrieve stripe_helper.generate_card_token :number => "4012888888881881"
 
     cus = Stripe::Customer.create(:email => 'alice@bob.com', :card => tok1.id)
 
