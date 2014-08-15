@@ -16,7 +16,7 @@ module StripeMock
           object[:cards][:count] += 1
         end
 
-        object[:default_card] = card[:id] if object[:cards][:count] < 1
+        object[:default_card] = card[:id] unless object[:default_card]
         object[:cards][:data] << card
 
         card
