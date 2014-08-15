@@ -77,7 +77,11 @@ shared_examples 'Card API' do
       expect(retrieved_cus.cards.data).to be_empty
     end
 
-    it "updates the default card if deleted"
+    it "updates the default card if deleted" do
+      card.delete
+      retrieved_cus = Stripe::Customer.retrieve(customer.id)
+      expect(retrieved_cus.default_card).to be_nil
+    end
 
   end
 
