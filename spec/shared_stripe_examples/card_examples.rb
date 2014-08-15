@@ -43,13 +43,22 @@ shared_examples 'Card API' do
     expect(card.exp_year).to eq(3031)
   end
 
-  it 'create does not change the customers default card' do
+  it 'create does not change the customers default card if already set' do
+    customer = Stripe::Customer.create(id: 'test_customer_sub', default_card: "test_cc_original")
+    card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+    card = customer.cards.create(card: card_token)
+
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+    expect(customer.default_card).to eq("test_cc_original")
+  end
+
+  it 'create updates the customers default card if not set' do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
     card = customer.cards.create(card: card_token)
 
     customer = Stripe::Customer.retrieve('test_customer_sub')
-    expect(customer.default_card).to be_nil
+    expect(customer.default_card).to_not be_nil
   end
 
   context "retrieval and deletion" do
