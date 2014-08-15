@@ -184,7 +184,8 @@ module StripeMock
         :trial_start => 1308595038,
         :trial_end => 1308681468,
         :customer => "c_test_customer",
-        :quantity => 1
+        :quantity => 1,
+        :metadata => {}
       }, params)
     end
 
