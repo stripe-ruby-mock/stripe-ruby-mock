@@ -184,7 +184,8 @@ module StripeMock
         :trial_start => 1308595038,
         :trial_end => 1308681468,
         :customer => "c_test_customer",
-        :quantity => 1
+        :quantity => 1,
+        :metadata => {}
       }, params)
     end
 
@@ -244,7 +245,7 @@ module StripeMock
 
     def self.mock_invoice_item(params = {})
       {
-        id: "ii_test",
+        id: "test_ii",
         object: "invoiceitem",
         date: 1349738920,
         amount: 1099,
@@ -293,21 +294,32 @@ module StripeMock
       }.merge(params)
     end
 
-    def self.mock_recipient(params={})
+    def self.mock_recipient(cards, params={})
+      rp_id = params[:id] || "test_rp_default"
+      cards.each {|card| card[:recipient] = rp_id}
       {
-        :name => "Stripe User",
-        :type => "individual",
-        :livemode => false,
-        :object => "recipient",
-        :id => "rp_test_recipient",
-        :active_account => {
-          :last4 => "6789",
-          :bank_name => "STRIPE TEST BANK",
-          :country => "US",
-          :object => "bank_account"
+        name: "Stripe User",
+        type: "individual",
+        livemode: false,
+        object: "recipient",
+        id: rp_id,
+        active_account: {
+          last4: "6789",
+          bank_name: "STRIPE TEST BANK",
+          country: "US",
+          object: "bank_account"
         },
-        :created => 1304114758,
-        :verified => true
+        created: 1304114758,
+        verified: true,
+        metadata: {
+        },
+        cards: {
+          object: "list",
+          count: cards.count,
+          url: "/v1/recipients/#{rp_id}/cards",
+          data: cards
+        },
+        default_card: nil
       }.merge(params)
     end
 

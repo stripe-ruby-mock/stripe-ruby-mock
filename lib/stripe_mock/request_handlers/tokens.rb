@@ -20,7 +20,7 @@ module StripeMock
         else
           customer = customers[params[:customer]]
           assert_existance :customer, params[:customer], customer
-          customer_card = get_customer_card(customer, customer[:default_card])
+          customer_card = get_card(customer, customer[:default_card])
         end
 
         token_id = generate_card_token(customer_card)

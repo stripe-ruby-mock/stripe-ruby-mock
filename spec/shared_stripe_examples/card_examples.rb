@@ -43,6 +43,7 @@ shared_examples 'Card API' do
     expect(card.exp_year).to eq(3031)
   end
 
+
   it "creates a single card with a generated card token", :live => true do
     customer = Stripe::Customer.create
     expect(customer.cards.count).to eq 0
@@ -54,6 +55,24 @@ shared_examples 'Card API' do
     customer2 = Stripe::Customer.retrieve(customer.id)
     expect(customer2.cards.count).to eq 1
     expect(customer2.default_card).to eq customer2.cards.first.id
+  end
+
+  it 'create does not change the customers default card if already set' do
+    customer = Stripe::Customer.create(id: 'test_customer_sub', default_card: "test_cc_original")
+    card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+    card = customer.cards.create(card: card_token)
+
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+    expect(customer.default_card).to eq("test_cc_original")
+  end
+
+  it 'create updates the customers default card if not set' do
+    customer = Stripe::Customer.create(id: 'test_customer_sub')
+    card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+    card = customer.cards.create(card: card_token)
+
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+    expect(customer.default_card).to_not be_nil
   end
 
   context "retrieval and deletion" do
@@ -72,7 +91,11 @@ shared_examples 'Card API' do
       expect(retrieved_cus.cards.data).to be_empty
     end
 
-    it "updates the default card if deleted"
+    it "updates the default card if deleted" do
+      card.delete
+      retrieved_cus = Stripe::Customer.retrieve(customer.id)
+      expect(retrieved_cus.default_card).to be_nil
+    end
 
   end
 
