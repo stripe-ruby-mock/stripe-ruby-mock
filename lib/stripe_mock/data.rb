@@ -244,7 +244,7 @@ module StripeMock
 
     def self.mock_invoice_item(params = {})
       {
-        id: "ii_test",
+        id: "test_ii",
         object: "invoiceitem",
         date: 1349738920,
         amount: 1099,
