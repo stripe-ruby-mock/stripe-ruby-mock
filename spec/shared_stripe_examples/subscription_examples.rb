@@ -10,10 +10,12 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data).to be_empty
       expect(customer.subscriptions.count).to eq(0)
 
-      sub = customer.subscriptions.create({ :plan => 'silver' })
+      sub = customer.subscriptions.create({ :plan => 'silver', :metadata => { :foo => "bar", :example => "yes" } })
 
       expect(sub.object).to eq('subscription')
       expect(sub.plan).to eq('silver')
+      expect(sub.metadata.foo).to eq( "bar" )
+      expect(sub.metadata.example).to eq( "yes" )
 
       customer = Stripe::Customer.retrieve('test_customer_sub')
       expect(customer.subscriptions.data).to_not be_empty
@@ -23,6 +25,8 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.id).to eq(sub.id)
       expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
       expect(customer.subscriptions.data.first.customer).to eq(customer.id)
+      expect(customer.subscriptions.data.first.metadata.foo).to eq( "bar" )
+      expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
 
     end
 
@@ -219,10 +223,17 @@ shared_examples 'Customer Subscriptions' do
 
       sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
       sub.plan = 'gold'
-      sub.save
+      sub.quantity = 5
+      sub.metadata.foo     = "bar"
+      sub.metadata.example = "yes"
+
+      expect(sub.save).to be_true
 
       expect(sub.object).to eq('subscription')
       expect(sub.plan).to eq('gold')
+      expect(sub.quantity).to eq(5)
+      expect(sub.metadata.foo).to eq( "bar" )
+      expect(sub.metadata.example).to eq( "yes" )
 
       customer = Stripe::Customer.retrieve('test_customer_sub')
       expect(customer.subscriptions.data).to_not be_empty
