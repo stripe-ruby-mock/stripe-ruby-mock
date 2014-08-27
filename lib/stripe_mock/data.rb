@@ -31,8 +31,9 @@ module StripeMock
     end
 
     def self.mock_charge(params={})
+      charge_id = params[:id] || "ch_1fD6uiR9FAA2zc"
       {
-        id: "ch_1fD6uiR9FAA2zc",
+        id: charge_id,
         object: "charge",
         created: 1366194027,
         livemode: false,
@@ -65,6 +66,11 @@ module StripeMock
         },
         captured: params.has_key?(:capture) ? params.delete(:capture) : true,
         refunds: {
+          object: "list",
+          total_count: 0,
+          has_more: false,
+          url: "/v1/charges/#{charge_id}/refunds",
+          data: []
         },
         balance_transaction: "txn_2dyYXXP90MN26R",
         failure_message: nil,
@@ -80,25 +86,16 @@ module StripeMock
     end
 
     def self.mock_refund(params={})
-      mock_charge(params[:charge]).merge({
-        refunded: true,
-        refunds: {
-          object: "list",
-          total_count: 1,
-          has_more: false,
-          data: [
-            {
-              amount: params[:refund][:amount],
-              currency: "usd",
-              created: 1380208998,
-              object: "refund",
-              balance_transaction: params[:refund][:balance_transaction],
-              id: params[:refund][:id]
-            }
-          ]
-        },
-        amount_refunded: params[:refund][:amount]
-      })
+      {
+        id: "re_4fWhgUh5si7InF",
+        amount: 1,
+        currency: "usd",
+        created: 1409165988,
+        object: "refund",
+        balance_transaction: "txn_4fWh2RKvgxcXqV",
+        metadata: {},
+        charge: "ch_4fWhYjzQ23UFWT"
+      }.merge(params)
     end
 
     def self.mock_charge_array
