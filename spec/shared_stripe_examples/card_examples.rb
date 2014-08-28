@@ -85,6 +85,11 @@ shared_examples 'Card API' do
       expect(retrieved.to_s).to eq(card.to_s)
     end
 
+    it "retrieves a customer's card after re-fetching the customer" do
+      retrieved = Stripe::Customer.retrieve(customer.id).cards.retrieve(card.id)
+      expect(retrieved.id).to eq card.id
+    end
+
     it "deletes a customers card" do
       card.delete
       retrieved_cus = Stripe::Customer.retrieve(customer.id)
