@@ -47,7 +47,7 @@ module StripeMock
 
         recipient = recipients[$1]
         assert_existance :recipient, $1, recipient
-        card = get_card(recipient, $2)
+        card = get_card(recipient, $2, "Recipient")
         assert_existance :card, $2, card
         card
       end

@@ -2,8 +2,13 @@ module StripeMock
   module RequestHandlers
     module Helpers
 
-      def get_card(object, token)
-        object[:cards][:data].find{|cc| cc[:id] == token }
+      def get_card(object, card_id, class_name='Customer')
+        card = object[:cards][:data].find{|cc| cc[:id] == card_id }
+        if card.nil?
+          msg = "#{class_name} #{object[:id]} does not have card #{card_id}"
+          raise Stripe::InvalidRequestError.new(msg, 'card', 404)
+        end
+        card
       end
 
       def add_card_to_object(type, card, object, replace_current=false)

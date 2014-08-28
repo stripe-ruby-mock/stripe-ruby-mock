@@ -93,5 +93,20 @@ shared_examples 'Recipient API' do
     }
   end
 
+  describe "Errors", :live => true do
+    it "throws an error when the customer does not have the retrieving card id" do
+      recipient = Stripe::Recipient.create(:name => "Bob Bobber", :type => "individual")
+      card_id = "card_123"
+      expect { recipient.cards.retrieve(card_id) }.to raise_error {|e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.message).to include "Recipient", recipient.id, "does not have", card_id
+        expect(e.param).to eq 'card'
+        expect(e.http_status).to eq 404
+      }
+    end
+
+    it "throws an error when the name does not have both first and last"
+  end
+
 end
 

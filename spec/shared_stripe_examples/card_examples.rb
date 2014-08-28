@@ -104,6 +104,19 @@ shared_examples 'Card API' do
 
   end
 
+  describe "Errors", :live => true do
+    it "throws an error when the customer does not have the retrieving card id" do
+      customer = Stripe::Customer.create
+      card_id = "card_123"
+      expect { customer.cards.retrieve(card_id) }.to raise_error {|e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.message).to include "Customer", customer.id, "does not have", card_id
+        expect(e.param).to eq 'card'
+        expect(e.http_status).to eq 404
+      }
+    end
+  end
+
   context "update card" do
     let!(:customer) { Stripe::Customer.create(id: 'test_customer_sub') }
     let!(:card_token) { StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
