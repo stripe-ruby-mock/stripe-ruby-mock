@@ -8,6 +8,7 @@ module StripeMock
         klass.add_handler 'get /v1/charges/(.*)',           :get_charge
         klass.add_handler 'post /v1/charges/(.*)/capture',  :capture_charge
         klass.add_handler 'post /v1/charges/(.*)/refund',   :refund_charge
+        klass.add_handler 'post /v1/charges/(.*)/refunds',  :create_refund
       end
 
       def new_charge(route, method_url, params, headers)
@@ -49,9 +50,26 @@ module StripeMock
       end
 
       def refund_charge(route, method_url, params, headers)
-        get_charge(route, method_url, params, headers)
-        route =~ method_url
-        Data.mock_refund :charge => charges[$1], :refund => params.merge(:balance_transaction => new_balance_transaction('txn'), :id => new_id('re'))
+        charge = get_charge(route, method_url, params, headers)
+
+        refund = Data.mock_refund params.merge(
+          :balance_transaction => new_balance_transaction('txn'),
+          :id => new_id('re')
+        )
+        add_refund_to_charge(refund, charge)
+        charge
+      end
+
+      def create_refund(route, method_url, params, headers)
+        charge = get_charge(route, method_url, params, headers)
+
+        refund = Data.mock_refund params.merge(
+          :balance_transaction => new_balance_transaction('txn'),
+          :id => new_id('re'),
+          :charge => charge[:id]
+        )
+        add_refund_to_charge(refund, charge)
+        refund
       end
 
     end
