@@ -96,12 +96,35 @@ shared_examples 'Card API' do
       expect(retrieved_cus.cards.data).to be_empty
     end
 
+    it "deletes a customers card then set the default_card to nil" do
+      card.delete
+      retrieved_cus = Stripe::Customer.retrieve(customer.id)
+      expect(retrieved_cus.default_card).to be_nil
+    end
+
     it "updates the default card if deleted" do
       card.delete
       retrieved_cus = Stripe::Customer.retrieve(customer.id)
       expect(retrieved_cus.default_card).to be_nil
     end
 
+    context "deletion when the user has two cards" do
+      let!(:card_token_2) { StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
+      let!(:card_2) { customer.cards.create(card: card_token_2) }
+
+      it "has just one card anymore" do
+        card.delete
+        retrieved_cus = Stripe::Customer.retrieve(customer.id)
+        expect(retrieved_cus.cards.data.count).to eq 1
+        expect(retrieved_cus.cards.data.first.id).to eq card_2.id
+      end
+
+      it "sets the default_card id to the last card remaining id" do
+        card.delete
+        retrieved_cus = Stripe::Customer.retrieve(customer.id)
+        expect(retrieved_cus.default_card).to eq card_2.id
+      end
+    end
   end
 
   describe "Errors", :live => true do
