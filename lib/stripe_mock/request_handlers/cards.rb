@@ -63,7 +63,7 @@ module StripeMock
         customer[:cards][:data].reject!{|cc|
           cc[:id] == card[:id]
         }
-        customer[:default_card] = customer[:cards][:data].count > 0 ? customer[:cards][:data].first.id : nil
+        customer[:default_card] = customer[:cards][:data].count > 0 ? customer[:cards][:data].first[:id] : nil
         card
       end
 
