@@ -23,4 +23,5 @@ def it_behaves_like_stripe(&block)
 
   # Integration tests
   it_behaves_like 'Multiple Customer Cards'
+  it_behaves_like 'Charging with Tokens'
 end
