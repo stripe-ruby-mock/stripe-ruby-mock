@@ -16,6 +16,8 @@ module StripeMock
 
         if params[:card] && params[:card].is_a?(String)
           params[:card] = get_card_by_token(params[:card])
+        elsif params[:card] && params[:card][:id]
+          raise Stripe::InvalidRequestError.new("Invalid token id: #{params[:card]}", 'card', 400)
         end
 
         charges[id] = Data.mock_charge(params.merge :id => id, :balance_transaction => new_balance_transaction('txn'))

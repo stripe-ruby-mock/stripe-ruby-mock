@@ -25,6 +25,7 @@ module StripeMock
 
       def get_card_by_token(token)
         if token.nil? || @card_tokens[token].nil?
+          # TODO: Make this strict
           Data.mock_card :id => new_id('cc')
         else
           @card_tokens.delete(token)
