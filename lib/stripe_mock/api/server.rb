@@ -1,9 +1,12 @@
 module StripeMock
 
-  class << self
-    ["pid", "log"].each do |config_type|
-      attr_writer "default_server_#{config_type}_path".to_sym
+  @default_server_pid_path = './stripe-mock-server.pid'
+  @default_server_log_path = './stripe-mock-server.log'
 
+  class << self
+    attr_writer :default_server_pid_path, :default_server_log_path
+
+    ["pid", "log"].each do |config_type|
       define_method("default_server_#{config_type}_path") do
         instance_variable_get("@default_server_#{config_type}_path") || "./stripe-mock-server.#{config_type}"
       end
