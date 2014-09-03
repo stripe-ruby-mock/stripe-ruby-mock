@@ -18,7 +18,7 @@
         "id": "cc_00000000000000",
         "object": "card",
         "last4": "4242",
-        "type": "Visa",
+        "brand": "Visa",
         "exp_month": 12,
         "exp_year": 2013,
         "fingerprint": "wXWJT135mEK107G8",
