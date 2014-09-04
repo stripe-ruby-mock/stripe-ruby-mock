@@ -8,12 +8,21 @@ module StripeMock
         klass.add_handler 'get /v1/invoices/(.*)',           :get_invoice
         klass.add_handler 'get /v1/invoices',                :list_invoices
         klass.add_handler 'post /v1/invoices/(.*)/pay',      :pay_invoice
+        klass.add_handler 'post /v1/invoices/(.*)',          :update_invoice
       end
 
       def new_invoice(route, method_url, params, headers)
         id = new_id('in')
         invoice_item = Data.mock_line_item()
         invoices[id] = Data.mock_invoice([invoice_item], params.merge(:id => id))
+      end
+
+      def update_invoice(route, method_url, params, headers)
+        route =~ method_url
+        assert_existance :invoice, $1, invoices[$1]
+
+        invoices[$1] ||= Data.mock_invoice([], :id => $1)
+        invoices[$1].merge!(params)
       end
 
       def list_invoices(route, method_url, params, headers)
