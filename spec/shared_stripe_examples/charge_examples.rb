@@ -122,7 +122,7 @@ shared_examples 'Charge API' do
         card: 'card_token_abc'
       })
 
-      expect(charge.captured).to be_true
+      expect(charge.captured).to eq(true)
     end
 
     it "reports captured if capture requested" do
@@ -133,7 +133,7 @@ shared_examples 'Charge API' do
         capture: true
       })
 
-      expect(charge.captured).to be_true
+      expect(charge.captured).to eq(true)
     end
 
     it "reports not captured if capture: false requested" do
@@ -144,7 +144,7 @@ shared_examples 'Charge API' do
         capture: false
       })
 
-      expect(charge.captured).to be_false
+      expect(charge.captured).to eq(false)
     end
   end
 
@@ -158,9 +158,9 @@ shared_examples 'Charge API' do
       })
 
       returned_charge = charge.capture
-      expect(charge.captured).to be_true
+      expect(charge.captured).to eq(true)
       expect(returned_charge.id).to eq(charge.id)
-      expect(returned_charge.captured).to be_true
+      expect(returned_charge.captured).to eq(true)
     end
   end
 

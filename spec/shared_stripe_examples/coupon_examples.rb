@@ -103,7 +103,7 @@ shared_examples 'Coupon API' do
 
       expect(coupon.id).to eq('test_coupon_x')
       expect(coupon.percent_off).to_not be_nil
-      expect(coupon.valid).to be_true
+      expect(coupon.valid).to eq(true)
     end
   end
 
