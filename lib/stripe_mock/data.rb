@@ -83,6 +83,7 @@ module StripeMock
         refunded: true,
         refunds: [
           {
+            id: 're_00000000000000',
             amount: params[:refund][:amount],
             currency: "usd",
             created: 1380208998,
