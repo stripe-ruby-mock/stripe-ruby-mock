@@ -159,6 +159,21 @@ shared_examples 'Charge API' do
       expect(returned_charge.id).to eq(charge.id)
       expect(returned_charge.captured).to be_true
     end
+
+    it "captures with specified amount" do
+      charge = Stripe::Charge.create({
+        amount: 777,
+        currency: 'USD',
+        card: stripe_helper.generate_card_token,
+        capture: false
+      })
+
+      returned_charge = charge.capture({ amount: 677 })
+      expect(charge.captured).to eq(true)
+      expect(returned_charge.amount_refunded).to eq(100)
+      expect(returned_charge.id).to eq(charge.id)
+      expect(returned_charge.captured).to eq(true)
+    end
   end
 
 end
