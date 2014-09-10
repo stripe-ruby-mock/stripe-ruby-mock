@@ -539,4 +539,34 @@ shared_examples 'Customer Subscriptions' do
     end
   end
 
+  describe "metadata" do
+
+    it "creates a stripe customer and subscribes them to a plan with meta data", :live => true do
+
+      stripe_helper.create_plan(
+        :amount => 500,
+        :interval => 'month',
+        :name => 'Sample Plan',
+        :currency => 'usd',
+        :id => 'Sample5',
+        :statement_description => "Plan Statement"
+      )
+
+      customer = Stripe::Customer.create({
+        email: 'johnny@appleseed.com',
+        card: stripe_helper.generate_card_token
+      })
+
+      subscription = customer.subscriptions.create(:plan => "Sample5")
+      subscription.metadata['foo'] = 'bar'
+
+      expect(subscription.save).to be_a Stripe::Subscription
+
+      customer = Stripe::Customer.retrieve(customer.id)
+      expect(customer.email).to eq('johnny@appleseed.com')
+      expect(customer.subscriptions.first.plan.id).to eq('Sample5')
+      expect(customer.subscriptions.first.metadata['foo']).to eq('bar')
+    end
+  end
+
 end
