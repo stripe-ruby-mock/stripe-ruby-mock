@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'jimson-temp'
   gem.add_dependency 'dante', '>= 0.2.0'
 
-  gem.add_development_dependency 'rspec', '~> 2.4'
+  gem.add_development_dependency 'rspec', '~> 2.99'
   gem.add_development_dependency 'rubygems-tasks', '~> 0.2'
   gem.add_development_dependency 'thin'
 end
