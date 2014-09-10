@@ -33,6 +33,8 @@ shared_examples 'Invoice API' do
       invoice.currency = "usd"
       invoice.statement_description = "new-desc"
       invoice.save
+
+      invoice = Stripe::Invoice.retrieve(invoice.id)
       expect(invoice.currency).to eq("usd")
       expect(invoice.statement_description).to eq("new-desc")
     end
