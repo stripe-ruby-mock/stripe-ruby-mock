@@ -45,6 +45,15 @@ module StripeMock
         route =~ method_url
         charge = assert_existance :charge, $1, charges[$1]
 
+        if params[:amount]
+          refund = Data.mock_refund(
+            :balance_transaction => new_balance_transaction('txn'),
+            :id => new_id('re'),
+            :amount => charge[:amount] - params[:amount]
+          )
+          add_refund_to_charge(refund, charge)
+        end
+
         charge[:captured] = true
         charge
       end
