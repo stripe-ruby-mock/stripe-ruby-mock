@@ -139,7 +139,7 @@ shared_examples 'Customer API' do
     }
   end
 
-  it 'cannot create a customer with an exsting plan, but no card token' do
+  it 'cannot create a customer with an existing plan, but no card token' do
     plan = stripe_helper.create_plan(id: 'p')
     expect {
       customer = Stripe::Customer.create(id: 'test_cus_no_plan', :plan => 'p')

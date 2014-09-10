@@ -504,6 +504,21 @@ shared_examples 'Customer Subscriptions' do
     expect(customer.subscriptions.data.first.status).to eq('trialing')
   end
 
+  it "doesn't require a card when trial_end is present", :live => true do
+    plan = stripe_helper.create_plan(
+      :amount => 2000,
+      :interval => 'month',
+      :name => 'Amazing Gold Plan',
+      :currency => 'usd',
+      :id => 'gold'
+    )
+
+    options = {plan: plan.id, trial_end: (Date.today + 30).to_time.to_i}
+
+    stripe_customer = Stripe::Customer.create
+    stripe_customer.subscriptions.create options
+  end
+
   context "retrieve multiple subscriptions" do
 
     it "retrieves a list of multiple subscriptions" do

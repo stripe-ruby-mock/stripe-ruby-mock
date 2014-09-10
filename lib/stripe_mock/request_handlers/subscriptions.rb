@@ -26,7 +26,7 @@ module StripeMock
         end
 
         # Ensure customer has card to charge if plan has no trial and is not free
-        verify_card_present(customer, plan)
+        verify_card_present(customer, plan, params)
 
         subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')) })
         subscription.merge!(custom_subscription_params(plan, customer, params))
@@ -120,9 +120,9 @@ module StripeMock
 
       private
 
-      def verify_card_present(customer, plan)
-        if customer[:default_card].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0
-          raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
+      def verify_card_present(customer, plan, params={})
+        if customer[:default_card].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0 && plan[:trial_end].nil? && params[:trial_end].nil?
+          raise Stripe::InvalidRequestError.new('You must supply a valid card xoxo', nil, 400)
         end
       end
 
