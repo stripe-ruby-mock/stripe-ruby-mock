@@ -32,13 +32,12 @@ module StripeMock
       def get_invoice(route, method_url, params, headers)
         route =~ method_url
         assert_existance :invoice, $1, invoices[$1]
-        invoices[$1] ||= Data.mock_invoice([], :id => $1)
+        invoices[$1]
       end
 
       def pay_invoice(route, method_url, params, headers)
         route =~ method_url
         assert_existance :invoice, $1, invoices[$1]
-        invoices[$1] ||= Data.mock_invoice([], :id => $1)
         invoices[$1].merge!(:paid => true, :attempted => true, :charge => 'ch_1fD6uiR9FAA2zc')
       end
 
@@ -48,7 +47,6 @@ module StripeMock
 
         customer = customers[params[:customer]]
         assert_existance :customer, params[:customer], customer
-        customer ||= Data.mock_customer([], :id => params[:customer])
 
         raise Stripe::InvalidRequestError.new("No upcoming invoices for customer: #{customer[:id]}", nil, 404) if customer[:subscriptions][:data].length == 0
 

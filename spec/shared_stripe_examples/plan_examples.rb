@@ -102,23 +102,7 @@ shared_examples 'Plan API' do
   end
 
 
-  context "With strict mode toggled off" do
-
-    before { StripeMock.toggle_strict(false) }
-
-    it "can retrieve a stripe plan with an id that doesn't exist" do
-      plan = Stripe::Plan.retrieve('test_charge_x')
-
-      expect(plan.id).to eq('test_charge_x')
-      expect(plan.amount).to_not be_nil
-      expect(plan.name).to_not be_nil
-
-      expect(plan.currency).to_not be_nil
-      expect(plan.interval).to_not be_nil
-    end
-  end
-
-  describe "Validation", :pending => "Wait for strict charge" do
+  describe "Validation", :live => true do
     let(:params) { stripe_helper.create_plan_params }
     let(:subject) { Stripe::Plan.create(params) }
 
@@ -135,9 +119,14 @@ shared_examples 'Plan API' do
     end
 
     describe "Uniqueness" do
+
       it "validates for uniqueness" do
+        stripe_helper.delete_plan(params[:id])
+
         Stripe::Plan.create(params)
-        expect { subject }.to raise_error(Stripe::InvalidRequestError, "Plan already exists.")
+        expect {
+          Stripe::Plan.create(params)
+        }.to raise_error(Stripe::InvalidRequestError, "Plan already exists.")
       end
     end
   end

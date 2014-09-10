@@ -44,7 +44,7 @@ module StripeMock
         route =~ method_url
         assert_existance :customer, $1, customers[$1]
 
-        cus = customers[$1] ||= Data.mock_customer([], :id => $1)
+        cus = customers[$1]
         cus.merge!(params)
 
         if params[:card]
@@ -71,7 +71,7 @@ module StripeMock
       def get_customer(route, method_url, params, headers)
         route =~ method_url
         assert_existance :customer, $1, customers[$1]
-        customers[$1] ||= Data.mock_customer([], :id => $1)
+        customers[$1]
       end
 
       def list_customers(route, method_url, params, headers)

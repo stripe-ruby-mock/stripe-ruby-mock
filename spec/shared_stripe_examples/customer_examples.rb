@@ -237,17 +237,4 @@ shared_examples 'Customer API' do
     customer = customer.delete
     expect(customer.deleted).to be_true
   end
-
-  context "With strict mode toggled off" do
-
-    before { StripeMock.toggle_strict(false) }
-
-    it "retrieves a stripe customer with an id that doesn't exist" do
-      customer = Stripe::Customer.retrieve('test_customer_x')
-      expect(customer.id).to eq('test_customer_x')
-      expect(customer.email).to_not be_nil
-      expect(customer.description).to_not be_nil
-    end
-  end
-
 end

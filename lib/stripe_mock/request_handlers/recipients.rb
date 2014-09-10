@@ -29,7 +29,7 @@ module StripeMock
         route =~ method_url
         assert_existance :recipient, $1, recipients[$1]
 
-        recipient = recipients[$1] ||= Data.mock_recipient([], :id => $1)
+        recipient = recipients[$1]
         recipient.merge!(params)
 
         if params[:card]
@@ -44,7 +44,7 @@ module StripeMock
       def get_recipient(route, method_url, params, headers)
         route =~ method_url
         assert_existance :recipient, $1, recipients[$1]
-        recipients[$1] ||= Data.mock_recipient([], :id => $1)
+        recipients[$1]
       end
     end
   end

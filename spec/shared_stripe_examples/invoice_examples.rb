@@ -78,7 +78,7 @@ shared_examples 'Invoice API' do
         expect(e).to be_a(ArgumentError) }
     end
 
-    it 'fails without a valid customer in strict mode' do
+    it 'fails without a valid customer' do
       expect { Stripe::Invoice.upcoming(customer: 'whatever') }.to raise_error {|e|
         expect(e).to be_a(Stripe::InvalidRequestError)
         expect(e.message).to eq('No such customer: whatever') }

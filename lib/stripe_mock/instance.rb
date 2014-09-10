@@ -34,7 +34,7 @@ module StripeMock
     attr_reader :bank_tokens, :charges, :coupons, :customers, :events,
                 :invoices, :invoice_items, :plans, :recipients, :subscriptions
 
-    attr_accessor :error_queue, :debug, :strict
+    attr_accessor :error_queue, :debug
 
     def initialize
       @bank_tokens = {}
@@ -53,7 +53,6 @@ module StripeMock
       @error_queue = ErrorQueue.new
       @id_counter = 0
       @balance_transaction_counter = 0
-      @strict = true
 
       # This is basically a cache for ParamValidators
       @base_strategy = TestStrategies::Base.new
@@ -97,8 +96,6 @@ module StripeMock
     private
 
     def assert_existance(type, id, obj, message=nil)
-      return unless @strict == true
-
       if obj.nil?
         msg = message || "No such #{type}: #{id}"
         raise Stripe::InvalidRequestError.new(msg, type.to_s, 404)

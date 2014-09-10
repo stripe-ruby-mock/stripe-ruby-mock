@@ -92,19 +92,4 @@ shared_examples 'Coupon API' do
     all.map(&:id).should include('Coupon One', 'Coupon Two')
     all.map(&:amount_off).should include(1500, 3000)
   end
-
-
-  context "With strict mode toggled off" do
-
-    before { StripeMock.toggle_strict(false) }
-
-    it "can retrieve a stripe coupon with an id that doesn't exist" do
-      coupon = Stripe::Coupon.retrieve('test_coupon_x')
-
-      expect(coupon.id).to eq('test_coupon_x')
-      expect(coupon.percent_off).to_not be_nil
-      expect(coupon.valid).to be_true
-    end
-  end
-
 end

@@ -7,7 +7,11 @@ module StripeMock
       end
 
       def delete_plan(plan_id)
-        StripeMock.instance.plans.delete(plan_id)
+        if StripeMock.state == 'remote'
+          StripeMock.client.destroy_resource('plans', plan_id)
+        elsif StripeMock.state == 'local'
+          StripeMock.instance.plans.delete(plan_id)
+        end
       end
 
     end
