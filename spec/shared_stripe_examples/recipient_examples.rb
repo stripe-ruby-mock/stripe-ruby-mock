@@ -8,7 +8,7 @@ shared_examples 'Recipient API' do
       name: "MyCo",
       email: "owner@myco.com",
       bank_account: 'void_bank_token',
-      card: "some_card_token"
+      card: stripe_helper.generate_card_token
     })
     expect(recipient.id).to match /^test_rp/
     expect(recipient.type).to eq('corporation')
@@ -49,13 +49,13 @@ shared_examples 'Recipient API' do
       type:  "individual",
       name: "Customer One",
       bank_account: 'bank_account_token_1',
-      card: "card_token_1"
+      card: stripe_helper.generate_card_token
     })
     recipient2 = Stripe::Recipient.create({
       type:  "individual",
       name: "Customer Two",
       bank_account: 'bank_account_token_1',
-      card: "card_token_1"
+      card: stripe_helper.generate_card_token
     })
     data = test_data_source(:recipients)
     expect(data[recipient.id]).to_not be_nil
@@ -74,7 +74,7 @@ shared_examples 'Recipient API' do
       type:  "individual",
       name: "Bob",
       email: "bob@example.com",
-      card: "card_test"
+      card: stripe_helper.generate_card_token
     })
     recipient = Stripe::Recipient.retrieve(original.id)
 

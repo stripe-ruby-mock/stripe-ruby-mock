@@ -6,7 +6,7 @@ shared_examples 'Refund API' do
     charge = Stripe::Charge.create(
       amount: 999,
       currency: 'USD',
-      card: 'card_token_abcde',
+      card: stripe_helper.generate_card_token,
       description: 'card charge'
     )
 
@@ -34,7 +34,7 @@ shared_examples 'Refund API' do
     charge = Stripe::Charge.create(
       amount: 999,
       currency: 'USD',
-      card: 'card_token_abcde',
+      card: stripe_helper.generate_card_token,
       description: 'card charge'
     )
     refund = charge.refund
@@ -47,7 +47,7 @@ shared_examples 'Refund API' do
     charge = Stripe::Charge.create(
       amount: 999,
       currency: 'USD',
-      card: 'card_token_abcde',
+      card: stripe_helper.generate_card_token,
       description: 'card charge'
     )
     refund = charge.refund

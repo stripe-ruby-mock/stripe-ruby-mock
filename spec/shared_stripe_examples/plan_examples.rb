@@ -118,7 +118,7 @@ shared_examples 'Plan API' do
     end
   end
 
-  describe "Validation" do
+  describe "Validation", :pending => "Wait for strict charge" do
     let(:params) { stripe_helper.create_plan_params }
     let(:subject) { Stripe::Plan.create(params) }
 

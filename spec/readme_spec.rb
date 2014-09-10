@@ -1,5 +1,6 @@
 
 describe 'README examples' do
+  let(:stripe_helper) { StripeMock.create_test_helper }
 
   before { StripeMock.start }
   after  { StripeMock.stop }
@@ -9,7 +10,7 @@ describe 'README examples' do
     # This doesn't touch stripe's servers nor the internet!
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
-      card: 'void_card_token'
+      card: stripe_helper.generate_card_token
     })
     expect(customer.email).to eq('johnny@appleseed.com')
   end

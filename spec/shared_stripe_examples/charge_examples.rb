@@ -2,11 +2,21 @@ require 'spec_helper'
 
 shared_examples 'Charge API' do
 
+  it "requires a valid card token", :live => true do
+    expect {
+      charge = Stripe::Charge.create(
+        amount: 99,
+        currency: 'usd',
+        card: 'bogus_card_token'
+      )
+    }.to raise_error(Stripe::InvalidRequestError, /Invalid token id/)
+  end
+
   it "creates a stripe charge item with a card token" do
     charge = Stripe::Charge.create(
       amount: 999,
       currency: 'USD',
-      card: 'card_token_abcde',
+      card: stripe_helper.generate_card_token,
       description: 'card charge'
     )
 
@@ -21,12 +31,12 @@ shared_examples 'Charge API' do
     charge = Stripe::Charge.create({
       amount: 333,
       currency: 'USD',
-      card: 'card_token_333'
+      card: stripe_helper.generate_card_token
     })
     charge2 = Stripe::Charge.create({
       amount: 777,
       currency: 'USD',
-      card: 'card_token_777'
+      card: stripe_helper.generate_card_token
     })
     data = test_data_source(:charges)
     expect(data[charge.id]).to_not be_nil
@@ -40,7 +50,7 @@ shared_examples 'Charge API' do
     original = Stripe::Charge.create({
       amount: 777,
       currency: 'USD',
-      card: 'card_token_abc'
+      card: stripe_helper.generate_card_token
     })
     charge = Stripe::Charge.retrieve(original.id)
 
@@ -60,14 +70,14 @@ shared_examples 'Charge API' do
     charge1 = Stripe::Charge.create(
       amount: 999,
       currency: 'USD',
-      card: 'card_token_abcde',
+      card: stripe_helper.generate_card_token,
       description: 'card charge'
     )
 
     charge2 = Stripe::Charge.create(
       amount: 999,
       currency: 'USD',
-      card: 'card_token_abcde',
+      card: stripe_helper.generate_card_token,
       description: 'card charge'
     )
 
@@ -101,25 +111,12 @@ shared_examples 'Charge API' do
     end
   end
 
-  context "With strict mode toggled off" do
-
-    before { StripeMock.toggle_strict(false) }
-
-    it "retrieves a stripe charge with an id that doesn't exist" do
-      charge = Stripe::Charge.retrieve('test_charge_x')
-      expect(charge.id).to eq('test_charge_x')
-      expect(charge.amount).to_not be_nil
-      expect(charge.card).to_not be_nil
-    end
-  end
-
-
   describe 'captured status value' do
     it "reports captured by default" do
       charge = Stripe::Charge.create({
         amount: 777,
         currency: 'USD',
-        card: 'card_token_abc'
+        card: stripe_helper.generate_card_token
       })
 
       expect(charge.captured).to be_true
@@ -129,7 +126,7 @@ shared_examples 'Charge API' do
       charge = Stripe::Charge.create({
         amount: 777,
         currency: 'USD',
-        card: 'card_token_abc',
+        card: stripe_helper.generate_card_token,
         capture: true
       })
 
@@ -140,7 +137,7 @@ shared_examples 'Charge API' do
       charge = Stripe::Charge.create({
         amount: 777,
         currency: 'USD',
-        card: 'card_token_abc',
+        card: stripe_helper.generate_card_token,
         capture: false
       })
 
@@ -153,7 +150,7 @@ shared_examples 'Charge API' do
       charge = Stripe::Charge.create({
         amount: 777,
         currency: 'USD',
-        card: 'card_token_abc',
+        card: stripe_helper.generate_card_token,
         capture: false
       })
 

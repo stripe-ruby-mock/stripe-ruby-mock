@@ -70,7 +70,7 @@ shared_examples 'Invoice API' do
 
   context "retrieving upcoming invoice" do
     before do
-      @customer = Stripe::Customer.create(email: 'johnny@appleseed.com', card: 'some_card_token')
+      @customer = Stripe::Customer.create(email: 'johnny@appleseed.com', card: stripe_helper.generate_card_token)
     end
 
     it 'fails without parameters' do

@@ -4,13 +4,17 @@ module StripeMock
 
       def create_plan(params={})
         raise "create_plan requires an :id" if params[:id].nil?
+        delete_plan(params[:id])
+        Stripe::Plan.create create_plan_params(params)
+      end
+
+      def delete_plan(plan_id)
         begin
-          plan = Stripe::Plan.retrieve params[:id]
+          plan = Stripe::Plan.retrieve(plan_id)
           plan.delete
         rescue Stripe::StripeError => e
-          # Nothing; we just wanted to make sure this plan no longer exists
+          # Do nothing; we just want to make sure this plan ceases to exists
         end
-        Stripe::Plan.create create_plan_params(params)
       end
 
     end
