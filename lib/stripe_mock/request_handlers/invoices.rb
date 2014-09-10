@@ -20,8 +20,6 @@ module StripeMock
       def update_invoice(route, method_url, params, headers)
         route =~ method_url
         assert_existance :invoice, $1, invoices[$1]
-
-        invoices[$1] ||= Data.mock_invoice([], :id => $1)
         invoices[$1].merge!(params)
       end
 
@@ -41,7 +39,6 @@ module StripeMock
       def get_invoice(route, method_url, params, headers)
         route =~ method_url
         assert_existance :invoice, $1, invoices[$1]
-        invoices[$1]
       end
 
       def pay_invoice(route, method_url, params, headers)

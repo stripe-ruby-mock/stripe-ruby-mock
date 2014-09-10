@@ -12,21 +12,21 @@ module StripeMock
           raise Stripe::InvalidRequestError.new('You must supply either a card, customer, or bank account to create a token.', nil, 400)
         end
 
-        if params[:customer] && params[:card]
-          customer = customers[params[:customer]]
-          assert_existance :customer, params[:customer], customer
+        cus_id = params[:customer]
 
-          # params[:card] is now an id; grab it from the db
+        if cus_id && params[:card]
+          customer = assert_existance :customer, cus_id, customers[cus_id]
+
+          # params[:card] is an id; grab it from the db
           customer_card = get_card(customer, params[:card])
           assert_existance :card, params[:card], customer_card
         elsif params[:card]
-          # "Sanitize" card number
+          # params[:card] is a hash of cc info; "Sanitize" the card number
           params[:card][:fingerprint] = StripeMock::Util.fingerprint(params[:card][:number])
           params[:card][:last4] = params[:card][:number][-4,4]
           customer_card = params[:card]
         else
-          customer = customers[params[:customer]]
-          assert_existance :customer, params[:customer], customer
+          customer = assert_existance :customer, cus_id, customers[cus_id]
           customer_card = get_card(customer, customer[:default_card])
         end
 

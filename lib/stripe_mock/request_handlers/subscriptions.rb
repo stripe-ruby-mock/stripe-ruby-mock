@@ -12,12 +12,10 @@ module StripeMock
 
       def create_subscription(route, method_url, params, headers)
         route =~ method_url
+        customer = assert_existance :customer, $1, customers[$1]
 
-        customer = customers[$1]
-        assert_existance :customer, $1, customer
-
-        plan = plans[params[:plan]]
-        assert_existance :plan, params[:plan], plan
+        plan_id = params[:plan]
+        plan = assert_existance :plan, plan_id, plans[plan_id]
 
         if params[:card]
           new_card = get_card_by_token(params.delete(:card))
@@ -38,28 +36,21 @@ module StripeMock
       def retrieve_subscription(route, method_url, params, headers)
         route =~ method_url
 
-        customer = customers[$1]
-        assert_existance :customer, $1, customer
-        subscription = get_customer_subscription(customer, $2)
-        assert_existance :subscription, $2, subscription
-
-        subscription
+        customer = assert_existance :customer, $1, customers[$1]
+        assert_existance :subscription, $2, get_customer_subscription(customer, $2)
       end
 
       def retrieve_subscriptions(route, method_url, params, headers)
         route =~ method_url
 
-        customer = customers[$1]
-        assert_existance :customer, $1, customer
-
+        customer = assert_existance :customer, $1, customers[$1]
         customer[:subscriptions]
       end
 
       def update_subscription(route, method_url, params, headers)
         route =~ method_url
+        customer = assert_existance :customer, $1, customers[$1]
 
-        customer = customers[$1]
-        assert_existance :customer, $1, customer
         subscription = get_customer_subscription(customer, $2)
         assert_existance :subscription, $2, subscription
 
@@ -93,9 +84,8 @@ module StripeMock
 
       def cancel_subscription(route, method_url, params, headers)
         route =~ method_url
+        customer = assert_existance :customer, $1, customers[$1]
 
-        customer = customers[$1]
-        assert_existance :customer, $1, customer
         subscription = get_customer_subscription(customer, $2)
         assert_existance :subscription, $2, subscription
 

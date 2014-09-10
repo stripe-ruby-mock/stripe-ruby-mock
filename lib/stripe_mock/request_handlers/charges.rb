@@ -39,13 +39,11 @@ module StripeMock
       def get_charge(route, method_url, params, headers)
         route =~ method_url
         assert_existance :charge, $1, charges[$1]
-        charges[$1]
       end
 
       def capture_charge(route, method_url, params, headers)
         route =~ method_url
-        charge = charges[$1]
-        assert_existance :charge, $1, charge
+        charge = assert_existance :charge, $1, charges[$1]
 
         charge[:captured] = true
         charge

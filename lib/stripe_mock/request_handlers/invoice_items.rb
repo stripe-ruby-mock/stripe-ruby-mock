@@ -17,12 +17,8 @@ module StripeMock
 
       def update_invoice_item(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :list_item, $1, invoice_items[$1]
-
-        list_item = invoice_items[$1]
+        list_item = assert_existance :list_item, $1, invoice_items[$1]
         list_item.merge!(params)
-
-        list_item
       end
 
       def delete_invoice_item(route, method_url, params, headers)
@@ -33,8 +29,6 @@ module StripeMock
           id: invoice_items[$1][:id],
           deleted: true
         }
-
-        invoice_items[$1]
       end
 
       def list_invoice_items(route, method_url, params, headers)
@@ -44,7 +38,6 @@ module StripeMock
       def get_invoice_item(route, method_url, params, headers)
         route =~ method_url
         assert_existance :invoice_item, $1, invoice_items[$1]
-        invoice_items[$1]
       end
 
     end

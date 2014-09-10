@@ -24,13 +24,11 @@ module StripeMock
       def get_plan(route, method_url, params, headers)
         route =~ method_url
         assert_existance :plan, $1, plans[$1]
-        plans[$1]
       end
 
       def delete_plan(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :plan, $1, plans[$1]
-        plans.delete($1)
+        assert_existance :plan, $1, plans.delete($1)
       end
 
       def list_plans(route, method_url, params, headers)

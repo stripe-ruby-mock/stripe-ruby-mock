@@ -100,6 +100,7 @@ module StripeMock
         msg = message || "No such #{type}: #{id}"
         raise Stripe::InvalidRequestError.new(msg, type.to_s, 404)
       end
+      obj
     end
 
     def new_id(prefix)
