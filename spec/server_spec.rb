@@ -87,6 +87,13 @@ describe 'StripeMock Server', :mock_server => true do
     StripeMock.default_server_pid_path = orig
   end
 
+  it "can set the default server log path" do
+    expect(StripeMock.default_server_log_path).to eq('./stripe-mock-server.log')
+
+    StripeMock.default_server_log_path = 'yule.log'
+    expect(StripeMock.default_server_log_path).to eq('yule.log')
+  end
+
 
   it "doesn't create multiple clients" do
     result = StripeMock.start_client
