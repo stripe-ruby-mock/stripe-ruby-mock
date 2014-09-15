@@ -8,7 +8,6 @@ module StripeMock
     @default_pid_path = new_path
   end
 
-
   def self.spawn_server(opts={})
     pid_path = opts[:pid_path] || @default_pid_path
     log_path = opts[:log_path] || @default_log_path

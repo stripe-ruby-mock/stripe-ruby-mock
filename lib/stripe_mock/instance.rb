@@ -6,18 +6,28 @@ module StripeMock
     # Handlers are ordered by priority
     @@handlers = []
 
-    def self.add_handler(route, name)
+    def self.add_handler(route, name, version=nil)
       @@handlers << {
         :route => %r{^#{route}$},
-        :name => name
+        :name => name,
+        :version => version
       }
     end
 
     def self.handler_for_method_url(method_url)
-      @@handlers.find {|h| method_url =~ h[:route] }
+      api_version_date = Date.strptime(StripeMock.version, '%Y-%m-%d')
+      default_handler = @@handlers.find {|h| method_url =~ h[:route] }
+
+      # Try to find a handler closest to the current version of the API
+      handlers = @@handlers.select {|h|
+        method_url =~ h[:route] && !h[:version].nil? && Date.strptime(h[:version], '%Y-%m-%d') <= api_version_date
+      }.sort_by {|h| h[:version]}
+
+      handlers.first || default_handler
     end
 
     include StripeMock::RequestHandlers::Charges
+    include StripeMock::RequestHandlers::Refunds
     include StripeMock::RequestHandlers::Cards
     include StripeMock::RequestHandlers::Subscriptions # must be before Customers
     include StripeMock::RequestHandlers::Customers

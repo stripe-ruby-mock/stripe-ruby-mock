@@ -23,6 +23,10 @@ module StripeMock
       end
     end
 
+    def set_version(version)
+      timeout_wrap { @pipe.set_version(version) }
+    end
+
     def get_server_data(key)
       timeout_wrap {
         # Massage the data make this behave the same as the local StripeMock.start

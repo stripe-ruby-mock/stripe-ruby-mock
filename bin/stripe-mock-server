@@ -4,6 +4,8 @@ lib = File.expand_path(File.dirname(__FILE__) + '/../lib')
 $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
 
 require 'trollop'
+require 'stripe_mock'
+require 'stripe_mock/server'
 
 opts = Trollop::options do
   opt :port, "Listening port", :type => :int, :default => 4999
@@ -11,9 +13,7 @@ opts = Trollop::options do
   opt :server, "Server to use", :type => :string, :default => 'thin'
   opt :debug, "Request and response output", :default => true
   opt :pid_path, "Location to put server pid file", :type => :string, :default => './stripe-mock-server.pid'
+  opt :"api-version", "API version (as a date, ex: 2014-06-17)", :type => :string, :default => StripeMock::FIRST_VERSION_DATE
 end
-
-require 'stripe_mock'
-require 'stripe_mock/server'
 
 StripeMock::Server.start_new(opts)

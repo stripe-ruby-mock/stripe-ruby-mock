@@ -13,6 +13,7 @@ module StripeMock
         :server => opts[:server] || :thin,
         :show_errors => true
       )
+      StripeMock.version = opts[:"api-version"]
       server.start
     end
 
@@ -29,6 +30,10 @@ module StripeMock
           :error_params => [e.message, e.param, e.http_status, e.http_body, e.json_body]
         }
       end
+    end
+
+    def set_version(version)
+      StripeMock.version = version
     end
 
     def get_data(key)

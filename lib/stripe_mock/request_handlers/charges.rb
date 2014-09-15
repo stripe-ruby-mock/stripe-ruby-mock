@@ -4,6 +4,7 @@ module StripeMock
 
       def Charges.included(klass)
         klass.add_handler 'post /v1/charges',               :new_charge
+        klass.add_handler 'post /v1/charges',               :new_charge_2014_06_17, '2014-06-17'
         klass.add_handler 'get /v1/charges',                :get_charges
         klass.add_handler 'get /v1/charges/(.*)',           :get_charge
         klass.add_handler 'post /v1/charges/(.*)/capture',  :capture_charge
@@ -18,6 +19,16 @@ module StripeMock
         end
 
         charges[id] = Data.mock_charge(params.merge :id => id, :balance_transaction => new_balance_transaction('txn'))
+      end
+
+      def new_charge_2014_06_17(route, method_url, params, headers)
+        id = new_id('ch')
+
+        if params[:card] && params[:card].is_a?(String)
+          params[:card] = get_card_by_token(params[:card])
+        end
+
+        charges[id] = Data.mock_charge_2014_06_17(params.merge :id => id, :balance_transaction => new_balance_transaction('txn'))
       end
 
       def get_charges(route, method_url, params, headers)
@@ -51,7 +62,8 @@ module StripeMock
       def refund_charge(route, method_url, params, headers)
         get_charge(route, method_url, params, headers)
         route =~ method_url
-        Data.mock_refund :charge => charges[$1], :refund => params.merge(:balance_transaction => new_balance_transaction('txn'))
+        Data.mock_refund(
+          :charge => charges[$1], :refund => params.merge(:balance_transaction => new_balance_transaction('txn')))
       end
 
     end

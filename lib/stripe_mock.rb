@@ -36,6 +36,7 @@ require 'stripe_mock/request_handlers/helpers/subscription_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/token_helpers.rb'
 
 require 'stripe_mock/request_handlers/charges.rb'
+require 'stripe_mock/request_handlers/refunds.rb'
 require 'stripe_mock/request_handlers/cards.rb'
 require 'stripe_mock/request_handlers/customers.rb'
 require 'stripe_mock/request_handlers/coupons.rb'
@@ -50,11 +51,15 @@ require 'stripe_mock/instance'
 
 module StripeMock
 
+  FIRST_VERSION_DATE = "2011-06-21"
+
   lib_dir = File.expand_path(File.dirname(__FILE__), '../..')
   @webhook_fixture_path = './spec/fixtures/stripe_webhooks/'
   @webhook_fixture_fallback_path = File.join(lib_dir, 'stripe_mock/webhook_fixtures')
+  @version = FIRST_VERSION_DATE
 
   class << self
     attr_accessor :webhook_fixture_path
+    attr_accessor :version
   end
 end

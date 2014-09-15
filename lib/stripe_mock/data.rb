@@ -63,8 +63,7 @@ module StripeMock
           address_zip_check: nil
         },
         captured: params.has_key?(:capture) ? params.delete(:capture) : true,
-        refunds: [
-        ],
+        refunds: [],
         balance_transaction: "txn_2dyYXXP90MN26R",
         failure_message: nil,
         failure_code: nil,
@@ -76,6 +75,18 @@ module StripeMock
         metadata: {
         }
       }.merge(params)
+    end
+
+    def self.mock_charge_2014_06_17(params={})
+      charge = mock_charge(params)
+      charge_id = charge[:id]
+      charge[:refunds] = {
+        object: "list",
+        count: "0",
+        url: "/v1/charges/#{charge_id}/refunds",
+        data: []
+      }
+      charge
     end
 
     def self.mock_refund(params={})
@@ -92,6 +103,19 @@ module StripeMock
         ],
         amount_refunded: params[:refund][:amount]
       })
+    end
+
+    def self.mock_refund_2014_06_17(params={})
+      {
+        charge: "test_ch_1fD6uiR9FAA2zc",
+        amount: 1,
+        currency: "usd",
+        created: 1380208998,
+        object: "refund",
+        balance_transaction: "txn_2dyYXXP90MN26R",
+        id: 'test_re_default'
+      }.merge(params)
+
     end
 
     def self.mock_charge_array
