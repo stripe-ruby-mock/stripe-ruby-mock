@@ -43,6 +43,16 @@ shared_examples 'Card API' do
     expect(card.exp_year).to eq(3031)
   end
 
+  it 'create adds cards' do
+    card_token1 = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+    card_token2 = StripeMock.generate_card_token(last4: "9923", exp_month: 11, exp_year: 2099)
+    customer = Stripe::Customer.create(id: 'test_customer_sub', card: card_token1)
+    card = customer.cards.create(card: card_token2)
+
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+    expect(customer.cards.all.count).to eq(2)
+  end
+
   it 'create does not change the customers default card' do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)

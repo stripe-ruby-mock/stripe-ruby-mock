@@ -49,7 +49,7 @@ module StripeMock
 
         if params[:card]
           new_card = get_card_by_token(params.delete(:card))
-          add_card_to_customer(new_card, cus)
+          add_card_to_customer(new_card, cus, true)
           cus[:default_card] = new_card[:id]
         end
 
