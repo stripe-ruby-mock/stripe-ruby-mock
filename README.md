@@ -9,6 +9,8 @@
 In your gemfile:
 
     gem 'stripe-ruby-mock', '~> 1.10.1.7'
+    # Edge branch (slightly more strict API):
+    # gem 'stripe-ruby-mock', :git => 'https://github.com/rebelidealist/stripe-ruby-mock', :branch => 'live-tests'
 
 ## Features
 

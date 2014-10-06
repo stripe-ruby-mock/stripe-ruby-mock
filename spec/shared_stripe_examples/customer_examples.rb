@@ -231,7 +231,7 @@ shared_examples 'Customer API' do
   it "deletes a customer" do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     customer = customer.delete
-    expect(customer.deleted).to be_true
+    expect(customer.deleted).to eq(true)
   end
 
   context "With strict mode toggled off" do

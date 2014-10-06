@@ -425,7 +425,7 @@ shared_examples 'Customer Subscriptions' do
       result = sub.delete()
 
       expect(result.status).to eq('canceled')
-      expect(result.cancel_at_period_end).to be_false
+      expect(result.cancel_at_period_end).to eq(false)
       expect(result.id).to eq(sub.id)
 
       customer = Stripe::Customer.retrieve('test_customer_sub')
@@ -434,7 +434,7 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.length).to eq(1)
 
       expect(customer.subscriptions.data.first.status).to eq('canceled')
-      expect(customer.subscriptions.data.first.cancel_at_period_end).to be_false
+      expect(customer.subscriptions.data.first.cancel_at_period_end).to eq(false)
       expect(customer.subscriptions.data.first.ended_at).to_not be_nil
       expect(customer.subscriptions.data.first.canceled_at).to_not be_nil
     end
@@ -447,7 +447,7 @@ shared_examples 'Customer Subscriptions' do
       result = sub.delete(at_period_end: true)
 
       expect(result.status).to eq('active')
-      expect(result.cancel_at_period_end).to be_true
+      expect(result.cancel_at_period_end).to eq(true)
       expect(result.id).to eq(sub.id)
 
       customer = Stripe::Customer.retrieve('test_customer_sub')
@@ -456,7 +456,7 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.length).to eq(1)
 
       expect(customer.subscriptions.data.first.status).to eq('active')
-      expect(customer.subscriptions.data.first.cancel_at_period_end).to be_true
+      expect(customer.subscriptions.data.first.cancel_at_period_end).to eq(true)
       expect(customer.subscriptions.data.first.ended_at).to be_nil
       expect(customer.subscriptions.data.first.canceled_at).to_not be_nil
     end
@@ -477,7 +477,7 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.length).to eq(1)
 
       expect(customer.subscriptions.data.first.status).to eq('active')
-      expect(customer.subscriptions.data.first.cancel_at_period_end).to be_false
+      expect(customer.subscriptions.data.first.cancel_at_period_end).to eq(false)
       expect(customer.subscriptions.data.first.ended_at).to be_nil
       expect(customer.subscriptions.data.first.canceled_at).to be_nil
     end
