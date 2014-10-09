@@ -25,7 +25,7 @@ module StripeMock
 
       def list_invoices(route, method_url, params, headers)
         params[:offset] ||= 0
-        params[:count] ||= 10
+        params[:count] ||= (params[:limit] || 10)
 
         result = invoices.clone
 
