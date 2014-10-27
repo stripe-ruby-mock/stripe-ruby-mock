@@ -37,6 +37,43 @@ describe StripeMock do
     }
   end
 
+  describe "Live Testing" do
+    after { StripeMock.instance_variable_set(:@state, 'ready') }
+
+    it "sets the default test strategy" do
+      StripeMock.toggle_live(true)
+      expect(StripeMock.create_test_helper).to be_a StripeMock::TestStrategies::Live
+
+      StripeMock.toggle_live(false)
+      expect(StripeMock.create_test_helper).to be_a StripeMock::TestStrategies::Mock
+    end
+
+    it "does not start when live" do
+      expect(StripeMock.state).to eq 'ready'
+      StripeMock.toggle_live(true)
+      expect(StripeMock.state).to eq 'live'
+      expect(StripeMock.start).to eq false
+      expect(StripeMock.start_client).to eq false
+    end
+
+    it "can be undone" do
+      StripeMock.toggle_live(true)
+      StripeMock.toggle_live(false)
+      expect(StripeMock.state).to eq 'ready'
+      expect(StripeMock.start).to_not eq false
+      StripeMock.stop
+    end
+
+    it "cannot be toggled when already started" do
+      StripeMock.start
+      expect { StripeMock.toggle_live(true) }.to raise_error
+      StripeMock.stop
+
+      StripeMock.instance_variable_set(:@state, 'remote')
+      expect { StripeMock.toggle_live(true) }.to raise_error
+    end
+  end
+
   describe "Test Helper Strategies" do
     before { StripeMock.instance_variable_set("@__test_strat", nil) }
 

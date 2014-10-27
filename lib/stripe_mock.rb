@@ -28,6 +28,7 @@ require 'stripe_mock/api/card_tokens'
 require 'stripe_mock/api/debug'
 require 'stripe_mock/api/errors'
 require 'stripe_mock/api/global_id_prefix'
+require 'stripe_mock/api/live'
 require 'stripe_mock/api/test_helpers'
 require 'stripe_mock/api/webhooks'
 
