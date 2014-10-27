@@ -12,61 +12,51 @@ module StripeMock
 
       def create_subscription(route, method_url, params, headers)
         route =~ method_url
+        customer = assert_existance :customer, $1, customers[$1]
 
-        customer = customers[$1]
-        assert_existance :customer, $1, customer
-
-        plan = plans[params[:plan]]
-        assert_existance :plan, params[:plan], plan
+        plan_id = params[:plan]
+        plan = assert_existance :plan, plan_id, plans[plan_id]
 
         if params[:card]
           new_card = get_card_by_token(params.delete(:card))
-          add_card_to_customer(new_card, customer)
+          add_card_to_object(:customer, new_card, customer)
           customer[:default_card] = new_card[:id]
         end
 
         # Ensure customer has card to charge if plan has no trial and is not free
-        verify_card_present(customer, plan)
+        verify_card_present(customer, plan, params)
 
         subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')) })
         subscription.merge!(custom_subscription_params(plan, customer, params))
         add_subscription_to_customer(customer, subscription)
 
-        # oddly, subscription returned from 'create_subscription' does not expand plan
-        subscription.merge(plan: params[:plan])
+        subscription
       end
 
       def retrieve_subscription(route, method_url, params, headers)
         route =~ method_url
 
-        customer = customers[$1]
-        assert_existance :customer, $1, customer
-        subscription = get_customer_subscription(customer, $2)
-        assert_existance :subscription, $2, subscription
-
-        subscription
+        customer = assert_existance :customer, $1, customers[$1]
+        assert_existance :subscription, $2, get_customer_subscription(customer, $2)
       end
 
       def retrieve_subscriptions(route, method_url, params, headers)
         route =~ method_url
 
-        customer = customers[$1]
-        assert_existance :customer, $1, customer
-
+        customer = assert_existance :customer, $1, customers[$1]
         customer[:subscriptions]
       end
 
       def update_subscription(route, method_url, params, headers)
         route =~ method_url
+        customer = assert_existance :customer, $1, customers[$1]
 
-        customer = customers[$1]
-        assert_existance :customer, $1, customer
         subscription = get_customer_subscription(customer, $2)
         assert_existance :subscription, $2, subscription
 
         if params[:card]
           new_card = get_card_by_token(params.delete(:card))
-          add_card_to_customer(new_card, customer)
+          add_card_to_object(:customer, new_card, customer)
           customer[:default_card] = new_card[:id]
         end
 
@@ -89,20 +79,19 @@ module StripeMock
         customer[:subscriptions][:data].reject! { |sub| sub[:id] == subscription[:id] }
         customer[:subscriptions][:data] << subscription
 
-        # oddly, subscription returned from 'create_subscription' does not expand plan
-        subscription.merge(plan: plan_name)
+        subscription
       end
 
       def cancel_subscription(route, method_url, params, headers)
         route =~ method_url
+        customer = assert_existance :customer, $1, customers[$1]
 
-        customer = customers[$1]
-        assert_existance :customer, $1, customer
         subscription = get_customer_subscription(customer, $2)
         assert_existance :subscription, $2, subscription
 
         cancel_params = { canceled_at: Time.now.utc.to_i }
-        if params[:at_period_end] == true
+        cancelled_at_period_end = (params[:at_period_end] == true)
+        if cancelled_at_period_end
           cancel_params[:cancel_at_period_end] = true
         else
           cancel_params[:status] = "canceled"
@@ -112,19 +101,18 @@ module StripeMock
 
         subscription.merge!(cancel_params)
 
-        customer[:subscriptions][:data].reject!{|sub|
-          sub[:id] == subscription[:id]
-        }
+        unless cancelled_at_period_end
+          delete_subscription_from_customer customer, subscription
+        end
 
-        customer[:subscriptions][:data] << subscription
         subscription
       end
 
       private
 
-      def verify_card_present(customer, plan)
-        if customer[:default_card].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0
-          raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
+      def verify_card_present(customer, plan, params={})
+        if customer[:default_card].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0 && plan[:trial_end].nil? && params[:trial_end].nil?
+          raise Stripe::InvalidRequestError.new('You must supply a valid card xoxo', nil, 400)
         end
       end
 

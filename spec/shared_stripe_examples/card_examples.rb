@@ -43,13 +43,36 @@ shared_examples 'Card API' do
     expect(card.exp_year).to eq(3031)
   end
 
-  it 'create does not change the customers default card' do
+
+  it "creates a single card with a generated card token", :live => true do
+    customer = Stripe::Customer.create
+    expect(customer.cards.count).to eq 0
+
+    customer.cards.create :card => stripe_helper.generate_card_token
+    # Yes, stripe-ruby does not actually add the new card to the customer instance
+    expect(customer.cards.count).to eq 0
+
+    customer2 = Stripe::Customer.retrieve(customer.id)
+    expect(customer2.cards.count).to eq 1
+    expect(customer2.default_card).to eq customer2.cards.first.id
+  end
+
+  it 'create does not change the customers default card if already set' do
+    customer = Stripe::Customer.create(id: 'test_customer_sub', default_card: "test_cc_original")
+    card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+    card = customer.cards.create(card: card_token)
+
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+    expect(customer.default_card).to eq("test_cc_original")
+  end
+
+  it 'create updates the customers default card if not set' do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
     card = customer.cards.create(card: card_token)
 
     customer = Stripe::Customer.retrieve('test_customer_sub')
-    expect(customer.default_card).to be_nil
+    expect(customer.default_card).to_not be_nil
   end
 
   context "retrieval and deletion" do
@@ -62,14 +85,59 @@ shared_examples 'Card API' do
       expect(retrieved.to_s).to eq(card.to_s)
     end
 
+    it "retrieves a customer's card after re-fetching the customer" do
+      retrieved = Stripe::Customer.retrieve(customer.id).cards.retrieve(card.id)
+      expect(retrieved.id).to eq card.id
+    end
+
     it "deletes a customers card" do
       card.delete
       retrieved_cus = Stripe::Customer.retrieve(customer.id)
       expect(retrieved_cus.cards.data).to be_empty
     end
 
-    it "updates the default card if deleted"
+    it "deletes a customers card then set the default_card to nil" do
+      card.delete
+      retrieved_cus = Stripe::Customer.retrieve(customer.id)
+      expect(retrieved_cus.default_card).to be_nil
+    end
 
+    it "updates the default card if deleted" do
+      card.delete
+      retrieved_cus = Stripe::Customer.retrieve(customer.id)
+      expect(retrieved_cus.default_card).to be_nil
+    end
+
+    context "deletion when the user has two cards" do
+      let!(:card_token_2) { StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
+      let!(:card_2) { customer.cards.create(card: card_token_2) }
+
+      it "has just one card anymore" do
+        card.delete
+        retrieved_cus = Stripe::Customer.retrieve(customer.id)
+        expect(retrieved_cus.cards.data.count).to eq 1
+        expect(retrieved_cus.cards.data.first.id).to eq card_2.id
+      end
+
+      it "sets the default_card id to the last card remaining id" do
+        card.delete
+        retrieved_cus = Stripe::Customer.retrieve(customer.id)
+        expect(retrieved_cus.default_card).to eq card_2.id
+      end
+    end
+  end
+
+  describe "Errors", :live => true do
+    it "throws an error when the customer does not have the retrieving card id" do
+      customer = Stripe::Customer.create
+      card_id = "card_123"
+      expect { customer.cards.retrieve(card_id) }.to raise_error {|e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.message).to include "Customer", customer.id, "does not have", card_id
+        expect(e.param).to eq 'card'
+        expect(e.http_status).to eq 404
+      }
+    end
   end
 
   context "update card" do

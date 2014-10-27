@@ -19,5 +19,9 @@ module StripeMock
       end
     end
 
+    def self.fingerprint(source)
+      Digest::SHA1.base64digest(source).gsub(/[^a-z]/i, '')[0..15]
+    end
+
   end
 end

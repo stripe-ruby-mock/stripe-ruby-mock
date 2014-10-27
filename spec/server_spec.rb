@@ -1,7 +1,9 @@
 require 'spec_helper'
 require_stripe_examples
 
-describe 'StripeMock Server' do
+describe 'StripeMock Server', :mock_server => true do
+
+  let(:stripe_helper) { StripeMock.create_test_helper }
 
   it_behaves_like_stripe do
     def test_data_source(type); StripeMock.client.get_server_data(type); end
@@ -22,7 +24,7 @@ describe 'StripeMock Server' do
     charge = Stripe::Charge.create(
       amount: 987,
       currency: 'USD',
-      card: 'card_token_abcde',
+      card: stripe_helper.generate_card_token,
       description: 'card charge'
     )
     expect(charge.amount).to eq(987)
@@ -49,7 +51,7 @@ describe 'StripeMock Server' do
 
 
   it "returns a response with symbolized hash keys" do
-    Stripe::Plan.create(id: 'x')
+    stripe_helper.create_plan(id: 'x')
     response, api_key = StripeMock.redirect_to_mock_server('get', '/v1/plans/x', 'xxx')
     response.keys.each {|k| expect(k).to be_a(Symbol) }
   end
@@ -83,6 +85,13 @@ describe 'StripeMock Server' do
 
     # Set back to original for #kill_server to work properly
     StripeMock.default_server_pid_path = orig
+  end
+
+  it "can set the default server log path" do
+    expect(StripeMock.default_server_log_path).to eq('./stripe-mock-server.log')
+
+    StripeMock.default_server_log_path = 'yule.log'
+    expect(StripeMock.default_server_log_path).to eq('yule.log')
   end
 
 

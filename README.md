@@ -17,6 +17,18 @@ In your gemfile:
 * No stripe server access required
 * Easily test against stripe errors
 * Mock and customize stripe webhooks
+* Flip a switch to run your tests against Stripe's **live test servers**
+
+### Specifications
+
+**STRIPE API TARGET VERSION:** 2014-06-17
+
+* Strict params: Plan, Token#create
+
+## TODO BEFORE MERGE
+
+* Strictify params: Customer#create
+* Require existing card tokens
 
 ## Description
 
@@ -33,6 +45,7 @@ You can use stripe-ruby-mock with any ruby testing library. Here's a quick dummy
 require 'stripe_mock'
 
 describe MyApp do
+  let(:stripe_helper) { StripeMock.create_test_helper }
   before { StripeMock.start }
   after { StripeMock.stop }
 
@@ -41,12 +54,64 @@ describe MyApp do
     # This doesn't touch stripe's servers nor the internet!
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
-      card: 'void_card_token'
+      card: stripe_helper.generate_card_token
     })
     expect(customer.email).to eq('johnny@appleseed.com')
   end
 end
 ```
+
+## Test Helpers
+
+Some Stripe API calls require several parameters. StripeMock helps you keep your test brief with some helpers:
+
+```ruby
+describe MyApp do
+  let(:stripe_helper) { StripeMock.create_test_helper }
+
+  it "creates a stripe plan" do
+    plan = stripe_helper.create_plan(:id => 'my_plan', :amount => 1500)
+
+    # The above line replaces the following:
+    # plan = Stripe::Plan.create(
+    #   :id => 'my_plan',
+    #   :name => 'StripeMock Default Plan ID',
+    #   :amount => 1500,
+    #   :currency => 'usd',
+    #   :interval => 'month'
+    # )
+    expect(plan.id).to eq('my_plan')
+    expect(plan.amount).to eq(1500)
+  end
+end
+```
+
+The [available helpers](lib/stripe_mock/test_strategies/) are:
+
+```ruby
+stripe_helper.create_plan(my_plan_params)
+stripe_helper.delete_plan(my_plan_params)
+stripe_helper.generate_card_token(my_card_params)
+```
+
+For everything else, use Stripe as you normally would (i.e. use Stripe as if you were not using StripeMock).
+
+## Live Testing
+
+Every once in a while you want to make sure your tests are actually valid. StripeMock has a switch that allows you to run your test suite (or a subset thereof) against Stripe's live test servers.
+
+Here is an example of setting up your RSpec test suite to run live with a command line switch:
+
+```ruby
+RSpec.configure do |c|
+  if c.filter_manager.inclusions.keys.include?(:live)
+    puts "Running **live** tests against Stripe..."
+    StripeMock.toggle_live(true)
+  end
+end
+```
+
+With this you can run live tests by running `rspec -t live`
 
 ## Mocking Card Errors
 
@@ -291,6 +356,7 @@ StripeMock.global_id_prefix = 'my_app_'
 * Cover all stripe urls/methods
 * Throw useful errors that emulate Stripe's requirements
   * For example: "You must supply either a card or a customer id" for `Stripe::Charge`
+* Fingerprinting for other resources besides Cards
 
 ## Developing stripe-ruby-mock
 
@@ -298,6 +364,7 @@ To run the tests:
 
     $ bundle install
     $ bundle exec rspec
+    $ bundle exec rspec -t live # Runs certain tests against Stripe's servers
 
 Patches are welcome and greatly appreciated! If you're contributing to fix a problem,
 be sure to write tests that illustrate the problem being fixed.

@@ -106,7 +106,7 @@ shared_examples 'Card Token Mocking' do
       expect(card_token.object).to eq("token")
     end
 
-    it "throws an error if neither card nor customer are provided" do
+    it "throws an error if neither card nor customer are provided", :live => true do
       expect { Stripe::Token.create }.to raise_error(
         Stripe::InvalidRequestError, /must supply either a card, customer/
       )

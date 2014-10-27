@@ -5,6 +5,7 @@ module StripeMock
   @original_request_method = Stripe.method(:request)
 
   def self.start
+    return false if @state == 'live'
     @instance = Instance.new
     alias_stripe_method :request, @instance.method(:mock_request)
     @state = 'local'

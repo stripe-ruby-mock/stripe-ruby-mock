@@ -49,7 +49,7 @@ shared_examples 'Stripe Error Mocking' do
     error = Stripe::AuthenticationError.new('Bad Auth', 499, 'abody', 'json abody')
     StripeMock.prepare_error(error)
 
-    expect { Stripe::Plan.create() }.to raise_error {|e|
+    expect { stripe_helper.create_plan() }.to raise_error {|e|
       expect(e).to be_a(Stripe::AuthenticationError)
       expect(e.message).to eq('Bad Auth')
 

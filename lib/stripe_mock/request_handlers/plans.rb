@@ -11,27 +11,24 @@ module StripeMock
       end
 
       def new_plan(route, method_url, params, headers)
-        params[:id] = ( params[:id] || new_id('plan') ).to_s
+        validate_create_plan_params(params)
         plans[ params[:id] ] = Data.mock_plan(params)
       end
 
       def update_plan(route, method_url, params, headers)
         route =~ method_url
         assert_existance :plan, $1, plans[$1]
-        plans[$1] ||= Data.mock_plan(:id => $1)
         plans[$1].merge!(params)
       end
 
       def get_plan(route, method_url, params, headers)
         route =~ method_url
         assert_existance :plan, $1, plans[$1]
-        plans[$1] ||= Data.mock_plan(:id => $1)
       end
 
       def delete_plan(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :plan, $1, plans[$1]
-        plans.delete($1)
+        assert_existance :plan, $1, plans.delete($1)
       end
 
       def list_plans(route, method_url, params, headers)

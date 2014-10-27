@@ -2,6 +2,7 @@ module StripeMock
   class Instance
 
     include StripeMock::RequestHandlers::Helpers
+    include StripeMock::RequestHandlers::ParamValidators
 
     # Handlers are ordered by priority
     @@handlers = []
@@ -31,9 +32,9 @@ module StripeMock
 
 
     attr_reader :bank_tokens, :charges, :coupons, :customers, :events,
-                :invoices, :plans, :recipients, :subscriptions
+                :invoices, :invoice_items, :plans, :recipients, :subscriptions
 
-    attr_accessor :error_queue, :debug, :strict
+    attr_accessor :error_queue, :debug
 
     def initialize
       @bank_tokens = {}
@@ -43,6 +44,7 @@ module StripeMock
       @coupons = {}
       @events = {}
       @invoices = {}
+      @invoice_items = {}
       @plans = {}
       @recipients = {}
       @subscriptions = {}
@@ -51,7 +53,9 @@ module StripeMock
       @error_queue = ErrorQueue.new
       @id_counter = 0
       @balance_transaction_counter = 0
-      @strict = true
+
+      # This is basically a cache for ParamValidators
+      @base_strategy = TestStrategies::Base.new
     end
 
     def mock_request(method, url, api_key, params={}, headers={})
@@ -64,6 +68,7 @@ module StripeMock
 
       if handler = Instance.handler_for_method_url(method_url)
         if @debug == true
+          puts "- - - - " * 8
           puts "[StripeMock req]::#{handler[:name]} #{method} #{url}"
           puts "                  #{params}"
         end
@@ -91,12 +96,11 @@ module StripeMock
     private
 
     def assert_existance(type, id, obj, message=nil)
-      return unless @strict == true
-
       if obj.nil?
         msg = message || "No such #{type}: #{id}"
         raise Stripe::InvalidRequestError.new(msg, type.to_s, 404)
       end
+      obj
     end
 
     def new_id(prefix)

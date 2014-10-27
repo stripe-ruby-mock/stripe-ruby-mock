@@ -10,6 +10,7 @@
       "object": "card",
       "last4": "4242",
       "type": "Visa",
+      "brand": "Visa",
       "exp_month": 3,
       "exp_year": 2020,
       "fingerprint": "wXWJT135mEK107G8",

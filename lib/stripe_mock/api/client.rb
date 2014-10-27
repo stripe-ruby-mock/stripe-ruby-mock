@@ -3,6 +3,7 @@ module StripeMock
   def self.client; @client; end
 
   def self.start_client(port=4999)
+    return false if @state == 'live'
     return @client unless @client.nil?
 
     alias_stripe_method :request, StripeMock.method(:redirect_to_mock_server)

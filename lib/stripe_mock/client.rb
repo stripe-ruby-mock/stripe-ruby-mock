@@ -40,14 +40,6 @@ module StripeMock
       timeout_wrap { @pipe.debug? }
     end
 
-    def set_server_strict(toggle)
-      timeout_wrap { @pipe.set_strict(toggle) }
-    end
-
-    def server_strict?
-      timeout_wrap { @pipe.strict? }
-    end
-
     def set_server_global_id_prefix(value)
       timeout_wrap { @pipe.set_global_id_prefix(value) }
     end
@@ -66,6 +58,10 @@ module StripeMock
 
     def generate_webhook_event(event_data)
       timeout_wrap { Stripe::Util.symbolize_names @pipe.generate_webhook_event(event_data) }
+    end
+
+    def destroy_resource(type, id)
+      timeout_wrap { @pipe.destroy_resource(type, id) }
     end
 
     def clear_server_data
