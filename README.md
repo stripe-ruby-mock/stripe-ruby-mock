@@ -23,11 +23,6 @@ In your gemfile:
 
 * Strict params: Plan, Token#create
 
-## TODO BEFORE MERGE
-
-* Strictify params: Customer#create
-* Require existing card tokens
-
 ## Description
 
 ** *WARNING: This library does not cover all Stripe API endpoints. If you need one that's missing, please create an issue for it.* **
