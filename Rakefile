@@ -14,7 +14,7 @@ rescue LoadError => e
 end
 
 begin
-  gem 'rspec', '~> 2.4'
+  gem 'rspec', '~> 3.1'
   require 'rspec/core/rake_task'
 
   RSpec::Core::RakeTask.new

@@ -97,8 +97,8 @@ shared_examples 'Plan API' do
 
     all = Stripe::Plan.all
     expect(all.length).to eq(2)
-    all.map(&:id).should include('Plan One', 'Plan Two')
-    all.map(&:amount).should include(54321, 98765)
+    expect(all.map &:id).to include('Plan One', 'Plan Two')
+    expect(all.map &:amount).to include(54321, 98765)
   end
 
 

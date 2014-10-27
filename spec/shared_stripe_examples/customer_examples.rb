@@ -198,7 +198,7 @@ shared_examples 'Customer API' do
 
     all = Stripe::Customer.all
     expect(all.length).to eq(2)
-    all.map(&:email).should include('one@one.com', 'two@two.com')
+    expect(all.map &:email).to include('one@one.com', 'two@two.com')
   end
 
   it "updates a stripe customer" do

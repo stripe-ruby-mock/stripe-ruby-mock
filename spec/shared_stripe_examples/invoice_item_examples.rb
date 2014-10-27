@@ -41,7 +41,7 @@ shared_examples 'Invoice Item API' do
     it "retrieves all invoice items" do
       all = Stripe::InvoiceItem.all
       expect(all.length).to eq(2)
-      all.map(&:amount).should include(1075, 1540)
+      expect(all.map &:amount).to include(1075, 1540)
     end
   end
 
@@ -63,7 +63,7 @@ shared_examples 'Invoice Item API' do
   it "deletes a invoice_item" do
     invoice_item = Stripe::InvoiceItem.create(id: 'test_invoice_item_sub')
     invoice_item = invoice_item.delete
-    expect(invoice_item.deleted).to be_true
+    expect(invoice_item.deleted).to eq true
   end
 
 end

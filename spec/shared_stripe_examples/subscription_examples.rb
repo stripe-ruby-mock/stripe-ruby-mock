@@ -231,7 +231,7 @@ shared_examples 'Customer Subscriptions' do
       sub.metadata.foo     = "bar"
       sub.metadata.example = "yes"
 
-      expect(sub.save).to be_true
+      expect(sub.save).to be_truthy
 
       expect(sub.object).to eq('subscription')
       expect(sub.plan.to_hash).to eq(gold.to_hash)
@@ -440,7 +440,7 @@ shared_examples 'Customer Subscriptions' do
       result = sub.delete
 
       expect(result.status).to eq('canceled')
-      expect(result.cancel_at_period_end).to be_false
+      expect(result.cancel_at_period_end).to eq false
       expect(result.canceled_at).to_not be_nil
       expect(result.id).to eq(sub.id)
 

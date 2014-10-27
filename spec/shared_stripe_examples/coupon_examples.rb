@@ -89,7 +89,7 @@ shared_examples 'Coupon API' do
 
     all = Stripe::Coupon.all
     expect(all.length).to eq(2)
-    all.map(&:id).should include('Coupon One', 'Coupon Two')
-    all.map(&:amount_off).should include(1500, 3000)
+    expect(all.map &:id).to include('Coupon One', 'Coupon Two')
+    expect(all.map &:amount_off).to include(1500, 3000)
   end
 end

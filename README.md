@@ -100,7 +100,7 @@ For everything else, use Stripe as you normally would (i.e. use Stripe as if you
 
 Every once in a while you want to make sure your tests are actually valid. StripeMock has a switch that allows you to run your test suite (or a subset thereof) against Stripe's live test servers.
 
-Here is an example of setting up your RSpec test suite to run live with a command line switch:
+Here is an example of setting up your RSpec (2.x) test suite to run live with a command line switch:
 
 ```ruby
 RSpec.configure do |c|

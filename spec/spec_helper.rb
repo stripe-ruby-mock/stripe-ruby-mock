@@ -1,6 +1,6 @@
 require 'set'
 
-gem 'rspec', '~> 2.4'
+gem 'rspec', '~> 3.1'
 require 'rspec'
 require 'stripe'
 require 'stripe_mock'
@@ -11,7 +11,7 @@ require 'stripe_mock/server'
 Dir["./spec/support/**/*.rb"].each {|f| require f}
 
 RSpec.configure do |c|
-  tags = c.filter_manager.inclusions.keys
+  tags = c.filter_manager.inclusions.rules
 
   if tags.include?(:live) || tags.include?(:oauth)
     puts "Running **live** tests against Stripe..."
