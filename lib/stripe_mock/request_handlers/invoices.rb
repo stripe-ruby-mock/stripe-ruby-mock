@@ -5,7 +5,7 @@ module StripeMock
       def Invoices.included(klass)
         klass.add_handler 'post /v1/invoices',               :new_invoice
         klass.add_handler 'get /v1/invoices/upcoming',       :upcoming_invoice
-        klass.add_handler 'get /v1/invoices/(.*)/lines',     :get_invoice_lines
+        klass.add_handler 'get /v1/invoices/(.*)/lines',     :get_invoice_line_items
         klass.add_handler 'get /v1/invoices/(.*)',           :get_invoice
         klass.add_handler 'get /v1/invoices',                :list_invoices
         klass.add_handler 'post /v1/invoices/(.*)/pay',      :pay_invoice
@@ -42,7 +42,7 @@ module StripeMock
         assert_existance :invoice, $1, invoices[$1]
       end
 
-      def get_invoice_lines(route, method_url, params, headers)
+      def get_invoice_line_items(route, method_url, params, headers)
         route =~ method_url
         assert_existance :invoice, $1, invoices[$1]
         invoices[$1][:lines]

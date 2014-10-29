@@ -156,7 +156,7 @@ shared_examples 'Invoice API' do
     end
 
     context 'retrieving invoice line items' do
-      it 'returns all line items for upcoming invoice' do
+      it 'returns all line items for created invoice' do
         @invoice = Stripe::Invoice.create(customer: @customer.id)
         @line_items = @invoice.lines.all
 
