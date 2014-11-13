@@ -5,6 +5,7 @@ module StripeMock
       def Invoices.included(klass)
         klass.add_handler 'post /v1/invoices',               :new_invoice
         klass.add_handler 'get /v1/invoices/upcoming',       :upcoming_invoice
+        klass.add_handler 'get /v1/invoices/(.*)/lines',     :get_invoice_line_items
         klass.add_handler 'get /v1/invoices/(.*)',           :get_invoice
         klass.add_handler 'get /v1/invoices',                :list_invoices
         klass.add_handler 'post /v1/invoices/(.*)/pay',      :pay_invoice
@@ -41,6 +42,12 @@ module StripeMock
         assert_existance :invoice, $1, invoices[$1]
       end
 
+      def get_invoice_line_items(route, method_url, params, headers)
+        route =~ method_url
+        assert_existance :invoice, $1, invoices[$1]
+        invoices[$1][:lines]
+      end
+
       def pay_invoice(route, method_url, params, headers)
         route =~ method_url
         assert_existance :invoice, $1, invoices[$1]
@@ -59,7 +66,9 @@ module StripeMock
         most_recent = customer[:subscriptions][:data].min_by { |sub| sub[:current_period_end] }
         invoice_item = get_mock_subscription_line_item(most_recent)
 
-        Data.mock_invoice([invoice_item],
+        id = new_id('in')
+        invoices[id] = Data.mock_invoice([invoice_item],
+          id: id,
           subscription: most_recent[:id],
           period_start: most_recent[:current_period_start],
           period_end: most_recent[:current_period_end],
