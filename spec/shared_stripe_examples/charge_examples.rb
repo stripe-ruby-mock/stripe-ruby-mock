@@ -27,6 +27,34 @@ shared_examples 'Charge API' do
   end
 
 
+  it "creates a stripe charge item with a customer and card id" do
+    customer = Stripe::Customer.create({
+      email: 'johnny@appleseed.com',
+      card: stripe_helper.generate_card_token(number: '4012888888881881'),
+      description: "a description"
+    })
+
+    expect(customer.cards.data.length).to eq(1)
+    expect(customer.cards.data[0].id).not_to be_nil
+    expect(customer.cards.data[0].last4).to eq('1881')
+
+    card   = customer.cards.data[0]
+    charge = Stripe::Charge.create(
+      amount: 999,
+      currency: 'USD',
+      customer: customer.id,
+      card: card.id,
+      description: 'a charge with a specific card'
+    )
+
+    expect(charge.id).to match(/^test_ch/)
+    expect(charge.amount).to eq(999)
+    expect(charge.description).to eq('a charge with a specific card')
+    expect(charge.captured).to eq(true)
+    expect(charge.card.last4).to eq('1881')
+  end
+
+
   it "stores a created stripe charge in memory" do
     charge = Stripe::Charge.create({
       amount: 333,

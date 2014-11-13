@@ -15,7 +15,14 @@ module StripeMock
         id = new_id('ch')
 
         if params[:card] && params[:card].is_a?(String)
-          params[:card] = get_card_by_token(params[:card])
+          # if a customer is provided, the card parameter is assumed to be the actual
+          # card id, not a token. in this case we'll find the card in the customer
+          # object and return that.
+          if params[:customer]
+            params[:card] = get_card(customers[params[:customer]], params[:card])
+          else
+            params[:card] = get_card_by_token(params[:card])
+          end
         elsif params[:card] && params[:card][:id]
           raise Stripe::InvalidRequestError.new("Invalid token id: #{params[:card]}", 'card', 400)
         end
