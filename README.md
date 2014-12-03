@@ -4,6 +4,10 @@
 * Issues: https://github.com/rebelidealist/stripe-ruby-mock/issues
 * **CHAT**: https://gitter.im/rebelidealist/stripe-ruby-mock
 
+# REQUEST: Looking for Additional Core Contributor
+
+This gem has unexpectedly grown in popularity, so I'm currently looking for an additional core contributor to help me out. I'm not abandoning the project, I just need someone to help manage pull requests and code quality; I don't have nearly as much free time as I used to. If you're interested, ping me in chat (see above).
+
 ## Install
 
 In your gemfile:
