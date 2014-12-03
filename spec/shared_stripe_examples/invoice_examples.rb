@@ -157,27 +157,27 @@ shared_examples 'Invoice API' do
 
     context 'retrieving invoice line items' do
       it 'returns all line items for created invoice' do
-        @invoice = Stripe::Invoice.create(customer: @customer.id)
-        @line_items = @invoice.lines.all
+        invoice = Stripe::Invoice.create(customer: @customer.id)
+        line_items = invoice.lines.all
 
-        expect(@invoice).to be_a Stripe::Invoice
-        expect(@line_items.count).to eq(1)
-        expect(@line_items.data[0].object).to eq('line_item')
-        expect(@line_items.data[0].description).to eq('Test invoice item')
-        expect(@line_items.data[0].type).to eq('invoiceitem')
+        expect(invoice).to be_a Stripe::Invoice
+        expect(line_items.count).to eq(1)
+        expect(line_items.data[0].object).to eq('line_item')
+        expect(line_items.data[0].description).to eq('Test invoice item')
+        expect(line_items.data[0].type).to eq('invoiceitem')
       end
 
       it 'returns all line items for upcoming invoice' do
-        @plan = stripe_helper.create_plan()
-        @subscription = @customer.subscriptions.create(plan: @plan.id)
-        @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
-        @line_items = @upcoming.lines.all
+        plan = stripe_helper.create_plan()
+        subscription = @customer.subscriptions.create(plan: plan.id)
+        upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
+        line_items = upcoming.lines.all
 
-        expect(@upcoming).to be_a Stripe::Invoice
-        expect(@line_items.count).to eq(1)
-        expect(@line_items.data[0].object).to eq('line_item')
-        expect(@line_items.data[0].description).to eq('Test invoice item')
-        expect(@line_items.data[0].type).to eq('subscription')
+        expect(upcoming).to be_a Stripe::Invoice
+        expect(line_items.count).to eq(1)
+        expect(line_items.data[0].object).to eq('line_item')
+        expect(line_items.data[0].description).to eq('Test invoice item')
+        expect(line_items.data[0].type).to eq('subscription')
       end
     end
 
