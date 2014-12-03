@@ -115,18 +115,18 @@ shared_examples 'Invoice API' do
     end
 
     it 'works when customer has a subscription' do
-      @plan = stripe_helper.create_plan()
-      @subscription = @customer.subscriptions.create(plan: @plan.id)
-      @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
+      plan = stripe_helper.create_plan()
+      subscription = @customer.subscriptions.create(plan: plan.id)
+      upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
 
-      expect(@upcoming).to be_a Stripe::Invoice
-      expect(@upcoming.customer).to eq(@customer.id)
-      expect(@upcoming.total).to eq(@upcoming.lines.data[0].amount)
-      expect(@upcoming.period_end).to eq(@upcoming.lines.data[0].period.start)
-      expect(Time.at(@upcoming.period_start).to_datetime >> 1).to eq(Time.at(@upcoming.period_end).to_datetime) # +1 month
-      expect(Time.at(@upcoming.period_start).to_datetime >> 2).to eq(Time.at(@upcoming.lines.data[0].period.end).to_datetime) # +1 month
-      expect(@upcoming.next_payment_attempt).to eq(@upcoming.period_end + 3600) # +1 hour
-      expect(@upcoming.subscription).to eq(@subscription.id)
+      expect(upcoming).to be_a Stripe::Invoice
+      expect(upcoming.customer).to eq(@customer.id)
+      expect(upcoming.total).to eq(upcoming.lines.data[0].amount)
+      expect(upcoming.period_end).to eq(upcoming.lines.data[0].period.start)
+      expect(Time.at(upcoming.period_start).to_datetime >> 1).to eq(Time.at(upcoming.period_end).to_datetime) # +1 month
+      expect(Time.at(upcoming.period_start).to_datetime >> 2).to eq(Time.at(upcoming.lines.data[0].period.end).to_datetime) # +1 month
+      expect(upcoming.next_payment_attempt).to eq(upcoming.period_end + 3600) # +1 hour
+      expect(upcoming.subscription).to eq(subscription.id)
     end
 
     it 'sets the start and end of billing periods correctly when plan has an interval_count' do
