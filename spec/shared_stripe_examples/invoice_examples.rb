@@ -120,6 +120,7 @@ shared_examples 'Invoice API' do
       @upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
 
       expect(@upcoming).to be_a Stripe::Invoice
+      expect(@upcoming.customer).to eq(@customer.id)
       expect(@upcoming.total).to eq(@upcoming.lines.data[0].amount)
       expect(@upcoming.period_end).to eq(@upcoming.lines.data[0].period.start)
       expect(Time.at(@upcoming.period_start).to_datetime >> 1).to eq(Time.at(@upcoming.period_end).to_datetime) # +1 month

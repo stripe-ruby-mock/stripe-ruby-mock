@@ -69,6 +69,7 @@ module StripeMock
         id = new_id('in')
         invoices[id] = Data.mock_invoice([invoice_item],
           id: id,
+          customer: customer[:id],
           subscription: most_recent[:id],
           period_start: most_recent[:current_period_start],
           period_end: most_recent[:current_period_end],
