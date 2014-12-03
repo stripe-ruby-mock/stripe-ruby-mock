@@ -114,8 +114,8 @@ shared_examples 'Invoice API' do
         expect(e.message).to eq("No upcoming invoices for customer: #{@customer.id}") }
     end
 
-    it 'works when customer has a subscription' do
-      plan = stripe_helper.create_plan()
+    it 'works when customer has a subscription', :live => true do
+      plan = stripe_helper.create_plan(:id => 'has_sub')
       subscription = @customer.subscriptions.create(plan: plan.id)
       upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
 
