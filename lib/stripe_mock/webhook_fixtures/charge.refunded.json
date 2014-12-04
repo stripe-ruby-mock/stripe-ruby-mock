@@ -18,8 +18,8 @@
         "id": "cc_00000000000000",
         "object": "card",
         "last4": "4242",
-        "type": "Visa",
         "brand": "Visa",
+        "funding": "credit",
         "exp_month": 12,
         "exp_year": 2013,
         "fingerprint": "wXWJT135mEK107G8",
@@ -37,21 +37,15 @@
         "address_zip_check": null
       },
       "captured": true,
-      "refunds": {
-        "object": "list",
-        "total_count": 1,
-        "has_more": false,
-        "data": [
-          {
-            "amount": 1000,
-            "currency": "usd",
-            "created": 1381080103,
-            "object": "refund",
-            "balance_transaction": "txn_2hkjgg43ucu7K1",
-            "id": "re_00000000000000"
-          }
-        ]
-      },
+      "refunds": [
+        {
+          "amount": 1000,
+          "currency": "usd",
+          "created": 1381080103,
+          "object": "refund",
+          "balance_transaction": "txn_2hkjgg43ucu7K1"
+        }
+      ],
       "balance_transaction": "txn_00000000000000",
       "failure_message": null,
       "failure_code": null,

@@ -47,8 +47,8 @@ module StripeMock
         card: {
           object: "card",
           last4: "4242",
-          type: "Visa",
           brand: "Visa",
+          funding: "credit",
           exp_month: 12,
           exp_year: 2013,
           fingerprint: "3TQGpK9JoY1GgXPw",
@@ -111,8 +111,8 @@ module StripeMock
         id: "test_cc_default",
         object: "card",
         last4: "4242",
-        type: "Visa",
         brand: "Visa",
+        funding: "credit",
         exp_month: 4,
         exp_year: 2016,
         fingerprint: "wXWJT135mEK107G8",
@@ -181,8 +181,7 @@ module StripeMock
         :trial_start => 1308595038,
         :trial_end => 1308681468,
         :customer => "c_test_customer",
-        :quantity => 1,
-        :metadata => {}
+        :quantity => 1
       }, params)
     end
 
@@ -242,7 +241,7 @@ module StripeMock
 
     def self.mock_invoice_item(params = {})
       {
-        id: "test_ii",
+        id: "ii_test",
         object: "invoiceitem",
         date: 1349738920,
         amount: 1099,
@@ -291,32 +290,21 @@ module StripeMock
       }.merge(params)
     end
 
-    def self.mock_recipient(cards, params={})
-      rp_id = params[:id] || "test_rp_default"
-      cards.each {|card| card[:recipient] = rp_id}
+    def self.mock_recipient(params={})
       {
-        name: "Stripe User",
-        type: "individual",
-        livemode: false,
-        object: "recipient",
-        id: rp_id,
-        active_account: {
-          last4: "6789",
-          bank_name: "STRIPE TEST BANK",
-          country: "US",
-          object: "bank_account"
+        :name => "Stripe User",
+        :type => "individual",
+        :livemode => false,
+        :object => "recipient",
+        :id => "rp_test_recipient",
+        :active_account => {
+          :last4 => "6789",
+          :bank_name => "STRIPE TEST BANK",
+          :country => "US",
+          :object => "bank_account"
         },
-        created: 1304114758,
-        verified: true,
-        metadata: {
-        },
-        cards: {
-          object: "list",
-          count: cards.count,
-          url: "/v1/recipients/#{rp_id}/cards",
-          data: cards
-        },
-        default_card: nil
+        :created => 1304114758,
+        :verified => true
       }.merge(params)
     end
 
@@ -339,8 +327,8 @@ module StripeMock
           :id => 'card_default',
           :object => 'card',
           :last4 => '2222',
-          :type => 'Visa',
           :brand => 'Visa',
+          :funding => 'credit',
           :exp_month => 9,
           :exp_year => 2017,
           :fingerprint => 'JRRLXGh38NiYygM7',
