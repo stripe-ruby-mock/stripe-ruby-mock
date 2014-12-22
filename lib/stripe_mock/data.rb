@@ -107,7 +107,7 @@ module StripeMock
     end
 
     def self.mock_card(params={})
-      {
+      StripeMock::Util.card_merge({
         id: "test_cc_default",
         object: "card",
         last4: "4242",
@@ -128,7 +128,7 @@ module StripeMock
         cvc_check: nil,
         address_line1_check: nil,
         address_zip_check: nil
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_bank_account(params={})
