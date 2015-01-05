@@ -6,6 +6,7 @@ module StripeMock
         klass.add_handler 'post /v1/invoices',               :new_invoice
         klass.add_handler 'get /v1/invoices/upcoming',       :upcoming_invoice
         klass.add_handler 'get /v1/invoices/(.*)/lines',     :get_invoice_line_items
+        klass.add_handler 'post /v1/invoices/(.*)/lines',     :post_invoice_line_items
         klass.add_handler 'get /v1/invoices/(.*)',           :get_invoice
         klass.add_handler 'get /v1/invoices',                :list_invoices
         klass.add_handler 'post /v1/invoices/(.*)/pay',      :pay_invoice
@@ -46,6 +47,16 @@ module StripeMock
         route =~ method_url
         assert_existance :invoice, $1, invoices[$1]
         invoices[$1][:lines]
+      end
+
+      def post_invoice_line_items(route, method_url, params, headers)
+        params[:id] ||= new_id('ii')
+        route =~ method_url
+        assert_existance :invoice, $1, invoices[$1]
+        invoice_item = Data.mock_line_item(params)
+        invoices[$1][:lines][:data] << invoice_item
+        invoices[$1][:lines][:count] = invoices[$1][:lines][:data].size
+        invoice_item
       end
 
       def pay_invoice(route, method_url, params, headers)
