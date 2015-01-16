@@ -1,9 +1,10 @@
 require 'spec_helper'
 
 shared_examples 'Card API' do
+
   it 'creates/returns a card when using customer.cards.create given a card token' do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
-    card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+    card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
     card = customer.cards.create(card: card_token)
 
     expect(card.customer).to eq('test_customer_sub')
@@ -59,7 +60,7 @@ shared_examples 'Card API' do
 
   it 'create does not change the customers default card if already set' do
     customer = Stripe::Customer.create(id: 'test_customer_sub', default_card: "test_cc_original")
-    card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+    card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
     card = customer.cards.create(card: card_token)
 
     customer = Stripe::Customer.retrieve('test_customer_sub')
@@ -68,7 +69,7 @@ shared_examples 'Card API' do
 
   it 'create updates the customers default card if not set' do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
-    card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+    card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
     card = customer.cards.create(card: card_token)
 
     customer = Stripe::Customer.retrieve('test_customer_sub')
@@ -77,7 +78,7 @@ shared_examples 'Card API' do
 
   context "retrieval and deletion" do
     let!(:customer) { Stripe::Customer.create(id: 'test_customer_sub') }
-    let!(:card_token) { StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
+    let!(:card_token) { stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
     let!(:card) { customer.cards.create(card: card_token) }
 
     it "retrieves a customers card" do
@@ -109,7 +110,7 @@ shared_examples 'Card API' do
     end
 
     context "deletion when the user has two cards" do
-      let!(:card_token_2) { StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
+      let!(:card_token_2) { stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
       let!(:card_2) { customer.cards.create(card: card_token_2) }
 
       it "has just one card anymore" do
@@ -142,7 +143,7 @@ shared_examples 'Card API' do
 
   context "update card" do
     let!(:customer) { Stripe::Customer.create(id: 'test_customer_sub') }
-    let!(:card_token) { StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
+    let!(:card_token) { stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
     let!(:card) { customer.cards.create(card: card_token) }
 
     it "updates the card" do
@@ -165,9 +166,9 @@ shared_examples 'Card API' do
     it "retrieves a list of multiple cards" do
       customer = Stripe::Customer.create(id: 'test_customer_card')
 
-      card_token = StripeMock.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+      card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
       card1 = customer.cards.create(card: card_token)
-      card_token = StripeMock.generate_card_token(last4: "1124", exp_month: 12, exp_year: 2098)
+      card_token = stripe_helper.generate_card_token(last4: "1124", exp_month: 12, exp_year: 2098)
       card2 = customer.cards.create(card: card_token)
 
       customer = Stripe::Customer.retrieve('test_customer_card')
