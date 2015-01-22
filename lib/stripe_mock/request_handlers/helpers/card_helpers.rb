@@ -18,7 +18,7 @@ module StripeMock
           object[:cards][:data].delete_if {|card| card[:id] == object[:default_card]}
           object[:default_card] = card[:id]
         else
-          object[:cards][:count] += 1
+          object[:cards][:total_count] += 1
         end
 
         object[:default_card] = card[:id] unless object[:default_card]

@@ -16,7 +16,7 @@ module StripeMock
         account_balance: 0,
         cards: {
           object: "list",
-          count: cards.count,
+          total_count: cards.size,
           url: "/v1/customers/#{cus_id}/cards",
           data: cards
         },
