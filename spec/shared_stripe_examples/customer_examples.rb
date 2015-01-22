@@ -154,7 +154,7 @@ shared_examples 'Customer API' do
   end
 
   it 'creates a customer with a coupon discount' do
-    coupon = Stripe::Coupon.create(id: "10PERCENT", duration: 'once')
+    coupon = Stripe::Coupon.create(id: "10PERCENT")
 
     customer =
       Stripe::Customer.create(id: 'test_cus_coupon', coupon: '10PERCENT')
