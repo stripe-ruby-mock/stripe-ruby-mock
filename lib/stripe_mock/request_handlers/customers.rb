@@ -23,7 +23,7 @@ module StripeMock
 
         if params[:plan]
           plan_id = params[:plan].to_s
-          plan = assert_existance :plan, plan_id, plans[plan_id]
+          plan = assert_existence :plan, plan_id, plans[plan_id]
 
           if params[:default_card].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0
             raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
@@ -41,7 +41,7 @@ module StripeMock
 
       def update_customer(route, method_url, params, headers)
         route =~ method_url
-        cus = assert_existance :customer, $1, customers[$1]
+        cus = assert_existence :customer, $1, customers[$1]
         cus.merge!(params)
 
         if params[:card]
@@ -55,7 +55,7 @@ module StripeMock
 
       def delete_customer(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :customer, $1, customers[$1]
+        assert_existence :customer, $1, customers[$1]
 
         customers[$1] = {
           id: customers[$1][:id],
@@ -65,7 +65,7 @@ module StripeMock
 
       def get_customer(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :customer, $1, customers[$1]
+        assert_existence :customer, $1, customers[$1]
       end
 
       def list_customers(route, method_url, params, headers)
