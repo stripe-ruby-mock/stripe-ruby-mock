@@ -47,6 +47,17 @@ describe StripeMock::Data::List do
     )
   end
 
+  it "delegates other methods to hash keys" do
+    list = StripeMock::Data::List.new([double, double, double])
+
+    expect(list).to respond_to(:data)
+    expect(list.data).to be_kind_of(Array)
+    expect(list.object).to eq("list")
+    expect(list.has_more).to eq(false)
+    expect(list.url).to eq("/v1/doubles")
+    expect { list.foobar }.to raise_error(NoMethodError)
+  end
+
   context "with a limit" do
     it "accepts a limit which is reflected in the data returned" do
       list = StripeMock::Data::List.new([double] * 25)

@@ -32,7 +32,7 @@ module StripeMock
       end
 
       def list_plans(route, method_url, params, headers)
-        plans.values
+        Data.mock_list_object(plans.values)
       end
 
     end

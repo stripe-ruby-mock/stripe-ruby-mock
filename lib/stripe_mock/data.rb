@@ -440,5 +440,10 @@ module StripeMock
         :id => "di_test_coupon"
       }
     end
+
+    def self.mock_list_object(data, params = {})
+      list = StripeMock::Data::List.new(data, params)
+      list.to_h
+    end
   end
 end

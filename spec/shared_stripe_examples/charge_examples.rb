@@ -120,21 +120,21 @@ shared_examples 'Charge API' do
     end
 
     it "stores charges for a customer in memory" do
-      expect(@customer.charges.map(&:id)).to eq([@charge.id])
+      expect(@customer.charges.data.map(&:id)).to eq([@charge.id])
     end
 
     it "stores all charges in memory" do
-      expect(Stripe::Charge.all.map(&:id)).to eq([@charge.id, @charge2.id])
+      expect(Stripe::Charge.all.data.map(&:id)).to eq([@charge.id, @charge2.id])
     end
 
     it "defaults count to 10 charges" do
       11.times { Stripe::Charge.create }
-      expect(Stripe::Charge.all.count).to eq(10)
+      expect(Stripe::Charge.all.data.count).to eq(10)
     end
 
-    context "when passing count" do
+    context "when passing limit" do
       it "gets that many charges" do
-        expect(Stripe::Charge.all(count: 1).count).to eq(1)
+        expect(Stripe::Charge.all(limit: 1).count).to eq(1)
       end
     end
   end

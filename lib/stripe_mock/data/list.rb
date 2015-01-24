@@ -22,6 +22,20 @@ module StripeMock
         (offset + limit) < data.size
       end
 
+      def method_missing(method_name, *args, &block)
+        hash = to_hash
+
+        if hash.keys.include?(method_name)
+          hash[method_name]
+        else
+          super
+        end
+      end
+
+      def respond_to?(method_name, priv = false)
+        to_hash.keys.include?(method_name) || super
+      end
+
       private
 
       # TODO: REFACTOR

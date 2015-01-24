@@ -96,7 +96,7 @@ shared_examples 'Plan API' do
     stripe_helper.create_plan(id: 'Plan Two', amount: 98765)
 
     all = Stripe::Plan.all
-    expect(all.length).to eq(2)
+    expect(all.count).to eq(2)
     expect(all.map &:id).to include('Plan One', 'Plan Two')
     expect(all.map &:amount).to include(54321, 98765)
   end
