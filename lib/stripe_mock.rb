@@ -6,6 +6,7 @@ require 'stripe'
 
 require 'stripe_mock/version'
 require 'stripe_mock/data'
+require 'stripe_mock/list'
 require 'stripe_mock/util'
 require 'stripe_mock/error_queue'
 
