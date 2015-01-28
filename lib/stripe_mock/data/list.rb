@@ -5,7 +5,7 @@ module StripeMock
 
       def initialize(data, options = {})
         @data = Array(data.clone)
-        @limit = [[options[:limit] || 10, 100].min, 1].max
+        @limit = [[options[:limit] || 10, 100].min, 1].max # restrict @limit to 1..100
         @starting_after = options[:starting_after]
       end
 
@@ -38,7 +38,6 @@ module StripeMock
 
       private
 
-      # TODO: REFACTOR
       def offset
         if starting_after
           if index = data.index { |datum| datum.id == starting_after }

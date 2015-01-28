@@ -132,6 +132,12 @@ shared_examples 'Charge API' do
       expect(Stripe::Charge.all.data.count).to eq(10)
     end
 
+    it "is marked as having more when more objects exist" do
+      11.times { Stripe::Charge.create }
+
+      expect(Stripe::Charge.all.has_more).to eq(true)
+    end
+
     context "when passing limit" do
       it "gets that many charges" do
         expect(Stripe::Charge.all(limit: 1).count).to eq(1)

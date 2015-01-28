@@ -60,6 +60,12 @@ shared_examples 'Invoice API' do
       expect(Stripe::Invoice.all.count).to eq(10)
     end
 
+    it "is marked as having more when more objects exist" do
+      11.times { Stripe::Invoice.create }
+
+      expect(Stripe::Invoice.all.has_more).to eq(true)
+    end
+
     context "when passing count" do
       it "gets that many invoices" do
         expect(Stripe::Invoice.all(limit: 1).count).to eq(1)
