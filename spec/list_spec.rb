@@ -105,7 +105,7 @@ describe StripeMock::Data::List do
       255.times { data << Stripe::Charge.create }
       new_charge = Stripe::Charge.create
       data[89] = new_charge
-      list = StripeMock::Data::List.new(data, starting_after: "test_ch_261")
+      list = StripeMock::Data::List.new(data, starting_after: new_charge.id)
       hash = list.to_h
 
       expect(hash[:data].size).to eq(10)
