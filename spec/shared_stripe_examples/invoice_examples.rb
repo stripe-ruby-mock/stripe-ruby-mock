@@ -66,7 +66,7 @@ shared_examples 'Invoice API' do
       expect(Stripe::Invoice.all.has_more).to eq(true)
     end
 
-    context "when passing count" do
+    context "when passing limit" do
       it "gets that many invoices" do
         expect(Stripe::Invoice.all(limit: 1).count).to eq(1)
       end
