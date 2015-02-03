@@ -14,14 +14,20 @@ shared_examples 'Webhook Events API' do
 
   it "first looks in spec/fixtures/stripe_webhooks/ for fixtures by default" do
     event = StripeMock.mock_webhook_event('account.updated')
+    payload = StripeMock.mock_webhook_payload('account.updated')
     expect(event).to be_a(Stripe::Event)
     expect(event.id).to match /^test_evt_[0-9]+/
     expect(event.type).to eq('account.updated')
+
+    expect(payload).to be_a(Hash)
+    expect(payload[:id]).to match /^test_evt_[0-9]+/
+    expect(payload[:type]).to eq('account.updated')
   end
 
   it "allows non-standard event names in the project fixture folder" do
     expect {
       event = StripeMock.mock_webhook_event('custom.account.updated')
+      StripeMock.mock_webhook_payload('custom.account.updated')
     }.to_not raise_error
   end
 
@@ -32,7 +38,9 @@ shared_examples 'Webhook Events API' do
     expect(StripeMock.webhook_fixture_path).to eq('./spec/_dummy/webhooks/')
 
     event = StripeMock.mock_webhook_event('dummy.event')
+    payload = StripeMock.mock_webhook_payload('dummy.event')
     expect(event.val).to eq('success')
+    expect(payload[:val]).to eq('success')
 
     StripeMock.webhook_fixture_path = original_path
   end
@@ -75,7 +83,11 @@ shared_examples 'Webhook Events API' do
     event = StripeMock.mock_webhook_event('customer.created', {
       :account_balance => 12345
     })
+    payload = StripeMock.mock_webhook_event('customer.created', {
+      :account_balance => 12345
+    })
     expect(event.data.object.account_balance).to eq(12345)
+    expect(payload[:data][:object][:account_balance]).to eq(12345)
   end
 
   it "takes a hash and deep merges arrays in the data object" do
@@ -104,6 +116,10 @@ shared_examples 'Webhook Events API' do
   it "raises an error for non-existant event types" do
     expect {
       event = StripeMock.mock_webhook_event('cow.bell')
+    }.to raise_error StripeMock::UnsupportedRequestError
+
+    expect {
+      StripeMock.mock_webhook_payload('cow.bell')
     }.to raise_error StripeMock::UnsupportedRequestError
   end
 
