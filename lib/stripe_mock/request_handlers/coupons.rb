@@ -25,7 +25,7 @@ module StripeMock
       end
 
       def list_coupons(route, method_url, params, headers)
-        coupons.values
+        Data.mock_list_object(coupons.values, params)
       end
 
     end

@@ -22,10 +22,9 @@ module StripeMock
       def retrieve_cards(route, method_url, params, headers)
         route =~ method_url
         customer = assert_existence :customer, $1, customers[$1]
-
         cards = customer[:cards]
-        cards[:count] = cards[:data].length
-        cards
+
+        Data.mock_list_object(cards[:data])
       end
 
       def retrieve_card(route, method_url, params, headers)

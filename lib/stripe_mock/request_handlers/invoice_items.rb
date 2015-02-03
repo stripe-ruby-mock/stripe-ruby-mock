@@ -32,7 +32,7 @@ module StripeMock
       end
 
       def list_invoice_items(route, method_url, params, headers)
-        invoice_items.values
+        Data.mock_list_object(invoice_items.values, params)
       end
 
       def get_invoice_item(route, method_url, params, headers)

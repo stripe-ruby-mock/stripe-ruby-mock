@@ -26,7 +26,7 @@ module StripeMock
 
       def list_invoices(route, method_url, params, headers)
         params[:offset] ||= 0
-        params[:count] ||= 10
+        params[:limit] ||= 10
 
         result = invoices.clone
 
@@ -34,7 +34,7 @@ module StripeMock
           result.delete_if { |k,v| v[:customer] != params[:customer] }
         end
 
-        result.values[params[:offset], params[:count]]
+        Data.mock_list_object(result.values, params)
       end
 
       def get_invoice(route, method_url, params, headers)

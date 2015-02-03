@@ -69,7 +69,7 @@ module StripeMock
       end
 
       def list_customers(route, method_url, params, headers)
-        customers.values
+        Data.mock_list_object(customers.values, params)
       end
 
     end

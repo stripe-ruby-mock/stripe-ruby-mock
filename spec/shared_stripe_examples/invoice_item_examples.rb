@@ -40,7 +40,7 @@ shared_examples 'Invoice Item API' do
 
     it "retrieves all invoice items" do
       all = Stripe::InvoiceItem.all
-      expect(all.length).to eq(2)
+      expect(all.count).to eq(2)
       expect(all.map &:amount).to include(1075, 1540)
     end
   end
