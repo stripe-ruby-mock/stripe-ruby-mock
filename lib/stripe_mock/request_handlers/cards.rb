@@ -9,6 +9,7 @@ module StripeMock
         klass.add_handler 'delete /v1/customers/(.*)/cards/(.*)', :delete_card
         klass.add_handler 'post /v1/customers/(.*)/cards/(.*)', :update_card
         klass.add_handler 'get /v1/recipients/(.*)/cards/(.*)', :retrieve_recipient_card
+        klass.add_handler 'post /v1/recipients/(.*)/cards', :create_recipient_card
       end
 
       def create_card(route, method_url, params, headers)
@@ -17,6 +18,14 @@ module StripeMock
 
         card = card_from_params(params[:card])
         add_card_to_object(:customer, card, customer)
+      end
+
+      def create_recipient_card(route, method_url, params, headers)
+        route =~ method_url
+        recipient = assert_existence :recipient, $1, recipients[$1]
+
+        card = card_from_params(params[:card])
+        add_card_to_object(:recipient, card, recipient)
       end
 
       def retrieve_cards(route, method_url, params, headers)

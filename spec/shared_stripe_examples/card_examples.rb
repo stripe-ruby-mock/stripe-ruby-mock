@@ -21,6 +21,25 @@ shared_examples 'Card API' do
     expect(card.exp_year).to eq(2099)
   end
 
+  it 'creates/returns a card when using recipient.cards.create given a card token' do
+    recipient = Stripe::Recipient.create(id: 'test_recipient_sub')
+    card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+    card = recipient.cards.create(card: card_token)
+
+    expect(card.recipient).to eq('test_recipient_sub')
+    expect(card.last4).to eq("1123")
+    expect(card.exp_month).to eq(11)
+    expect(card.exp_year).to eq(2099)
+
+    recipient = Stripe::Recipient.retrieve('test_recipient_sub')
+    expect(recipient.cards.count).to eq(1)
+    card = recipient.cards.data.first
+    expect(card.recipient).to eq('test_recipient_sub')
+    expect(card.last4).to eq("1123")
+    expect(card.exp_month).to eq(11)
+    expect(card.exp_year).to eq(2099)
+  end
+
   it 'creates/returns a card when using customer.cards.create given card params' do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     card = customer.cards.create(card: {
@@ -44,6 +63,28 @@ shared_examples 'Card API' do
     expect(card.exp_year).to eq(3031)
   end
 
+  it 'creates/returns a card when using recipient.cards.create given card params' do
+    recipient = Stripe::Recipient.create(id: 'test_recipient_sub')
+    card = recipient.cards.create(card: {
+      number: '4000056655665556',
+      exp_month: '11',
+      exp_year: '3031',
+      cvc: '123'
+    })
+
+    expect(card.recipient).to eq('test_recipient_sub')
+    expect(card.last4).to eq("5556")
+    expect(card.exp_month).to eq(11)
+    expect(card.exp_year).to eq(3031)
+
+    recipient = Stripe::Recipient.retrieve('test_recipient_sub')
+    expect(recipient.cards.count).to eq(1)
+    card = recipient.cards.data.first
+    expect(card.recipient).to eq('test_recipient_sub')
+    expect(card.last4).to eq("5556")
+    expect(card.exp_month).to eq(11)
+    expect(card.exp_year).to eq(3031)
+  end
 
   it "creates a single card with a generated card token", :live => true do
     customer = Stripe::Customer.create
