@@ -9,7 +9,7 @@ shared_examples 'Charge API' do
         currency: 'usd',
         card: 'bogus_card_token'
       )
-    }.to raise_error(Stripe::InvalidRequestError, /Invalid token id/)
+    }.to raise_error(Stripe::InvalidRequestError, /token/i)
   end
 
   it "creates a stripe charge item with a card token" do

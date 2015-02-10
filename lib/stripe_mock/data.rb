@@ -315,9 +315,9 @@ module StripeMock
         },
         cards: {
           object: "list",
-          count: cards.count,
           url: "/v1/recipients/#{rp_id}/cards",
-          data: cards
+          data: cards,
+          total_count: cards.count
         },
         default_card: nil
       }.merge(params)
