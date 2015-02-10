@@ -150,6 +150,42 @@ shared_examples 'Card API' do
       expect(retrieved_cus.default_card).to be_nil
     end
 
+    context "for recipient cards" do
+      let!(:recipient) { Stripe::Recipient.create(id: 'test_recipient_sub') }
+      let!(:card_token) { stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
+      let!(:card) { recipient.cards.create(card: card_token) }
+
+      it "deletes a recipient card" do
+        card.delete
+        retrieved_cus = Stripe::Recipient.retrieve(recipient.id)
+        expect(retrieved_cus.cards.data).to be_empty
+      end
+
+      it "deletes a recipient card then set the default_card to nil" do
+        card.delete
+        retrieved_cus = Stripe::Recipient.retrieve(recipient.id)
+        expect(retrieved_cus.default_card).to be_nil
+      end
+
+      context "deletion when the recipient has two cards" do
+        let!(:card_token_2) { stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
+        let!(:card_2) { recipient.cards.create(card: card_token_2) }
+
+        it "has just one card anymore" do
+          card.delete
+          retrieved_rec = Stripe::Recipient.retrieve(recipient.id)
+          expect(retrieved_rec.cards.data.count).to eq 1
+          expect(retrieved_rec.cards.data.first.id).to eq card_2.id
+        end
+
+        it "sets the default_card id to the last card remaining id" do
+          card.delete
+          retrieved_rec = Stripe::Recipient.retrieve(recipient.id)
+          expect(retrieved_rec.default_card).to eq card_2.id
+        end
+      end
+    end
+
     context "deletion when the user has two cards" do
       let!(:card_token_2) { stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
       let!(:card_2) { customer.cards.create(card: card_token_2) }

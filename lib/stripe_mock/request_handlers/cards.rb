@@ -10,6 +10,7 @@ module StripeMock
         klass.add_handler 'post /v1/customers/(.*)/cards/(.*)', :update_card
         klass.add_handler 'get /v1/recipients/(.*)/cards/(.*)', :retrieve_recipient_card
         klass.add_handler 'post /v1/recipients/(.*)/cards', :create_recipient_card
+        klass.add_handler 'delete /v1/recipients/(.*)/cards/(.*)', :delete_recipient_card
       end
 
       def create_card(route, method_url, params, headers)
@@ -61,6 +62,20 @@ module StripeMock
           cc[:id] == card[:id]
         }
         customer[:default_card] = customer[:cards][:data].count > 0 ? customer[:cards][:data].first[:id] : nil
+        card
+      end
+
+      def delete_recipient_card(route, method_url, params, headers)
+        route =~ method_url
+        recipient = assert_existence :recipient, $1, recipients[$1]
+
+        assert_existence :card, $2, get_card(recipient, $2)
+
+        card = { id: $2, deleted: true }
+        recipient[:cards][:data].reject!{|cc|
+          cc[:id] == card[:id]
+        }
+        recipient[:default_card] = recipient[:cards][:data].count > 0 ? recipient[:cards][:data].first[:id] : nil
         card
       end
 
