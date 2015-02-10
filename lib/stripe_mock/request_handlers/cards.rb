@@ -15,18 +15,12 @@ module StripeMock
 
       def create_card(route, method_url, params, headers)
         route =~ method_url
-        customer = assert_existence :customer, $1, customers[$1]
-
-        card = card_from_params(params[:card])
-        add_card_to_object(:customer, card, customer)
+        add_card_to(:customer, $1, params, customers)
       end
 
       def create_recipient_card(route, method_url, params, headers)
         route =~ method_url
-        recipient = assert_existence :recipient, $1, recipients[$1]
-
-        card = card_from_params(params[:card])
-        add_card_to_object(:recipient, card, recipient)
+        add_card_to(:recipient, $1, params, recipients)
       end
 
       def retrieve_cards(route, method_url, params, headers)
@@ -53,30 +47,12 @@ module StripeMock
 
       def delete_card(route, method_url, params, headers)
         route =~ method_url
-        customer = assert_existence :customer, $1, customers[$1]
-
-        assert_existence :card, $2, get_card(customer, $2)
-
-        card = { id: $2, deleted: true }
-        customer[:cards][:data].reject!{|cc|
-          cc[:id] == card[:id]
-        }
-        customer[:default_card] = customer[:cards][:data].count > 0 ? customer[:cards][:data].first[:id] : nil
-        card
+        delete_card_from(:customer, $1, $2, customers)
       end
 
       def delete_recipient_card(route, method_url, params, headers)
         route =~ method_url
-        recipient = assert_existence :recipient, $1, recipients[$1]
-
-        assert_existence :card, $2, get_card(recipient, $2)
-
-        card = { id: $2, deleted: true }
-        recipient[:cards][:data].reject!{|cc|
-          cc[:id] == card[:id]
-        }
-        recipient[:default_card] = recipient[:cards][:data].count > 0 ? recipient[:cards][:data].first[:id] : nil
-        card
+        delete_card_from(:recipient, $1, $2, recipients)
       end
 
       def update_card(route, method_url, params, headers)
@@ -89,6 +65,26 @@ module StripeMock
       end
 
       private
+
+      def delete_card_from(type, type_id, card_id, objects)
+        resource = assert_existence type, type_id, objects[type_id]
+
+        assert_existence :card, card_id, get_card(resource, card_id)
+
+        card = { id: card_id, deleted: true }
+        resource[:cards][:data].reject!{|cc|
+          cc[:id] == card[:id]
+        }
+        resource[:default_card] = resource[:cards][:data].count > 0 ? resource[:cards][:data].first[:id] : nil
+        card
+      end
+
+      def add_card_to(type, type_id, params, objects)
+        resource = assert_existence type, type_id, objects[type_id]
+
+        card = card_from_params(params[:card])
+        add_card_to_object(type, card, resource)
+      end
 
       def validate_card(card)
         [:exp_month, :exp_year].each do |field|
