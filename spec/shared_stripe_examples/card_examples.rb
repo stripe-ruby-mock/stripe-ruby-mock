@@ -169,9 +169,9 @@ shared_examples 'Card API' do
     end
   end
 
-  describe "retrieval and deletion with recipients" do
-    let!(:recipient) { Stripe::Recipient.create(id: 'test_recipient_sub') }
-    let!(:card_token) { stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
+  describe "retrieval and deletion with recipients", :live => true do
+    let!(:recipient) { Stripe::Recipient.create(name: 'Test Recipient', type: 'individual') }
+    let!(:card_token) { stripe_helper.generate_card_token(number: "4000056655665556") }
     let!(:card) { recipient.cards.create(card: card_token) }
 
     it "deletes a recipient card" do
@@ -187,7 +187,7 @@ shared_examples 'Card API' do
     end
 
     context "deletion when the recipient has two cards" do
-      let!(:card_token_2) { stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
+      let!(:card_token_2) {  stripe_helper.generate_card_token(number: "5200828282828210") }
       let!(:card_2) { recipient.cards.create(card: card_token_2) }
 
       it "has just one card anymore" do
