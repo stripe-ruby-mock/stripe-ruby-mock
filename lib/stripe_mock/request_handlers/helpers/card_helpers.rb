@@ -27,6 +27,13 @@ module StripeMock
         card
       end
 
+      def retrieve_object_cards(type, type_id, objects)
+        resource = assert_existence type, type_id, objects[type_id]
+        cards = resource[:cards]
+
+        Data.mock_list_object(cards[:data])
+      end
+
       def delete_card_from(type, type_id, card_id, objects)
         resource = assert_existence type, type_id, objects[type_id]
 

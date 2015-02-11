@@ -8,6 +8,7 @@ module StripeMock
         klass.add_handler 'get /v1/customers/(.*)/cards/(.*)', :retrieve_card
         klass.add_handler 'delete /v1/customers/(.*)/cards/(.*)', :delete_card
         klass.add_handler 'post /v1/customers/(.*)/cards/(.*)', :update_card
+        klass.add_handler 'get /v1/recipients/(.*)/cards', :retrieve_recipient_cards
         klass.add_handler 'get /v1/recipients/(.*)/cards/(.*)', :retrieve_recipient_card
         klass.add_handler 'post /v1/recipients/(.*)/cards', :create_recipient_card
         klass.add_handler 'delete /v1/recipients/(.*)/cards/(.*)', :delete_recipient_card
@@ -25,10 +26,12 @@ module StripeMock
 
       def retrieve_cards(route, method_url, params, headers)
         route =~ method_url
-        customer = assert_existence :customer, $1, customers[$1]
-        cards = customer[:cards]
+        retrieve_object_cards(:customer, $1, customers)
+      end
 
-        Data.mock_list_object(cards[:data])
+      def retrieve_recipient_cards(route, method_url, params, headers)
+        route =~ method_url
+        retrieve_object_cards(:recipient, $1, recipients)
       end
 
       def retrieve_card(route, method_url, params, headers)

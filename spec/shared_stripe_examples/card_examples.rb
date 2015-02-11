@@ -122,6 +122,11 @@ shared_examples 'Card API' do
     let!(:card_token) { stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
     let!(:card) { customer.cards.create(card: card_token) }
 
+    it "can retrieve all customer's cards" do
+      retrieved = customer.cards.all
+      expect(retrieved.count).to eq(1)
+    end
+
     it "retrieves a customers card" do
       retrieved = customer.cards.retrieve(card.id)
       expect(retrieved.to_s).to eq(card.to_s)
@@ -173,6 +178,11 @@ shared_examples 'Card API' do
     let!(:recipient) { Stripe::Recipient.create(name: 'Test Recipient', type: 'individual') }
     let!(:card_token) { stripe_helper.generate_card_token(number: "4000056655665556") }
     let!(:card) { recipient.cards.create(card: card_token) }
+
+    it "can retrieve all recipient's cards" do
+      retrieved = recipient.cards.all
+      expect(retrieved.count).to eq(1)
+    end
 
     it "deletes a recipient card" do
       card.delete
