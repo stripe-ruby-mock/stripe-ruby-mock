@@ -1,6 +1,6 @@
 module StripeMock
 
-  def self.mock_webhook_event(type, params={})
+  def self.mock_webhook_payload(type, params = {})
 
     fixture_file = File.join(@webhook_fixture_path, "#{type}.json")
 
@@ -25,8 +25,11 @@ module StripeMock
     else
       raise UnstartedStateError
     end
+    event_data
+  end
 
-    Stripe::Event.construct_from(event_data)
+  def self.mock_webhook_event(type, params={})
+    Stripe::Event.construct_from(mock_webhook_payload(type, params))
   end
 
   module Webhooks
