@@ -26,7 +26,7 @@ module StripeMock
       end
 
       def add_subscription_to_customer(cus, sub)
-        cus[:subscriptions][:count] = (cus[:subscriptions][:count] || 0) + 1
+        cus[:subscriptions][:total_count] = (cus[:subscriptions][:total_count] || 0) + 1
         cus[:subscriptions][:data].unshift sub
       end
 
@@ -34,7 +34,7 @@ module StripeMock
         cus[:subscriptions][:data].reject!{|sub|
           sub[:id] == subscription[:id]
         }
-        cus[:subscriptions][:count] -=1
+        cus[:subscriptions][:total_count] -=1
       end
 
       # `intervals` is set to 1 when calculating current_period_end from current_period_start & plan
