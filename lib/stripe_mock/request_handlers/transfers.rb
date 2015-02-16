@@ -19,13 +19,13 @@ module StripeMock
 
       def get_transfer(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :transfer, $1, transfers[$1]
+        assert_existence :transfer, $1, transfers[$1]
         transfers[$1] ||= Data.mock_transfer(:id => $1)
       end
 
       def cancel_transfer(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :transfer, $1, transfers[$1]
+        assert_existence :transfer, $1, transfers[$1]
         t = transfers[$1] ||= Data.mock_transfer(:id => $1)
         t.merge!({:status => "canceled"})
       end
