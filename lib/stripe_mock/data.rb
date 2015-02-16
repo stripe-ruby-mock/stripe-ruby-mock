@@ -22,7 +22,7 @@ module StripeMock
         },
         subscriptions: {
           object: "list",
-          count: 0,
+          total_count: 0,
           url: "/v1/customers/#{cus_id}/subscriptions",
           data: []
         },
