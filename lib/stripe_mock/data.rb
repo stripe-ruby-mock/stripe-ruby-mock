@@ -209,6 +209,7 @@ module StripeMock
         object: 'invoice',
         attempted: false,
         closed: false,
+        forgiven: false,
         paid: false,
         livemode: false,
         attempt_count: 0,
