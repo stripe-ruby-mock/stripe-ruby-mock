@@ -34,7 +34,7 @@ shared_examples 'Customer Subscriptions' do
 
     end
 
-    it "correctly sets quantity and application_fee_percent" do
+    it "correctly sets quantity, application_fee_percent and tax_percent" do
       Stripe::Plan.create(
         :amount => 2500,
         :interval => 'month',
@@ -46,9 +46,10 @@ shared_examples 'Customer Subscriptions' do
       customer = Stripe::Customer.create(id: 'test_customer_sub', card: gen_card_tk)
 
       subscription = customer.subscriptions.create({
-        :plan => "silver", quantity: 2, application_fee_percent: 10})
+        :plan => "silver", quantity: 2, application_fee_percent: 10, tax_percent: 20})
       expect(subscription.quantity).to eq(2)
       expect(subscription.application_fee_percent).to eq(10)
+      expect(subscription.tax_percent).to eq(20)
     end
 
     it "adds additional subscription to customer with existing subscription" do
