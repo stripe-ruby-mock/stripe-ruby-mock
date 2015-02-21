@@ -54,7 +54,6 @@ module StripeMock
       @debug = false
       @error_queue = ErrorQueue.new
       @id_counter = 0
-      @strict = true
       @balance_transaction_counter = 0
 
       # This is basically a cache for ParamValidators
