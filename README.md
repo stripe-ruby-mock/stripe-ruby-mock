@@ -25,7 +25,7 @@ In your gemfile:
 
 ## Description
 
-** *WARNING: This library does not cover all Stripe API endpoints. If you need one that's missing, please create an issue for it.* **
+** *WARNING: This library does not cover all Stripe API endpoints. If you need one that's missing, please create an issue for it, or [see this wiki page](https://github.com/rebelidealist/stripe-ruby-mock/wiki/Implementing-a-New-Behavior) if you're interested in contributing* **
 
 At its core, this library overrides [stripe-ruby's](https://github.com/stripe/stripe-ruby)
 request method to skip all http calls and
