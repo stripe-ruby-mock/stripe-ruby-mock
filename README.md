@@ -353,11 +353,7 @@ StripeMock.global_id_prefix = 'my_app_'
 
 ## Developing stripe-ruby-mock
 
-To run the tests:
-
-    $ bundle install
-    $ bundle exec rspec
-    $ bundle exec rspec -t live # Runs certain tests against Stripe's servers
+[Please see this wiki page](https://github.com/rebelidealist/stripe-ruby-mock/wiki/Implementing-a-New-Behavior)
 
 Patches are welcome and greatly appreciated! If you're contributing to fix a problem,
 be sure to write tests that illustrate the problem being fixed.
