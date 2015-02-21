@@ -379,7 +379,8 @@ module StripeMock
         :livemode => false,
         :currency => "usd",
         :object => "transfer",
-        :date => 1304114826
+        :date => 1304114826,
+        :description => "Transfer description",
       }.merge(params)
     end
 
