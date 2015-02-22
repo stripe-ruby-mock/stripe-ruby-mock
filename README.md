@@ -19,9 +19,11 @@ In your gemfile:
 
 ### Specifications
 
-**STRIPE API TARGET VERSION:** 2014-06-17
+**STRIPE API TARGET VERSION:** 2015-02-18 (master)
 
-* Strict params: Plan, Token#create
+Older API version branches:
+
+- [api-2014-06-17](https://github.com/rebelidealist/stripe-ruby-mock/tree/api-2014-06-17)
 
 ## Description
 
