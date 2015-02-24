@@ -14,10 +14,6 @@ module StripeMock
       def new_charge(route, method_url, params, headers)
         id = new_id('ch')
 
-        if params[:amount] && !params[:amount].is_a?(Integer) || params[:amount] < 1
-          raise Stripe::InvalidRequestError.new("Invalid positive integer", 'amount', 400)
-        end
-
         if params[:card] && params[:card].is_a?(String)
           # if a customer is provided, the card parameter is assumed to be the actual
           # card id, not a token. in this case we'll find the card in the customer
@@ -29,6 +25,12 @@ module StripeMock
           end
         elsif params[:card] && params[:card][:id]
           raise Stripe::InvalidRequestError.new("Invalid token id: #{params[:card]}", 'card', 400)
+        end
+
+        if params[:amount] && !params[:amount].is_a?(Integer)
+          raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', 400)
+        elsif params[:amount] && params[:amount] < 1
+          raise Stripe::InvalidRequestError.new("Invalid positive integer", 'amount', 400)
         end
 
         charges[id] = Data.mock_charge(params.merge :id => id, :balance_transaction => new_balance_transaction('txn'))
