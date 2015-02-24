@@ -14,6 +14,10 @@ module StripeMock
       def new_charge(route, method_url, params, headers)
         id = new_id('ch')
 
+        if params[:amount] && !params[:amount].is_a?(Integer) || params[:amount] < 1
+          raise Stripe::InvalidRequestError.new("Invalid positive integer", 'amount', 400)
+        end
+
         if params[:card] && params[:card].is_a?(String)
           # if a customer is provided, the card parameter is assumed to be the actual
           # card id, not a token. in this case we'll find the card in the customer
