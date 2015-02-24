@@ -17,9 +17,9 @@ shared_examples 'Charge API' do
       charge = Stripe::Charge.create(
         amount: -99,
         currency: 'usd',
-        card: 'bogus_card_token'
+        card: stripe_helper.generate_card_token
       )
-    }.to raise_error(Stripe::InvalidRequestError, /integer/i)
+    }.to raise_error(Stripe::InvalidRequestError, /invalid positive integer/i)
   end
 
   it "requires a valid integer amount", :live => true do
@@ -27,9 +27,9 @@ shared_examples 'Charge API' do
       charge = Stripe::Charge.create(
         amount: 99.0,
         currency: 'usd',
-        card: 'bogus_card_token'
+        card: stripe_helper.generate_card_token
       )
-    }.to raise_error(Stripe::InvalidRequestError, /integer/i)
+    }.to raise_error(Stripe::InvalidRequestError, /invalid integer/i)
   end
 
   it "creates a stripe charge item with a card token" do
