@@ -1,9 +1,9 @@
 module StripeMock
   module Data
 
-    def self.mock_customer(cards, params)
+    def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
-      cards.each {|card| card[:customer] = cus_id}
+      sources.each {|source| source[:customer] = cus_id}
       {
         email: 'stripe_mock@example.com',
         description: 'an auto-generated stripe customer data mock',
@@ -14,11 +14,11 @@ module StripeMock
         delinquent: false,
         discount: nil,
         account_balance: 0,
-        cards: {
+        sources: {
           object: "list",
-          total_count: cards.size,
-          url: "/v1/customers/#{cus_id}/cards",
-          data: cards
+          total_count: sources.size,
+          url: "/v1/customers/#{cus_id}/sources",
+          data: sources
         },
         subscriptions: {
           object: "list",
@@ -26,7 +26,7 @@ module StripeMock
           url: "/v1/customers/#{cus_id}/subscriptions",
           data: []
         },
-        default_card: nil
+        default_source: nil
       }.merge(params)
     end
 
@@ -45,7 +45,7 @@ module StripeMock
         status: 'succeeded',
         fee_details: [
         ],
-        card: {
+        source: {
           object: "card",
           last4: "4242",
           type: "Visa",
