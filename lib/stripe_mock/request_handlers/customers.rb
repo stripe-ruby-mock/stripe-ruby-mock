@@ -12,14 +12,14 @@ module StripeMock
 
       def new_customer(route, method_url, params, headers)
         params[:id] ||= new_id('cus')
-        cards = []
+        sources = []
 
-        if params[:card]
-          cards << get_card_by_token(params.delete(:card))
-          params[:default_card] = cards.first[:id]
+        if params[:source]
+          sources << get_card_by_token(params.delete(:source))
+          params[:default_source] = sources.first[:id]
         end
 
-        customers[ params[:id] ] = Data.mock_customer(cards, params)
+        customers[ params[:id] ] = Data.mock_customer(sources, params)
 
         if params[:plan]
           plan_id = params[:plan].to_s
@@ -44,10 +44,10 @@ module StripeMock
         cus = assert_existence :customer, $1, customers[$1]
         cus.merge!(params)
 
-        if params[:card]
-          new_card = get_card_by_token(params.delete(:card))
+        if params[:source]
+          new_card = get_card_by_token(params.delete(:source))
           add_card_to_object(:customer, new_card, cus, true)
-          cus[:default_card] = new_card[:id]
+          cus[:default_source] = new_card[:id]
         end
 
         cus
