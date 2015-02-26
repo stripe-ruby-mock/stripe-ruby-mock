@@ -200,7 +200,7 @@ module StripeMock
         period_start: 1349738950,
         lines: {
           object: "list",
-          count: lines.count,
+          total_count: lines.count,
           url: "/v1/invoices/#{in_id}/lines",
           data: lines
         },
