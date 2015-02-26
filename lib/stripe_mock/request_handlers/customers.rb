@@ -25,7 +25,7 @@ module StripeMock
           plan_id = params[:plan].to_s
           plan = assert_existence :plan, plan_id, plans[plan_id]
 
-          if params[:default_card].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0
+          if params[:default_source].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0
             raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
           end
 
