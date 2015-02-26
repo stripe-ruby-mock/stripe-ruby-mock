@@ -24,6 +24,7 @@ shared_examples 'Charge API' do
     expect(charge.amount).to eq(999)
     expect(charge.description).to eq('card charge')
     expect(charge.captured).to eq(true)
+    expect(charge.status).to eq('succeeded')
   end
 
 

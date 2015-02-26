@@ -42,6 +42,7 @@ module StripeMock
         currency: "usd",
         refunded: false,
         fee: 0,
+        status: 'succeeded',
         fee_details: [
         ],
         card: {
