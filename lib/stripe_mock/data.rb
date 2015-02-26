@@ -364,6 +364,7 @@ module StripeMock
     end
 
     def self.mock_transfer(params={})
+      id = params[:id] || 'tr_test_transfer'
       {
         :status => 'pending',
         :amount => 100,
@@ -376,12 +377,19 @@ module StripeMock
         :recipient => 'test_recipient',
         :fee => 0,
         :fee_details => [],
-        :id => "tr_test_transfer",
+        :id => id,
         :livemode => false,
         :currency => "usd",
         :object => "transfer",
         :date => 1304114826,
         :description => "Transfer description",
+        :reversed => false,
+        :reversals => {
+          :object => "list",
+          :total_count => 0,
+          :has_more => false,
+          :url => "/v1/transfers/#{id}/reversals"
+        },
       }.merge(params)
     end
 
