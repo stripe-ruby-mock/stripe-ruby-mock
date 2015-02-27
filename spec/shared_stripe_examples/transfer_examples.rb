@@ -10,6 +10,7 @@ shared_examples 'Transfer API' do
     expect(transfer.amount).to eq('100')
     expect(transfer.currency).to eq('usd')
     expect(transfer.recipient).to eq recipient.id
+    expect(transfer.reversed).to eq(false)
   end
 
   describe "listing transfers" do
