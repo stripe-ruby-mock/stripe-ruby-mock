@@ -1,9 +1,9 @@
 module StripeMock
   module Data
 
-    def self.mock_customer(cards, params)
+    def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
-      cards.each {|card| card[:customer] = cus_id}
+      sources.each {|source| source[:customer] = cus_id}
       {
         email: 'stripe_mock@example.com',
         description: 'an auto-generated stripe customer data mock',
@@ -14,11 +14,11 @@ module StripeMock
         delinquent: false,
         discount: nil,
         account_balance: 0,
-        cards: {
+        sources: {
           object: "list",
-          total_count: cards.size,
-          url: "/v1/customers/#{cus_id}/cards",
-          data: cards
+          total_count: sources.size,
+          url: "/v1/customers/#{cus_id}/sources",
+          data: sources
         },
         subscriptions: {
           object: "list",
@@ -26,7 +26,7 @@ module StripeMock
           url: "/v1/customers/#{cus_id}/subscriptions",
           data: []
         },
-        default_card: nil
+        default_source: nil
       }.merge(params)
     end
 
@@ -42,9 +42,10 @@ module StripeMock
         currency: "usd",
         refunded: false,
         fee: 0,
+        status: 'succeeded',
         fee_details: [
         ],
-        card: {
+        source: {
           object: "card",
           last4: "4242",
           type: "Visa",
@@ -199,7 +200,7 @@ module StripeMock
         period_start: 1349738950,
         lines: {
           object: "list",
-          count: lines.count,
+          total_count: lines.count,
           url: "/v1/invoices/#{in_id}/lines",
           data: lines
         },
@@ -363,6 +364,7 @@ module StripeMock
     end
 
     def self.mock_transfer(params={})
+      id = params[:id] || 'tr_test_transfer'
       {
         :status => 'pending',
         :amount => 100,
@@ -375,12 +377,19 @@ module StripeMock
         :recipient => 'test_recipient',
         :fee => 0,
         :fee_details => [],
-        :id => "tr_test_transfer",
+        :id => id,
         :livemode => false,
         :currency => "usd",
         :object => "transfer",
         :date => 1304114826,
         :description => "Transfer description",
+        :reversed => false,
+        :reversals => {
+          :object => "list",
+          :total_count => 0,
+          :has_more => false,
+          :url => "/v1/transfers/#{id}/reversals"
+        },
       }.merge(params)
     end
 
