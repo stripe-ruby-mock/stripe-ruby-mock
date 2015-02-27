@@ -17,10 +17,10 @@ module StripeMock
         plan_id = params[:plan]
         plan = assert_existence :plan, plan_id, plans[plan_id]
 
-        if params[:card]
-          new_card = get_card_by_token(params.delete(:card))
+        if params[:source]
+          new_card = get_card_by_token(params.delete(:source))
           add_card_to_object(:customer, new_card, customer)
-          customer[:default_card] = new_card[:id]
+          customer[:default_source] = new_card[:id]
         end
 
         # Ensure customer has card to charge if plan has no trial and is not free
@@ -54,10 +54,10 @@ module StripeMock
         subscription = get_customer_subscription(customer, $2)
         assert_existence :subscription, $2, subscription
 
-        if params[:card]
-          new_card = get_card_by_token(params.delete(:card))
+        if params[:source]
+          new_card = get_card_by_token(params.delete(:source))
           add_card_to_object(:customer, new_card, customer)
-          customer[:default_card] = new_card[:id]
+          customer[:default_source] = new_card[:id]
         end
 
         # expand the plan for addition to the customer object
@@ -111,7 +111,7 @@ module StripeMock
       private
 
       def verify_card_present(customer, plan, params={})
-        if customer[:default_card].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0 && plan[:trial_end].nil? && params[:trial_end].nil?
+        if customer[:default_source].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0 && plan[:trial_end].nil? && params[:trial_end].nil?
           raise Stripe::InvalidRequestError.new('You must supply a valid card xoxo', nil, 400)
         end
       end
