@@ -51,7 +51,7 @@ module StripeMock
           cc[:id] == card[:id]
         }
 
-        is_customer = object.has_key?(:sources)
+        is_customer = resource.has_key?(:sources)
         new_default = cards_or_sources[:data].count > 0 ? cards_or_sources[:data].first[:id] : nil
         resource[:default_card]   = new_default unless is_customer
         resource[:default_source] = new_default if is_customer
