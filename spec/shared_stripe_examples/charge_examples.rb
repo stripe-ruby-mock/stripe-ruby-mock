@@ -7,7 +7,7 @@ shared_examples 'Charge API' do
       charge = Stripe::Charge.create(
         amount: 99,
         currency: 'usd',
-        card: 'bogus_card_token'
+        source: 'bogus_card_token'
       )
     }.to raise_error(Stripe::InvalidRequestError, /token/i)
   end
@@ -16,7 +16,7 @@ shared_examples 'Charge API' do
     charge = Stripe::Charge.create(
       amount: 999,
       currency: 'USD',
-      card: stripe_helper.generate_card_token,
+      source: stripe_helper.generate_card_token,
       description: 'card charge'
     )
 
@@ -31,20 +31,20 @@ shared_examples 'Charge API' do
   it "creates a stripe charge item with a customer and card id" do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
-      card: stripe_helper.generate_card_token(number: '4012888888881881'),
+      source: stripe_helper.generate_card_token(number: '4012888888881881'),
       description: "a description"
     })
 
-    expect(customer.cards.data.length).to eq(1)
-    expect(customer.cards.data[0].id).not_to be_nil
-    expect(customer.cards.data[0].last4).to eq('1881')
+    expect(customer.sources.data.length).to eq(1)
+    expect(customer.sources.data[0].id).not_to be_nil
+    expect(customer.sources.data[0].last4).to eq('1881')
 
-    card   = customer.cards.data[0]
+    card   = customer.sources.data[0]
     charge = Stripe::Charge.create(
       amount: 999,
       currency: 'USD',
       customer: customer.id,
-      card: card.id,
+      source: card.id,
       description: 'a charge with a specific card'
     )
 
@@ -52,7 +52,7 @@ shared_examples 'Charge API' do
     expect(charge.amount).to eq(999)
     expect(charge.description).to eq('a charge with a specific card')
     expect(charge.captured).to eq(true)
-    expect(charge.card.last4).to eq('1881')
+    expect(charge.source.last4).to eq('1881')
   end
 
 
@@ -60,12 +60,12 @@ shared_examples 'Charge API' do
     charge = Stripe::Charge.create({
       amount: 333,
       currency: 'USD',
-      card: stripe_helper.generate_card_token
+      source: stripe_helper.generate_card_token
     })
     charge2 = Stripe::Charge.create({
       amount: 777,
       currency: 'USD',
-      card: stripe_helper.generate_card_token
+      source: stripe_helper.generate_card_token
     })
     data = test_data_source(:charges)
     expect(data[charge.id]).to_not be_nil
@@ -79,7 +79,7 @@ shared_examples 'Charge API' do
     original = Stripe::Charge.create({
       amount: 777,
       currency: 'USD',
-      card: stripe_helper.generate_card_token
+      source: stripe_helper.generate_card_token
     })
     charge = Stripe::Charge.retrieve(original.id)
 
