@@ -28,6 +28,13 @@ shared_examples 'Recipient API' do
     expect { recipient.card }.to raise_error
   end
 
+  it "raises a error if params are invalid" do
+    expect { Stripe::Recipient.create(name: "foo") }.to raise_error
+    expect { Stripe::Recipient.create(type: "individual") }.to raise_error
+    expect { Stripe::Recipient.create(name: "foo", type: "bar") }.to raise_error
+    expect { Stripe::Recipient.create(name: "foo", type: "individual") }.not_to raise_error
+  end
+
   it "creates a stripe recipient without a card" do
     recipient = Stripe::Recipient.create({
       type:  "corporation",
@@ -109,4 +116,3 @@ shared_examples 'Recipient API' do
   end
 
 end
-
