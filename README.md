@@ -25,6 +25,14 @@ Older API version branches:
 
 - [api-2014-06-17](https://github.com/rebelidealist/stripe-ruby-mock/tree/api-2014-06-17)
 
+### Versioning System
+
+Since StripeMock tries to keep up with Stripe's API version, its version system is a little different:
+
+- The **major** number (1.x.x) is for breaking changes involving how you use StripeMock itself
+- The **minor** number (x.1.x) is for breaking changes involving Stripe's API
+- The **patch** number (x.x.0) is for non-breaking changes/fixes involving Stripe's API, or for non-breaking changes/fixes/features for StripeMock itself.
+
 ## Description
 
 ** *WARNING: This library does not cover all Stripe API endpoints. If you need one that's missing, please create an issue for it, or [see this wiki page](https://github.com/rebelidealist/stripe-ruby-mock/wiki/Implementing-a-New-Behavior) if you're interested in contributing* **
