@@ -8,12 +8,6 @@ module StripeMock
         klass.add_handler 'get /v1/customers/(.*)/sources/(.*)', :retrieve_source
         klass.add_handler 'delete /v1/customers/(.*)/sources/(.*)', :delete_source
         klass.add_handler 'post /v1/customers/(.*)/sources/(.*)', :update_source
-
-        # While Stripe removes these endpoints.
-        # https://github.com/stripe/stripe-ruby/issues/215
-        klass.add_handler 'get /v1/customers/(.*)/cards/(.*)', :retrieve_source
-        klass.add_handler 'delete /v1/customers/(.*)/cards/(.*)', :delete_source
-        klass.add_handler 'post /v1/customers/(.*)/cards/(.*)', :update_source
       end
 
       def create_source(route, method_url, params, headers)
