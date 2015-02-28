@@ -3,7 +3,8 @@ module StripeMock
     module Helpers
 
       def get_card(object, card_id, class_name='Customer')
-        card = object[:cards][:data].find{|cc| cc[:id] == card_id }
+        cards = object[:cards] || object[:sources]
+        card = cards[:data].find{|cc| cc[:id] == card_id }
         if card.nil?
           msg = "#{class_name} #{object[:id]} does not have card #{card_id}"
           raise Stripe::InvalidRequestError.new(msg, 'card', 404)
@@ -13,23 +14,28 @@ module StripeMock
 
       def add_card_to_object(type, card, object, replace_current=false)
         card[type] = object[:id]
+        cards_or_sources = object[:cards] || object[:sources]
+
+        is_customer = object.has_key?(:sources)
 
         if replace_current
-          object[:cards][:data].delete_if {|card| card[:id] == object[:default_card]}
-          object[:default_card] = card[:id]
+          cards_or_sources[:data].delete_if {|card| card[:id] == object[:default_card]}
+          object[:default_card]   = card[:id] unless is_customer
+          object[:default_source] = card[:id] if is_customer
         else
-          object[:cards][:total_count] += 1
+          cards_or_sources[:total_count] += 1
         end
 
-        object[:default_card] = card[:id] unless object[:default_card]
-        object[:cards][:data] << card
+        object[:default_card]   = card[:id] if !is_customer && object[:default_card].nil?
+        object[:default_source] = card[:id] if is_customer  && object[:default_source].nil?
+        cards_or_sources[:data] << card
 
         card
       end
 
       def retrieve_object_cards(type, type_id, objects)
         resource = assert_existence type, type_id, objects[type_id]
-        cards = resource[:cards]
+        cards = resource[:cards] || resource[:sources]
 
         Data.mock_list_object(cards[:data])
       end
@@ -40,17 +46,22 @@ module StripeMock
         assert_existence :card, card_id, get_card(resource, card_id)
 
         card = { id: card_id, deleted: true }
-        resource[:cards][:data].reject!{|cc|
+        cards_or_sources = resource[:cards] || resource[:sources]
+        cards_or_sources[:data].reject!{|cc|
           cc[:id] == card[:id]
         }
-        resource[:default_card] = resource[:cards][:data].count > 0 ? resource[:cards][:data].first[:id] : nil
+
+        is_customer = resource.has_key?(:sources)
+        new_default = cards_or_sources[:data].count > 0 ? cards_or_sources[:data].first[:id] : nil
+        resource[:default_card]   = new_default unless is_customer
+        resource[:default_source] = new_default if is_customer
         card
       end
 
       def add_card_to(type, type_id, params, objects)
         resource = assert_existence type, type_id, objects[type_id]
 
-        card = card_from_params(params[:card])
+        card = card_from_params(params[:card] || params[:source])
         add_card_to_object(type, card, resource)
       end
 
@@ -68,7 +79,6 @@ module StripeMock
         card = get_card_by_token(attrs_or_token)
         validate_card(card)
       end
-
     end
   end
 end
