@@ -7,8 +7,8 @@ shared_examples 'Card Token Mocking' do
     it "generates and reads a card token for create charge" do
       card_token = StripeMock.generate_card_token(last4: "2244", exp_month: 33, exp_year: 2255)
 
-      charge = Stripe::Charge.create(amount: 500, source: card_token)
-      card = charge.source
+      charge = Stripe::Charge.create(amount: 500, currency: 'usd', card: card_token)
+      card = charge.card
       expect(card.last4).to eq("2244")
       expect(card.exp_month).to eq(33)
       expect(card.exp_year).to eq(2255)

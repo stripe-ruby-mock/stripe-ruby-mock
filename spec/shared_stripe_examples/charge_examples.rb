@@ -12,6 +12,24 @@ shared_examples 'Charge API' do
     }.to raise_error(Stripe::InvalidRequestError, /token/i)
   end
 
+  it "requires presence of amount", :live => true do
+    expect {
+      charge = Stripe::Charge.create(
+        currency: 'usd',
+        card: stripe_helper.generate_card_token
+      )
+    }.to raise_error(Stripe::InvalidRequestError, /missing required param: amount/i)
+  end
+
+  it "requires presence of currency", :live => true do
+    expect {
+      charge = Stripe::Charge.create(
+        amount: 99,
+        card: stripe_helper.generate_card_token
+      )
+    }.to raise_error(Stripe::InvalidRequestError, /missing required param: currency/i)
+  end
+
   it "requires a valid positive amount", :live => true do
     expect {
       charge = Stripe::Charge.create(
@@ -136,8 +154,8 @@ shared_examples 'Charge API' do
   context "retrieving a list of charges" do
     before do
       @customer = Stripe::Customer.create(email: 'johnny@appleseed.com')
-      @charge = Stripe::Charge.create(amount: 1, customer: @customer.id)
-      @charge2 = Stripe::Charge.create(amount: 1)
+      @charge = Stripe::Charge.create(amount: 1, currency: 'usd', customer: @customer.id)
+      @charge2 = Stripe::Charge.create(amount: 1, currency: 'usd')
     end
 
     it "stores charges for a customer in memory" do
@@ -149,12 +167,12 @@ shared_examples 'Charge API' do
     end
 
     it "defaults count to 10 charges" do
-      11.times { Stripe::Charge.create(amount: 1) }
+      11.times { Stripe::Charge.create(amount: 1, currency: 'usd') }
       expect(Stripe::Charge.all.data.count).to eq(10)
     end
 
     it "is marked as having more when more objects exist" do
-      11.times { Stripe::Charge.create(amount: 1) }
+      11.times { Stripe::Charge.create(amount: 1, currency: 'usd') }
 
       expect(Stripe::Charge.all.has_more).to eq(true)
     end
