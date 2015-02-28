@@ -27,11 +27,7 @@ module StripeMock
           raise Stripe::InvalidRequestError.new("Invalid token id: #{params[:card]}", 'card', 400)
         end
 
-        if params[:amount] && !params[:amount].is_a?(Integer)
-          raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', 400)
-        elsif params[:amount] && params[:amount] < 1
-          raise Stripe::InvalidRequestError.new("Invalid positive integer", 'amount', 400)
-        end
+        ensure_required_params(params)
 
         charges[id] = Data.mock_charge(params.merge :id => id, :balance_transaction => new_balance_transaction('txn'))
       end
@@ -94,6 +90,23 @@ module StripeMock
         refund
       end
 
+      private
+
+      def ensure_required_params(params)
+        if non_integer_charge_amount?(params)
+          raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', 400)
+        elsif non_positive_charge_amount?(params)
+          raise Stripe::InvalidRequestError.new('Invalid positive integer', 'amount', 400)
+        end
+      end
+
+      def non_integer_charge_amount?(params)
+        params[:amount] && !params[:amount].is_a?(Integer)
+      end
+
+      def non_positive_charge_amount?(params)
+        params[:amount] && params[:amount] < 1
+      end
     end
   end
 end
