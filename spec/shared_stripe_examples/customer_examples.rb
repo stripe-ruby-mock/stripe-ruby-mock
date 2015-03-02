@@ -226,7 +226,7 @@ shared_examples 'Customer API' do
     original.save
 
     new_card = original.sources.data.last
-    expect(original.sources.count).to eq(2)
+    expect(original.sources.count).to eq(1)
     expect(original.default_source).to_not eq(card.id)
 
     expect(new_card.id).to_not eq(card.id)
