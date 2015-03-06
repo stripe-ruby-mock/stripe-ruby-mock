@@ -568,8 +568,7 @@ shared_examples 'Customer Subscriptions' do
         :interval => 'month',
         :name => 'Sample Plan',
         :currency => 'usd',
-        :id => 'Sample5',
-        :statement_description => "Plan Statement"
+        :id => 'Sample5'
       )
 
       customer = Stripe::Customer.create({
