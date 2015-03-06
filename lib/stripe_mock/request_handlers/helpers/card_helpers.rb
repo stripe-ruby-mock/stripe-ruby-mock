@@ -6,8 +6,13 @@ module StripeMock
         cards = object[:cards] || object[:sources]
         card = cards[:data].find{|cc| cc[:id] == card_id }
         if card.nil?
-          msg = "#{class_name} #{object[:id]} does not have card #{card_id}"
-          raise Stripe::InvalidRequestError.new(msg, 'card', 404)
+          if class_name == 'Recipient'
+            msg = "#{class_name} #{object[:id]} does not have a card with ID #{card_id}"
+            raise Stripe::InvalidRequestError.new(msg, 'card', 404)
+          else
+            msg = "There is no source with ID #{card_id}"
+            raise Stripe::InvalidRequestError.new(msg, 'id', 404)
+          end
         end
         card
       end
