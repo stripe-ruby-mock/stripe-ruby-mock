@@ -61,7 +61,11 @@ module StripeMock
         end
 
         # expand the plan for addition to the customer object
-        plan_name = params[:plan] || subscription[:plan][:id]
+        if params[:plan].blank? or params[:plan].nil?
+          plan_name = subscription[:plan][:id]
+        else
+          plan_name = params[:plan]
+        end
         plan = plans[plan_name]
 
         assert_existence :plan, plan_name, plan
