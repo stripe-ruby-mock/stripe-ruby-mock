@@ -6,7 +6,7 @@ rvm:
 before_script:
   - "sudo touch /var/log/stripe-mock-server.log"
   - "sudo chown travis /var/log/stripe-mock-server.log"
-script: "bundle exec rspec; bundle exec rspec -t live"
+script: "bundle exec rspec && bundle exec rspec -t live"
 notifications:
   webhooks:
     urls:
