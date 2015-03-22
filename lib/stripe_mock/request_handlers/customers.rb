@@ -36,6 +36,13 @@ module StripeMock
           raise Stripe::InvalidRequestError.new('Received unknown parameter: trial_end', nil, 400)
         end
 
+        if params[:coupon]
+          coupon = coupons[ params[:coupon] ]
+          assert_existance :coupon, params[:coupon], coupon
+
+          add_coupon_to_customer(customers[params[:id]], coupon)
+        end
+
         customers[ params[:id] ]
       end
 
@@ -48,6 +55,13 @@ module StripeMock
           new_card = get_card_by_token(params.delete(:source))
           add_card_to_object(:customer, new_card, cus, true)
           cus[:default_source] = new_card[:id]
+        end
+
+        if params[:coupon]
+          coupon = coupons[ params[:coupon] ]
+          assert_existance :coupon, params[:coupon], coupon
+
+          add_coupon_to_customer(cus, coupon)
         end
 
         cus
