@@ -14,7 +14,7 @@
       "amount": 1000,
       "currency": "usd",
       "refunded": true,
-      "card": {
+      "source": {
         "id": "cc_00000000000000",
         "object": "card",
         "last4": "4242",

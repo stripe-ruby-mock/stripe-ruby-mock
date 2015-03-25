@@ -18,7 +18,7 @@
       "subscription": null,
       "discount": null,
       "account_balance": 0,
-      "cards": {
+      "sources": {
         "object": "list",
         "count": 1,
         "url": "/v1/customers/cus_2I2AhGQOPmEFeu/cards",
