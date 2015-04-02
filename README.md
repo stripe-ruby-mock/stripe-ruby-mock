@@ -55,6 +55,7 @@ describe MyApp do
   it "creates a stripe customer" do
 
     # This doesn't touch stripe's servers nor the internet!
+    # Specify :source in place of :card (with same value) to return customer with source data
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
       card: stripe_helper.generate_card_token
