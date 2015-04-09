@@ -9,6 +9,7 @@ module StripeMock
         klass.add_handler 'post /v1/charges/(.*)/capture',  :capture_charge
         klass.add_handler 'post /v1/charges/(.*)/refund',   :refund_charge
         klass.add_handler 'post /v1/charges/(.*)/refunds',  :create_refund
+        klass.add_handler 'post /v1/charges/(.*)',          :update_charge
       end
 
       def new_charge(route, method_url, params, headers)
@@ -30,6 +31,21 @@ module StripeMock
         ensure_required_params(params)
 
         charges[id] = Data.mock_charge(params.merge :id => id, :balance_transaction => new_balance_transaction('txn'))
+      end
+
+      def update_charge(route, method_url, params, headers)
+        route =~ method_url
+        id = $1
+
+        charge = assert_existence :charge, id, charges[id]
+
+        allowed = [:description, :metadata, :receipt_email, :fraud_details]
+        disallowed = params.keys - allowed
+        if disallowed.count > 0
+          raise Stripe::InvalidRequestError.new("Received unknown parameters: #{disallowed.join(', ')}" , '', 400)
+        end
+
+        charges[id] = charge.merge(params)
       end
 
       def get_charges(route, method_url, params, headers)

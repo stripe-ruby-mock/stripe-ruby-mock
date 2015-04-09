@@ -133,6 +133,46 @@ shared_examples 'Charge API' do
     }
   end
 
+  it "updates a stripe charge" do
+    original = Stripe::Charge.create({
+      amount: 777,
+      currency: 'USD',
+      source: stripe_helper.generate_card_token,
+      description: 'Original description',
+    })
+    charge = Stripe::Charge.retrieve(original.id)
+
+    charge.description = "Updated description"
+    charge.metadata[:receipt_id] = 1234
+    charge.receipt_email = "newemail@email.com"
+    charge.fraud_details = {"user_report" => "safe"}
+    charge.save
+
+    updated = Stripe::Charge.retrieve(original.id)
+
+    expect(updated.description).to eq(charge.description)
+    expect(updated.metadata.to_hash).to eq(charge.metadata.to_hash)
+    expect(updated.receipt_email).to eq(charge.receipt_email)
+    expect(updated.fraud_details.to_hash).to eq(charge.fraud_details.to_hash)
+  end
+
+  it "disallows most parameters on updating a stripe charge" do
+    original = Stripe::Charge.create({
+      amount: 777,
+      currency: 'USD',
+      source: stripe_helper.generate_card_token,
+      description: 'Original description',
+    })
+
+    charge = Stripe::Charge.retrieve(original.id)
+    charge.currency = "CAD"
+    charge.amount = 777
+    charge.source = {any: "source"}
+
+    expect { charge.save }.to raise_error(Stripe::InvalidRequestError, /Received unknown parameters: currency, amount, source/i)
+  end
+
+
   it "creates a unique balance transaction" do
     charge1 = Stripe::Charge.create(
       amount: 999,
