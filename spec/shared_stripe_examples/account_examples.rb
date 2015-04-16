@@ -13,7 +13,7 @@ shared_examples 'Account API' do
     expect(account).to be_a Stripe::Account
     expect(account.id).to match /acct\_/
   end
-  it 'retrieves all', live: true do
+  it 'retrieves all' do
     accounts = Stripe::Account.all
 
     expect(accounts).to be_a Stripe::ListObject
