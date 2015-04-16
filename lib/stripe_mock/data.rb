@@ -1,22 +1,94 @@
 module StripeMock
   module Data
 
-    def self.mock_account
+    def self.mock_account(params = {})
+      id = params[:id] || 'acct_103ED82ePvKYlo2C'
       {
-        id: 'acct_254EeH4YHiYvObBL',
-        email: 'stripe_mock@example.com',
+        id: id,
+        email: "bob@example.com",
         statement_descriptor: nil,
-        display_name: nil,
+        display_name: "Stripe.com",
+        timezone: "US/Pacific",
         details_submitted: false,
-        charge_enabled: false,
-        transfer_enabled: false,
+        charges_enabled: false,
+        transfers_enabled: false,
         currencies_supported: [
-          'usd'
+          "usd"
         ],
-        default_currency: 'usd',
-        country: 'US',
-        object: 'account'
-      }
+        default_currency: "usd",
+        country: "US",
+        object: "account",
+        business_name: "Stripe.com",
+        business_url: nil,
+        support_phone: nil,
+        managed: false,
+        product_description: nil,
+        debit_negative_balances: true,
+        bank_accounts: {
+          object: "list",
+          total_count: 0,
+          has_more: false,
+          url: "/v1/accounts/#{id}/bank_accounts",
+          data: [
+
+          ]
+        },
+        verification: {
+          fields_needed: [],
+          due_by: nil,
+          contacted: false
+        },
+        transfer_schedule: {
+          delay_days: 7,
+          interval: "daily"
+        },
+        tos_acceptance: {
+          ip: nil,
+          date: nil,
+          user_agent: nil
+        },
+        legal_entity: {
+          type: nil,
+          business_name: nil,
+          address: {
+            line1: nil,
+            line2: nil,
+            city: nil,
+            state: nil,
+            postal_code: nil,
+            country: "US"
+          },
+          first_name: nil,
+          last_name: nil,
+          personal_address: {
+            line1: nil,
+            line2: nil,
+            city: nil,
+            state: nil,
+            postal_code: nil,
+            country: nil
+          },
+          dob: {
+            day: nil,
+            month: nil,
+            year: nil
+          },
+          additional_owners: nil,
+          verification: {
+            status: "unverified",
+            document: nil,
+            details: nil
+          }
+        },
+        decline_charge_on: {
+          cvc_failure: false,
+          avs_failure: false
+        },
+        keys: {
+          secret: nil,
+          publishable: nil
+        }
+      }.merge(params)
     end
 
     def self.mock_customer(sources, params)
