@@ -13,12 +13,14 @@ module StripeMock
       def new_account(route, method_url, params, headers)
         params[:id] ||= new_id('acct')
         route =~ method_url
-        accounts[ params[:id] ] ||= Data.mock_account(params)
+        accounts[params[:id]] ||= Data.mock_account(params)
       end
 
       def get_account(route, method_url, params, headers)
         route =~ method_url
-        Data.mock_account
+        init_account
+        id = $1 || accounts.keys[0]
+        assert_existence :account, id, accounts[id]
       end
 
       def update_account(route, method_url, params, headers)
@@ -28,7 +30,17 @@ module StripeMock
       end
 
       def list_accounts(route, method_url, params, headers)
+        init_account
         Data.mock_list_object(accounts.values, params)
+      end
+
+      private
+
+      def init_account
+        if accounts == {}
+          acc = Data.mock_account
+          accounts[acc[:id]] = acc
+        end
       end
     end
   end
