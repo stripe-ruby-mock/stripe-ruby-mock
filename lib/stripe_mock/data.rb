@@ -185,6 +185,7 @@ module StripeMock
         :customer => "c_test_customer",
         :quantity => 1,
         :tax_percent => nil,
+        :discount => nil,
         :metadata => {}
       }, params)
     end

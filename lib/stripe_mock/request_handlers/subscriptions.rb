@@ -28,7 +28,22 @@ module StripeMock
 
         subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')) })
         subscription.merge!(custom_subscription_params(plan, customer, params))
+
+        if params[:coupon]
+          coupon_id = params[:coupon]
+
+          raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400) unless coupons[coupon_id]
+
+          # FIXME assert_existence returns 404 error code but Stripe returns 400
+          # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
+
+          coupon = Data.mock_coupon({ id: coupon_id })
+
+          subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+        end
+
         add_subscription_to_customer(customer, subscription)
+
 
         subscription
       end
@@ -63,6 +78,17 @@ module StripeMock
         # expand the plan for addition to the customer object
         plan_name = params[:plan] || subscription[:plan][:id]
         plan = plans[plan_name]
+
+        if params[:coupon]
+          coupon_id = params[:coupon]
+          raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400) unless coupons[coupon_id]
+
+          # FIXME assert_existence returns 404 error code but Stripe returns 400
+          # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
+
+          coupon = Data.mock_coupon({ id: coupon_id })
+          subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+        end
 
         assert_existence :plan, plan_name, plan
         params[:plan] = plan if params[:plan]
