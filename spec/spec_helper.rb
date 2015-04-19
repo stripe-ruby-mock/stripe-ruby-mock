@@ -32,6 +32,15 @@ RSpec.configure do |c|
       raise "Please set your STRIPE_TEST_SECRET_KEY environment variable."
     end
 
+    if ENV['IS_TRAVIS']
+      puts "Travis ruby version: #{RUBY_VERSION}"
+      api_key = case RUBY_VERSION
+      when '1.9.3' then ENV['STRIPE_TEST_SECRET_KEY_A']
+      when '2.0.0' then ENV['STRIPE_TEST_SECRET_KEY_B']
+      when '2.1.6' then ENV['STRIPE_TEST_SECRET_KEY_C']
+      end
+    end
+
     c.before(:each) do
       StripeMock.stub(:start).and_return(nil)
       StripeMock.stub(:stop).and_return(nil)
