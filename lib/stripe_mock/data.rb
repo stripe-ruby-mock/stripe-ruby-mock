@@ -3,7 +3,7 @@ module StripeMock
 
     def self.mock_account(params = {})
       id = params[:id] || 'acct_103ED82ePvKYlo2C'
-      {
+      StripeMock::Util.rmerge({
         id: id,
         email: "bob@example.com",
         statement_descriptor: nil,
@@ -88,13 +88,13 @@ module StripeMock
           secret: 'SECRETKEY',
           publishable: 'PUBLISHABLEKEY'
         }
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
       sources.each {|source| source[:customer] = cus_id}
-      {
+      StripeMock::Util.rmerge({
         email: 'stripe_mock@example.com',
         description: 'an auto-generated stripe customer data mock',
         object: "customer",
@@ -117,12 +117,12 @@ module StripeMock
           data: []
         },
         default_source: nil
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_charge(params={})
       charge_id = params[:id] || "ch_1fD6uiR9FAA2zc"
-      {
+      StripeMock::Util.rmerge({
         id: charge_id,
         object: "charge",
         created: 1366194027,
@@ -174,11 +174,11 @@ module StripeMock
         dispute: nil,
         metadata: {
         }
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_refund(params={})
-      {
+      StripeMock::Util.rmerge({
         id: "re_4fWhgUh5si7InF",
         amount: 1,
         currency: "usd",
@@ -187,7 +187,7 @@ module StripeMock
         balance_transaction: "txn_4fWh2RKvgxcXqV",
         metadata: {},
         charge: "ch_4fWhYjzQ23UFWT"
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_charge_array
@@ -225,7 +225,7 @@ module StripeMock
     end
 
     def self.mock_bank_account(params={})
-      {
+      StripeMock::Util.rmerge({
         object: "bank_account",
         bank_name: "STRIPEMOCK TEST BANK",
         last4: "6789",
@@ -233,11 +233,11 @@ module StripeMock
         currency: "usd",
         validated: false,
         fingerprint: "aBcFinGerPrINt123"
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_coupon(params={})
-      {
+      StripeMock::Util.rmerge({
         :duration => 'repeating',
         :duration_in_months => 3,
         :percent_off => 25,
@@ -250,7 +250,7 @@ module StripeMock
         :times_redeemed => 0,
         :valid => true,
         :metadata => {},
-      }.merge(params)
+      }, params)
     end
 
     #FIXME nested overrides would be better than hardcoding plan_id
@@ -283,7 +283,7 @@ module StripeMock
     def self.mock_invoice(lines, params={})
       in_id = params[:id] || "test_in_default"
       lines << Data.mock_line_item() if lines.empty?
-      {
+      StripeMock::Util.rmerge({
         id: 'in_test_invoice',
         date: 1349738950,
         period_end: 1349738950,
@@ -312,11 +312,11 @@ module StripeMock
         charge: nil,
         discount: nil,
         subscription: nil
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_line_item(params = {})
-      {
+      StripeMock::Util.rmerge({
         id: "ii_test",
         object: "line_item",
         type: "invoiceitem",
@@ -332,11 +332,11 @@ module StripeMock
         plan: nil,
         description: "Test invoice item",
         metadata: {}
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_invoice_item(params = {})
-      {
+      StripeMock::Util.rmerge({
         id: "test_ii",
         object: "invoiceitem",
         date: 1349738920,
@@ -349,7 +349,7 @@ module StripeMock
         metadata: {},
         invoice: nil,
         subscription: nil
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_paid_invoice
@@ -373,7 +373,7 @@ module StripeMock
     end
 
     def self.mock_plan(params={})
-      {
+      StripeMock::Util.rmerge({
         interval: "month",
         name: "The Basic Plan",
         amount: 2300,
@@ -383,13 +383,13 @@ module StripeMock
         livemode: false,
         interval_count: 1,
         trial_period_days: nil
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_recipient(cards, params={})
       rp_id = params[:id] || "test_rp_default"
       cards.each {|card| card[:recipient] = rp_id}
-      {
+      StripeMock::Util.rmerge({
         name: "Stripe User",
         type: "individual",
         livemode: false,
@@ -412,7 +412,7 @@ module StripeMock
           total_count: cards.count
         },
         default_card: nil
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_recipient_array
@@ -424,7 +424,7 @@ module StripeMock
     end
 
     def self.mock_token(params={})
-      {
+      StripeMock::Util.rmerge({
         :id => 'tok_default',
         :livemode => false,
         :used => false,
@@ -450,12 +450,12 @@ module StripeMock
           :address_zip => nil,
           :address_country => nil
         }
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_transfer(params={})
       id = params[:id] || 'tr_test_transfer'
-      {
+      StripeMock::Util.rmerge({
         :status => 'pending',
         :amount => 100,
         :account => {
@@ -480,7 +480,7 @@ module StripeMock
           :has_more => false,
           :url => "/v1/transfers/#{id}/reversals"
         },
-      }.merge(params)
+      }, params)
     end
 
     def self.mock_transfer_array
