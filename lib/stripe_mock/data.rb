@@ -148,7 +148,6 @@ module StripeMock
 
     def self.mock_coupon(params={})
       {
-        :duration => 'repeating',
         :duration_in_months => 3,
         :percent_off => 25,
         :amount_off => nil,
