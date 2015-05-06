@@ -38,7 +38,7 @@ module StripeMock
 
         if params[:coupon]
           coupon = coupons[ params[:coupon] ]
-          assert_existance :coupon, params[:coupon], coupon
+          assert_existence :coupon, params[:coupon], coupon
 
           add_coupon_to_customer(customers[params[:id]], coupon)
         end
@@ -59,7 +59,7 @@ module StripeMock
 
         if params[:coupon]
           coupon = coupons[ params[:coupon] ]
-          assert_existance :coupon, params[:coupon], coupon
+          assert_existence :coupon, params[:coupon], coupon
 
           add_coupon_to_customer(cus, coupon)
         end
