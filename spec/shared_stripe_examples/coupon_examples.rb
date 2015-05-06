@@ -24,10 +24,13 @@ shared_examples 'Coupon API' do
     }
   end
 
+  before do
+    coupons = Stripe::Coupon.all
+    coupons.data.map { |coup| coup.delete } if coupons.data.count > 0
+  end
+
   context 'create coupon' do
     let(:coupon) { Stripe::Coupon.create(attributes) }
-
-    after { coupon.delete }
 
     it 'creates a stripe coupon', live: true do
       expect(coupon.id).to eq('10BUCKS')
