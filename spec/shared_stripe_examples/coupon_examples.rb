@@ -62,11 +62,12 @@ shared_examples 'Coupon API' do
     let(:coupon2) { Stripe::Coupon.create(attributes.merge(id: '11BUCKS', amount_off: 3000)) }
 
     it 'retrieves a stripe coupon' do
+      coupon1
+
       coupon = Stripe::Coupon.retrieve(coupon1.id)
 
       expect(coupon.id).to eq(coupon1.id)
       expect(coupon.amount_off).to eq(coupon1.amount_off)
-      coupon.delete
     end
     it 'retrieves all coupons' do
       coupon1
