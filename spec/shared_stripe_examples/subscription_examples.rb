@@ -6,6 +6,11 @@ shared_examples 'Customer Subscriptions' do
     stripe_helper.generate_card_token
   end
 
+  def delete_all_coupons
+    coupons = Stripe::Coupon.all
+    coupons.data.map { |coup| coup.delete } if coupons.data.count > 0
+  end
+
   context "creating a new subscription" do
     it "adds a new subscription to customer with none", :live => true do
       plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999)
@@ -35,6 +40,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it 'contains coupon object', live: true do
+      delete_all_coupons
+
       plan = stripe_helper.create_plan(id: 'plan_with_coupon', name: 'One More Test Plan', amount: 777)
       coupon = Stripe::Coupon.create(percent_off: 25, duration: 'repeating', duration_in_months: 3, id: 'one_more_coupon')
       customer = Stripe::Customer.create(source: gen_card_tk)
@@ -276,6 +283,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it 'when adds coupon', live: true do
+      delete_all_coupons
+
       plan = stripe_helper.create_plan(id: 'plan_with_coupon2', name: 'One More Test Plan', amount: 777)
       coupon = Stripe::Coupon.create(percent_off: 25, duration: 'repeating', duration_in_months: 3, id: 'two_more_coupon')
       customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
