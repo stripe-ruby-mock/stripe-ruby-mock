@@ -38,6 +38,24 @@ shared_examples 'Customer API' do
     expect(customer.default_source).to be_nil
   end
 
+  it 'creates a stripe customer with a dictionary of card values', live: true do
+    customer = Stripe::Customer.create(source: {
+                                           object: 'card',
+                                           number: '4242424242424242',
+                                           exp_month: 12,
+                                           exp_year: 2024
+                                       },
+                                       email: 'blah@blah.com')
+
+    expect(customer).to be_a Stripe::Customer
+    expect(customer.id).to match(/cus_/)
+    expect(customer.email).to eq 'blah@blah.com'
+    expect(customer.sources.data.first.object).to eq 'card'
+    expect(customer.sources.data.first.last4).to eq '4242'
+    expect(customer.sources.data.first.exp_month).to eq 12
+    expect(customer.sources.data.first.exp_year).to eq 2024
+  end
+
   it 'creates a customer with a plan' do
     plan = stripe_helper.create_plan(id: 'silver')
     customer = Stripe::Customer.create(id: 'test_cus_plan', source: gen_card_tk, :plan => 'silver')
