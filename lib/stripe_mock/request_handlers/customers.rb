@@ -15,7 +15,16 @@ module StripeMock
         sources = []
 
         if params[:source]
-          sources << get_card_by_token(params.delete(:source))
+          new_card =
+            if params[:source].is_a?(Hash)
+              unless params[:source][:object] && params[:source][:number] && params[:source][:exp_month] && params[:source][:exp_year]
+                raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
+              end
+              card_from_params(params[:source])
+            else
+              get_card_by_token(params.delete(:source))
+            end
+          sources << new_card
           params[:default_source] = sources.first[:id]
         end
 
