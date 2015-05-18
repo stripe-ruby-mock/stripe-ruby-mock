@@ -64,6 +64,8 @@ module StripeMock
     def mock_request(method, url, api_key, params={}, headers={}, api_base_url=nil)
       return {} if method == :xtest
 
+      api_key ||= Stripe.api_key
+
       # Ensure params hash has symbols as keys
       params = Stripe::Util.symbolize_names(params)
 
