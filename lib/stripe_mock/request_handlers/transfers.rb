@@ -34,6 +34,11 @@ module StripeMock
         if params[:bank_account]
           params[:account] = get_bank_by_token(params.delete(:bank_account))
         end
+
+        unless params[:amount].is_a?(Integer) || (params[:amount].is_a?(String) && /^\d+$/.match(params[:amount]))
+          raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', 400)
+        end
+
         transfers[id] = Data.mock_transfer(params.merge :id => id)
       end
 
