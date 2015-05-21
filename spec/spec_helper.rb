@@ -47,5 +47,7 @@ RSpec.configure do |c|
       Stripe.api_key = api_key
     end
     c.after(:each) { sleep 1 }
+  else
+    Stripe.api_key ||= ''
   end
 end
