@@ -20,6 +20,13 @@ module StripeMock
     self.prepare_error  Stripe::CardError.new(*args), *handler_names
   end
 
+  def self.clear_card_errors
+    if @state == 'local'
+      # reset queue
+      instance.error_queue.reset
+    end
+  end
+
   module CardErrors
 
     def self.argument_map

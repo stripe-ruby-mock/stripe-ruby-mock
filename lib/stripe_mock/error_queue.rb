@@ -9,6 +9,10 @@ module StripeMock
       @queue << handler_names.map {|n| [n, error]}
     end
 
+    def reset
+      @queue = []
+    end
+
     def error_for_handler_name(handler_name)
       return nil if @queue.count == 0
       triggers = @queue.first
