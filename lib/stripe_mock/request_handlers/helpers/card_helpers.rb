@@ -23,14 +23,14 @@ module StripeMock
 
         is_customer = object.has_key?(:sources)
 
-        if replace_current
+        if replace_current && cards_or_sources[:data]
           cards_or_sources[:data].delete_if {|card| card[:id] == object[:default_card]}
           object[:default_card]   = card[:id] unless is_customer
           object[:default_source] = card[:id] if is_customer
           cards_or_sources[:data] = [card]
         else
-          cards_or_sources[:total_count] += 1
-          cards_or_sources[:data] << card
+          cards_or_sources[:total_count] = cards_or_sources[:total_count] || 0 + 1
+          (cards_or_sources[:data] ||= []) << card
         end
 
         object[:default_card]   = card[:id] if !is_customer && object[:default_card].nil?
