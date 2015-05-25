@@ -20,6 +20,7 @@ module StripeMock
 
       def update_invoice(route, method_url, params, headers)
         route =~ method_url
+        params.delete(:lines) if params[:lines]
         assert_existence :invoice, $1, invoices[$1]
         invoices[$1].merge!(params)
       end
