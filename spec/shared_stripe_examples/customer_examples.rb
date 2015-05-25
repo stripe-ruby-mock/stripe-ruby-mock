@@ -262,13 +262,13 @@ shared_examples 'Customer API' do
     original = Stripe::Customer.create(id: 'test_customer_update', source: gen_card_tk)
     card = original.sources.data.first
     expect(original.default_source).to eq(card.id)
-    expect(original.sources.count).to eq(1)
+    expect(original.sources.data.count).to eq(1)
 
     original.source = gen_card_tk
     original.save
 
     new_card = original.sources.data.last
-    expect(original.sources.count).to eq(1)
+    expect(original.sources.data.count).to eq(1)
     expect(original.default_source).to_not eq(card.id)
 
     expect(new_card.id).to_not eq(card.id)
