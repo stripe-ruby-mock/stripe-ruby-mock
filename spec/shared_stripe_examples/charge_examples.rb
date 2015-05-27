@@ -224,6 +224,30 @@ shared_examples 'Charge API' do
     end
   end
 
+  it 'when use starting_after param', live: true do
+    cus = Stripe::Customer.create(
+        description: 'Customer for test@example.com',
+        source: {
+            object: 'card',
+            number: '4242424242424242',
+            exp_month: 12,
+            exp_year: 2024
+        }
+    )
+    12.times do
+      Stripe::Charge.create(customer: cus.id, amount: 100, currency: "usd")
+    end
+
+    all = Stripe::Charge.all
+    default_limit = 10
+    half = Stripe::Charge.all(starting_after: all.data.at(1).id)
+
+    expect(half).to be_a(Stripe::ListObject)
+    expect(half.data.count).to eq(default_limit)
+    expect(half.data.first.id).to eq(all.data.at(2).id)
+  end
+
+
   describe 'captured status value' do
     it "reports captured by default" do
       charge = Stripe::Charge.create({
