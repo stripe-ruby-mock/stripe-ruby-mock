@@ -40,11 +40,8 @@ module StripeMock
 
       def offset
         if starting_after
-          if index = data.index { |datum| datum.id == starting_after }
-            index + 1
-          else
-            raise "No such object id: #{starting_after}"
-          end
+          index = data.index { |datum| datum[:id] == starting_after }
+          (index || raise("No such object id: #{starting_after}")) + 1
         else
           0
         end
