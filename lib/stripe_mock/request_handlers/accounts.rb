@@ -4,6 +4,7 @@ module StripeMock
 
       def Accounts.included(klass)
         klass.add_handler 'post /v1/accounts',  :new_account
+        klass.add_handler 'get /v1/account',      :get_account
         klass.add_handler 'get /v1/accounts/(.*)',  :get_account
         klass.add_handler 'post /v1/accounts/(.*)',  :update_account
       end
@@ -16,7 +17,11 @@ module StripeMock
 
       def get_account(route, method_url, params, headers)
         route =~ method_url
-        assert_existence :account, $1, accounts[$1]
+        if $1
+          accounts[$1] || raise(Stripe::AuthenticationError.new('no', 401))
+        else
+          Data.mock_account
+        end
       end
 
       def update_account(route, method_url, params, headers)
