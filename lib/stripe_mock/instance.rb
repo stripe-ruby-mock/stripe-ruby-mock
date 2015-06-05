@@ -86,7 +86,7 @@ module StripeMock
         end
       else
         puts "[StripeMock] Warning : Unrecognized endpoint + method : [#{method} #{url}]"
-        puts "[StripeMock] params: #{params}"
+        puts "[StripeMock] params: #{params}" unless params.empty?
         [{}, api_key]
       end
     end
