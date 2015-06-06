@@ -110,6 +110,19 @@ end
 
 With this you can run live tests by running `rspec -t live`
 
+To set up your RSpec (3.x) test suite to run live with a command line switch, place this code in your spec/rails_helper.rb file.  Notice the change from `keys` to `rules`:
+
+```ruby
+RSpec.configure do |c|
+  if c.filter_manager.inclusions.rules.include?(:live)
+    StripeMock.toggle_live(true)
+    Rails.logger.info(“*** Now running LIVE TESTS against Stripe ***")
+  end
+end
+```
+
+Run your live tests with the same command, `rspec -t live`
+
 ## Mocking Card Errors
 
 Tired of manually inputting fake credit card numbers to test against errors? Tire no more!
