@@ -111,15 +111,28 @@ Every once in a while you want to make sure your tests are actually valid. Strip
 Here is an example of setting up your RSpec (2.x) test suite to run live with a command line switch:
 
 ```ruby
+# RSpec 2.x
 RSpec.configure do |c|
   if c.filter_manager.inclusions.keys.include?(:live)
-    puts "Running **live** tests against Stripe..."
     StripeMock.toggle_live(true)
+    puts "Running **live** tests against Stripe..."
   end
 end
 ```
 
 With this you can run live tests by running `rspec -t live`
+
+Here is an example of setting up your RSpec (3.x) test suite to run live with the same command line switch:
+
+```ruby
+# RSpec 3.x
+RSpec.configure do |c|
+  if config.filter_manager.inclusions.rules.include?(:live)
+    StripeMock.toggle_live(true)
+    puts "Running **live** tests against Stripe..."
+  end
+end
+```
 
 ## Mocking Card Errors
 
