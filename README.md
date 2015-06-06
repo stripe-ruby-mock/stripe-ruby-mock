@@ -114,9 +114,11 @@ To set up your RSpec (3.x) test suite to run live with a command line switch, pl
 
 ```ruby
 RSpec.configure do |c|
-  if c.filter_manager.inclusions.rules.include?(:live)
+  # To run tests against Stripe, using StripeMock's live switch, run this
+  # command in Terminal $ rspec -t live
+  if config.filter_manager.inclusions.rules.include?(:live)
     StripeMock.toggle_live(true)
-    Rails.logger.info(“*** Now running LIVE TESTS against Stripe ***")
+    Rails.logger.info("Running **live** tests against Stripe...")
   end
 end
 ```
