@@ -111,6 +111,7 @@ end
 
 With this you can run live tests by running `rspec -t live`
 
+Here is an example of setting up your RSpec (3.x) test suite to run live with the same command line switch:
 
 ```ruby
 # RSpec 3.x
@@ -121,8 +122,6 @@ RSpec.configure do |c|
   end
 end
 ```
-
-Run your live tests with the same command, `rspec -t live`
 
 ## Mocking Card Errors
 
