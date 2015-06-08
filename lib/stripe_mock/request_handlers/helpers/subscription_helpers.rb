@@ -11,7 +11,7 @@ module StripeMock
 
         start_time = options[:current_period_start] || Time.now.utc.to_i
         params = { plan: plan, customer: cus[:id], current_period_start: start_time }
-        params.merge! options.select {|k,v| k =~ /application_fee_percent|quantity|metadata/}
+        params.merge! options.select {|k,v| k =~ /application_fee_percent|quantity|metadata|tax_percent/}
         # TODO: Implement coupon logic
 
         if (plan[:trial_period_days].nil? && options[:trial_end].nil?) || options[:trial_end] == "now"
@@ -26,7 +26,7 @@ module StripeMock
       end
 
       def add_subscription_to_customer(cus, sub)
-        cus[:subscriptions][:count] = (cus[:subscriptions][:count] || 0) + 1
+        cus[:subscriptions][:total_count] = (cus[:subscriptions][:total_count] || 0) + 1
         cus[:subscriptions][:data].unshift sub
       end
 
@@ -34,7 +34,7 @@ module StripeMock
         cus[:subscriptions][:data].reject!{|sub|
           sub[:id] == subscription[:id]
         }
-        cus[:subscriptions][:count] -=1
+        cus[:subscriptions][:total_count] -=1
       end
 
       # `intervals` is set to 1 when calculating current_period_end from current_period_start & plan

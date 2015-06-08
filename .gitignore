@@ -4,3 +4,4 @@ pkg/
 stripe-mock-server.pid
 Gemfile.lock
 stripe-mock-server.log
+.idea

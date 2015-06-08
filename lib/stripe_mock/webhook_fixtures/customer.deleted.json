@@ -21,7 +21,8 @@
         "name": "1231",
         "object": "card",
         "type": "Visa",
-        "brand": "Visa"
+        "brand": "Visa",
+        "funding": "credit"
       },
       "created": 1359947599,
       "delinquent": false,

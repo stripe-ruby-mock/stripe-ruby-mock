@@ -17,22 +17,22 @@ module StripeMock
 
       def update_plan(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :plan, $1, plans[$1]
+        assert_existence :plan, $1, plans[$1]
         plans[$1].merge!(params)
       end
 
       def get_plan(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :plan, $1, plans[$1]
+        assert_existence :plan, $1, plans[$1]
       end
 
       def delete_plan(route, method_url, params, headers)
         route =~ method_url
-        assert_existance :plan, $1, plans.delete($1)
+        assert_existence :plan, $1, plans.delete($1)
       end
 
       def list_plans(route, method_url, params, headers)
-        plans.values
+        Data.mock_list_object(plans.values)
       end
 
     end

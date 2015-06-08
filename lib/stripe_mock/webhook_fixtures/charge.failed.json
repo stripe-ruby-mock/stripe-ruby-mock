@@ -20,6 +20,7 @@
         "last4": "4242",
         "type": "Visa",
         "brand": "Visa",
+        "funding": "credit",
         "exp_month": 12,
         "exp_year": 2013,
         "fingerprint": "wXWJT135mEK107G8",

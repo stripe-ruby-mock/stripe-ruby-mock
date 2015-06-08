@@ -2,11 +2,16 @@ language: ruby
 rvm:
   - 1.9.3
   - 2.0.0
-  - 2.1.0
+  - 2.1.6
 before_script:
   - "sudo touch /var/log/stripe-mock-server.log"
   - "sudo chown travis /var/log/stripe-mock-server.log"
-script: "bundle exec rspec"
+script: "bundle exec rspec && bundle exec rspec -t live"
+
+env:
+  global:
+    - IS_TRAVIS=true STRIPE_TEST_SECRET_KEY_A=sk_test_sXdhUWu3NhrB7r1tkK0zZfMW STRIPE_TEST_SECRET_KEY_B=sk_test_v2K2hV9VJ8AoRKTeDRkQ3rG3 STRIPE_TEST_SECRET_KEY_C=sk_test_QNgKQJhW4fWYT63be2AUSVjJ
+
 notifications:
   webhooks:
     urls:

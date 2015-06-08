@@ -20,6 +20,7 @@ module StripeMock
 
     include StripeMock::RequestHandlers::Charges
     include StripeMock::RequestHandlers::Cards
+    include StripeMock::RequestHandlers::Sources
     include StripeMock::RequestHandlers::Subscriptions # must be before Customers
     include StripeMock::RequestHandlers::Customers
     include StripeMock::RequestHandlers::Coupons
@@ -28,11 +29,12 @@ module StripeMock
     include StripeMock::RequestHandlers::InvoiceItems
     include StripeMock::RequestHandlers::Plans
     include StripeMock::RequestHandlers::Recipients
+    include StripeMock::RequestHandlers::Transfers
     include StripeMock::RequestHandlers::Tokens
 
 
     attr_reader :bank_tokens, :charges, :coupons, :customers, :events,
-                :invoices, :invoice_items, :plans, :recipients, :subscriptions
+                :invoices, :invoice_items, :plans, :recipients, :transfers, :subscriptions
 
     attr_accessor :error_queue, :debug
 
@@ -47,6 +49,7 @@ module StripeMock
       @invoice_items = {}
       @plans = {}
       @recipients = {}
+      @transfers = {}
       @subscriptions = {}
 
       @debug = false
@@ -58,7 +61,7 @@ module StripeMock
       @base_strategy = TestStrategies::Base.new
     end
 
-    def mock_request(method, url, api_key, params={}, headers={})
+    def mock_request(method, url, api_key, params={}, headers={}, api_base_url=nil)
       return {} if method == :xtest
 
       # Ensure params hash has symbols as keys
@@ -82,8 +85,8 @@ module StripeMock
           [res, api_key]
         end
       else
-        puts "WARNING: Unrecognized method + url: [#{method} #{url}]"
-        puts " params: #{params}"
+        puts "[StripeMock] Warning : Unrecognized endpoint + method : [#{method} #{url}]"
+        puts "[StripeMock] params: #{params}" unless params.empty?
         [{}, api_key]
       end
     end
@@ -95,7 +98,7 @@ module StripeMock
 
     private
 
-    def assert_existance(type, id, obj, message=nil)
+    def assert_existence(type, id, obj, message=nil)
       if obj.nil?
         msg = message || "No such #{type}: #{id}"
         raise Stripe::InvalidRequestError.new(msg, type.to_s, 404)

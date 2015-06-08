@@ -60,9 +60,15 @@ shared_examples 'Invoice API' do
       expect(Stripe::Invoice.all.count).to eq(10)
     end
 
-    context "when passing count" do
+    it "is marked as having more when more objects exist" do
+      11.times { Stripe::Invoice.create }
+
+      expect(Stripe::Invoice.all.has_more).to eq(true)
+    end
+
+    context "when passing limit" do
       it "gets that many invoices" do
-        expect(Stripe::Invoice.all(count: 1).count).to eq(1)
+        expect(Stripe::Invoice.all(limit: 1).count).to eq(1)
       end
     end
   end
@@ -86,7 +92,7 @@ shared_examples 'Invoice API' do
 
   context "retrieving upcoming invoice" do
     before do
-      @customer = Stripe::Customer.create(email: 'johnny@appleseed.com', card: stripe_helper.generate_card_token)
+      @customer = Stripe::Customer.create(email: 'johnny@appleseed.com', source: stripe_helper.generate_card_token)
     end
 
     it 'fails without parameters' do

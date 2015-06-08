@@ -4,15 +4,15 @@
 * Issues: https://github.com/rebelidealist/stripe-ruby-mock/issues
 * **CHAT**: https://gitter.im/rebelidealist/stripe-ruby-mock
 
-# REQUEST: Looking for Additional Core Contributor
+# REQUEST: Looking for More Core Contributors
 
-This gem has unexpectedly grown in popularity, so I'm currently looking for an additional core contributor to help me out. I'm not abandoning the project, I just need someone to help manage pull requests and code quality; I don't have nearly as much free time as I used to. If you're interested, ping me in chat (see above).
+This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'm currently looking for more core contributors to help me out. If you're interested, there is only one requirement: submit a significant enough pull request and have it merged into master (many of you have already done this). Afterwards, ping me in [chat](https://gitter.im/rebelidealist/stripe-ruby-mock) and I will add you as a collaborator.
 
 ## Install
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 2.0.1'
+    gem 'stripe-ruby-mock', '~> 2.1.1', :require => 'stripe_mock'
 
 ## Features
 
@@ -23,13 +23,23 @@ In your gemfile:
 
 ### Specifications
 
-**STRIPE API TARGET VERSION:** 2014-06-17
+**STRIPE API TARGET VERSION:** 2015-02-18 (master)
 
-* Strict params: Plan, Token#create
+Older API version branches:
+
+- [api-2014-06-17](https://github.com/rebelidealist/stripe-ruby-mock/tree/api-2014-06-17)
+
+### Versioning System
+
+Since StripeMock tries to keep up with Stripe's API version, its version system is a little different:
+
+- The **major** number (1.x.x) is for breaking changes involving how you use StripeMock itself
+- The **minor** number (x.1.x) is for breaking changes involving Stripe's API
+- The **patch** number (x.x.0) is for non-breaking changes/fixes involving Stripe's API, or for non-breaking changes/fixes/features for StripeMock itself.
 
 ## Description
 
-** *WARNING: This library does not cover all Stripe API endpoints. If you need one that's missing, please create an issue for it.* **
+** *WARNING: This library does not cover all Stripe API endpoints. If you need one that's missing, please create an issue for it, or [see this wiki page](https://github.com/rebelidealist/stripe-ruby-mock/wiki/Implementing-a-New-Behavior) if you're interested in contributing* **
 
 At its core, this library overrides [stripe-ruby's](https://github.com/stripe/stripe-ruby)
 request method to skip all http calls and
@@ -49,6 +59,7 @@ describe MyApp do
   it "creates a stripe customer" do
 
     # This doesn't touch stripe's servers nor the internet!
+    # Specify :source in place of :card (with same value) to return customer with source data
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
       card: stripe_helper.generate_card_token
@@ -132,7 +143,7 @@ it "mocks a declined card error" do
   # Prepares an error for the next create charge request
   StripeMock.prepare_card_error(:card_declined)
 
-  expect { Stripe::Charge.create }.to raise_error {|e|
+  expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to raise_error {|e|
     expect(e).to be_a Stripe::CardError
     expect(e.http_status).to eq(402)
     expect(e.code).to eq('card_declined')
@@ -188,7 +199,7 @@ it "raises a custom error for specific actions" do
 
   StripeMock.prepare_error(custom_error, :new_customer)
 
-  expect { Stripe::Charge.create }.to_not raise_error
+  expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to_not raise_error
   expect { Stripe::Customer.create }.to raise_error {|e|
     expect(e).to be_a StandardError
     expect(e.message).to eq("Please knock first.")
@@ -370,11 +381,7 @@ StripeMock.global_id_prefix = 'my_app_'
 
 ## Developing stripe-ruby-mock
 
-To run the tests:
-
-    $ bundle install
-    $ bundle exec rspec
-    $ bundle exec rspec -t live # Runs certain tests against Stripe's servers
+[Please see this wiki page](https://github.com/rebelidealist/stripe-ruby-mock/wiki/Implementing-a-New-Behavior)
 
 Patches are welcome and greatly appreciated! If you're contributing to fix a problem,
 be sure to write tests that illustrate the problem being fixed.
