@@ -12,14 +12,22 @@ module StripeMock
           raise Stripe::InvalidRequestError.new('You must supply either a card, customer, or bank account to create a token.', nil, 400)
         end
 
-        if params[:card]
-          # "Sanitize" card number
+        cus_id = params[:customer]
+
+        if cus_id && params[:source]
+          customer = assert_existence :customer, cus_id, customers[cus_id]
+
+          # params[:card] is an id; grab it from the db
+          customer_card = get_card(customer, params[:source])
+          assert_existence :card, params[:source], customer_card
+        elsif params[:card]
+          # params[:card] is a hash of cc info; "Sanitize" the card number
+          params[:card][:fingerprint] = StripeMock::Util.fingerprint(params[:card][:number])
           params[:card][:last4] = params[:card][:number][-4,4]
           customer_card = params[:card]
         else
-          customer = customers[params[:customer]]
-          assert_existance :customer, params[:customer], customer
-          customer_card = get_customer_card(customer, customer[:default_card])
+          customer = assert_existence :customer, cus_id, customers[cus_id]
+          customer_card = get_card(customer, customer[:default_source])
         end
 
         token_id = generate_card_token(customer_card)
@@ -32,7 +40,7 @@ module StripeMock
         route =~ method_url
         # A Stripe token can be either a bank token or a card token
         bank_or_card = @bank_tokens[$1] || @card_tokens[$1]
-        assert_existance :token, $1, bank_or_card
+        assert_existence :token, $1, bank_or_card
 
         if bank_or_card[:object] == 'card'
           Data.mock_token(:id => $1, :card => bank_or_card)

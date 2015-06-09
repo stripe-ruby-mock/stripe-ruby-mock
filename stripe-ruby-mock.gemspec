@@ -17,11 +17,11 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ['lib']
 
-  gem.add_dependency 'stripe', '>= 1.10.1'
+  gem.add_dependency 'stripe', '= 1.20.1'
   gem.add_dependency 'jimson-temp'
   gem.add_dependency 'dante', '>= 0.2.0'
 
-  gem.add_development_dependency 'rspec', '~> 2.99'
+  gem.add_development_dependency 'rspec', '~> 3.1.0'
   gem.add_development_dependency 'rubygems-tasks', '~> 0.2'
   gem.add_development_dependency 'thin'
 end

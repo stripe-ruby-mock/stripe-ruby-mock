@@ -35,16 +35,16 @@ module StripeMock
       @instance.send(key)
     end
 
+    def destroy_resource(type, id)
+      @instance.send(type).delete(id)
+    end
+
     def clear_data
       @instance = Instance.new
     end
 
     def set_debug(toggle)
       @instance.debug = toggle
-    end
-
-    def set_strict(toggle)
-      @instance.strict = toggle
     end
 
     def set_global_id_prefix(value)
@@ -68,7 +68,6 @@ module StripeMock
     end
 
     def debug?; @instance.debug; end
-    def strict?; @instance.strict; end
     def ping; true; end
   end
 

@@ -8,9 +8,7 @@ module StripeMock
 
       def retrieve_event(route, method_url, params, headers)
         route =~ method_url
-        event = events[$1]
-        assert_existance :event, $1, event
-        event
+        assert_existence :event, $1, events[$1]
       end
 
     end
