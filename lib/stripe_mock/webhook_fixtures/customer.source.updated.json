@@ -2,7 +2,7 @@
   "created": 1326853478,
   "livemode": false,
   "id": "evt_00000000000000",
-  "type": "customer.card.created",
+  "type": "customer.source.updated",
   "object": "event",
   "data": {
     "object": {
@@ -27,6 +27,10 @@
       "cvc_check": "pass",
       "address_line1_check": null,
       "address_zip_check": null
+    },
+    "previous_attributes":
+    {
+      "name": "Testy Tester Jr."
     }
   }
 }
