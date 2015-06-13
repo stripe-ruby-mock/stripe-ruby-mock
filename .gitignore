@@ -3,5 +3,6 @@ pkg/
 .DS_Store
 stripe-mock-server.pid
 Gemfile.lock
+.idea
 stripe-mock-server.log
 .idea
