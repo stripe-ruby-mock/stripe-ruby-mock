@@ -7,11 +7,4 @@ shared_examples 'Account API' do
     expect(account).to be_a Stripe::Account
     expect(account.id).to match /acct\_/
   end
-  # it "retrieves a stripe customer with an id that doesn't exist", live: true do
-  #   expect { Stripe::Account.retrieve('nope') }.to raise_error {|e|
-  #                                                     expect(e).to be_a Stripe::AuthenticationError
-  #                                                     expect(e.http_status).to eq(401)
-  #                                                   }
-  #
-  # end
 end

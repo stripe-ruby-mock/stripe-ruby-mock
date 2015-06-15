@@ -17,11 +17,7 @@ module StripeMock
 
       def get_account(route, method_url, params, headers)
         route =~ method_url
-        if $1
-          accounts[$1] || raise(Stripe::AuthenticationError.new('no', 401))
-        else
-          Data.mock_account
-        end
+        Data.mock_account
       end
 
       def update_account(route, method_url, params, headers)
