@@ -11,7 +11,6 @@ shared_examples 'Webhook Events API' do
     expect(file_names - events).to eq(Set.new)
   end
 
-
   it "first looks in spec/fixtures/stripe_webhooks/ for fixtures by default" do
     event = StripeMock.mock_webhook_event('account.updated')
     payload = StripeMock.mock_webhook_payload('account.updated')
@@ -70,7 +69,7 @@ shared_examples 'Webhook Events API' do
     expect(data[event_b.id][:id]).to eq(event_b.id)
   end
 
-  it "retrieves an eveng using the event resource" do
+  it "retrieves an event using the event resource" do
     webhook_event = StripeMock.mock_webhook_event('plan.created')
     expect(webhook_event.id).to_not be_nil
 
@@ -81,10 +80,10 @@ shared_examples 'Webhook Events API' do
 
   it "takes a hash and deep merges into the data object" do
     event = StripeMock.mock_webhook_event('customer.created', {
-      :account_balance => 12345
+      account_balance: 12345
     })
     payload = StripeMock.mock_webhook_event('customer.created', {
-      :account_balance => 12345
+      account_balance: 12345
     })
     expect(event.data.object.account_balance).to eq(12345)
     expect(payload[:data][:object][:account_balance]).to eq(12345)
@@ -92,10 +91,10 @@ shared_examples 'Webhook Events API' do
 
   it "takes a hash and deep merges arrays in the data object" do
     event = StripeMock.mock_webhook_event('invoice.created', {
-      :lines => {
-        :data => [
-          { :amount => 555,
-            :plan => { :id => 'wh_test' }
+      lines: {
+        data: [
+          { amount: 555,
+            plan: { id: 'wh_test' }
           }
         ]
       }
