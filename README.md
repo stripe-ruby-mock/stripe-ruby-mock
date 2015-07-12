@@ -339,14 +339,19 @@ Sometimes you need to check if your code reads a stripe card correctly. If so, y
 assign card data to a generated card token:
 
 ```ruby
-it "generates a stripe card token" do
-  card_token = StripeMock.generate_card_token(last4: "9191", exp_year: 1984)
-
-  cus = Stripe::Customer.create(card: card_token)
-  card = cus.cards.data.first
-  expect(card.last4).to eq("9191")
-  expect(card.exp_year).to eq(1984)
-end
+    it "generates a stripe card token" do
+      StripeMock.start
+      card_token = StripeMock.generate_card_token(last4: "9191", exp_month: 12, exp_year: 2025)
+      customer = Stripe::Customer.create(source: card_token)
+      customer.save
+      user = Stripe::Customer.retrieve(customer.id)
+      card = user.sources.data.first
+      expect(card.last4).to eq "9191"
+      expect(card.exp_month).to eq 12
+      expect(card.exp_year).to eq 2025
+      expect(user.sources.data.first.id).to match /^test_tok/
+      StripeMock.stop
+    end
 ```
 
 ## Debugging
