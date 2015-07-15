@@ -221,7 +221,8 @@ shared_examples 'Card API' do
       card_id = "card_123"
       expect { customer.sources.retrieve(card_id) }.to raise_error {|e|
         expect(e).to be_a Stripe::InvalidRequestError
-        expect(e.message).to include "no source", card_id
+        expect(e.message).to match /no.*source/i
+        expect(e.message).to include card_id
         expect(e.param).to eq 'id'
         expect(e.http_status).to eq 404
       }
