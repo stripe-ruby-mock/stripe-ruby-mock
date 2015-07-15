@@ -1,6 +1,24 @@
 module StripeMock
   module Data
 
+    def self.mock_account(params = {})
+      id = params[:id] || 'acct_103ED82ePvKYlo2C'
+      {
+        id: id,
+        email: "bob@example.com",
+        statement_descriptor: nil,
+        display_name: "Stripe.com",
+        timezone: "US/Pacific",
+        details_submitted: false,
+        charges_enabled: false,
+        transfers_enabled: false,
+        currencies_supported: [
+          "usd"
+        ],
+
+      }.merge(params)
+    end
+
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
       sources.each {|source| source[:customer] = cus_id}
