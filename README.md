@@ -127,7 +127,7 @@ Here is an example of setting up your RSpec (3.x) test suite to run live with th
 ```ruby
 # RSpec 3.x
 RSpec.configure do |c|
-  if config.filter_manager.inclusions.rules.include?(:live)
+  if c.filter_manager.inclusions.rules.include?(:live)
     StripeMock.toggle_live(true)
     puts "Running **live** tests against Stripe..."
   end
