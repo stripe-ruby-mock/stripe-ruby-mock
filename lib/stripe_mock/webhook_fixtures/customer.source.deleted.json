@@ -2,7 +2,7 @@
   "created": 1326853478,
   "livemode": false,
   "id": "evt_00000000000000",
-  "type": "customer.card.deleted",
+  "type": "customer.source.deleted",
   "object": "event",
   "data": {
     "object": {

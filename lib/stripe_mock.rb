@@ -42,6 +42,7 @@ require 'stripe_mock/request_handlers/helpers/token_helpers.rb'
 
 require 'stripe_mock/request_handlers/validators/param_validators.rb'
 
+require 'stripe_mock/request_handlers/accounts.rb'
 require 'stripe_mock/request_handlers/charges.rb'
 require 'stripe_mock/request_handlers/cards.rb'
 require 'stripe_mock/request_handlers/sources.rb'
