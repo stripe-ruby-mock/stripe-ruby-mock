@@ -340,7 +340,6 @@ assign card data to a generated card token:
 
 ```ruby
     it "generates a stripe card token" do
-      StripeMock.start
       card_token = StripeMock.generate_card_token(last4: "9191", exp_month: 12, exp_year: 2025)
       customer = Stripe::Customer.create(source: card_token)
       customer.save
@@ -350,7 +349,6 @@ assign card data to a generated card token:
       expect(card.exp_month).to eq 12
       expect(card.exp_year).to eq 2025
       expect(user.sources.data.first.id).to match /^test_tok/
-      StripeMock.stop
     end
 ```
 
