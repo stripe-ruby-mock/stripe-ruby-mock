@@ -8,7 +8,7 @@ shared_examples 'Card Error Prep' do
     expect { Stripe::Charge.create({
       amount: 900,
       currency: 'usd',
-      source: stripe_helper.generate_card_token(number: '4242424242424241', brand: 'Visa'),
+      source: StripeMock.generate_card_token(number: '4242424242424241', brand: 'Visa'),
       description: 'hello'
       })
     }.to raise_error(Stripe::CardError, 'The card was declined')
