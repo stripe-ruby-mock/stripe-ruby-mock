@@ -266,7 +266,7 @@ StripeMock.spawn_server(
   pid_path: StripeMock.default_server_pid_path,
   host: '0.0.0.0',
   port: 4999,
-  serverL :thin
+  server: :thin
 )
 
 StripeMock.kill_server(StripeMock.default_server_pid_path)
