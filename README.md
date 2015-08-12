@@ -12,7 +12,7 @@ This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 2.1.1', :require => 'stripe_mock'
+    gem 'stripe-ruby-mock', '~> 2.1.1', require: 'stripe_mock'
 
 ## Features
 
@@ -56,13 +56,13 @@ describe MyApp do
   before { StripeMock.start }
   after { StripeMock.stop }
 
-  it "creates a stripe customer" do
+  it 'creates a stripe customer' do
 
     # This doesn't touch stripe's servers nor the internet!
     # Specify :source in place of :card (with same value) to return customer with source data
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
-      card: stripe_helper.generate_card_token
+      source: stripe_helper.generate_card_token
     })
     expect(customer.email).to eq('johnny@appleseed.com')
   end
@@ -77,16 +77,16 @@ Some Stripe API calls require several parameters. StripeMock helps you keep your
 describe MyApp do
   let(:stripe_helper) { StripeMock.create_test_helper }
 
-  it "creates a stripe plan" do
-    plan = stripe_helper.create_plan(:id => 'my_plan', :amount => 1500)
+  it 'creates a stripe plan' do
+    plan = stripe_helper.create_plan(id: 'my_plan', amount: 1500)
 
     # The above line replaces the following:
     # plan = Stripe::Plan.create(
-    #   :id => 'my_plan',
-    #   :name => 'StripeMock Default Plan ID',
-    #   :amount => 1500,
-    #   :currency => 'usd',
-    #   :interval => 'month'
+    #   id: 'my_plan',
+    #   name: 'StripeMock Default Plan ID',
+    #   amount: 1500,
+    #   currency: 'usd',
+    #   interval: 'month'
     # )
     expect(plan.id).to eq('my_plan')
     expect(plan.amount).to eq(1500)
@@ -115,7 +115,7 @@ Here is an example of setting up your RSpec (2.x) test suite to run live with a 
 RSpec.configure do |c|
   if c.filter_manager.inclusions.keys.include?(:live)
     StripeMock.toggle_live(true)
-    puts "Running **live** tests against Stripe..."
+    puts 'Running **live** tests against Stripe...'
   end
 end
 ```
@@ -129,7 +129,7 @@ Here is an example of setting up your RSpec (3.x) test suite to run live with th
 RSpec.configure do |c|
   if c.filter_manager.inclusions.rules.include?(:live)
     StripeMock.toggle_live(true)
-    puts "Running **live** tests against Stripe..."
+    puts 'Running **live** tests against Stripe...'
   end
 end
 ```
@@ -139,11 +139,11 @@ end
 Tired of manually inputting fake credit card numbers to test against errors? Tire no more!
 
 ```ruby
-it "mocks a declined card error" do
+it 'mocks a declined card error' do
   # Prepares an error for the next create charge request
   StripeMock.prepare_card_error(:card_declined)
 
-  expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to raise_error {|e|
+  expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to raise_error { |e|
     expect(e).to be_a Stripe::CardError
     expect(e.http_status).to eq(402)
     expect(e.code).to eq('card_declined')
@@ -182,7 +182,7 @@ If you want the error to trigger on a different event, you need to replace `:new
 StripeMock.prepare_card_error(:card_declined, :create_card)
 customer = Stripe::Customer.create
 # This line throws the card error
-customer.cards.create
+customer.sources.create
 ```
 
 `:new_charge` and `:create_card` are names of methods in the [StripeMock request handlers](lib/stripe_mock/request_handlers). You can also set `StripeMock.toggle_debug(true)` to see the event name for each Stripe request made in your tests.
@@ -194,13 +194,13 @@ To raise an error on a specific type of request, take a look at the [request han
 If you wanted to raise an error for creating a new customer, for instance, you would do the following:
 
 ```ruby
-it "raises a custom error for specific actions" do
-  custom_error = StandardError.new("Please knock first.")
+it 'raises a custom error for specific actions' do
+  custom_error = StandardError.new('Please knock first.')
 
   StripeMock.prepare_error(custom_error, :new_customer)
 
   expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to_not raise_error
-  expect { Stripe::Customer.create }.to raise_error {|e|
+  expect { Stripe::Customer.create }.to raise_error { |e|
     expect(e).to be_a StandardError
     expect(e.message).to eq("Please knock first.")
   }
@@ -230,11 +230,13 @@ describe MyApp do
   end
 
   after do
-    StripeMock.stop_client
+    @client = StripeMock.stop_client
     # Alternatively:
     #   @client.close!
     # -- Or --
-    #   StripeMock.stop_client(:clear_server_data => true)
+    #   StripeMock.stop_client
+    # -- Or --
+    #   StripeMock.stop_client(clear_server_data: true)
   end
 end
 ```
@@ -261,10 +263,10 @@ Here are some other neat things you can do with the client:
 StripeMock.default_server_pid_path = './stripe-mock-server.pid'
 
 StripeMock.spawn_server(
-  :pid_path => StripeMock.default_server_pid_path,
-  :host => '0.0.0.0',
-  :port => 4999,
-  :server => :thin
+  pid_path: StripeMock.default_server_pid_path,
+  host: '0.0.0.0',
+  port: 4999,
+  serverL :thin
 )
 
 StripeMock.kill_server(StripeMock.default_server_pid_path)
@@ -284,7 +286,7 @@ If your application handles stripe webhooks, you are most likely retrieving the 
 stripe and passing the result to a handler. StripeMock helps you by easily mocking that event:
 
 ```ruby
-it "mocks a stripe webhook" do
+it 'mocks a stripe webhook' do
   event = StripeMock.mock_webhook_event('customer.created')
 
   customer_object = event.data.object
@@ -304,7 +306,7 @@ For example, you could create a file in `spec/fixtures/stripe_webhooks/invoice.c
 Then you can use that webook directly in your specs:
 
 ```ruby
-it "can use a custom webhook fixture" do
+it 'can use a custom webhook fixture' do
   event = StripeMock.mock_webhook_event('invoice.created.with-sub')
   # etc.
 end
@@ -316,14 +318,14 @@ You can alse override values on the fly:
 it "can override webhook values" do
   # NOTE: given hash values get merged directly into event.data.object
   event = StripeMock.mock_webhook_event('customer.created', {
-    :id => 'cus_my_custom_value',
-    :email => 'joe@example.com'
+    id: 'cus_my_custom_value',
+    email: 'joe@example.com'
   })
   # Alternatively:
   # event.data.object.id = 'cus_my_custom_value'
   # event.data.object.email = 'joe@example.com'
   expect(event.data.object.id).to eq('cus_my_custom_value')
-  expect(event.data.object.email).to eq('joe@example.com')
+  expect(event.data.object.email).to eq 'joe@example.com'
 end
 ```
 
@@ -339,18 +341,15 @@ Sometimes you need to check if your code reads a stripe card correctly. If so, y
 assign card data to a generated card token:
 
 ```ruby
-    it "generates a stripe card token" do
-      StripeMock.start
-      card_token = StripeMock.generate_card_token(last4: "9191", exp_month: 12, exp_year: 2025)
-      customer = Stripe::Customer.create(source: card_token)
-      customer.save
-      user = Stripe::Customer.retrieve(customer.id)
+    it 'generates a stripe card token' do
+      card_token = StripeMock.generate_card_token(last4: '9191', exp_month: 12, exp_year: 2025)
+      cus = Stripe::Customer.create(source: card_token)
+      user = Stripe::Customer.retrieve(cus.id)
       card = user.sources.data.first
-      expect(card.last4).to eq "9191"
+      expect(card.last4).to eq '9191'
       expect(card.exp_month).to eq 12
       expect(card.exp_year).to eq 2025
-      expect(user.sources.data.first.id).to match /^test_tok/
-      StripeMock.stop
+      expect(user.sources.data.first.id).to match(/^test_cc/)
     end
 ```
 
