@@ -18,7 +18,7 @@ module StripeMock
 
       def get_account(route, method_url, params, headers)
         route =~ method_url
-        Data.mock_account
+        assert_existence :account, $1, accounts[$1]
       end
 
       def update_account(route, method_url, params, headers)

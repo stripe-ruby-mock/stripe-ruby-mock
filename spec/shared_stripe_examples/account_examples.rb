@@ -1,11 +1,14 @@
 require 'spec_helper'
 
 shared_examples 'Account API' do
-  it 'retrieves a stripe account', live: true do
-    account = Stripe::Account.retrieve
+  it "retrieves a newly created stripe account" do
+    original = Stripe::Account.create({
+      email: 'johnny@appleseed.com'
+    })
+    account = Stripe::Account.retrieve(original.id)
 
-    expect(account).to be_a Stripe::Account
-    expect(account.id).to match /acct\_/
+    expect(account.id).to eq(original.id)
+    expect(account.email).to eq(original.email)
   end
 
   it 'all', live: true do
