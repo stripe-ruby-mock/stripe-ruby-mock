@@ -137,7 +137,8 @@ module StripeMock
       private
 
       def verify_card_present(customer, plan, params={})
-        if customer[:default_source].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0 && plan[:trial_end].nil? && params[:trial_end].nil?
+        if customer[:default_source].nil? && customer[:trial_end].nil? && plan[:trial_period_days].nil? &&
+           plan[:amount] != 0 && plan[:trial_end].nil? && params[:trial_end].nil?
           raise Stripe::InvalidRequestError.new('You must supply a valid card xoxo', nil, 400)
         end
       end
