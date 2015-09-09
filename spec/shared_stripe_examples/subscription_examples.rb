@@ -359,6 +359,17 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.plan.to_hash).to eq(free.to_hash)
     end
 
+    it 'updates a subscription if the customer has a free trial', live: true do
+      stripe_helper.create_plan(id: 'enterprise', amount: 499)
+      trial_end = Time.now.utc.to_i + 3600
+      customer  = Stripe::Customer.create(plan: 'enterprise',
+                                          trial_end: trial_end)
+      subscription          = customer.subscriptions.first
+      subscription.quantity = 2
+      subscription.save
+      expect(subscription.quantity).to eq(2)
+    end
+
     it "updates a customer with no card to a plan with a free trial" do
       free = stripe_helper.create_plan(id: 'free', amount: 0)
       trial = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
