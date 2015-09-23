@@ -47,5 +47,11 @@ RSpec.configure do |c|
       Stripe.api_key = api_key
     end
     c.after(:each) { sleep 1 }
+  else
+    c.filter_run_excluding :oauth => true
+    Stripe.api_key ||= ''
   end
+
+  c.filter_run focus: true
+  c.run_all_when_everything_filtered = true
 end
