@@ -52,6 +52,10 @@ module StripeMock
         coupons = Stripe::Coupon.all
         coupons.data.map(&:delete) if coupons.data.count > 0
       end
+
+      def prepare_card_error
+        StripeMock.prepare_card_error(:card_error, :new_customer) if StripeMock.state == 'local'
+      end
     end
   end
 end

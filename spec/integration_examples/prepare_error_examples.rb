@@ -15,4 +15,24 @@ shared_examples 'Card Error Prep' do
   #     })
   #   }.to raise_error Stripe::CardError
   # end
+
+  it 'is a valid card error', live: true do
+    stripe_helper.prepare_card_error
+
+    begin
+      Stripe::Customer.create(
+        email: 'alice@bob.com',
+        source: stripe_helper.generate_card_token(number: '123')
+      )
+    rescue Stripe::CardError => e
+      body = e.json_body
+      err  = body[:error]
+
+      expect(body).to be_a(Hash)
+      expect(err[:type]).to eq 'card_error'
+      expect(err[:param]).to eq 'number'
+      expect(err[:code]).to eq 'invalid_number'
+      expect(err[:message]).to eq 'This card number looks invalid.'
+    end
+  end
 end
