@@ -58,6 +58,10 @@ module StripeMock
       def update_customer(route, method_url, params, headers)
         route =~ method_url
         cus = assert_existence :customer, $1, customers[$1]
+
+        # Delete those params if their value is nil. Workaround of the problematic way Stripe serialize objects
+        params.delete(:sources) if params[:sources] && params[:sources][:data].nil?
+        params.delete(:subscriptions) if params[:subscriptions] && params[:subscriptions][:data].nil?
         cus.merge!(params)
 
         if params[:source]

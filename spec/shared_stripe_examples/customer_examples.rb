@@ -271,6 +271,16 @@ shared_examples 'Customer API' do
     expect(customer.discount.coupon).to be_a Stripe::Coupon
   end
 
+  it "retrieves the customer's default source after it was updated" do
+    customer = Stripe::Customer.create()
+    customer.source = gen_card_tk
+    customer.save
+    card = customer.sources.retrieve(customer.default_source)
+
+    expect(customer.sources).to be_a(Stripe::ListObject)
+    expect(card).to be_a(Stripe::Card)
+  end
+
   it "updates a stripe customer's card" do
     original = Stripe::Customer.create(id: 'test_customer_update', source: gen_card_tk)
     card = original.sources.data.first
