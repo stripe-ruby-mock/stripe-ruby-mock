@@ -8,6 +8,7 @@ module StripeMock
         klass.add_handler 'get /v1/accounts/(.*)',  :get_account
         klass.add_handler 'post /v1/accounts/(.*)', :update_account
         klass.add_handler 'get /v1/accounts',       :list_accounts
+        klass.add_handler 'post /oauth/deauthorize',:deauthorize
       end
 
       def new_account(route, method_url, params, headers)
@@ -29,6 +30,11 @@ module StripeMock
 
       def list_accounts(route, method_url, params, headers)
         Data.mock_list_object(accounts.values, params)
+      end
+
+      def deauthorize(route, method_url, params, headers)
+        route =~ method_url
+        Stripe::StripeObject.construct_from(:stripe_user_id => params[:stripe_user_id])
       end
     end
   end
