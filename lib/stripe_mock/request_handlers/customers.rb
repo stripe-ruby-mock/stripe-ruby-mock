@@ -72,7 +72,7 @@ module StripeMock
           unless params[:source][:object] && params[:source][:number] && params[:source][:exp_month] && params[:source][:exp_year]
             raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
           end
-          new_card = card_from_params(params.delete[:source])
+          new_card = card_from_params(params.delete(:source))
           add_card_to_object(:customer, new_card, cus, true)
           cus[:default_source] = new_card[:id]
         end
