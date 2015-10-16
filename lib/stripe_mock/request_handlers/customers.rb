@@ -64,8 +64,15 @@ module StripeMock
         params.delete(:subscriptions) if params[:subscriptions] && params[:subscriptions][:data].nil?
         cus.merge!(params)
 
-        if params[:source]
-          new_card = get_card_by_token(params.delete(:source))
+        if params[:source] 
+          if params[:source].is_a?(String)
+            new_card = get_card_by_token(params.delete(:source))
+          elsif params[:source].is_a?(Hash)
+            unless params[:source][:object] && params[:source][:number] && params[:source][:exp_month] && params[:source][:exp_year]
+              raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
+            end
+            new_card = card_from_params(params.delete(:source))
+          end
           add_card_to_object(:customer, new_card, cus, true)
           cus[:default_source] = new_card[:id]
         end

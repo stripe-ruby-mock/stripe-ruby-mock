@@ -281,8 +281,8 @@ shared_examples 'Customer API' do
     expect(card).to be_a(Stripe::Card)
   end
 
-  it "updates a stripe customer's card" do
-    original = Stripe::Customer.create(id: 'test_customer_update', source: gen_card_tk)
+  it "updates a stripe customer's card from a token" do
+    original = Stripe::Customer.create( source: gen_card_tk)
     card = original.sources.data.first
     expect(original.default_source).to eq(card.id)
     expect(original.sources.data.count).to eq(1)
@@ -295,6 +295,27 @@ shared_examples 'Customer API' do
     expect(original.default_source).to_not eq(card.id)
 
     expect(new_card.id).to_not eq(card.id)
+  end
+
+  it "updates a stripe customer's card from a hash" do
+    original = Stripe::Customer.create( source: gen_card_tk)
+    card = original.sources.data.first
+    expect(original.default_source).to eq(card.id)
+    expect(original.sources.data.count).to eq(1)
+
+    original.source = {
+      object: 'card',
+      number: '4012888888881881',
+      exp_year: 2018,
+      exp_month: 12,
+      cvc: 666
+    }
+
+    original.save
+
+    new_card = original.sources.data.last
+    expect(original.sources.data.count).to eq(1)
+    expect(original.default_source).to_not eq(card.id)
   end
 
   it "deletes a customer" do
