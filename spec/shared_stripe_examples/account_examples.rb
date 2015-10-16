@@ -15,7 +15,7 @@ shared_examples 'Account API' do
     expect(accounts.data).to eq []
   end
 
-  it 'deauthorizes the stripe account', live: true do
+  it 'deauthorizes the stripe account', live: false do
     account = Stripe::Account.retrieve
     result = account.deauthorize('CLIENT_ID')
 
