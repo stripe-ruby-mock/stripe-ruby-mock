@@ -106,6 +106,33 @@ shared_examples 'Card Token Mocking' do
       expect(card_token.object).to eq("token")
     end
 
+    it "generates a card token from another card" do
+      token = StripeMock.generate_card_token(last4: "2244", exp_month: 33, exp_year: 2255)
+
+      cus1 = Stripe::Customer.create()
+      cus1.source = token
+      cus1.save
+
+      card1 = cus1.sources.data.first
+      expect(card1.last4).to eq("2244")
+      expect(card1.exp_month).to eq(33)
+      expect(card1.exp_year).to eq(2255)
+
+      card_token = Stripe::Token.create({
+        customer: cus1.id,
+        card: card1.id
+      })
+
+      cus2 = Stripe::Customer.create()
+      cus2.source = card_token.id
+      cus2.save
+
+      card2 = cus2.sources.data.first
+      expect(card2.last4).to eq("2244")
+      expect(card2.exp_month).to eq(33)
+      expect(card2.exp_year).to eq(2255)
+    end
+
     it "throws an error if neither card nor customer are provided", :live => true do
       expect { Stripe::Token.create }.to raise_error(
         Stripe::InvalidRequestError, /must supply either a card, customer/
