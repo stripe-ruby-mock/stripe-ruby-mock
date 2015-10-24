@@ -23,7 +23,7 @@ In your gemfile:
 
 ### Specifications
 
-**STRIPE API TARGET VERSION:** 2015-02-18 (master)
+**STRIPE API TARGET VERSION:** 2015-09-08 (master)
 
 Older API version branches:
 
