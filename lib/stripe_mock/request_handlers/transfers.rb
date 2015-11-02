@@ -26,7 +26,7 @@ module StripeMock
           _transfers = _transfers.first([params[:limit], _transfers.size].min)
         end
 
-        _transfers
+        Data.mock_list_object(_transfers, params)
       end
 
       def new_transfer(route, method_url, params, headers)
