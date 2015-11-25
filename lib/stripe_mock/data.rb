@@ -205,6 +205,37 @@ module StripeMock
       }, params)
     end
 
+    def self.mock_product(params)
+      prod_id = params[:id] || "test_cus_default"
+      { 
+        :name => 'test_prod_name',
+        :description => 'test_prod_description',
+        :object =>  "product",
+        :active => true,
+        :attributes => [],
+        :caption => nil,
+        :created => Time.now.to_i,
+        :images => [],
+        :livemode => false,
+        :metadata => {},
+        :package_dimensions => nil,
+        :shippable => true,
+        :skus => {
+          :object => "list",
+          :data => [],
+          :url => "/v1/skus?product=#{prod_id}",
+          :total_count => 0,
+          :has_more => false
+        }
+      }.merge(params)
+    end
+
+    def self.mock_sku(params)
+      { 
+        :id => "test_sku_default"
+      }.merge(params)
+    end
+
     def self.mock_invoice(lines, params={})
       in_id = params[:id] || "test_in_default"
       lines << Data.mock_line_item() if lines.empty?

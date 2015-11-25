@@ -2,7 +2,7 @@ module StripeMock
   module RequestHandlers
     module Products
 
-      def Customers.included(klass)
+      def Products.included(klass)
         klass.add_handler 'post /v1/products',                     :new_product
         #klass.add_handler 'post /v1/customers/(.*)',                :update_customer
         #klass.add_handler 'get /v1/customers/(.*)',                 :get_customer
@@ -12,10 +12,8 @@ module StripeMock
 
       def new_product(route, method_url, params, headers)
         params[:id] ||= new_id('prod')
-
-        puts " we are here and #{route}, #{method_url}, #{params.inspect}"
         
-        products[ params[:id] ] = Data.mock_product(sources, params)
+        products[ params[:id] ] = Data.mock_product(params)
 
         products[ params[:id] ]
       end

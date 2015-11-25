@@ -32,10 +32,13 @@ module StripeMock
     include StripeMock::RequestHandlers::Recipients
     include StripeMock::RequestHandlers::Transfers
     include StripeMock::RequestHandlers::Tokens
+    include StripeMock::RequestHandlers::Products
+    include StripeMock::RequestHandlers::Skus
 
 
     attr_reader :accounts, :bank_tokens, :charges, :coupons, :customers, :events,
-                :invoices, :invoice_items, :plans, :recipients, :transfers, :subscriptions
+                :invoices, :invoice_items, :plans, :recipients, :transfers, :subscriptions,
+                :products, :skus
 
     attr_accessor :error_queue, :debug
 
@@ -53,6 +56,8 @@ module StripeMock
       @recipients = {}
       @transfers = {}
       @subscriptions = {}
+      @products = {}
+      @skus = {}
 
       @debug = false
       @error_queue = ErrorQueue.new
