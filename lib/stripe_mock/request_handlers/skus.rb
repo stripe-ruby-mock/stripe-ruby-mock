@@ -23,22 +23,22 @@ module StripeMock
       def update_sku(route, method_url, params, headers)
         route =~ method_url
 
-        existing_sku = skus[ params[:id] ]
-        existing_sku.merge!(params)
+        sku = assert_existence :sku, $1, skus[$1]
+        sku.merge!(params)
 
-        product = assert_existence :product, existing_sku[:product], products[existing_sku[:product]]
-        product[:skus][:data].replace { |x| x[:id] == params[:id] }
+        product = assert_existence :product, sku[:product], products[sku[:product]]
+        product[:skus][:data].map! { |x| x[:id] == $1 ? x.merge!(params) : x }
         
-        skus[ params[:id] ]
+        sku
       end
 
       def get_sku(route, method_url, params, headers)
         route =~ method_url
-
-        existing_sku = skus[ params[:id] ]
-        product = assert_existence :product, existing_sku[:product], products[existing_sku[:product]]
         
-        skus[ params[:id] ]
+        sku = assert_existence :sku, $1, skus[$1]
+        product = assert_existence :product, sku[:product], products[sku[:product]]
+        
+        sku
       end
 
       def list_skus(route, method_url, params, headers)
