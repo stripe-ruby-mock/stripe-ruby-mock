@@ -156,6 +156,22 @@ shared_examples 'Charge API' do
     expect(updated.fraud_details.to_hash).to eq(charge.fraud_details.to_hash)
   end
 
+  it "does not loose data when updating a charge" do
+    original = Stripe::Charge.create({
+      amount: 777,
+      currency: 'USD',
+      source: stripe_helper.generate_card_token,
+      metadata: {:foo => "bar"}
+    })
+    original.metadata[:receipt_id] = 1234
+    original.save
+
+    updated = Stripe::Charge.retrieve(original.id)
+
+    expect(updated.metadata[:foo]).to eq "bar"
+    expect(updated.metadata[:receipt_id]).to eq 1234
+  end
+
   it "disallows most parameters on updating a stripe charge" do
     original = Stripe::Charge.create({
       amount: 777,

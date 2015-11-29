@@ -44,7 +44,7 @@ module StripeMock
           raise Stripe::InvalidRequestError.new("Received unknown parameters: #{disallowed.join(', ')}" , '', 400)
         end
 
-        charges[id] = charge.merge(params)
+        charges[id] = Util.rmerge(charge, params)
       end
 
       def get_charges(route, method_url, params, headers)
