@@ -156,7 +156,7 @@ shared_examples 'Charge API' do
     expect(updated.fraud_details.to_hash).to eq(charge.fraud_details.to_hash)
   end
 
-  it "does not loose data when updating a charge" do
+  it "does not lose data when updating a charge" do
     original = Stripe::Charge.create({
       amount: 777,
       currency: 'USD',
