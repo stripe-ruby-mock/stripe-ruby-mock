@@ -15,6 +15,10 @@ module StripeMock
         currencies_supported: [
           "usd"
         ],
+        keys: {
+          secret: nil,
+          publishable: nil
+        }
 
       }.merge(params)
     end
