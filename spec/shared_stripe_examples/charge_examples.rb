@@ -21,6 +21,16 @@ shared_examples 'Charge API' do
     }.to raise_error(Stripe::InvalidRequestError, /missing required param: amount/i)
   end
 
+  it "requires either a source or a customer token" do
+    expect {
+      Stripe::Charge.create(
+        amount: 999,
+        currency: 'USD',
+        description: 'card charge'
+      )
+    }.to raise_error {Stripe::InvalidRequestError, "Must provide source or customer."}
+  end
+
   it "requires presence of currency", :live => true do
     expect {
       charge = Stripe::Charge.create(

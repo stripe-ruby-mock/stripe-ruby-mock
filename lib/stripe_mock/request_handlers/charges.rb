@@ -14,6 +14,9 @@ module StripeMock
 
       def new_charge(route, method_url, params, headers)
         id = new_id('ch')
+        if !params[:source] && !params[:customer]
+          raise Stripe::InvalidRequestError.new("Must provide source or customer.", 'card', 400)
+        end
 
         if params[:source] && params[:source].is_a?(String)
           # if a customer is provided, the card parameter is assumed to be the actual
