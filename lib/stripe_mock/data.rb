@@ -328,6 +328,54 @@ module StripeMock
       }
     end
 
+    def self.mock_order(order_items, params)
+      or_id = params[:id] || "test_or_default"
+      order_items << Data.mock_order_item if order_items.empty?
+      {
+        id: or_id,
+        object: "order",
+        amount: 5000,
+        application: nil,
+        application_fee: nil,
+        charge: nil,
+        created: 1448272783,
+        currency: "eur",
+        customer: nil,
+        email: nil,
+        items: order_items,
+        livemode: false,
+        metadata: {},
+        selected_shipping_method: nil,
+        shipping: {
+          address: {
+            city: "Anytown",
+            country: "US",
+            line1: "1234 Main street",
+            line2: nil,
+            postal_code: "123456",
+            state: nil
+          },
+          name: "Jenny Rosen",
+          phone: nil
+        },
+        shipping_methods: nil,
+        status: "created",
+        updated: 1448272783
+      }.merge(params)
+    end
+
+    def self.mock_order_item(params={})
+      {
+        object: "order_item",
+        amount: 5000,
+        currency: "eur",
+        description: "Anyitem",
+        parent: "sku_parent",
+        quantity: 1,
+        type: "sku"
+      }.merge(params)
+    end
+
     def self.mock_plan(params={})
       {
         interval: "month",
