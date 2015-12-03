@@ -318,6 +318,16 @@ shared_examples 'Customer API' do
     expect(original.default_source).to_not eq(card.id)
   end
 
+  it "still has sources after save when sources unchanged" do
+    original = Stripe::Customer.create(source: gen_card_tk)
+    card = original.sources.data.first
+    card_id = card.id
+
+    original.save
+
+    expect(original.sources.data.first.id).to eq(card_id)
+  end
+
   it "deletes a customer" do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     customer = customer.delete
