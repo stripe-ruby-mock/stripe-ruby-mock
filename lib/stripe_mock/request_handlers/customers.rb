@@ -62,13 +62,12 @@ module StripeMock
         # Delete those params if their value is nil. Workaround of the problematic way Stripe serialize objects
         params.delete(:sources) if params[:sources] && params[:sources][:data].nil?
         params.delete(:subscriptions) if params[:subscriptions] && params[:subscriptions][:data].nil?
+        # Delete those params if their values aren't valid. Workaround of the problematic way Stripe serialize objects
         if params[:sources] && !params[:sources][:data].nil?
-          # Copy old sources over empty objects
-          params[:sources][:data].collect!.with_index {|v, i| !v[:type] ? cus[:sources][:data][i].clone : v }
+          params.delete(:sources) unless params[:sources][:data].any?{ |v| !!v[:type]}
         end
         if params[:subscriptions] && !params[:subscriptions][:data].nil?
-          # Copy old subscriptions over empty objects
-          params[:subscriptions][:data].collect!.with_index {|v, i| !v[:type] ? cus[:subscriptions][:data][i].clone : v }
+          params.delete(:subscriptions) unless params[:subscriptions][:data].any?{ |v| !!v[:type]}
         end
         cus.merge!(params)
 
