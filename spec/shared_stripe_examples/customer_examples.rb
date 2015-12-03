@@ -328,6 +328,17 @@ shared_examples 'Customer API' do
     expect(original.sources.data.first.id).to eq(card_id)
   end
 
+  it "still has subscriptions after save when subscriptions unchanged" do
+    plan = stripe_helper.create_plan(id: 'silver')
+    original = Stripe::Customer.create(source: gen_card_tk, plan: 'silver')
+    subscription = original.subscriptions.data.first
+    subscription_id = subscription.id
+
+    original.save
+
+    expect(original.subscriptions.data.first.id).to eq(subscription_id)
+  end
+
   it "deletes a customer" do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     customer = customer.delete

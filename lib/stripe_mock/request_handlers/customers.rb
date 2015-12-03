@@ -64,7 +64,11 @@ module StripeMock
         params.delete(:subscriptions) if params[:subscriptions] && params[:subscriptions][:data].nil?
         if params[:sources] && !params[:sources][:data].nil?
           # Copy old sources over empty objects
-          params[:sources][:data].collect!.with_index {|v, i| v.keys.length == 0 ? cus[:sources][:data][i].clone : v }
+          params[:sources][:data].collect!.with_index {|v, i| !v[:type] ? cus[:sources][:data][i].clone : v }
+        end
+        if params[:subscriptions] && !params[:subscriptions][:data].nil?
+          # Copy old subscriptions over empty objects
+          params[:subscriptions][:data].collect!.with_index {|v, i| !v[:type] ? cus[:subscriptions][:data][i].clone : v }
         end
         cus.merge!(params)
 
