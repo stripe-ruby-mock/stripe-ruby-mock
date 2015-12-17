@@ -472,7 +472,7 @@ module StripeMock
         :livemode => false,
         :metadata => {},
         :reason => "general",
-        :status => "lost"
+        :status => "under_review"
       }.merge(params)
     end
 
