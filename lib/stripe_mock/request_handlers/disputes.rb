@@ -16,9 +16,17 @@ module StripeMock
       end
 
       def update_dispute(route, method_url, params, headers)
+        route =~ method_url
+        dispute = assert_existence :dispute, $1, disputes[$1]
+        dispute.merge!(params)
+        dispute
       end
 
       def close_dispute(route, method_url, params, headers)
+        route =~ method_url
+        dispute = assert_existence :dispute, $1, disputes[$1]
+        dispute[:status] = "lost"
+        dispute
       end
 
       def list_disputes(route, method_url, params, headers)
