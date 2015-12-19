@@ -456,6 +456,14 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_disputes(ids=[])
+      disputes = {}
+      ids.each do |id|
+        disputes[id] = self.mock_dispute(id: id)
+      end
+      disputes
+    end
+
     def self.mock_dispute(params={})
       id = params[:id] || "dp_test_dispute"
       {
