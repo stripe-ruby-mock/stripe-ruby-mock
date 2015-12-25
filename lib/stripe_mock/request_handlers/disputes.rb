@@ -4,8 +4,8 @@ module StripeMock
 
       def Disputes.included(klass)
         klass.add_handler 'get /v1/disputes/(.*)',        :get_dispute
-        klass.add_handler 'post /v1/disputes/(.*)',       :update_dispute
         klass.add_handler 'post /v1/disputes/(.*)/close', :close_dispute
+        klass.add_handler 'post /v1/disputes/(.*)',       :update_dispute
         klass.add_handler 'get /v1/disputes',             :list_disputes   
       end
 
