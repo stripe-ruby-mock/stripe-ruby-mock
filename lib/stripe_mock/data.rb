@@ -224,6 +224,7 @@ module StripeMock
         customer: "test_customer",
         object: 'invoice',
         attempted: false,
+        application_fee: nil,
         closed: false,
         forgiven: false,
         paid: false,
