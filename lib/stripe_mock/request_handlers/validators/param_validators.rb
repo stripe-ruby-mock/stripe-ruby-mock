@@ -6,7 +6,7 @@ module StripeMock
         params[:id] = params[:id].to_s
 
         @base_strategy.create_plan_params.keys.each do |name|
-          raise Stripe::InvalidRequestError.new("Missing required param: #{name}", name) if params[name].nil?
+          raise Stripe::InvalidRequestError.new("Missing required param: #{name}.", name) if params[name].nil?
         end
         if plans[ params[:id] ]
           raise Stripe::InvalidRequestError.new("Plan already exists.", :id)

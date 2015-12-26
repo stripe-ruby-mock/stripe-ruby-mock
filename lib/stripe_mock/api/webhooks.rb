@@ -4,7 +4,7 @@ module StripeMock
 
     fixture_file = File.join(@webhook_fixture_path, "#{type}.json")
 
-    if File.exists?(fixture_file) == false
+    unless File.exists?(fixture_file)
       unless Webhooks.event_list.include?(type)
         raise UnsupportedRequestError.new "Unsupported webhook event `#{type}` (Searched in #{@webhook_fixture_path})"
       end
@@ -44,9 +44,9 @@ module StripeMock
         'charge.dispute.created',
         'charge.dispute.updated',
         'charge.dispute.closed',
-        'customer.card.created',
-        'customer.card.deleted',
-        'customer.card.updated',
+        'customer.source.created',
+        'customer.source.deleted',
+        'customer.source.updated',
         'customer.created',
         'customer.updated',
         'customer.deleted',

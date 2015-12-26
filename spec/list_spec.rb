@@ -33,9 +33,9 @@ describe StripeMock::Data::List do
   end
 
   it "eventually gets turned into a hash" do
-    charge1 = Stripe::Charge.create
-    charge2 = Stripe::Charge.create
-    charge3 = Stripe::Charge.create
+    charge1 = Stripe::Charge.create(amount: 1, currency: 'usd')
+    charge2 = Stripe::Charge.create(amount: 1, currency: 'usd')
+    charge3 = Stripe::Charge.create(amount: 1, currency: 'usd')
     list = StripeMock::Data::List.new([charge1, charge2, charge3])
     hash = list.to_h
 
@@ -95,15 +95,15 @@ describe StripeMock::Data::List do
 
   context "pagination" do
     it "has a has_more field when it has more" do
-      list = StripeMock::Data::List.new([Stripe::Charge.create] * 256)
+      list = StripeMock::Data::List.new([Stripe::Charge.create(amount: 1, currency: 'usd')] * 256)
 
       expect(list).to have_more
     end
 
     it "accepts a starting_after parameter" do
       data = []
-      255.times { data << Stripe::Charge.create }
-      new_charge = Stripe::Charge.create
+      255.times { data << Stripe::Charge.create(amount: 1, currency: 'usd') }
+      new_charge = Stripe::Charge.create(amount: 1, currency: 'usd')
       data[89] = new_charge
       list = StripeMock::Data::List.new(data, starting_after: new_charge.id)
       hash = list.to_h
@@ -114,7 +114,7 @@ describe StripeMock::Data::List do
 
     it "raises an error if starting_after cursor is not found" do
       data = []
-      255.times { data << Stripe::Charge.create }
+      255.times { data << Stripe::Charge.create(amount: 1, currency: 'usd') }
       list = StripeMock::Data::List.new(data, starting_after: "test_ch_unknown")
 
       expect { list.to_h }.to raise_error

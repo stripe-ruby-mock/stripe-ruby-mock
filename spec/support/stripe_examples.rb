@@ -5,6 +5,7 @@ def require_stripe_examples
 end
 
 def it_behaves_like_stripe(&block)
+  it_behaves_like 'Account API', &block
   it_behaves_like 'Bank Account Token Mocking', &block
   it_behaves_like 'Card Token Mocking', &block
   it_behaves_like 'Card API', &block
@@ -25,4 +26,5 @@ def it_behaves_like_stripe(&block)
   # Integration tests
   it_behaves_like 'Multiple Customer Cards'
   it_behaves_like 'Charging with Tokens'
+  it_behaves_like 'Card Error Prep'
 end

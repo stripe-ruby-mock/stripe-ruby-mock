@@ -9,6 +9,7 @@ module StripeMock
         klass.add_handler 'post /v1/charges/(.*)/capture',  :capture_charge
         klass.add_handler 'post /v1/charges/(.*)/refund',   :refund_charge
         klass.add_handler 'post /v1/charges/(.*)/refunds',  :create_refund
+        klass.add_handler 'post /v1/charges/(.*)',          :update_charge
       end
 
       def new_charge(route, method_url, params, headers)
@@ -27,7 +28,23 @@ module StripeMock
           raise Stripe::InvalidRequestError.new("Invalid token id: #{params[:card]}", 'card', 400)
         end
 
+        ensure_required_params(params)
+
         charges[id] = Data.mock_charge(params.merge :id => id, :balance_transaction => new_balance_transaction('txn'))
+      end
+
+      def update_charge(route, method_url, params, headers)
+        route =~ method_url
+        id = $1
+
+        charge = assert_existence :charge, id, charges[id]
+        allowed = allowed_params(params)
+        disallowed = params.keys - allowed
+        if disallowed.count > 0
+          raise Stripe::InvalidRequestError.new("Received unknown parameters: #{disallowed.join(', ')}" , '', 400)
+        end
+
+        charges[id] = Util.rmerge(charge, params)
       end
 
       def get_charges(route, method_url, params, headers)
@@ -88,6 +105,44 @@ module StripeMock
         refund
       end
 
+      private
+
+      def ensure_required_params(params)
+        if params[:amount].nil?
+          require_param(:amount)
+        elsif params[:currency].nil?
+          require_param(:currency)
+        elsif non_integer_charge_amount?(params)
+          raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', 400)
+        elsif non_positive_charge_amount?(params)
+          raise Stripe::InvalidRequestError.new('Invalid positive integer', 'amount', 400)
+        end
+      end
+
+      def non_integer_charge_amount?(params)
+        params[:amount] && !params[:amount].is_a?(Integer)
+      end
+
+      def non_positive_charge_amount?(params)
+        params[:amount] && params[:amount] < 1
+      end
+
+      def require_param(param)
+        raise Stripe::InvalidRequestError.new("Missing required param: #{param}", param.to_s, 400)
+      end
+
+      def allowed_params(params)
+        allowed = [:description, :metadata, :receipt_email, :fraud_details, :shipping]
+
+        # This is a workaround for the way the Stripe API sends params even when they aren't modified.
+        # Stipe will include those params even when they aren't modified.
+        allowed << :fee_details if params.has_key?(:fee_details) && params[:fee_details].nil?
+        allowed << :source if params.has_key?(:source) && params[:source].empty?
+        if params.has_key?(:refunds) && (params[:refunds].empty? ||
+           params[:refunds].has_key?(:data) && params[:refunds][:data].nil?)
+          allowed << :refunds
+        end
+      end
     end
   end
 end

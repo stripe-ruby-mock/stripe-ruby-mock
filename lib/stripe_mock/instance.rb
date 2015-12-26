@@ -18,6 +18,7 @@ module StripeMock
       @@handlers.find {|h| method_url =~ h[:route] }
     end
 
+    include StripeMock::RequestHandlers::Accounts
     include StripeMock::RequestHandlers::Charges
     include StripeMock::RequestHandlers::Cards
     include StripeMock::RequestHandlers::Sources
@@ -27,18 +28,21 @@ module StripeMock
     include StripeMock::RequestHandlers::Events
     include StripeMock::RequestHandlers::Invoices
     include StripeMock::RequestHandlers::InvoiceItems
+    include StripeMock::RequestHandlers::Orders
     include StripeMock::RequestHandlers::Plans
     include StripeMock::RequestHandlers::Recipients
     include StripeMock::RequestHandlers::Transfers
     include StripeMock::RequestHandlers::Tokens
 
 
-    attr_reader :bank_tokens, :charges, :coupons, :customers, :events,
-                :invoices, :invoice_items, :plans, :recipients, :transfers, :subscriptions
+    attr_reader :accounts, :bank_tokens, :charges, :coupons, :customers, :events,
+                :invoices, :invoice_items, :orders, :plans, :recipients, :transfers,
+                :subscriptions
 
     attr_accessor :error_queue, :debug
 
     def initialize
+      @accounts = {}
       @bank_tokens = {}
       @card_tokens = {}
       @customers = {}
@@ -47,6 +51,7 @@ module StripeMock
       @events = {}
       @invoices = {}
       @invoice_items = {}
+      @orders = {}
       @plans = {}
       @recipients = {}
       @transfers = {}
@@ -63,6 +68,8 @@ module StripeMock
 
     def mock_request(method, url, api_key, params={}, headers={}, api_base_url=nil)
       return {} if method == :xtest
+
+      api_key ||= Stripe.api_key
 
       # Ensure params hash has symbols as keys
       params = Stripe::Util.symbolize_names(params)
@@ -85,8 +92,8 @@ module StripeMock
           [res, api_key]
         end
       else
-        puts "WARNING: Unrecognized method + url: [#{method} #{url}]"
-        puts " params: #{params}"
+        puts "[StripeMock] Warning : Unrecognized endpoint + method : [#{method} #{url}]"
+        puts "[StripeMock] params: #{params}" unless params.empty?
         [{}, api_key]
       end
     end

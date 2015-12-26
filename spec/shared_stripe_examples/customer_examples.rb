@@ -38,6 +38,24 @@ shared_examples 'Customer API' do
     expect(customer.default_source).to be_nil
   end
 
+  it 'creates a stripe customer with a dictionary of card values', live: true do
+    customer = Stripe::Customer.create(source: {
+                                           object: 'card',
+                                           number: '4242424242424242',
+                                           exp_month: 12,
+                                           exp_year: 2024
+                                       },
+                                       email: 'blah@blah.com')
+
+    expect(customer).to be_a Stripe::Customer
+    expect(customer.id).to match(/cus_/)
+    expect(customer.email).to eq 'blah@blah.com'
+    expect(customer.sources.data.first.object).to eq 'card'
+    expect(customer.sources.data.first.last4).to eq '4242'
+    expect(customer.sources.data.first.exp_month).to eq 12
+    expect(customer.sources.data.first.exp_year).to eq 2024
+  end
+
   it 'creates a customer with a plan' do
     plan = stripe_helper.create_plan(id: 'silver')
     customer = Stripe::Customer.create(id: 'test_cus_plan', source: gen_card_tk, :plan => 'silver')
@@ -89,6 +107,19 @@ shared_examples 'Customer API' do
       customer = Stripe::Customer.create(id: 'test_cus_trial_end', source: gen_card_tk, plan: 'silver', trial_end: trial_end)
 
       customer = Stripe::Customer.retrieve('test_cus_trial_end')
+      expect(customer.subscriptions.count).to eq(1)
+      expect(customer.subscriptions.data.length).to eq(1)
+
+      expect(customer.subscriptions).to_not be_nil
+      expect(customer.subscriptions.first.plan.id).to eq('silver')
+      expect(customer.subscriptions.first.current_period_end).to eq(trial_end)
+      expect(customer.subscriptions.first.trial_end).to eq(trial_end)
+    end
+
+    it 'creates a customer when trial_end is set and no source', live: true do
+      plan = stripe_helper.create_plan(id: 'silver', amount: 999)
+      trial_end = Time.now.utc.to_i + 3600
+      customer = Stripe::Customer.create(plan: 'silver', trial_end: trial_end)
       expect(customer.subscriptions.count).to eq(1)
       expect(customer.subscriptions.data.length).to eq(1)
 
@@ -153,6 +184,26 @@ shared_examples 'Customer API' do
     }
   end
 
+  it 'creates a customer with a coupon discount' do
+    coupon = Stripe::Coupon.create(id: "10PERCENT", duration: 'once')
+
+    customer =
+      Stripe::Customer.create(id: 'test_cus_coupon', coupon: '10PERCENT')
+
+    customer = Stripe::Customer.retrieve('test_cus_coupon')
+    expect(customer.discount).to_not be_nil
+    expect(customer.discount.coupon).to_not be_nil
+  end
+
+  it 'cannot create a customer with a coupon that does not exist' do
+    expect{
+      customer = Stripe::Customer.create(id: 'test_cus_no_coupon', coupon: '5OFF')
+    }.to raise_error {|e|
+      expect(e).to be_a(Stripe::InvalidRequestError)
+      expect(e.message).to eq('No such coupon: 5OFF')
+    }
+  end
+
   it "stores a created stripe customer in memory" do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
@@ -205,31 +256,66 @@ shared_examples 'Customer API' do
     original = Stripe::Customer.create(id: 'test_customer_update')
     email = original.email
 
+    coupon = Stripe::Coupon.create(id: "10PERCENT", duration: 'once')
     original.description = 'new desc'
+    original.coupon      = coupon.id
     original.save
 
     expect(original.email).to eq(email)
     expect(original.description).to eq('new desc')
+    expect(original.discount.coupon).to be_a Stripe::Coupon
 
     customer = Stripe::Customer.retrieve("test_customer_update")
     expect(customer.email).to eq(original.email)
     expect(customer.description).to eq('new desc')
+    expect(customer.discount.coupon).to be_a Stripe::Coupon
   end
 
-  it "updates a stripe customer's card" do
-    original = Stripe::Customer.create(id: 'test_customer_update', source: gen_card_tk)
+  it "retrieves the customer's default source after it was updated" do
+    customer = Stripe::Customer.create()
+    customer.source = gen_card_tk
+    customer.save
+    card = customer.sources.retrieve(customer.default_source)
+
+    expect(customer.sources).to be_a(Stripe::ListObject)
+    expect(card).to be_a(Stripe::Card)
+  end
+
+  it "updates a stripe customer's card from a token" do
+    original = Stripe::Customer.create( source: gen_card_tk)
     card = original.sources.data.first
     expect(original.default_source).to eq(card.id)
-    expect(original.sources.count).to eq(1)
+    expect(original.sources.data.count).to eq(1)
 
     original.source = gen_card_tk
     original.save
 
     new_card = original.sources.data.last
-    expect(original.sources.count).to eq(1)
+    expect(original.sources.data.count).to eq(1)
     expect(original.default_source).to_not eq(card.id)
 
     expect(new_card.id).to_not eq(card.id)
+  end
+
+  it "updates a stripe customer's card from a hash" do
+    original = Stripe::Customer.create( source: gen_card_tk)
+    card = original.sources.data.first
+    expect(original.default_source).to eq(card.id)
+    expect(original.sources.data.count).to eq(1)
+
+    original.source = {
+      object: 'card',
+      number: '4012888888881881',
+      exp_year: 2018,
+      exp_month: 12,
+      cvc: 666
+    }
+
+    original.save
+
+    new_card = original.sources.data.last
+    expect(original.sources.data.count).to eq(1)
+    expect(original.default_source).to_not eq(card.id)
   end
 
   it "deletes a customer" do

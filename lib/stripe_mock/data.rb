@@ -1,6 +1,24 @@
 module StripeMock
   module Data
 
+    def self.mock_account(params = {})
+      id = params[:id] || 'acct_103ED82ePvKYlo2C'
+      {
+        id: id,
+        email: "bob@example.com",
+        statement_descriptor: nil,
+        display_name: "Stripe.com",
+        timezone: "US/Pacific",
+        details_submitted: false,
+        charges_enabled: false,
+        transfers_enabled: false,
+        currencies_supported: [
+          "usd"
+        ],
+
+      }.merge(params)
+    end
+
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
       sources.each {|source| source[:customer] = cus_id}
@@ -41,10 +59,7 @@ module StripeMock
         amount: 0,
         currency: "usd",
         refunded: false,
-        fee: 0,
         status: 'succeeded',
-        fee_details: [
-        ],
         source: {
           object: "card",
           last4: "4242",
@@ -148,7 +163,6 @@ module StripeMock
 
     def self.mock_coupon(params={})
       {
-        :duration => 'repeating',
         :duration_in_months => 3,
         :percent_off => 25,
         :amount_off => nil,
@@ -186,6 +200,7 @@ module StripeMock
         :customer => "c_test_customer",
         :quantity => 1,
         :tax_percent => nil,
+        :discount => nil,
         :metadata => {}
       }, params)
     end
@@ -281,6 +296,54 @@ module StripeMock
         :object => 'list',
         :url => '/v1/invoices?customer=test_customer'
       }
+    end
+
+    def self.mock_order(order_items, params)
+      or_id = params[:id] || "test_or_default"
+      order_items << Data.mock_order_item if order_items.empty?
+      {
+        id: or_id,
+        object: "order",
+        amount: 5000,
+        application: nil,
+        application_fee: nil,
+        charge: nil,
+        created: 1448272783,
+        currency: "eur",
+        customer: nil,
+        email: nil,
+        items: order_items,
+        livemode: false,
+        metadata: {},
+        selected_shipping_method: nil,
+        shipping: {
+          address: {
+            city: "Anytown",
+            country: "US",
+            line1: "1234 Main street",
+            line2: nil,
+            postal_code: "123456",
+            state: nil
+          },
+          name: "Jenny Rosen",
+          phone: nil
+        },
+        shipping_methods: nil,
+        status: "created",
+        updated: 1448272783
+      }.merge(params)
+    end
+
+    def self.mock_order_item(params={})
+      {
+        object: "order_item",
+        amount: 5000,
+        currency: "eur",
+        description: "Anyitem",
+        parent: "sku_parent",
+        quantity: 1,
+        type: "sku"
+      }.merge(params)
     end
 
     def self.mock_plan(params={})
