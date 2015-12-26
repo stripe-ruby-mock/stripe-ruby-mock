@@ -230,6 +230,7 @@ module StripeMock
         forgiven: false,
         metadata: {},
         paid: false,
+        receipt_number: nil,
         livemode: false,
         attempt_count: 0,
         amount_due: lines.map {|line| line[:amount]}.reduce(0, :+),
