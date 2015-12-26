@@ -228,6 +228,7 @@ module StripeMock
         closed: false,
         description: nil,
         forgiven: false,
+        metadata: {},
         paid: false,
         livemode: false,
         attempt_count: 0,
