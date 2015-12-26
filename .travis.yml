@@ -3,6 +3,8 @@ rvm:
   - 1.9.3
   - 2.0.0
   - 2.1.6
+before_install:
+  - gem install bundler
 before_script:
   - "sudo touch /var/log/stripe-mock-server.log"
   - "sudo chown travis /var/log/stripe-mock-server.log"
