@@ -234,6 +234,7 @@ module StripeMock
         statement_descriptor: nil,
         tax: nil,
         tax_percent: nil,
+        webhooks_delivered_at: 1349825350,
         livemode: false,
         attempt_count: 0,
         amount_due: lines.map {|line| line[:amount]}.reduce(0, :+),
