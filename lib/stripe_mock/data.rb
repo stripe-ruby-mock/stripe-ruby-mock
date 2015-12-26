@@ -226,6 +226,7 @@ module StripeMock
         attempted: false,
         application_fee: nil,
         closed: false,
+        description: nil,
         forgiven: false,
         paid: false,
         livemode: false,
