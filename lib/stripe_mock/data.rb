@@ -256,12 +256,14 @@ module StripeMock
         livemode: false,
         amount: 1000,
         currency: "usd",
+        discountable: false,
         proration: false,
         period: {
           start: 1349738920,
           end: 1349738920
         },
         quantity: nil,
+        subscription: nil,
         plan: nil,
         description: "Test invoice item",
         metadata: {}
