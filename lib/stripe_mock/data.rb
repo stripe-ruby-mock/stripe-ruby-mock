@@ -57,6 +57,7 @@ module StripeMock
         livemode: false,
         paid: true,
         amount: 0,
+        application_fee: nil,
         currency: "usd",
         refunded: false,
         status: 'succeeded',
