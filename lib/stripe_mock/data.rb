@@ -96,6 +96,7 @@ module StripeMock
           url: "/v1/charges/#{charge_id}/refunds",
           data: []
         },
+        transfer: nil,
         balance_transaction: "txn_2dyYXXP90MN26R",
         failure_message: nil,
         failure_code: nil,
