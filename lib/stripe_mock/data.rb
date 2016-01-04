@@ -60,6 +60,7 @@ module StripeMock
         application_fee: nil,
         currency: "usd",
         destination: nil,
+        fraud_details: {},
         refunded: false,
         status: 'succeeded',
         source: {
