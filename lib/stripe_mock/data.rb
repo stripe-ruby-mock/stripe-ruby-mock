@@ -64,6 +64,7 @@ module StripeMock
         receipt_email: nil,
         receipt_number: nil,
         refunded: false,
+        shipping: {},
         status: 'succeeded',
         source: {
           object: "card",
