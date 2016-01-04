@@ -65,6 +65,7 @@ module StripeMock
         receipt_number: nil,
         refunded: false,
         shipping: {},
+        statement_descriptor: "Charge #{charge_id}",
         status: 'succeeded',
         source: {
           object: "card",
