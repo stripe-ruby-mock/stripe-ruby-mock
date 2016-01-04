@@ -61,6 +61,8 @@ module StripeMock
         currency: "usd",
         destination: nil,
         fraud_details: {},
+        receipt_email: nil,
+        receipt_number: nil,
         refunded: false,
         status: 'succeeded',
         source: {
