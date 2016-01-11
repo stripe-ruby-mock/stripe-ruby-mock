@@ -29,7 +29,7 @@ module StripeMock
           object[:default_source] = card[:id] if is_customer
           cards_or_sources[:data] = [card]
         else
-          cards_or_sources[:total_count] = cards_or_sources[:total_count] || 0 + 1
+          cards_or_sources[:total_count] = (cards_or_sources[:total_count] || 0) + 1
           (cards_or_sources[:data] ||= []) << card
         end
 
