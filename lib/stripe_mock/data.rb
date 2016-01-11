@@ -57,8 +57,15 @@ module StripeMock
         livemode: false,
         paid: true,
         amount: 0,
+        application_fee: nil,
         currency: "usd",
+        destination: nil,
+        fraud_details: {},
+        receipt_email: nil,
+        receipt_number: nil,
         refunded: false,
+        shipping: {},
+        statement_descriptor: "Charge #{charge_id}",
         status: 'succeeded',
         source: {
           object: "card",
@@ -89,6 +96,7 @@ module StripeMock
           url: "/v1/charges/#{charge_id}/refunds",
           data: []
         },
+        transfer: nil,
         balance_transaction: "txn_2dyYXXP90MN26R",
         failure_message: nil,
         failure_code: nil,
@@ -256,12 +264,14 @@ module StripeMock
         livemode: false,
         amount: 1000,
         currency: "usd",
+        discountable: false,
         proration: false,
         period: {
           start: 1349738920,
           end: 1349738920
         },
         quantity: nil,
+        subscription: nil,
         plan: nil,
         description: "Test invoice item",
         metadata: {}
