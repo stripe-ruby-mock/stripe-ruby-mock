@@ -85,6 +85,7 @@ module StripeMock
           type: "subscription",
           plan: subscription[:plan],
           amount: subscription[:plan][:amount],
+          discountable: true,
           quantity: 1,
           period: {
             start: subscription[:current_period_end],

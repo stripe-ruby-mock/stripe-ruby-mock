@@ -123,4 +123,64 @@ shared_examples 'Webhook Events API' do
     }.to raise_error StripeMock::UnsupportedRequestError
   end
 
+  describe "listing events" do
+
+    it "retrieves all events" do
+      customer_created_event = StripeMock.mock_webhook_event('customer.created')
+      expect(customer_created_event).to be_a(Stripe::Event)
+      expect(customer_created_event.id).to_not be_nil
+
+      plan_created_event = StripeMock.mock_webhook_event('plan.created')
+      expect(plan_created_event).to be_a(Stripe::Event)
+      expect(plan_created_event.id).to_not be_nil
+
+      coupon_created_event = StripeMock.mock_webhook_event('coupon.created')
+      expect(coupon_created_event).to be_a(Stripe::Event)
+      expect(coupon_created_event).to_not be_nil
+
+      invoice_created_event = StripeMock.mock_webhook_event('invoice.created')
+      expect(invoice_created_event).to be_a(Stripe::Event)
+      expect(invoice_created_event).to_not be_nil
+
+      invoice_item_created_event = StripeMock.mock_webhook_event('invoiceitem.created')
+      expect(invoice_item_created_event).to be_a(Stripe::Event)
+      expect(invoice_item_created_event).to_not be_nil
+      
+      events = Stripe::Event.all
+      
+      expect(events.count).to eq(5)
+      expect(events.map &:id).to include(customer_created_event.id, plan_created_event.id, coupon_created_event.id, invoice_created_event.id, invoice_item_created_event.id)
+      expect(events.map &:type).to include('customer.created', 'plan.created', 'coupon.created', 'invoice.created', 'invoiceitem.created')
+    end
+
+    it "retrieves events with a limit(3)" do
+      customer_created_event = StripeMock.mock_webhook_event('customer.created')
+      expect(customer_created_event).to be_a(Stripe::Event)
+      expect(customer_created_event.id).to_not be_nil
+
+      plan_created_event = StripeMock.mock_webhook_event('plan.created')
+      expect(plan_created_event).to be_a(Stripe::Event)
+      expect(plan_created_event.id).to_not be_nil
+
+      coupon_created_event = StripeMock.mock_webhook_event('coupon.created')
+      expect(coupon_created_event).to be_a(Stripe::Event)
+      expect(coupon_created_event).to_not be_nil
+
+      invoice_created_event = StripeMock.mock_webhook_event('invoice.created')
+      expect(invoice_created_event).to be_a(Stripe::Event)
+      expect(invoice_created_event).to_not be_nil
+
+      invoice_item_created_event = StripeMock.mock_webhook_event('invoiceitem.created')
+      expect(invoice_item_created_event).to be_a(Stripe::Event)
+      expect(invoice_item_created_event).to_not be_nil
+      
+      events = Stripe::Event.all(limit: 3)
+      
+      expect(events.count).to eq(3)
+      expect(events.map &:id).to include(customer_created_event.id, plan_created_event.id, coupon_created_event.id)
+      expect(events.map &:type).to include('customer.created', 'plan.created', 'coupon.created')
+    end 
+
+  end
+
 end

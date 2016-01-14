@@ -57,8 +57,15 @@ module StripeMock
         livemode: false,
         paid: true,
         amount: 0,
+        application_fee: nil,
         currency: "usd",
+        destination: nil,
+        fraud_details: {},
+        receipt_email: nil,
+        receipt_number: nil,
         refunded: false,
+        shipping: {},
+        statement_descriptor: "Charge #{charge_id}",
         status: 'succeeded',
         source: {
           object: "card",
@@ -89,6 +96,7 @@ module StripeMock
           url: "/v1/charges/#{charge_id}/refunds",
           data: []
         },
+        transfer: nil,
         balance_transaction: "txn_2dyYXXP90MN26R",
         failure_message: nil,
         failure_code: nil,
@@ -224,9 +232,17 @@ module StripeMock
         customer: "test_customer",
         object: 'invoice',
         attempted: false,
+        application_fee: nil,
         closed: false,
+        description: nil,
         forgiven: false,
+        metadata: {},
         paid: false,
+        receipt_number: nil,
+        statement_descriptor: nil,
+        tax: nil,
+        tax_percent: nil,
+        webhooks_delivered_at: 1349825350,
         livemode: false,
         attempt_count: 0,
         amount_due: lines.map {|line| line[:amount]}.reduce(0, :+),
@@ -248,12 +264,14 @@ module StripeMock
         livemode: false,
         amount: 1000,
         currency: "usd",
+        discountable: false,
         proration: false,
         period: {
           start: 1349738920,
           end: 1349738920
         },
         quantity: nil,
+        subscription: nil,
         plan: nil,
         description: "Test invoice item",
         metadata: {}
@@ -454,6 +472,75 @@ module StripeMock
           :url => "/v1/transfers/#{id}/reversals"
         },
       }.merge(params)
+    end
+
+    def self.mock_disputes(ids=[])
+      disputes = {}
+      ids.each do |id|
+        disputes[id] = self.mock_dispute(id: id)
+      end
+      disputes
+    end
+
+    def self.mock_dispute(params={})
+      id = params[:id] || "dp_test_dispute"
+      {
+        :id => id,
+        :object => "dispute",
+        :amount => 195,
+        :balance_transactions => [],
+        :charge => "ch_15RsQR2eZvKYlo2CA8IfzCX0",
+        :created => 1422915137,
+        :currency => "usd",
+        :evidence => self.mock_dispute_evidence,
+        :evidence_details => self.mock_dispute_evidence_details,
+        :is_charge_refundable => false,
+        :livemode => false,
+        :metadata => {},
+        :reason => "general",
+        :status => "under_review"
+      }.merge(params)
+    end
+
+    def self.mock_dispute_evidence
+      {
+        :access_activity_log => nil,
+        :billing_address => nil,
+        :cancellation_policy => nil,
+        :cancellation_policy_disclosure => nil,
+        :cancellation_rebuttal => nil,
+        :customer_communication => nil,
+        :customer_email_address => nil,
+        :customer_name => nil,
+        :customer_purchase_ip => nil,
+        :customer_signature => nil,
+        :duplicate_charge_documentation => nil,
+        :duplicate_charge_explanation => nil,
+        :duplicate_charge_id => nil,
+        :product_description => nil,
+        :receipt => nil,
+        :refund_policy => nil,
+        :refund_policy_disclosure => nil,
+        :refund_refusal_explanation => nil,
+        :service_date => nil,
+        :service_documentation => nil,
+        :shipping_address => nil,
+        :shipping_carrier => nil,
+        :shipping_date => nil,
+        :shipping_documentation => nil,
+        :shipping_tracking_number => nil,
+        :uncategorized_file => nil,
+        :uncategorized_text => nil
+      }
+    end
+
+    def self.mock_dispute_evidence_details
+      {
+        :due_by => 1424303999,
+        :has_evidence => false,
+        :past_due => false,
+        :submission_count => 0
+      }
     end
 
     def self.mock_transfer_array
