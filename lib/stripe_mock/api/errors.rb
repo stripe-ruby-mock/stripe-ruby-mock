@@ -34,7 +34,8 @@ module StripeMock
         card_declined: add_json_body(["The card was declined", nil, 'card_declined', 402]),
         missing: add_json_body(["There is no card on a customer that is being charged.", nil, 'missing', 402]),
         processing_error: add_json_body(["An error occurred while processing the card", nil, 'processing_error', 402]),
-        card_error: add_json_body(['This card number looks invalid.', 'number', 'invalid_number', 402])
+        card_error: add_json_body(['This card number looks invalid.', 'number', 'invalid_number', 402]),
+        incorrect_zip: add_json_body(["The zip code you supplied failed validation.", "address_zip", "incorrect_zip", 402]),
       }
     end
 
