@@ -32,7 +32,7 @@ shared_examples 'Card Error Prep' do
       expect(err[:type]).to eq 'card_error'
       expect(err[:param]).to eq 'number'
       expect(err[:code]).to eq 'invalid_number'
-      expect(err[:message]).to eq 'This card number looks invalid.'
+      expect(err[:message]).to eq 'The card number is not a valid credit card number.'
     end
   end
 end
