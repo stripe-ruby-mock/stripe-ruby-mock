@@ -109,7 +109,7 @@ shared_examples 'Plan API' do
     describe "Required Parameters" do
       after do
         params.delete(@name)
-        expect { subject }.to raise_error(Stripe::InvalidRequestError, "Missing required param: #{@name}")
+        expect { subject }.to raise_error(Stripe::InvalidRequestError, "Missing required param: #{@name}.")
       end
 
       it("requires a name") { @name = :name }

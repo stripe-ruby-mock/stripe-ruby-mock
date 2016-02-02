@@ -14,7 +14,13 @@ module StripeMock
 
         cus_id = params[:customer]
 
-        if cus_id && params[:card]
+        if cus_id && params[:source]
+          customer = assert_existence :customer, cus_id, customers[cus_id]
+
+          # params[:card] is an id; grab it from the db
+          customer_card = get_card(customer, params[:source])
+          assert_existence :card, params[:source], customer_card
+        elsif params[:card].is_a?(String)
           customer = assert_existence :customer, cus_id, customers[cus_id]
 
           # params[:card] is an id; grab it from the db
@@ -27,7 +33,7 @@ module StripeMock
           customer_card = params[:card]
         else
           customer = assert_existence :customer, cus_id, customers[cus_id]
-          customer_card = get_card(customer, customer[:default_card])
+          customer_card = get_card(customer, customer[:default_source])
         end
 
         token_id = generate_card_token(customer_card)

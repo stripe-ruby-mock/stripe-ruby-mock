@@ -7,8 +7,8 @@ shared_examples 'Card Token Mocking' do
     it "generates and reads a card token for create charge" do
       card_token = StripeMock.generate_card_token(last4: "2244", exp_month: 33, exp_year: 2255)
 
-      charge = Stripe::Charge.create(amount: 500, card: card_token)
-      card = charge.card
+      charge = Stripe::Charge.create(amount: 500, currency: 'usd', source: card_token)
+      card = charge.source
       expect(card.last4).to eq("2244")
       expect(card.exp_month).to eq(33)
       expect(card.exp_year).to eq(2255)
@@ -17,8 +17,8 @@ shared_examples 'Card Token Mocking' do
     it "generates and reads a card token for create customer" do
       card_token = StripeMock.generate_card_token(last4: "9191", exp_month: 99, exp_year: 3005)
 
-      cus = Stripe::Customer.create(card: card_token)
-      card = cus.cards.data.first
+      cus = Stripe::Customer.create(source: card_token)
+      card = cus.sources.data.first
       expect(card.last4).to eq("9191")
       expect(card.exp_month).to eq(99)
       expect(card.exp_year).to eq(3005)
@@ -27,11 +27,11 @@ shared_examples 'Card Token Mocking' do
     it "generates and reads a card token for update customer" do
       card_token = StripeMock.generate_card_token(last4: "1133", exp_month: 11, exp_year: 2099)
 
-      cus = Stripe::Customer.create()
-      cus.card = card_token
+      cus = Stripe::Customer.create
+      cus.source = card_token
       cus.save
 
-      card = cus.cards.data.first
+      card = cus.sources.data.first
       expect(card.last4).to eq("1133")
       expect(card.exp_month).to eq(11)
       expect(card.exp_year).to eq(2099)
@@ -60,8 +60,8 @@ shared_examples 'Card Token Mocking' do
         }
       })
 
-      cus = Stripe::Customer.create(card: card_token.id)
-      card = cus.cards.data.first
+      cus = Stripe::Customer.create(source: card_token.id)
+      card = cus.sources.data.first
       expect(card.last4).to eq("2222")
       expect(card.exp_month).to eq(9)
       expect(card.exp_year).to eq(2017)
@@ -76,11 +76,11 @@ shared_examples 'Card Token Mocking' do
         }
       })
 
-      cus = Stripe::Customer.create()
-      cus.card = card_token.id
+      cus = Stripe::Customer.create
+      cus.source = card_token.id
       cus.save
 
-      card = cus.cards.data.first
+      card = cus.sources.data.first
       expect(card.last4).to eq("4444")
       expect(card.exp_month).to eq(11)
       expect(card.exp_year).to eq(2019)
@@ -96,7 +96,7 @@ shared_examples 'Card Token Mocking' do
       })
 
       cus = Stripe::Customer.create()
-      cus.card = card_token.id
+      cus.source = card_token.id
       cus.save
 
       card_token = Stripe::Token.create({
@@ -104,6 +104,64 @@ shared_examples 'Card Token Mocking' do
       })
 
       expect(card_token.object).to eq("token")
+    end
+
+    it "generates a card token from another card" do
+      token = StripeMock.generate_card_token(last4: "2244", exp_month: 33, exp_year: 2255)
+
+      cus1 = Stripe::Customer.create()
+      cus1.source = token
+      cus1.save
+
+      card1 = cus1.sources.data.first
+      expect(card1.last4).to eq("2244")
+      expect(card1.exp_month).to eq(33)
+      expect(card1.exp_year).to eq(2255)
+
+      card_token = Stripe::Token.create({
+        customer: cus1.id,
+        card: card1.id
+      })
+
+      cus2 = Stripe::Customer.create()
+      cus2.source = card_token.id
+      cus2.save
+
+      card2 = cus2.sources.data.first
+      expect(card2.last4).to eq("2244")
+      expect(card2.exp_month).to eq(33)
+      expect(card2.exp_year).to eq(2255)
+    end
+
+    it 'generates a card token from another card', oauth: true do
+      token = Stripe::Token.create(
+          card: {
+              exp_month: 10,
+              exp_year: 2016,
+              number: '4242424242424242'
+          }
+      )
+
+      cus1 = Stripe::Customer.create(source: token.id)
+
+      card1 = cus1.sources.data.first
+      expect(card1.last4).to eq('4242')
+      expect(card1.exp_month).to eq(10)
+      expect(card1.exp_year).to eq(2016)
+
+      card_token = Stripe::Token.create(
+          {
+              customer: cus1.id,
+              card: card1.id
+          },
+          ENV['STRIPE_TEST_OAUTH_ACCESS_TOKEN'])
+
+      cus2 = Stripe::Customer.create({ source: card_token.id }, ENV['STRIPE_TEST_OAUTH_ACCESS_TOKEN'])
+
+      card2 = cus2.sources.data.first
+      expect(card2.last4).to eq('4242')
+      expect(card2.exp_month).to eq(10)
+      expect(card2.exp_year).to eq(2016)
     end
 
     it "throws an error if neither card nor customer are provided", :live => true do

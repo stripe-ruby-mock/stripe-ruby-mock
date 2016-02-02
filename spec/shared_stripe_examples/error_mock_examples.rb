@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 def expect_card_error(code, param)
-  expect { Stripe::Charge.create() }.to raise_error {|e|
+  expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to raise_error {|e|
     expect(e).to be_a(Stripe::CardError)
     expect(e.http_status).to eq(402)
     expect(e.code).to eq(code)
@@ -33,7 +33,7 @@ shared_examples 'Stripe Error Mocking' do
     error = Stripe::InvalidRequestError.new('Test Invalid', 'param', 987, 'ibody', 'json ibody')
     StripeMock.prepare_error(error)
 
-    expect { Stripe::Charge.create() }.to raise_error {|e|
+    expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to raise_error {|e|
       expect(e).to be_a(Stripe::InvalidRequestError)
       expect(e.param).to eq('param')
       expect(e.message).to eq('Test Invalid')
@@ -64,7 +64,7 @@ shared_examples 'Stripe Error Mocking' do
     custom_error = StandardError.new("Please knock first.")
     StripeMock.prepare_error(custom_error, :new_customer)
 
-    expect { Stripe::Charge.create }.to_not raise_error
+    expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to_not raise_error
     expect { Stripe::Customer.create }.to raise_error {|e|
       expect(e).to be_a StandardError
       expect(e.message).to eq("Please knock first.")
@@ -84,12 +84,12 @@ shared_examples 'Stripe Error Mocking' do
   it "only raises a card error when a card charge is attempted" do
     StripeMock.prepare_card_error(:card_declined)
     expect { Stripe::Customer.create(id: 'x') }.to_not raise_error
-    expect { Stripe::Charge.create() }.to raise_error Stripe::CardError
+    expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to raise_error Stripe::CardError
   end
 
   it "mocks a card error with a given handler" do
     StripeMock.prepare_card_error(:incorrect_cvc, :new_customer)
-    expect { Stripe::Charge.create() }.to_not raise_error
+    expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to_not raise_error
 
     expect { Stripe::Customer.create() }.to raise_error {|e|
       expect(e).to be_a(Stripe::CardError)

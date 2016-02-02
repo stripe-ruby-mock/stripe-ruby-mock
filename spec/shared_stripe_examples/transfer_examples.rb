@@ -10,6 +10,7 @@ shared_examples 'Transfer API' do
     expect(transfer.amount).to eq('100')
     expect(transfer.currency).to eq('usd')
     expect(transfer.recipient).to eq recipient.id
+    expect(transfer.reversed).to eq(false)
   end
 
   describe "listing transfers" do
@@ -63,4 +64,18 @@ shared_examples 'Transfer API' do
     }
   end
 
+  it 'when amount is not integer', live: true do
+    rec = Stripe::Recipient.create({
+                                       type:  'individual',
+                                       name: 'Alex Smith',
+                                   })
+    expect { Stripe::Transfer.create(amount: '400.2',
+                                       currency: 'usd',
+                                       recipient: rec.id,
+                                       description: 'Transfer for test@example.com') }.to raise_error { |e|
+      expect(e).to be_a Stripe::InvalidRequestError
+      expect(e.param).to eq('amount')
+      expect(e.http_status).to eq(400)
+    }
+  end
 end

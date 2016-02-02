@@ -20,6 +20,7 @@ module StripeMock
 
       def update_invoice(route, method_url, params, headers)
         route =~ method_url
+        params.delete(:lines) if params[:lines]
         assert_existence :invoice, $1, invoices[$1]
         invoices[$1].merge!(params)
       end
@@ -84,6 +85,7 @@ module StripeMock
           type: "subscription",
           plan: subscription[:plan],
           amount: subscription[:plan][:amount],
+          discountable: true,
           quantity: 1,
           period: {
             start: subscription[:current_period_end],
