@@ -30,6 +30,7 @@ module StripeMock
         charges[id] = Data.mock_charge(:id => id, :customer => cus[:id], :amount => sub[:plan][:amount])
         cus[:subscriptions][:total_count] = (cus[:subscriptions][:total_count] || 0) + 1
         cus[:subscriptions][:data].unshift sub
+        cus[:currency] = sub[:plan][:currency]
       end
 
       def delete_subscription_from_customer(cus, subscription)
