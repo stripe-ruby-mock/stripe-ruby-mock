@@ -15,6 +15,7 @@ module StripeMock
 
     json = Stripe::Util.symbolize_names(json)
     params = Stripe::Util.symbolize_names(params)
+    json[:user_id] = params.delete(:user_id) if params.key?(:user_id)
     json[:data][:object] = Util.rmerge(json[:data][:object], params)
     json.delete(:id)
 

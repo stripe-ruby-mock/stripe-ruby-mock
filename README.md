@@ -292,6 +292,12 @@ it "mocks a stripe webhook" do
   expect(customer_object.default_card).to_not be_nil
   # etc.
 end
+
+it "mocks stripe connect webhooks" do
+  event = StripeMock.mock_webhook_event('customer.created', user_id: 'acc_123123')
+
+  expect(event.user_id).to eq('acc_123123')
+end
 ```
 
 ### Customizing Webhooks
