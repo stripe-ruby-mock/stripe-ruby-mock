@@ -12,7 +12,7 @@ This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 2.2.1', :require => 'stripe_mock'
+    gem 'stripe-ruby-mock', '~> 2.3.1', :require => 'stripe_mock'
 
 ## Features
 
@@ -23,7 +23,7 @@ In your gemfile:
 
 ### Specifications
 
-**STRIPE API TARGET VERSION:** 2015-09-08 (master)
+**STRIPE API TARGET VERSION:** 1.34.0 (2016-01-25)
 
 Older API version branches:
 
@@ -62,7 +62,7 @@ describe MyApp do
     # Specify :source in place of :card (with same value) to return customer with source data
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
-      card: stripe_helper.generate_card_token
+      source: stripe_helper.generate_card_token
     })
     expect(customer.email).to eq('johnny@appleseed.com')
   end
