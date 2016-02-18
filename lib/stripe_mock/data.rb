@@ -32,6 +32,7 @@ module StripeMock
         delinquent: false,
         discount: nil,
         account_balance: 0,
+        currency: nil,
         sources: {
           object: "list",
           total_count: sources.size,

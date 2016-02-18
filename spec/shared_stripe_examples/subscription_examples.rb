@@ -8,7 +8,7 @@ shared_examples 'Customer Subscriptions' do
 
   context "creating a new subscription" do
     it "adds a new subscription to customer with none", :live => true do
-      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999)
+      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
       customer = Stripe::Customer.create(source: gen_card_tk)
 
       expect(customer.subscriptions.data).to be_empty
@@ -26,15 +26,15 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.count).to eq(1)
       expect(customer.subscriptions.data.length).to eq(1)
       expect(customer.charges.data.length).to eq(1)
+      expect(customer.currency).to eq( "usd" )
 
       expect(customer.subscriptions.data.first.id).to eq(sub.id)
       expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
       expect(customer.subscriptions.data.first.customer).to eq(customer.id)
       expect(customer.subscriptions.data.first.metadata.foo).to eq( "bar" )
       expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
-
     end
-    
+
     it 'creates a charge for the customer', live: true do
       stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999)
 
@@ -153,6 +153,19 @@ shared_examples 'Customer Subscriptions' do
 
       expect(customer.subscriptions.data).to be_empty
       expect(customer.subscriptions.count).to eq(0)
+    end
+
+    it "throws an error when subscribing the customer to a second plan in a different currency" do
+      usd_plan = stripe_helper.create_plan(id: 'enterprise_usd', amount: 499, currency: 'usd')
+      customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
+      usd_subscription = customer.subscriptions.create({ :plan => 'enterprise_usd' })
+
+      eur_plan = stripe_helper.create_plan(id: 'enterprise_eur', amount: 499, currency: 'eur')
+      expect { customer.subscriptions.create({ :plan => 'enterprise_eur' }) }.to raise_error {|e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.http_status).to eq(400)
+        expect(e.message).to_not be_nil
+      }
     end
 
     it "subscribes a customer with no card to a plan with a free trial" do

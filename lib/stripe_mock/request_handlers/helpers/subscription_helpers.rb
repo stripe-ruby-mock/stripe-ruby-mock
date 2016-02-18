@@ -28,6 +28,11 @@ module StripeMock
       def add_subscription_to_customer(cus, sub)
         id = new_id('ch')
         charges[id] = Data.mock_charge(:id => id, :customer => cus[:id], :amount => sub[:plan][:amount])
+        if cus[:currency].nil?
+          cus[:currency] = sub[:plan][:currency]
+        elsif cus[:currency] != sub[:plan][:currency]
+          raise Stripe::InvalidRequestError.new( "Can't combine currencies on a single customer. This customer has had a subscription, coupon, or invoice item with currency #{cus[:currency]}", 'currency', 400)
+        end
         cus[:subscriptions][:total_count] = (cus[:subscriptions][:total_count] || 0) + 1
         cus[:subscriptions][:data].unshift sub
       end
