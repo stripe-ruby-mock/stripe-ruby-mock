@@ -72,7 +72,7 @@ module StripeMock
       params = Stripe::Util.symbolize_names(params)
 
       method_url = "#{method} #{url}"
-
+      puts method_url
       if handler = Instance.handler_for_method_url(method_url)
         if @debug == true
           puts "- - - - " * 8

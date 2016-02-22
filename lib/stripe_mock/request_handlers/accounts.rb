@@ -13,12 +13,14 @@ module StripeMock
       def new_account(route, method_url, params, headers)
         params[:id] ||= new_id('acct')
         route =~ method_url
+        binding.pry
         accounts[ params[:id] ] ||= Data.mock_account(params)
+        accounts[ params[:id] ].merge({:bank_accounts => []})
       end
 
       def get_account(route, method_url, params, headers)
         route =~ method_url
-        Data.mock_account
+        accounts[$1]
       end
 
       def update_account(route, method_url, params, headers)
@@ -28,6 +30,7 @@ module StripeMock
       end
 
       def list_accounts(route, method_url, params, headers)
+        binding.pry
         Data.mock_list_object(accounts.values, params)
       end
     end

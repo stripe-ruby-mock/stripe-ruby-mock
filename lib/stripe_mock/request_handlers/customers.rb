@@ -62,9 +62,15 @@ module StripeMock
         # Delete those params if their value is nil. Workaround of the problematic way Stripe serialize objects
         params.delete(:sources) if params[:sources] && params[:sources][:data].nil?
         params.delete(:subscriptions) if params[:subscriptions] && params[:subscriptions][:data].nil?
+        # if params[:sources] && !params[:sources][:data].nil?
+        #   params.delete(:sources) unless params[:sources][:data].any?{ |v| !!v[:type]}
+        # end
+        # if params[:subscriptions] && !params[:subscriptions][:data].nil?
+        #   params.delete(:subscriptions) unless params[:subscriptions][:data].any?{ |v| !!v[:type]}
+        # end
         cus.merge!(params)
 
-        if params[:source] 
+        if params[:source]
           if params[:source].is_a?(String)
             new_card = get_card_by_token(params.delete(:source))
           elsif params[:source].is_a?(Hash)
@@ -83,7 +89,7 @@ module StripeMock
 
           add_coupon_to_customer(cus, coupon)
         end
-
+        binding.pry
         cus
       end
 
