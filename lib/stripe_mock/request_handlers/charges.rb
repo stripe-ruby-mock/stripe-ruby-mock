@@ -142,6 +142,8 @@ module StripeMock
            params[:refunds].has_key?(:data) && params[:refunds][:data].nil?)
           allowed << :refunds
         end
+
+        allowed
       end
     end
   end
