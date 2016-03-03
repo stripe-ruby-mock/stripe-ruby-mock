@@ -85,8 +85,8 @@ module StripeMock
           avs_failure: false
         },
         keys: {
-          secret: nil,
-          publishable: nil
+          secret: "sk_test_AmJhMTLPtY9JL4c6EG0",
+          publishable: "pk_test_2rSaMTLPtY9JL449dsf"
         }
       }.merge(params)
     end

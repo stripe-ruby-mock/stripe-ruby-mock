@@ -1,36 +1,50 @@
 require 'spec_helper'
 
 shared_examples 'Account API' do
-  it 'retrieves a stripe account', live: true do
-    account = Stripe::Account.retrieve
+  describe 'retrive accounts' do
+    it 'retrieves a stripe account', live: true do
+      account = Stripe::Account.retrieve
 
-    expect(account).to be_a Stripe::Account
-    expect(account.id).to match /acct\_/
+      expect(account).to be_a Stripe::Account
+      expect(account.id).to match /acct\_/
+    end
+    it 'retrieves a specific stripe account' do
+      account = Stripe::Account.retrieve('acct_103ED82ePvKYlo2C')
+
+      expect(account).to be_a Stripe::Account
+      expect(account.id).to match /acct\_/
+    end
+    it 'retrieves all' do
+      accounts = Stripe::Account.all
+
+      expect(accounts).to be_a Stripe::ListObject
+      expect(accounts.data.count).to satisfy { |n| n >= 1 }
+    end
   end
-  it 'retrieves a specific stripe account' do
-    account = Stripe::Account.retrieve('acct_103ED82ePvKYlo2C')
+  describe 'create account' do
+    it 'creates one more account' do
+      account = Stripe::Account.create(email: 'lol@what.com')
 
-    expect(account).to be_a Stripe::Account
-    expect(account.id).to match /acct\_/
+      expect(account).to be_a Stripe::Account
+    end
+    it 'create managed account' do
+      account = Stripe::Account.create(managed: true, country: 'CA')
+
+      # expect(account).to include(:keys)
+      expect(account.keys).not_to be_nil
+      expect(account.keys.secret).to match /sk_(live|test)_[\d\w]+/
+      expect(account.keys.publishable).to match /pk_(live|test)_[\d\w]+/
+    end
   end
-  it 'retrieves all' do
-    accounts = Stripe::Account.all
+  describe 'updates account' do
+    it 'updates account' do
+      account = Stripe::Account.retrieve
+      account.support_phone = '1234567'
+      account.save
 
-    expect(accounts).to be_a Stripe::ListObject
-    expect(accounts.data.count).to satisfy { |n| n >= 1 }
-  end
-  it 'creates one more account' do
-    account = Stripe::Account.create(email: 'lol@what.com')
+      account = Stripe::Account.retrieve
 
-    expect(account).to be_a Stripe::Account
-  end
-  it 'updates account' do
-    account = Stripe::Account.retrieve
-    account.support_phone = '1234567'
-    account.save
-
-    account = Stripe::Account.retrieve
-
-    expect(account.support_phone).to eq '1234567'
+      expect(account.support_phone).to eq '1234567'
+    end
   end
 end
