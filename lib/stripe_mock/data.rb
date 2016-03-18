@@ -226,7 +226,8 @@ module StripeMock
         address_country: nil,
         cvc_check: nil,
         address_line1_check: nil,
-        address_zip_check: nil
+        address_zip_check: nil,
+        tokenization_method: nil
       }, params)
     end
 
