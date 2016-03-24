@@ -78,6 +78,10 @@ module StripeMock
           add_refund_to_charge(refund, charge)
         end
 
+        if params[:application_fee]
+          charge[:application_fee] = params[:application_fee]
+        end
+
         charge[:captured] = true
         charge
       end

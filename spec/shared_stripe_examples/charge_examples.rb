@@ -335,9 +335,10 @@ shared_examples 'Charge API' do
         capture: false
       })
 
-      returned_charge = charge.capture({ amount: 677 })
+      returned_charge = charge.capture({ amount: 677, application_fee: 123 })
       expect(charge.captured).to eq(true)
       expect(returned_charge.amount_refunded).to eq(100)
+      expect(returned_charge.application_fee).to eq(123)
       expect(returned_charge.id).to eq(charge.id)
       expect(returned_charge.captured).to eq(true)
     end
