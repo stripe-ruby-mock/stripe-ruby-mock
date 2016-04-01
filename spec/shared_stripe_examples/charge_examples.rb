@@ -199,7 +199,12 @@ shared_examples 'Charge API' do
     charge.amount = 777
     charge.source = {any: "source"}
 
-    expect { charge.save }.to raise_error(Stripe::InvalidRequestError, /Received unknown parameters: currency, amount, source/i)
+    expect { charge.save }.to raise_error(Stripe::InvalidRequestError) do |error|
+      expect(error.message).to match(/Received unknown parameters/)
+      expect(error.message).to match(/currency/)
+      expect(error.message).to match(/amount/)
+      expect(error.message).to match(/source/)
+    end
   end
 
 
