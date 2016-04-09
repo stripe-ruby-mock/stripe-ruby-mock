@@ -199,7 +199,12 @@ shared_examples 'Charge API' do
     charge.amount = 777
     charge.source = {any: "source"}
 
-    expect { charge.save }.to raise_error(Stripe::InvalidRequestError, /Received unknown parameters: currency, amount, source/i)
+    expect { charge.save }.to raise_error(Stripe::InvalidRequestError) do |error|
+      expect(error.message).to match(/Received unknown parameters/)
+      expect(error.message).to match(/currency/)
+      expect(error.message).to match(/amount/)
+      expect(error.message).to match(/source/)
+    end
   end
 
 
@@ -335,9 +340,10 @@ shared_examples 'Charge API' do
         capture: false
       })
 
-      returned_charge = charge.capture({ amount: 677 })
+      returned_charge = charge.capture({ amount: 677, application_fee: 123 })
       expect(charge.captured).to eq(true)
       expect(returned_charge.amount_refunded).to eq(100)
+      expect(returned_charge.application_fee).to eq(123)
       expect(returned_charge.id).to eq(charge.id)
       expect(returned_charge.captured).to eq(true)
     end
