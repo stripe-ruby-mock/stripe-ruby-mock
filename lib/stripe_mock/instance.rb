@@ -4,6 +4,8 @@ module StripeMock
     include StripeMock::RequestHandlers::Helpers
     include StripeMock::RequestHandlers::ParamValidators
 
+    DUMMY_API_KEY = (0...32).map { (65 + rand(26)).chr }.join.downcase
+
     # Handlers are ordered by priority
     @@handlers = []
 
@@ -71,7 +73,7 @@ module StripeMock
     def mock_request(method, url, api_key, params={}, headers={}, api_base_url=nil)
       return {} if method == :xtest
 
-      api_key ||= Stripe.api_key
+      api_key ||= (Stripe.api_key || DUMMY_API_KEY)
 
       # Ensure params hash has symbols as keys
       params = Stripe::Util.symbolize_names(params)
