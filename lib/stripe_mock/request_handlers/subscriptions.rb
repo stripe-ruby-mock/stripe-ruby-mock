@@ -14,7 +14,7 @@ module StripeMock
         route =~ method_url
         customer = assert_existence :customer, $1, customers[$1]
 
-        plan_id = params[:plan]
+        plan_id = params[:plan].to_s
         plan = assert_existence :plan, plan_id, plans[plan_id]
 
         if params[:source]
