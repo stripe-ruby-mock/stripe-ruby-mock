@@ -3,11 +3,11 @@ module StripeMock
     module Subscriptions
 
       def Subscriptions.included(klass)
-        klass.add_handler 'get /v1/customers/(.*)/subscriptions', :retrieve_subscriptions
-        klass.add_handler 'post /v1/customers/(.*)/subscriptions', :create_subscription
-        klass.add_handler 'get /v1/customers/(.*)/subscriptions/(.*)', :retrieve_subscription
-        klass.add_handler 'post /v1/customers/(.*)/subscriptions/(.*)', :update_subscription
-        klass.add_handler 'delete /v1/customers/(.*)/subscriptions/(.*)', :cancel_subscription
+        klass.add_handler 'get /v1/customers/(.*)/subscription(?:s)?', :retrieve_subscriptions
+        klass.add_handler 'post /v1/customers/(.*)/subscription(?:s)?', :create_subscription
+        klass.add_handler 'get /v1/customers/(.*)/subscription(?:s)?/(.*)', :retrieve_subscription
+        klass.add_handler 'post /v1/customers/(.*)/subscription(?:s)?/(.*)', :update_subscription
+        klass.add_handler 'delete /v1/customers/(.*)/subscription(?:s)?/(.*)', :cancel_subscription
       end
 
       def create_subscription(route, method_url, params, headers)
