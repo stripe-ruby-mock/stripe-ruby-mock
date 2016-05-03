@@ -39,7 +39,7 @@ module StripeMock
         token_id = generate_card_token(customer_card)
         card = @card_tokens[token_id]
 
-        Data.mock_token(params.merge :id => token_id, :card => card)
+        Data.mock_card_token(params.merge :id => token_id, :card => card)
       end
 
       def get_token(route, method_url, params, headers)
@@ -49,9 +49,9 @@ module StripeMock
         assert_existence :token, $1, bank_or_card
 
         if bank_or_card[:object] == 'card'
-          Data.mock_token(:id => $1, :card => bank_or_card)
+          Data.mock_card_token(:id => $1, :card => bank_or_card)
         elsif bank_or_card[:object] == 'bank_account'
-          Data.mock_token(:id => $1, :bank_account => bank_or_card)
+          Data.mock_bank_account_token(:id => $1, :bank_account => bank_or_card)
         end
       end
     end

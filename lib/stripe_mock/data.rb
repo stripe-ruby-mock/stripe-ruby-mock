@@ -235,9 +235,13 @@ module StripeMock
         object: "bank_account",
         bank_name: "STRIPEMOCK TEST BANK",
         last4: "6789",
+        routing_number: '110000000',
         country: "US",
         currency: "usd",
         validated: false,
+        status: 'new',
+        account_holder_name: 'John Doe',
+        account_holder_type: 'individual',
         fingerprint: "aBcFinGerPrINt123"
       }.merge(params)
     end
@@ -487,7 +491,7 @@ module StripeMock
       }
     end
 
-    def self.mock_token(params={})
+    def self.mock_card_token(params={})
       {
         :id => 'tok_default',
         :livemode => false,
@@ -513,6 +517,22 @@ module StripeMock
           :address_state => nil,
           :address_zip => nil,
           :address_country => nil
+        }
+      }.merge(params)
+    end
+
+    def self.mock_bank_account_token(params={})
+      {
+        :id => 'tok_default',
+        :livemode => false,
+        :used => false,
+        :object => 'token',
+        :type => 'bank_account',
+        :bank_account => {
+          :id => 'bank_account_default',
+          :object => 'bank_account',
+          :last4 => '2222',
+          :fingerprint => 'JRRLXGh38NiYygM7',
         }
       }.merge(params)
     end
