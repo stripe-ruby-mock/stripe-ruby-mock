@@ -4,6 +4,7 @@ module StripeMock
 
       def generate_bank_token(bank_params)
         token = new_id 'btok'
+        bank_params[:id] = new_id 'bank_account'
         @bank_tokens[token] = Data.mock_bank_account bank_params
         token
       end
@@ -31,6 +32,10 @@ module StripeMock
         else
           @card_tokens.delete(token)
         end
+      end
+
+      def get_card_or_bank_by_token(token)
+        @card_tokens[token] || @bank_tokens[token] || raise(Stripe::InvalidRequestError.new("Invalid token id: #{token}", 'tok', 404))
       end
 
     end
