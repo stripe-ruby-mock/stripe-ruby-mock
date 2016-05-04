@@ -4,9 +4,9 @@ module StripeMock
     handler_names.push(:all) if handler_names.count == 0
 
     if @state == 'local'
-      instance.error_queue.queue(stripe_error, handler_names)
+      instance.prepare_error stripe_error, handler_names
     elsif @state == 'remote'
-      client.error_queue.queue(stripe_error, handler_names)
+      client.prepare_error stripe_error, handler_names
     else
       raise UnstartedStateError
     end
@@ -17,7 +17,7 @@ module StripeMock
 
     args = CardErrors.argument_map[code]
     raise StripeMockError.new("Unrecognized stripe card error code: #{code}") if args.nil?
-    self.prepare_error  Stripe::CardError.new(*args), *handler_names
+    self.prepare_error Stripe::CardError.new(*args), *handler_names
   end
 
   module CardErrors

@@ -1,6 +1,7 @@
+require 'drb/drb'
+
 module StripeMock
   class ErrorQueue
-
     def initialize
       @queue = []
     end

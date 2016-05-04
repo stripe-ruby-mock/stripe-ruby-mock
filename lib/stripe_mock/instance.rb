@@ -109,6 +109,14 @@ module StripeMock
       @events[ event_data[:id] ] = symbolize_names(event_data)
     end
 
+    def prepare_error(stripe_error, handler_name)
+      error_queue.queue stripe_error, handler_name
+    end
+
+    def error_for_handler_name(handler_name)
+      error_queue.error_for_handler_name handler_name
+    end
+
     private
 
     def assert_existence(type, id, obj, message=nil)

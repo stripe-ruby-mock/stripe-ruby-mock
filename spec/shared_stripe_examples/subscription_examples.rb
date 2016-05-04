@@ -35,23 +35,6 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
     end
 
-    it "adds a new subscription to customer (string/symbol agnostic)" do
-      customer = Stripe::Customer.create(source: gen_card_tk)
-      expect(customer.subscriptions.count).to eq(0)
-
-      plan = stripe_helper.create_plan(id: :silver, name: 'Silver Plan', amount: 4999, currency: 'usd')
-      sub = customer.subscriptions.create({ :plan => 'silver' })
-      customer = Stripe::Customer.retrieve(customer.id)
-      expect(sub.plan.to_hash).to eq(plan.to_hash)
-      expect(customer.subscriptions.count).to eq(1)
-
-      plan = stripe_helper.create_plan(id: 'gold', name: 'Gold Plan', amount: 14999, currency: 'usd')
-      sub = customer.subscriptions.create({ :plan => :gold })
-      customer = Stripe::Customer.retrieve(customer.id)
-      expect(sub.plan.to_hash).to eq(plan.to_hash)
-      expect(customer.subscriptions.count).to eq(2)
-    end
-
     it 'creates a charge for the customer', live: true do
       stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999)
 
@@ -284,7 +267,6 @@ shared_examples 'Customer Subscriptions' do
         expect(e.message).to eq("Invalid timestamp: can be no more than five years in the future")
       }
     end
-
   end
 
   context "updating a subscription" do
