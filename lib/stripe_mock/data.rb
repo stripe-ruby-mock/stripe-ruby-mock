@@ -730,7 +730,7 @@ module StripeMock
           }
         ],
         net: 9680,
-        source: "#{source}",
+        source: source,
         sourced_transfers: {
           object: "list",
           data: [],

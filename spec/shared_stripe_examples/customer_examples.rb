@@ -348,5 +348,4 @@ shared_examples 'Customer API' do
     customer = customer.delete
     expect(customer.deleted).to eq(true)
   end
-
 end
