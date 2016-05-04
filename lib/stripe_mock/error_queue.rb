@@ -2,6 +2,9 @@ require 'drb/drb'
 
 module StripeMock
   class ErrorQueue
+    include DRb::DRbUndumped
+    extend DRb::DRbUndumped
+
     def initialize
       @queue = []
     end

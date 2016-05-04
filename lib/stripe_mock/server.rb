@@ -66,16 +66,8 @@ module StripeMock
       @instance.generate_webhook_event(event_data)
     end
 
-    def prepare_error(stripe_error, handler_name)
-      @instance.prepare_error stripe_error, handler_name
-    end
-
-    def error_for_handler_name(handler_name)
-      @instance.error_for_handler_name handler_name
-    end
-
-    def dequeue_error
-      @instance.error_queue.dequeue
+    def error_queue
+      @instance.error_queue
     end
 
     def debug?

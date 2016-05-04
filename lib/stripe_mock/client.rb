@@ -33,20 +33,8 @@ module StripeMock
       }
     end
 
-    def prepare_error(stripe_error, handler_name)
-      timeout_wrap { @pipe.prepare_error stripe_error, handler_name }
-    end
-
-    def dequeue_error
-      timeout_wrap { @pipe.dequeue_error }
-    end
-
-    def error_for_handler_name(handler_name)
-      timeout_wrap { @pipe.error_for_handler_name(handler_name) }
-    end
-
-    def prepend_error(stripe_error, handler_name)
-      timeout_wrap { @pipe.prepend_error stripe_error, handler_name }
+    def error_queue
+      timeout_wrap { @pipe.error_queue }
     end
 
     def set_server_debug(toggle)

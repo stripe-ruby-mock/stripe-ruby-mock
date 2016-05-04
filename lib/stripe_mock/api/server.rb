@@ -1,7 +1,4 @@
-require 'pry-remote'
-
 module StripeMock
-
   @default_server_pid_path = './stripe-mock-server.pid'
   @default_server_log_path = './stripe-mock-server.log'
 

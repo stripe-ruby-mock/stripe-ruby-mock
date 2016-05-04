@@ -4,12 +4,12 @@ module StripeMock
     handler_names.push(:all) if handler_names.count == 0
 
     if @state == 'local'
-      instance.prepare_error stripe_error, handler_names
+      instance
     elsif @state == 'remote'
-      client.prepare_error stripe_error, handler_names
+      client
     else
       raise UnstartedStateError
-    end
+    end.error_queue.queue stripe_error, handler_names
   end
 
   def self.prepare_card_error(code, *handler_names)
