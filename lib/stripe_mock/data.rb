@@ -695,9 +695,53 @@ module StripeMock
       }
     end
 
-    def self.mock_list_object(data, params = {})
+    def self.mock_list_object(data, params={})
       list = StripeMock::Data::List.new(data, params)
       list.to_h
     end
+
+    def self.mock_balance_transactions(ids=[])
+      bts = {}
+      ids.each do |id|
+        bts[id] = self.mock_balance_transaction(id: id)
+      end
+      bts
+    end
+
+    def self.mock_balance_transaction(params = {})
+      bt_id = params[:id] || 'test_txn_default'
+      source = params[:source] || 'ch_test_charge'
+      {
+        id: bt_id,
+        object: "balance_transaction",
+        amount: 10000,
+        available_on: 1462406400,
+        created: 1461880226,
+        currency: "usd",
+        description: nil,
+        fee: 320,
+        fee_details: [
+          {
+            amount: 320,
+            application: nil,
+            currency: "usd",
+            description: "Stripe processing fees",
+            type: "stripe_fee"
+          }
+        ],
+        net: 9680,
+        source: source,
+        sourced_transfers: {
+          object: "list",
+          data: [],
+          has_more: false,
+          total_count: 0,
+          url: "/v1/transfers?source_transaction=#{source}"
+        },
+        status: "pending",
+        type: "charge"
+      }.merge(params)
+    end
+
   end
 end
