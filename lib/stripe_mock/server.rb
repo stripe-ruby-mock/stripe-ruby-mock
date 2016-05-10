@@ -1,5 +1,4 @@
 require 'drb/drb'
-require 'pry-remote'
 
 module StripeMock
   class Server
