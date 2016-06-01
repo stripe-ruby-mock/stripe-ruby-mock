@@ -17,6 +17,23 @@ module StripeMock
         card
       end
 
+      def add_source_to_object(type, source, object, replace_current=false)
+        source[type] = object[:id]
+        sources = object[:sources]
+
+        if replace_current && sources[:data]
+          sources[:data].delete_if {|source| source[:id] == object[:default_source]}
+          object[:default_source] = source[:id]
+          sources[:data] = [source]
+        else
+          sources[:total_count] = (sources[:total_count] || 0) + 1
+          (sources[:data] ||= []) << source
+        end
+        object[:default_source] = source[:id] if object[:default_source].nil?
+
+        source
+      end
+
       def add_card_to_object(type, card, object, replace_current=false)
         card[type] = object[:id]
         cards_or_sources = object[:cards] || object[:sources]
@@ -62,6 +79,24 @@ module StripeMock
         resource[:default_card]   = new_default unless is_customer
         resource[:default_source] = new_default if is_customer
         card
+      end
+
+      def add_source_to(type, type_id, params, objects)
+        resource = assert_existence type, type_id, objects[type_id]
+
+        source =
+          if params[:card]
+            card_from_params(params[:card])
+          elsif params[:bank_account]
+            get_bank_by_token(params[:bank_account])
+          else
+            begin
+              get_card_by_token(params[:source])
+            rescue Stripe::InvalidRequestError
+              get_bank_by_token(params[:source])
+            end
+          end
+        add_source_to_object(type, source, resource)
       end
 
       def add_card_to(type, type_id, params, objects)
