@@ -2,14 +2,14 @@ module StripeMock
   module RequestHandlers
     module Helpers
 
-      def generate_bank_token(bank_params)
+      def generate_bank_token(bank_params = {})
         token = new_id 'btok'
         bank_params[:id] = new_id 'bank_account'
         @bank_tokens[token] = Data.mock_bank_account bank_params
         token
       end
 
-      def generate_card_token(card_params)
+      def generate_card_token(card_params = {})
         token = new_id 'tok'
         card_params[:id] = new_id 'cc'
         @card_tokens[token] = Data.mock_card symbolize_names(card_params)
