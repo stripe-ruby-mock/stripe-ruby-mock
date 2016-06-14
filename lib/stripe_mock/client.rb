@@ -1,23 +1,24 @@
 module StripeMock
-
   class Client
-    attr_reader :port, :state, :error_queue
+    attr_reader :port, :state
 
     def initialize(port)
       @port = port
-      @pipe = Jimson::Client.new("http://0.0.0.0:#{port}")
+
+      DRb.start_service
+      @pipe = DRbObject.new_with_uri "druby://localhost:#{port}"
+
       # Ensure client can connect to server
       timeout_wrap(5) { @pipe.ping }
       @state = 'ready'
-      @error_queue = ErrorQueue.new
     end
 
     def mock_request(method, url, api_key, params={}, headers={})
       timeout_wrap do
         @pipe.mock_request(method, url, api_key, params, headers).tap {|result|
           response, api_key = result
-          if response.is_a?(Hash) && response['error_raised'] == 'invalid_request'
-            raise Stripe::InvalidRequestError.new(*response['error_params'])
+          if response.is_a?(Hash) && response[:error_raised] == 'invalid_request'
+            raise Stripe::InvalidRequestError.new(*response[:error_params])
           end
         }
       end
@@ -30,6 +31,10 @@ module StripeMock
         @pipe.get_data(key).each {|k,v| result[k] = Stripe::Util.symbolize_names(v) }
         result
       }
+    end
+
+    def error_queue
+      timeout_wrap { @pipe.error_queue }
     end
 
     def set_server_debug(toggle)
@@ -86,7 +91,7 @@ module StripeMock
         yield
       rescue ClosedClientConnectionError
         raise
-      rescue Errno::ECONNREFUSED => e
+      rescue Errno::ECONNREFUSED, DRb::DRbConnError => e
         tries -= 1
         if tries > 0
           if tries == original_tries - 1

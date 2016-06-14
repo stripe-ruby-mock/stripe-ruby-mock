@@ -1,19 +1,15 @@
-require 'jimson-temp'
+require 'drb/drb'
 
 module StripeMock
-
   class Server
-    extend Jimson::Handler
-
     def self.start_new(opts)
       puts "Starting StripeMock server on port #{opts[:port] || 4999}"
-      server = Jimson::Server.new(Server.new,
-        :host => opts[:host] || '0.0.0.0',
-        :port => opts[:port] || 4999,
-        :server => opts[:server] || :thin,
-        :show_errors => true
-      )
-      server.start
+
+      host = opts.fetch :host,'0.0.0.0'
+      port = opts.fetch :port, 4999
+
+      DRb.start_service "druby://#{host}:#{port}", Server.new
+      DRb.thread.join
     end
 
     def initialize
@@ -26,7 +22,9 @@ module StripeMock
       rescue Stripe::InvalidRequestError => e
         {
           :error_raised => 'invalid_request',
-          :error_params => [e.message, e.param, e.http_status, e.http_body, e.json_body]
+          :error_params => [
+            e.message, e.param, e.http_status, e.http_body, e.json_body
+          ]
         }
       end
     end
@@ -67,8 +65,16 @@ module StripeMock
       @instance.generate_webhook_event(event_data)
     end
 
-    def debug?; @instance.debug; end
-    def ping; true; end
-  end
+    def error_queue
+      @instance.error_queue
+    end
 
+    def debug?
+      @instance.debug
+    end
+
+    def ping
+      true
+    end
+  end
 end
