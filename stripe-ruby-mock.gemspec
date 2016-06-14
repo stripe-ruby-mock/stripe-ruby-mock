@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
 
   gem.add_dependency 'stripe', ['>= 1.31.0', '< 1.42']
-  gem.add_dependency 'jimson-temp'
+  gem.add_dependency 'multi_json', '>= 1.0.0'
   gem.add_dependency 'dante', '>= 0.2.0'
 
   gem.add_development_dependency 'rspec', '~> 3.1.0'
