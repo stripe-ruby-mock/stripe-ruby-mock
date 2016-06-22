@@ -1,6 +1,6 @@
 module StripeMock
 
-  def self.generate_card_token(card_params)
+  def self.generate_card_token(card_params = {})
     if @state == 'local'
       instance.generate_card_token(card_params)
     elsif @state == 'remote'

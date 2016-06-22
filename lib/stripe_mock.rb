@@ -1,5 +1,5 @@
 require 'ostruct'
-require 'jimson-temp'
+require 'multi_json'
 require 'dante'
 
 require 'stripe'
@@ -34,6 +34,7 @@ require 'stripe_mock/api/live'
 require 'stripe_mock/api/test_helpers'
 require 'stripe_mock/api/webhooks'
 
+require 'stripe_mock/request_handlers/helpers/bank_account_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/card_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/charge_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/coupon_helpers.rb'
@@ -43,6 +44,7 @@ require 'stripe_mock/request_handlers/helpers/token_helpers.rb'
 require 'stripe_mock/request_handlers/validators/param_validators.rb'
 
 require 'stripe_mock/request_handlers/accounts.rb'
+require 'stripe_mock/request_handlers/balance_transactions.rb'
 require 'stripe_mock/request_handlers/charges.rb'
 require 'stripe_mock/request_handlers/cards.rb'
 require 'stripe_mock/request_handlers/sources.rb'

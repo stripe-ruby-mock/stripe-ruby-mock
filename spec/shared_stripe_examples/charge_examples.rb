@@ -65,6 +65,31 @@ shared_examples 'Charge API' do
     expect(charge.status).to eq('succeeded')
   end
 
+  it 'creates a stripe charge item with a customer', :live => true do
+    customer = Stripe::Customer.create({
+      email: 'johnny@appleseed.com',
+      source: stripe_helper.generate_card_token(number: '4012888888881881', address_city: 'LA'),
+      description: "a description"
+    })
+
+    expect(customer.sources.data.length).to eq(1)
+    expect(customer.sources.data[0].id).not_to be_nil
+    expect(customer.sources.data[0].last4).to eq('1881')
+
+    charge = Stripe::Charge.create(
+      amount: 999,
+      currency: 'USD',
+      customer: customer.id,
+      description: 'a charge with a specific customer'
+    )
+
+    expect(charge.id).to match(/^(test_)?ch/)
+    expect(charge.amount).to eq(999)
+    expect(charge.description).to eq('a charge with a specific customer')
+    expect(charge.captured).to eq(true)
+    expect(charge.source.last4).to eq('1881')
+    expect(charge.source.address_city).to eq('LA')
+  end
 
   it "creates a stripe charge item with a customer and card id" do
     customer = Stripe::Customer.create({

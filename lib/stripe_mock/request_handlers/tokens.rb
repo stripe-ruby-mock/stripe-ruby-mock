@@ -8,7 +8,7 @@ module StripeMock
       end
 
       def create_token(route, method_url, params, headers)
-        if params[:customer].nil? && params[:card].nil?
+        if params[:customer].nil? && params[:card].nil? && params[:bank_account].nil?
           raise Stripe::InvalidRequestError.new('You must supply either a card, customer, or bank account to create a token.', nil, 400)
         end
 
@@ -31,15 +31,25 @@ module StripeMock
           params[:card][:fingerprint] = StripeMock::Util.fingerprint(params[:card][:number])
           params[:card][:last4] = params[:card][:number][-4,4]
           customer_card = params[:card]
+        elsif params[:bank_account]
+          # params[:card] is a hash of cc info; "Sanitize" the card number
+          bank_account = params[:bank_account]
         else
           customer = assert_existence :customer, cus_id, customers[cus_id]
           customer_card = get_card(customer, customer[:default_source])
         end
 
-        token_id = generate_card_token(customer_card)
-        card = @card_tokens[token_id]
+        if bank_account
+          token_id = generate_bank_token(bank_account)
+          bank_account = @bank_tokens[token_id]
 
-        Data.mock_token(params.merge :id => token_id, :card => card)
+          Data.mock_bank_account_token(params.merge :id => token_id, :bank_account => bank_account)
+        else
+          token_id = generate_card_token(customer_card)
+          card = @card_tokens[token_id]
+
+          Data.mock_card_token(params.merge :id => token_id, :card => card)
+        end
       end
 
       def get_token(route, method_url, params, headers)
@@ -49,9 +59,9 @@ module StripeMock
         assert_existence :token, $1, bank_or_card
 
         if bank_or_card[:object] == 'card'
-          Data.mock_token(:id => $1, :card => bank_or_card)
+          Data.mock_card_token(:id => $1, :card => bank_or_card)
         elsif bank_or_card[:object] == 'bank_account'
-          Data.mock_token(:id => $1, :bank_account => bank_or_card)
+          Data.mock_bank_account_token(:id => $1, :bank_account => bank_or_card)
         end
       end
     end

@@ -192,7 +192,9 @@ module StripeMock
         object: "refund",
         balance_transaction: "txn_4fWh2RKvgxcXqV",
         metadata: {},
-        charge: "ch_4fWhYjzQ23UFWT"
+        charge: "ch_4fWhYjzQ23UFWT",
+        receipt_number: nil,
+        status: "succeeded"
       }.merge(params)
     end
 
@@ -235,9 +237,13 @@ module StripeMock
         object: "bank_account",
         bank_name: "STRIPEMOCK TEST BANK",
         last4: "6789",
+        routing_number: '110000000',
         country: "US",
         currency: "usd",
         validated: false,
+        status: 'new',
+        account_holder_name: 'John Doe',
+        account_holder_type: 'individual',
         fingerprint: "aBcFinGerPrINt123"
       }.merge(params)
     end
@@ -487,7 +493,7 @@ module StripeMock
       }
     end
 
-    def self.mock_token(params={})
+    def self.mock_card_token(params={})
       {
         :id => 'tok_default',
         :livemode => false,
@@ -513,6 +519,22 @@ module StripeMock
           :address_state => nil,
           :address_zip => nil,
           :address_country => nil
+        }
+      }.merge(params)
+    end
+
+    def self.mock_bank_account_token(params={})
+      {
+        :id => 'tok_default',
+        :livemode => false,
+        :used => false,
+        :object => 'token',
+        :type => 'bank_account',
+        :bank_account => {
+          :id => 'bank_account_default',
+          :object => 'bank_account',
+          :last4 => '2222',
+          :fingerprint => 'JRRLXGh38NiYygM7',
         }
       }.merge(params)
     end
@@ -675,9 +697,53 @@ module StripeMock
       }
     end
 
-    def self.mock_list_object(data, params = {})
+    def self.mock_list_object(data, params={})
       list = StripeMock::Data::List.new(data, params)
       list.to_h
     end
+
+    def self.mock_balance_transactions(ids=[])
+      bts = {}
+      ids.each do |id|
+        bts[id] = self.mock_balance_transaction(id: id)
+      end
+      bts
+    end
+
+    def self.mock_balance_transaction(params = {})
+      bt_id = params[:id] || 'test_txn_default'
+      source = params[:source] || 'ch_test_charge'
+      {
+        id: bt_id,
+        object: "balance_transaction",
+        amount: 10000,
+        available_on: 1462406400,
+        created: 1461880226,
+        currency: "usd",
+        description: nil,
+        fee: 320,
+        fee_details: [
+          {
+            amount: 320,
+            application: nil,
+            currency: "usd",
+            description: "Stripe processing fees",
+            type: "stripe_fee"
+          }
+        ],
+        net: 9680,
+        source: source,
+        sourced_transfers: {
+          object: "list",
+          data: [],
+          has_more: false,
+          total_count: 0,
+          url: "/v1/transfers?source_transaction=#{source}"
+        },
+        status: "pending",
+        type: "charge"
+      }.merge(params)
+    end
+
   end
 end
