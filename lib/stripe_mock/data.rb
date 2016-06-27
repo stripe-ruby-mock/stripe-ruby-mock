@@ -444,14 +444,17 @@ module StripeMock
 
     def self.mock_plan(params={})
       {
-        interval: "month",
-        name: "The Basic Plan",
-        amount: 2300,
-        currency: "usd",
         id: "2",
         object: "plan",
-        livemode: false,
+        amount: 2300,
+        created: 1466698898,
+        currency: "usd",
+        interval: "month",
         interval_count: 1,
+        livemode: false,
+        metadata: {},
+        name: "The Basic Plan",
+        statement_descriptor: nil,
         trial_period_days: nil
       }.merge(params)
     end
