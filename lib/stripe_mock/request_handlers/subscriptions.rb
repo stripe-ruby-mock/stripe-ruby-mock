@@ -137,12 +137,8 @@ module StripeMock
         end
 
         # expand the plan for addition to the customer object
-        plan_name = 
-          if params[:plan].is_a?(String)
-            params[:plan]
-          else
-            subscription[:plan][:id]
-          end
+        plan_name =
+          params[:plan].is_a?(String) ? params[:plan] : subscription[:plan][:id]
 
         plan = plans[plan_name]
 
