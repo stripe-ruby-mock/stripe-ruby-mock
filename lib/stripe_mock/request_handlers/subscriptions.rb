@@ -144,13 +144,17 @@ module StripeMock
 
         if params[:coupon]
           coupon_id = params[:coupon]
-          raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400) unless coupons[coupon_id]
 
-          # FIXME assert_existence returns 404 error code but Stripe returns 400
+          # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
-          coupon = Data.mock_coupon({ id: coupon_id })
-          subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          coupon = coupons[coupon_id]
+
+          if coupon
+            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          else
+            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
+          end
         end
 
         assert_existence :plan, plan_name, plan
