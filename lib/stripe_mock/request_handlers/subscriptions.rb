@@ -17,7 +17,7 @@ module StripeMock
       def retrieve_customer_subscription(route, method_url, params, headers)
         route =~ method_url
 
-        customer = :customer, $1, customers[$1]
+        customer = assert_existence :customer, $1, customers[$1]
         subscription = get_customer_subscription(customer, $2)
 
         assert_existence :subscription, $2, subscription
