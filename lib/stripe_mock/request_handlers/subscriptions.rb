@@ -6,8 +6,9 @@ module StripeMock
         klass.add_handler 'get /v1/subscriptions', :retrieve_subscriptions
         klass.add_handler 'post /v1/subscriptions', :create_subscription
         klass.add_handler 'get /v1/subscriptions/(.*)', :retrieve_subscription
-        klass.add_handler 'post /v1/subscriptions/(.*)', :update_subscription
-        klass.add_handler 'delete /v1/subscriptions/(.*)', :cancel_subscription
+        klass.add_handler 'post /v1/customers/(.*)/subscriptions/(.*)', :update_subscription
+        klass.add_handler 'delete /v1/customers/(.*)/(.*)/discount', :delete_discount
+        klass.add_handler 'delete /v1/(.*)/subscriptions/(.*)', :cancel_subscription
 
         klass.add_handler 'post /v1/customers/(.*)/subscriptions', :create_customer_subscription
         klass.add_handler 'get /v1/customers/(.*)/subscriptions/(.*)', :retrieve_customer_subscription
@@ -129,7 +130,7 @@ module StripeMock
 
       def update_subscription(route, method_url, params, headers)
         route =~ method_url
-        subscription = assert_existence :subscription, $1, subscriptions[$1]
+        subscription = assert_existence :subscription, $2, subscriptions[$2]
 
         customer_id = subscription[:customer]
         customer = assert_existence :customer, customer_id, customers[customer_id]
@@ -155,7 +156,11 @@ module StripeMock
           coupon = coupons[coupon_id]
 
           if coupon
-            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+            now = Time.zone.now
+            discount_start = now.to_i
+            discount_end = (now + (coupon[:duration_in_months]).months).to_i
+
+            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon, start: discount_start, end: discount_end }, {})
           else
             raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
           end
@@ -179,10 +184,20 @@ module StripeMock
         subscription
       end
 
+      def delete_discount(route, method_url, params, headers)
+        route =~ method_url
+        test_subscription = $2
+        $2.slice! "/discount"
+
+        subscription = assert_existence :subscription, test_subscription, subscriptions[test_subscription]
+
+        subscription[:discount] = nil
+      end
+
       def cancel_subscription(route, method_url, params, headers)
         route =~ method_url
 
-        subscription = assert_existence :subscription, $1, subscriptions[$1]
+        subscription = assert_existence :subscription, $2, subscriptions[$2]
 
         customer_id = subscription[:customer]
         customer = assert_existence :customer, customer_id, customers[customer_id]
