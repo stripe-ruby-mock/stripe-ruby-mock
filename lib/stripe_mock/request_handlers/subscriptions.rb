@@ -12,6 +12,7 @@ module StripeMock
 
         klass.add_handler 'post /v1/customers/(.*)/subscriptions', :create_customer_subscription
         klass.add_handler 'get /v1/customers/(.*)/subscriptions/(.*)', :retrieve_customer_subscription
+        klass.add_handler 'delete /v1/customers/(.*)/subscriptions/(.*)/delete', :cancel_customer_subscription
         klass.add_handler 'post /v1/customers/(.*)/subscriptions/(.*)', :update_customer_subscription
         klass.add_handler 'get /v1/customers/(.*)/subscriptions', :retrieve_customer_subscriptions
       end
@@ -231,6 +232,33 @@ module StripeMock
         route =~ method_url
 
         subscription = assert_existence :subscription, $1, subscriptions[$1]
+
+        customer_id = subscription[:customer]
+        customer = assert_existence :customer, customer_id, customers[customer_id]
+
+        cancel_params = { canceled_at: Time.now.utc.to_i }
+        cancelled_at_period_end = (params[:at_period_end] == true)
+        if cancelled_at_period_end
+          cancel_params[:cancel_at_period_end] = true
+        else
+          cancel_params[:status] = "canceled"
+          cancel_params[:cancel_at_period_end] = false
+          cancel_params[:ended_at] = Time.now.utc.to_i
+        end
+
+        subscription.merge!(cancel_params)
+
+        unless cancelled_at_period_end
+          delete_subscription_from_customer customer, subscription
+        end
+
+        subscription
+      end
+
+      def cancel_customer_subscription(route, method_url, params, headers)
+        route =~ method_url
+
+        subscription = assert_existence :subscription, $2, subscriptions[$2]
 
         customer_id = subscription[:customer]
         customer = assert_existence :customer, customer_id, customers[customer_id]
