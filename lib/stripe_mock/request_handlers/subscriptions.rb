@@ -171,6 +171,7 @@ module StripeMock
           subscription[:canceled_at] = nil
         end
 
+        params[:current_period_start] = subscription[:current_period_start]
         subscription.merge!(custom_subscription_params(plan, customer, params))
 
         # delete the old subscription, replace with the new subscription
