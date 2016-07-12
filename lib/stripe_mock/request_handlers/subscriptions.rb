@@ -7,10 +7,13 @@ module StripeMock
         klass.add_handler 'post /v1/subscriptions', :create_subscription
         klass.add_handler 'get /v1/subscriptions/(.*)', :retrieve_subscription
         klass.add_handler 'post /v1/subscriptions/(.*)', :update_subscription
+        klass.add_handler 'delete /v1/subscriptions/(.*)/discount', :delete_discount
         klass.add_handler 'delete /v1/subscriptions/(.*)', :cancel_subscription
 
         klass.add_handler 'post /v1/customers/(.*)/subscriptions', :create_customer_subscription
         klass.add_handler 'get /v1/customers/(.*)/subscriptions/(.*)', :retrieve_customer_subscription
+        klass.add_handler 'delete /v1/customers/(.*)/subscriptions/(.*)', :cancel_customer_subscription
+        klass.add_handler 'post /v1/customers/(.*)/subscriptions/(.*)', :update_customer_subscription
         klass.add_handler 'get /v1/customers/(.*)/subscriptions', :retrieve_customer_subscriptions
       end
 
@@ -152,13 +155,7 @@ module StripeMock
           # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
-          coupon = coupons[coupon_id]
-
-          if coupon
-            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
-          else
-            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
-          end
+          add_coupon_to_subscription(coupon_id, subscription)
         end
 
         assert_existence :plan, plan_name, plan
@@ -179,10 +176,89 @@ module StripeMock
         subscription
       end
 
+      def update_customer_subscription(route, method_url, params, headers)
+        route =~ method_url
+        subscription = assert_existence :subscription, $2, subscriptions[$2]
+        customer = assert_existence :customer, $1, customers[$1]
+
+        customer_id = subscription[:customer]
+
+        if params[:source]
+          new_card = get_card_by_token(params.delete(:source))
+          add_card_to_object(:customer, new_card, customer)
+          customer[:default_source] = new_card[:id]
+        end
+
+        # expand the plan for addition to the customer object
+        plan_name =
+          params[:plan].is_a?(String) ? params[:plan] : subscription[:plan][:id]
+
+        plan = plans[plan_name]
+
+        if params[:coupon]
+          coupon_id = params[:coupon]
+
+          # assert_existence returns 404 error code but Stripe returns 400
+          # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
+
+          add_coupon_to_subscription(coupon_id, subscription)
+        end
+
+        assert_existence :plan, plan_name, plan
+        params[:plan] = plan if params[:plan]
+        verify_card_present(customer, plan)
+
+        if subscription[:cancel_at_period_end]
+          subscription[:cancel_at_period_end] = false
+          subscription[:canceled_at] = nil
+        end
+
+        subscription.merge!(custom_subscription_params(plan, customer, params))
+
+        # delete the old subscription, replace with the new subscription
+        customer[:subscriptions][:data].reject! { |sub| sub[:id] == subscription[:id] }
+        customer[:subscriptions][:data] << subscription
+
+        subscription
+      end
+
+      def delete_discount(route, method_url, params, headers)
+        route =~ method_url
+        subscription = assert_existence :subscription, $1, subscriptions[$1]
+        subscription[:discount] = nil
+      end
+
       def cancel_subscription(route, method_url, params, headers)
         route =~ method_url
 
         subscription = assert_existence :subscription, $1, subscriptions[$1]
+
+        customer_id = subscription[:customer]
+        customer = assert_existence :customer, customer_id, customers[customer_id]
+
+        cancel_params = { canceled_at: Time.now.utc.to_i }
+        cancelled_at_period_end = (params[:at_period_end] == true)
+        if cancelled_at_period_end
+          cancel_params[:cancel_at_period_end] = true
+        else
+          cancel_params[:status] = "canceled"
+          cancel_params[:cancel_at_period_end] = false
+          cancel_params[:ended_at] = Time.now.utc.to_i
+        end
+
+        subscription.merge!(cancel_params)
+
+        unless cancelled_at_period_end
+          delete_subscription_from_customer customer, subscription
+        end
+
+        subscription
+      end
+
+      def cancel_customer_subscription(route, method_url, params, headers)
+        route =~ method_url
+
+        subscription = assert_existence :subscription, $2, subscriptions[$2]
 
         customer_id = subscription[:customer]
         customer = assert_existence :customer, customer_id, customers[customer_id]

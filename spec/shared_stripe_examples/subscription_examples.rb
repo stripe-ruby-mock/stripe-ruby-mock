@@ -74,7 +74,29 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.count).to eq(1)
       expect(customer.subscriptions.data.first.discount).not_to be_nil
       expect(customer.subscriptions.data.first.discount).to be_a(Stripe::StripeObject)
+      expect(customer.subscriptions.data.first.discount.coupon.id).to eq(coupon.id)      
+    end
+
+    it 'can delete a discount applied to a customer subscription', live: true do
+      StripeMock.toggle_debug(true)
+      plan = stripe_helper.create_plan(id: 'plan_with_coupon', name: 'One More Test Plan', amount: 777)
+      coupon = stripe_helper.create_coupon(id: 'free_coupon', duration: 'repeating', duration_in_months: 3)
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      Stripe::Subscription.create(plan: plan.id, customer: customer.id, coupon: coupon.id)
+      customer = Stripe::Customer.retrieve(customer.id)
+
+      expect(customer.subscriptions.data).to be_a(Array)
+      expect(customer.subscriptions.data.count).to eq(1)
+      expect(customer.subscriptions.data.first.discount).not_to be_nil
+      expect(customer.subscriptions.data.first.discount).to be_a(Stripe::StripeObject)
       expect(customer.subscriptions.data.first.discount.coupon.id).to eq(coupon.id)
+
+      subscription = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
+      subscription.delete_discount
+      subscription.save
+
+      customer = Stripe::Customer.retrieve(customer.id)
+      expect(customer.subscriptions.data.first.discount).to be_nil
     end
 
     it 'when coupon is not exist', live: true do
@@ -546,6 +568,24 @@ shared_examples 'Customer Subscriptions' do
       customer = Stripe::Customer.create(source: gen_card_tk, plan: "the truth")
 
       sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+      result = sub.delete
+
+      expect(result.status).to eq('canceled')
+      expect(result.cancel_at_period_end).to eq false
+      expect(result.canceled_at).to_not be_nil
+      expect(result.id).to eq(sub.id)
+
+      customer = Stripe::Customer.retrieve(customer.id)
+      expect(customer.subscriptions.data).to be_empty
+      expect(customer.subscriptions.count).to eq(0)
+      expect(customer.subscriptions.data.length).to eq(0)
+    end
+
+    it "cancels a stripe customer's subscription via customer entity", :live => true do
+      truth = stripe_helper.create_plan(id: 'the truth')
+      customer = Stripe::Customer.create(source: gen_card_tk, plan: "the truth")
+
+      sub = customer.subscriptions.retrieve(customer.subscriptions.data.first.id)
       result = sub.delete
 
       expect(result.status).to eq('canceled')
