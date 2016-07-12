@@ -17,7 +17,7 @@ module StripeMock
       def retrieve_customer_subscription(route, method_url, params, headers)
         route =~ method_url
 
-        customer = :customer, $1, customers[$1]
+        customer = assert_existence :customer, $1, customers[$1]
         subscription = get_customer_subscription(customer, $2)
 
         assert_existence :subscription, $2, subscription
@@ -53,14 +53,16 @@ module StripeMock
         if params[:coupon]
           coupon_id = params[:coupon]
 
-          raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400) unless coupons[coupon_id]
-
-          # FIXME assert_existence returns 404 error code but Stripe returns 400
+          # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
-          coupon = Data.mock_coupon({ id: coupon_id })
+          coupon = coupons[coupon_id]
 
-          subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          if coupon
+            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          else
+            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
+          end
         end
 
         subscriptions[subscription[:id]] = subscription
@@ -93,14 +95,16 @@ module StripeMock
         if params[:coupon]
           coupon_id = params[:coupon]
 
-          raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400) unless coupons[coupon_id]
-
-          # FIXME assert_existence returns 404 error code but Stripe returns 400
+          # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
-          coupon = Data.mock_coupon({ id: coupon_id })
+          coupon = coupons[coupon_id]
 
-          subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          if coupon
+            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          else
+            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
+          end
         end
 
         subscriptions[subscription[:id]] = subscription
@@ -138,19 +142,23 @@ module StripeMock
 
         # expand the plan for addition to the customer object
         plan_name =
-          params[:plan].is_a?(String) ? params[:plan] : subscription[:plan][:id]
+            params[:plan].is_a?(String) ? params[:plan] : subscription[:plan][:id]
 
         plan = plans[plan_name]
 
         if params[:coupon]
           coupon_id = params[:coupon]
-          raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400) unless coupons[coupon_id]
 
-          # FIXME assert_existence returns 404 error code but Stripe returns 400
+          # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
-          coupon = Data.mock_coupon({ id: coupon_id })
-          subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          coupon = coupons[coupon_id]
+
+          if coupon
+            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          else
+            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
+          end
         end
 
         assert_existence :plan, plan_name, plan
@@ -202,7 +210,7 @@ module StripeMock
 
       def verify_card_present(customer, plan, params={})
         if customer[:default_source].nil? && customer[:trial_end].nil? && plan[:trial_period_days].nil? &&
-           plan[:amount] != 0 && plan[:trial_end].nil? && params[:trial_end].nil?
+            plan[:amount] != 0 && plan[:trial_end].nil? && params[:trial_end].nil?
           raise Stripe::InvalidRequestError.new('You must supply a valid card xoxo', nil, 400)
         end
       end
