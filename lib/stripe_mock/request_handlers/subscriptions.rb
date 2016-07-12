@@ -12,6 +12,7 @@ module StripeMock
 
         klass.add_handler 'post /v1/customers/(.*)/subscriptions', :create_customer_subscription
         klass.add_handler 'get /v1/customers/(.*)/subscriptions/(.*)', :retrieve_customer_subscription
+        klass.add_handler 'post /v1/customers/(.*)/subscriptions/(.*)', :update_customer_subscription
         klass.add_handler 'get /v1/customers/(.*)/subscriptions', :retrieve_customer_subscriptions
       end
 
@@ -153,17 +154,53 @@ module StripeMock
           # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
-          coupon = coupons[coupon_id]
+          add_coupon_to_subscription(coupon_id, subscription)
+        end
 
-          if coupon
-            now = DateTime.now
-            discount_start = now
-            discount_end = (now >> (coupon[:duration_in_months]).to_i)
+        assert_existence :plan, plan_name, plan
+        params[:plan] = plan if params[:plan]
+        verify_card_present(customer, plan)
 
-            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon, start: discount_start.to_time.to_i, end: discount_end.to_time.to_i }, {})
-          else
-            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
-          end
+        if subscription[:cancel_at_period_end]
+          subscription[:cancel_at_period_end] = false
+          subscription[:canceled_at] = nil
+        end
+
+        subscription.merge!(custom_subscription_params(plan, customer, params))
+
+        # delete the old subscription, replace with the new subscription
+        customer[:subscriptions][:data].reject! { |sub| sub[:id] == subscription[:id] }
+        customer[:subscriptions][:data] << subscription
+
+        subscription
+      end
+
+      def update_customer_subscription(route, method_url, params, headers)
+        route =~ method_url
+        subscription = assert_existence :subscription, $2, subscriptions[$2]
+        customer = assert_existence :customer, $1, customers[$1]
+
+        customer_id = subscription[:customer]
+
+        if params[:source]
+          new_card = get_card_by_token(params.delete(:source))
+          add_card_to_object(:customer, new_card, customer)
+          customer[:default_source] = new_card[:id]
+        end
+
+        # expand the plan for addition to the customer object
+        plan_name =
+          params[:plan].is_a?(String) ? params[:plan] : subscription[:plan][:id]
+
+        plan = plans[plan_name]
+
+        if params[:coupon]
+          coupon_id = params[:coupon]
+
+          # assert_existence returns 404 error code but Stripe returns 400
+          # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
+
+          add_coupon_to_subscription(coupon_id, subscription)
         end
 
         assert_existence :plan, plan_name, plan
