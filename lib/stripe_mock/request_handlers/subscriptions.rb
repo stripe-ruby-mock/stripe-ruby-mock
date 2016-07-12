@@ -130,6 +130,7 @@ module StripeMock
       def update_subscription(route, method_url, params, headers)
         route =~ method_url
         subscription = assert_existence :subscription, $1, subscriptions[$1]
+        verify_active_status(subscription)
 
         customer_id = subscription[:customer]
         customer = assert_existence :customer, customer_id, customers[customer_id]
@@ -215,6 +216,14 @@ module StripeMock
         end
       end
 
+      def verify_active_status(subscription)
+        id, status = subscription.values_at(:id, :status)
+
+        if status == 'canceled'
+          message = "No such subscription: #{id}"
+          raise Stripe::InvalidRequestError.new(message, 'subscription', 404)
+        end
+      end
     end
   end
 end
