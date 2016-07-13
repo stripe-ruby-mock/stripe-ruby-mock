@@ -9,6 +9,10 @@ shared_examples 'Plan API' do
       :amount => 9900,
       :currency => 'USD',
       :interval => 1,
+      :metadata => {
+        :description => "desc text",
+        :info => "info text"
+      },
       :trial_period_days => 30
     )
 
@@ -18,6 +22,10 @@ shared_examples 'Plan API' do
 
     expect(plan.currency).to eq('USD')
     expect(plan.interval).to eq(1)
+
+    expect(plan.metadata.description).to eq('desc text')
+    expect(plan.metadata.info).to eq('info text')
+
     expect(plan.trial_period_days).to eq(30)
   end
 

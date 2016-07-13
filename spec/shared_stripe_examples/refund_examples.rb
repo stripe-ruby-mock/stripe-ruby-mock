@@ -43,6 +43,19 @@ shared_examples 'Refund API' do
     expect(refund.refunds.data.first.id).to match(/^test_re/)
   end
 
+  it "creates a stripe refund with a status" do
+    charge = Stripe::Charge.create(
+      amount: 999,
+      currency: 'USD',
+      card: stripe_helper.generate_card_token,
+      description: 'card charge'
+    )
+    refund = charge.refund
+
+    expect(refund.refunds.data.count).to eq 1
+    expect(refund.refunds.data.first.status).to eq("succeeded")
+  end
+  
   it "creates a stripe refund with a different balance transaction than the charge" do
     charge = Stripe::Charge.create(
       amount: 999,

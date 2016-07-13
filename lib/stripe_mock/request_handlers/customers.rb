@@ -22,7 +22,7 @@ module StripeMock
               end
               card_from_params(params[:source])
             else
-              get_card_by_token(params.delete(:source))
+              get_card_or_bank_by_token(params.delete(:source))
             end
           sources << new_card
           params[:default_source] = sources.first[:id]
@@ -41,6 +41,7 @@ module StripeMock
           subscription = Data.mock_subscription({ id: new_id('su') })
           subscription.merge!(custom_subscription_params(plan, customers[ params[:id] ], params))
           add_subscription_to_customer(customers[ params[:id] ], subscription)
+          subscriptions[subscription[:id]] = subscription
         elsif params[:trial_end]
           raise Stripe::InvalidRequestError.new('Received unknown parameter: trial_end', nil, 400)
         end
@@ -71,9 +72,9 @@ module StripeMock
         end
         cus.merge!(params)
 
-        if params[:source] 
+        if params[:source]
           if params[:source].is_a?(String)
-            new_card = get_card_by_token(params.delete(:source))
+            new_card = get_card_or_bank_by_token(params.delete(:source))
           elsif params[:source].is_a?(Hash)
             unless params[:source][:object] && params[:source][:number] && params[:source][:exp_month] && params[:source][:exp_year]
               raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)

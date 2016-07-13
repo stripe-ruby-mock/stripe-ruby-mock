@@ -43,7 +43,8 @@ shared_examples 'Customer API' do
                                            object: 'card',
                                            number: '4242424242424242',
                                            exp_month: 12,
-                                           exp_year: 2024
+                                           exp_year: 2024,
+                                           cvc: 123
                                        },
                                        email: 'blah@blah.com')
 
