@@ -1,5 +1,5 @@
 require 'ostruct'
-require 'jimson-temp'
+require 'multi_json'
 require 'dante'
 
 require 'stripe'

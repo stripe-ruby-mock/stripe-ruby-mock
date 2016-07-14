@@ -3,19 +3,40 @@ module StripeMock
     module Subscriptions
 
       def Subscriptions.included(klass)
-        klass.add_handler 'get /v1/customers/(.*)/subscriptions', :retrieve_subscriptions
-        klass.add_handler 'post /v1/customers/(.*)/subscriptions', :create_subscription
-        klass.add_handler 'get /v1/customers/(.*)/subscriptions/(.*)', :retrieve_subscription
-        klass.add_handler 'post /v1/customers/(.*)/subscriptions/(.*)', :update_subscription
-        klass.add_handler 'delete /v1/customers/(.*)/subscriptions/(.*)', :cancel_subscription
+        klass.add_handler 'get /v1/subscriptions', :retrieve_subscriptions
+        klass.add_handler 'post /v1/subscriptions', :create_subscription
+        klass.add_handler 'get /v1/subscriptions/(.*)', :retrieve_subscription
+        klass.add_handler 'post /v1/subscriptions/(.*)', :update_subscription
+        klass.add_handler 'delete /v1/subscriptions/(.*)', :cancel_subscription
+
+        klass.add_handler 'post /v1/customers/(.*)/subscriptions', :create_customer_subscription
+        klass.add_handler 'get /v1/customers/(.*)/subscriptions/(.*)', :retrieve_customer_subscription
+        klass.add_handler 'get /v1/customers/(.*)/subscriptions', :retrieve_customer_subscriptions
       end
 
-      def create_subscription(route, method_url, params, headers)
+      def retrieve_customer_subscription(route, method_url, params, headers)
         route =~ method_url
+
         customer = assert_existence :customer, $1, customers[$1]
+        subscription = get_customer_subscription(customer, $2)
+
+        assert_existence :subscription, $2, subscription
+      end
+
+      def retrieve_customer_subscriptions(route, method_url, params, headers)
+        route =~ method_url
+
+        customer = assert_existence :customer, $1, customers[$1]
+        customer[:subscriptions]
+      end
+
+      def create_customer_subscription(route, method_url, params, headers)
+        route =~ method_url
 
         plan_id = params[:plan].to_s
         plan = assert_existence :plan, plan_id, plans[plan_id]
+
+        customer = assert_existence :customer, $1, customers[$1]
 
         if params[:source]
           new_card = get_card_by_token(params.delete(:source))
@@ -32,42 +53,86 @@ module StripeMock
         if params[:coupon]
           coupon_id = params[:coupon]
 
-          raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400) unless coupons[coupon_id]
-
-          # FIXME assert_existence returns 404 error code but Stripe returns 400
+          # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
-          coupon = Data.mock_coupon({ id: coupon_id })
+          coupon = coupons[coupon_id]
 
-          subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          if coupon
+            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          else
+            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
+          end
         end
 
+        subscriptions[subscription[:id]] = subscription
         add_subscription_to_customer(customer, subscription)
 
+        subscriptions[subscription[:id]]
+      end
 
-        subscription
+      def create_subscription(route, method_url, params, headers)
+        route =~ method_url
+
+        plan_id = params[:plan].to_s
+        plan = assert_existence :plan, plan_id, plans[plan_id]
+
+        customer_id = params[:customer].to_s
+        customer = assert_existence :customer, customer_id, customers[customer_id]
+
+        if params[:source]
+          new_card = get_card_by_token(params.delete(:source))
+          add_card_to_object(:customer, new_card, customer)
+          customer[:default_source] = new_card[:id]
+        end
+
+        # Ensure customer has card to charge if plan has no trial and is not free
+        verify_card_present(customer, plan, params)
+
+        subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')) })
+        subscription.merge!(custom_subscription_params(plan, customer, params))
+
+        if params[:coupon]
+          coupon_id = params[:coupon]
+
+          # assert_existence returns 404 error code but Stripe returns 400
+          # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
+
+          coupon = coupons[coupon_id]
+
+          if coupon
+            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          else
+            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
+          end
+        end
+
+        subscriptions[subscription[:id]] = subscription
+        add_subscription_to_customer(customer, subscription)
+
+        subscriptions[subscription[:id]]
       end
 
       def retrieve_subscription(route, method_url, params, headers)
         route =~ method_url
 
-        customer = assert_existence :customer, $1, customers[$1]
-        assert_existence :subscription, $2, get_customer_subscription(customer, $2)
+        assert_existence :subscription, $1, subscriptions[$1]
       end
 
       def retrieve_subscriptions(route, method_url, params, headers)
         route =~ method_url
 
-        customer = assert_existence :customer, $1, customers[$1]
-        customer[:subscriptions]
+        Data.mock_list_object(subscriptions.values, params)
+        #customer = assert_existence :customer, $1, customers[$1]
+        #customer[:subscriptions]
       end
 
       def update_subscription(route, method_url, params, headers)
         route =~ method_url
-        customer = assert_existence :customer, $1, customers[$1]
+        subscription = assert_existence :subscription, $1, subscriptions[$1]
 
-        subscription = get_customer_subscription(customer, $2)
-        assert_existence :subscription, $2, subscription
+        customer_id = subscription[:customer]
+        customer = assert_existence :customer, customer_id, customers[customer_id]
 
         if params[:source]
           new_card = get_card_by_token(params.delete(:source))
@@ -76,19 +141,24 @@ module StripeMock
         end
 
         # expand the plan for addition to the customer object
-        plan_name = params[:plan] if params[:plan] && params[:plan] != {}
-        plan_name ||= subscription[:plan][:id]
+        plan_name =
+          params[:plan].is_a?(String) ? params[:plan] : subscription[:plan][:id]
+
         plan = plans[plan_name]
 
         if params[:coupon]
           coupon_id = params[:coupon]
-          raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400) unless coupons[coupon_id]
 
-          # FIXME assert_existence returns 404 error code but Stripe returns 400
+          # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
-          coupon = Data.mock_coupon({ id: coupon_id })
-          subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          coupon = coupons[coupon_id]
+
+          if coupon
+            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          else
+            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
+          end
         end
 
         assert_existence :plan, plan_name, plan
@@ -111,10 +181,11 @@ module StripeMock
 
       def cancel_subscription(route, method_url, params, headers)
         route =~ method_url
-        customer = assert_existence :customer, $1, customers[$1]
 
-        subscription = get_customer_subscription(customer, $2)
-        assert_existence :subscription, $2, subscription
+        subscription = assert_existence :subscription, $1, subscriptions[$1]
+
+        customer_id = subscription[:customer]
+        customer = assert_existence :customer, customer_id, customers[customer_id]
 
         cancel_params = { canceled_at: Time.now.utc.to_i }
         cancelled_at_period_end = (params[:at_period_end] == true)

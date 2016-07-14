@@ -21,6 +21,21 @@ module StripeMock
         stripe_token.id
       end
 
+      def generate_bank_token(bank_account_params={})
+        bank_account = {
+          :country => "US",
+          :currency => "usd",
+          :account_holder_name => "Jane Austen",
+          :account_holder_type => "individual",
+          :routing_number => "110000000",
+          :account_number => "000123456789"
+        }.merge(bank_account_params)
+        bank_account[:fingerprint] = StripeMock::Util.fingerprint(bank_account[:account_number]) if StripeMock.state == 'local'
+
+        stripe_token = Stripe::Token.create(:bank_account => bank_account)
+        stripe_token.id
+      end
+
       def create_coupon_params(params = {})
         {
           id: '10BUCKS',

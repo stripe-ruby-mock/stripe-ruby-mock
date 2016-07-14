@@ -128,7 +128,7 @@ describe 'StripeMock Server', :mock_server => true do
       # We should never get here
       expect(false).to eq(true)
     rescue StripeMock::ServerTimeoutError => e
-      expect(e.associated_error).to be_a(Errno::ECONNREFUSED)
+      expect(e).to be_a StripeMock::ServerTimeoutError
     end
   end
 
