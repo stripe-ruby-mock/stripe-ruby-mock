@@ -375,4 +375,20 @@ shared_examples 'Charge API' do
     end
   end
 
+  describe "idempotency" do
+    it "returns the original charge if the same idempotency_key is passed in" do
+      charge_params = {
+        amount: 777,
+        currency: 'USD',
+        card: stripe_helper.generate_card_token,
+        capture: true,
+        idempotency_key: 'onceisenough'
+      }
+      charge1 = Stripe::Charge.create(charge_params)
+      charge2 = Stripe::Charge.create(charge_params)
+
+      expect(charge1).to eq(charge2)
+    end
+  end
+
 end

@@ -13,6 +13,11 @@ module StripeMock
       end
 
       def new_charge(route, method_url, params, headers)
+        if params[:idempotency_key]
+          original_charge = charges.values.select { |c| c[:idempotency_key] == params[:idempotency_key]}.first
+          return charges[original_charge[:id]] if original_charge
+        end
+
         id = new_id('ch')
 
         if params[:source]
