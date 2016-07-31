@@ -12,6 +12,7 @@ module StripeMock
         klass.add_handler 'post /v1/customers/(.*)/subscriptions', :create_customer_subscription
         klass.add_handler 'get /v1/customers/(.*)/subscriptions/(.*)', :retrieve_customer_subscription
         klass.add_handler 'get /v1/customers/(.*)/subscriptions', :retrieve_customer_subscriptions
+        klass.add_handler 'post /v1/subscriptions/(.*)subscriptions/(.*)', :update_subscription
         klass.add_handler 'delete /v1/customers/(.*)/subscriptions/(.*)', :cancel_subscription
       end
 
@@ -130,7 +131,9 @@ module StripeMock
 
       def update_subscription(route, method_url, params, headers)
         route =~ method_url
-        subscription = assert_existence :subscription, $1, subscriptions[$1]
+
+        subscription_id = $2 ? $2 : $1
+        subscription = assert_existence :subscription, subscription_id, subscriptions[subscription_id]
 
         customer_id = subscription[:customer]
         customer = assert_existence :customer, customer_id, customers[customer_id]
