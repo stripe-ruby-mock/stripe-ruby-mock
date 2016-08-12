@@ -375,4 +375,31 @@ shared_examples 'Charge API' do
     end
   end
 
+  describe "idempotency" do
+    let(:idempotent_charge_params) {{
+      amount: 777,
+      currency: 'USD',
+      card: stripe_helper.generate_card_token,
+      capture: true,
+      idempotency_key: 'onceisenough'
+    }}
+
+    it "returns the original charge if the same idempotency_key is passed in" do
+      charge1 = Stripe::Charge.create(idempotent_charge_params)
+      charge2 = Stripe::Charge.create(idempotent_charge_params)
+
+      expect(charge1).to eq(charge2)
+    end
+
+    it "returns different charges if different idempotency_keys are used for each charge" do
+      idempotent_charge_params2 = idempotent_charge_params.clone
+      idempotent_charge_params2[:idempotency_key] = 'thisoneisdifferent'
+
+      charge1 = Stripe::Charge.create(idempotent_charge_params)
+      charge2 = Stripe::Charge.create(idempotent_charge_params2)
+
+      expect(charge1).not_to eq(charge2)
+    end
+  end
+
 end
