@@ -154,16 +154,14 @@ module StripeMock
         if params[:coupon]
           coupon_id = params[:coupon]
 
-          # remove discount if coupon_id is set to nil
-          return subscription[:discount] = nil unless params[:coupon].present?
-
           # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
           coupon = coupons[coupon_id]
-
           if coupon
             subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          elsif coupon_id == ""
+            subscription[:discount] = Stripe::Util.convert_to_stripe_object(nil, {})
           else
             raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
           end

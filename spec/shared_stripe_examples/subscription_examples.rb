@@ -360,6 +360,20 @@ shared_examples 'Customer Subscriptions' do
 
     end
 
+    it 'when coupon is removed' do
+      plan = stripe_helper.create_plan(id: 'plan_with_coupon3', name: 'One More Test Plan', amount: 777)
+      customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
+      coupon = stripe_helper.create_coupon
+      subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+
+      subscription.coupon = coupon.id
+      subscription.save
+      subscription.coupon = nil
+      subscription.save
+
+      expect(subscription.discount).to be_nil
+    end
+
     it "throws an error when plan does not exist" do
       free = stripe_helper.create_plan(id: 'free', amount: 0)
       customer = Stripe::Customer.create(id: 'cardless', plan: 'free')
