@@ -154,6 +154,9 @@ module StripeMock
         if params[:coupon]
           coupon_id = params[:coupon]
 
+          #remove discount if coupon_id is set to nil
+          return subscription[:discount] = {} if nil
+
           # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
