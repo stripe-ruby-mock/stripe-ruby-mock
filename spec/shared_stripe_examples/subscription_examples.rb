@@ -288,6 +288,19 @@ shared_examples 'Customer Subscriptions' do
   end
 
   context "updating a subscription" do
+    it 'raises invalid request exception when subscription is cancelled' do
+      stripe_helper.create_plan(id: 'the truth')
+      customer = Stripe::Customer.create(source: gen_card_tk, plan: 'the truth')
+
+      subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+      subscription.delete
+
+      expect { subscription.save }.to raise_error { |e|
+        expect(e).to be_a(Stripe::InvalidRequestError)
+        expect(e.http_status).to eq(404)
+        expect(e.message).to eq("No such subscription: #{subscription.id}")
+      }
+    end
 
     it "updates a stripe customer's existing subscription" do
       silver = stripe_helper.create_plan(id: 'silver')
