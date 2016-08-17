@@ -18,7 +18,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
 
   gem.add_dependency 'mime-types', '<= 2.6.2'
-  gem.add_dependency 'stripe', '>= 1.31.0'
+  gem.add_dependency 'rest-client', '<= 1.8.0'
+  gem.add_dependency 'stripe', ['>= 1.31.0', '<= 1.50'] 
   gem.add_dependency 'multi_json', '>= 1.0.0'
   gem.add_dependency 'dante', '>= 0.2.0'
 
