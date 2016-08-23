@@ -100,4 +100,19 @@ shared_examples 'Refund API' do
     expect(charge.refunds.total_count).to eq 2
     expect(charge.amount_refunded).to eq 700
   end
+
+  it 'returns Stripe::Refund object', live: true do
+    charge = Stripe::Charge.create(
+        amount: 999,
+        currency: 'USD',
+        card: stripe_helper.generate_card_token,
+        description: 'card charge'
+    )
+    refund = Stripe::Refund.create(
+        charge: charge.id,
+        amount: 500,
+    )
+
+    expect(refund).to be_a(Stripe::Refund)
+  end
 end
