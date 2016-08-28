@@ -9,10 +9,16 @@ module StripeMock
         klass.add_handler 'post /v1/charges/(.*)/capture',  :capture_charge
         klass.add_handler 'post /v1/charges/(.*)/refund',   :refund_charge
         klass.add_handler 'post /v1/charges/(.*)/refunds',  :create_refund
+        klass.add_handler 'post /v1/refunds',               :create_refund
         klass.add_handler 'post /v1/charges/(.*)',          :update_charge
       end
 
       def new_charge(route, method_url, params, headers)
+        if params[:idempotency_key] && charges.any?
+          original_charge = charges.values.find { |c| c[:idempotency_key] == params[:idempotency_key]}
+          return charges[original_charge[:id]] if original_charge
+        end
+
         id = new_id('ch')
 
         if params[:source]
@@ -69,7 +75,8 @@ module StripeMock
 
       def get_charge(route, method_url, params, headers)
         route =~ method_url
-        assert_existence :charge, $1, charges[$1]
+        charge_id = $1 || params[:charge]
+        assert_existence :charge, charge_id, charges[charge_id]
       end
 
       def capture_charge(route, method_url, params, headers)

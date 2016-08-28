@@ -12,6 +12,8 @@ module StripeMock
         klass.add_handler 'post /v1/customers/(.*)/subscriptions', :create_customer_subscription
         klass.add_handler 'get /v1/customers/(.*)/subscriptions/(.*)', :retrieve_customer_subscription
         klass.add_handler 'get /v1/customers/(.*)/subscriptions', :retrieve_customer_subscriptions
+        klass.add_handler 'post /v1/customers/(.*)subscriptions/(.*)', :update_subscription
+        klass.add_handler 'delete /v1/customers/(.*)/subscriptions/(.*)', :cancel_subscription
       end
 
       def retrieve_customer_subscription(route, method_url, params, headers)
@@ -129,7 +131,10 @@ module StripeMock
 
       def update_subscription(route, method_url, params, headers)
         route =~ method_url
-        subscription = assert_existence :subscription, $1, subscriptions[$1]
+
+        subscription_id = $2 ? $2 : $1
+        subscription = assert_existence :subscription, subscription_id, subscriptions[subscription_id]
+        verify_active_status(subscription)
 
         customer_id = subscription[:customer]
         customer = assert_existence :customer, customer_id, customers[customer_id]
@@ -153,9 +158,10 @@ module StripeMock
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
           coupon = coupons[coupon_id]
-
           if coupon
             subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+          elsif coupon_id == ""
+            subscription[:discount] = Stripe::Util.convert_to_stripe_object(nil, {})
           else
             raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
           end
@@ -170,6 +176,7 @@ module StripeMock
           subscription[:canceled_at] = nil
         end
 
+        params[:current_period_start] = subscription[:current_period_start]
         subscription.merge!(custom_subscription_params(plan, customer, params))
 
         # delete the old subscription, replace with the new subscription
@@ -182,7 +189,8 @@ module StripeMock
       def cancel_subscription(route, method_url, params, headers)
         route =~ method_url
 
-        subscription = assert_existence :subscription, $1, subscriptions[$1]
+        subscription_id = $2 ? $2 : $1
+        subscription = assert_existence :subscription, subscription_id, subscriptions[subscription_id]
 
         customer_id = subscription[:customer]
         customer = assert_existence :customer, customer_id, customers[customer_id]
@@ -192,7 +200,7 @@ module StripeMock
         if cancelled_at_period_end
           cancel_params[:cancel_at_period_end] = true
         else
-          cancel_params[:status] = "canceled"
+          cancel_params[:status] = 'canceled'
           cancel_params[:cancel_at_period_end] = false
           cancel_params[:ended_at] = Time.now.utc.to_i
         end
@@ -215,6 +223,14 @@ module StripeMock
         end
       end
 
+      def verify_active_status(subscription)
+        id, status = subscription.values_at(:id, :status)
+
+        if status == 'canceled'
+          message = "No such subscription: #{id}"
+          raise Stripe::InvalidRequestError.new(message, 'subscription', 404)
+        end
+      end
     end
   end
 end

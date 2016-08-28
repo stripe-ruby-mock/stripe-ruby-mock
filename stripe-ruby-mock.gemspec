@@ -17,8 +17,8 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ['lib']
 
-  gem.add_dependency 'stripe', ['>= 1.31.0', '<= 1.43']
-  gem.add_dependency 'multi_json', '>= 1.0.0'
+  gem.add_dependency 'stripe', '~> 1.31'
+  gem.add_dependency 'multi_json', '~> 1.0'
   gem.add_dependency 'dante', '>= 0.2.0'
 
   gem.add_development_dependency 'rspec', '~> 3.1.0'
