@@ -37,11 +37,12 @@ module StripeMock
     include StripeMock::RequestHandlers::Recipients
     include StripeMock::RequestHandlers::Transfers
     include StripeMock::RequestHandlers::Tokens
+    include StripeMock::RequestHandlers::CountrySpec
 
 
     attr_reader :accounts, :balance_transactions, :bank_tokens, :charges, :coupons, :customers,
                 :disputes, :events, :invoices, :invoice_items, :orders, :plans, :recipients,
-                :transfers, :subscriptions
+                :transfers, :subscriptions, :country_spec
 
     attr_accessor :error_queue, :debug
 
@@ -62,6 +63,7 @@ module StripeMock
       @recipients = {}
       @transfers = {}
       @subscriptions = {}
+      @country_spec = {}
 
       @debug = false
       @error_queue = ErrorQueue.new
