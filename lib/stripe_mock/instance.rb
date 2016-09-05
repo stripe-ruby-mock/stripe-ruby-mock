@@ -126,9 +126,16 @@ module StripeMock
       "#{StripeMock.global_id_prefix}#{prefix}_#{@id_counter += 1}"
     end
 
-    def new_balance_transaction(prefix)
+    def new_balance_transaction(prefix, params = {})
       # balance transaction ids must be strings
-      "#{StripeMock.global_id_prefix}#{prefix}_#{@balance_transaction_counter += 1}"
+      id = "#{StripeMock.global_id_prefix}#{prefix}_#{@balance_transaction_counter += 1}"
+      amount = params[:amount]
+      unless amount.nil?
+        # Fee calculation
+        params[:fee] ||= 30 + (amount * 0.029).ceil
+      end
+      @balance_transactions[id] = Data.mock_balance_transaction(params.merge(id: id))
+      id
     end
 
     def symbolize_names(hash)
