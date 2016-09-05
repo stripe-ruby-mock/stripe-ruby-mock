@@ -42,8 +42,11 @@ module StripeMock
         end
 
         ensure_required_params(params)
+        bal_trans_params = { amount: params[:amount], source: params[:source] }
 
-        charges[id] = Data.mock_charge(params.merge :id => id, :balance_transaction => new_balance_transaction('txn'))
+        charges[id] = Data.mock_charge(
+            params.merge :id => id,
+            :balance_transaction => new_balance_transaction('txn', bal_trans_params))
       end
 
       def update_charge(route, method_url, params, headers)
