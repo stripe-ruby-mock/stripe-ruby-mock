@@ -47,6 +47,15 @@ module StripeMock
           date: nil,
           user_agent: nil
         },
+        external_accounts: {
+            object: "list",
+            data: [
+
+            ],
+            has_more: false,
+            total_count: 0,
+            url: "/v1/accounts/#{id}/external_accounts"
+        },
         legal_entity: {
           type: nil,
           business_name: nil,
