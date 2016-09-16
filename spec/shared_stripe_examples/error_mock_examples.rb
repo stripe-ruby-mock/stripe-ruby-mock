@@ -149,4 +149,9 @@ shared_examples 'Stripe Error Mocking' do
     expect_card_error 'processing_error', nil
   end
 
+  it "mocks an incorrect zip code card error" do
+    StripeMock.prepare_card_error(:incorrect_zip)
+    expect_card_error 'incorrect_zip', 'address_zip'
+  end
+
 end
