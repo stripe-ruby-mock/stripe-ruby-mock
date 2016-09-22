@@ -4,6 +4,7 @@ rvm:
   - 2.0.0
   - 2.1.6
 before_install:
+  - rvm 1.9.3 do gem install mime-types -v 2.6.2
   - gem install bundler
 before_script:
   - "sudo touch /var/log/stripe-mock-server.log"
