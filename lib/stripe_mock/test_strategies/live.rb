@@ -30,6 +30,11 @@ module StripeMock
           # do nothing
         end
       end
+
+      def renew_subscriptions(subscription_list = [])
+        raise "Renewing subscriptions in Live mode not supported"
+      end
+
     end
   end
 end

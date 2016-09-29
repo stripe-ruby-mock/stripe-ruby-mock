@@ -54,7 +54,6 @@ module StripeMock
     end
 
     def generate_card_token(card_params)
-puts "in StripeMock.Server.generate_card_token"
       @instance.generate_card_token(card_params)
     end
 
@@ -77,5 +76,10 @@ puts "in StripeMock.Server.generate_card_token"
     def ping
       true
     end
+
+    def renew_subscriptions(subscription_list)
+      @instance.renew_subscriptions(subscription_list)
+    end
+
   end
 end

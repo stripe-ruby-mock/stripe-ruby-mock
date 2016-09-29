@@ -14,6 +14,14 @@ module StripeMock
         end
       end
 
+      def renew_subscriptions(subscription_list = [])
+        if StripeMock.state == 'remote'
+          StripeMock.client.renew_subscriptions(subscription_list)
+        elsif StripeMock.state == 'local'
+          StripeMock.instance.renew_subscriptions(subscription_list)
+        end
+      end
+
     end
   end
 end
