@@ -49,7 +49,7 @@ module StripeMock
 
     def initialize
       @accounts = {}
-      @application_fees = {}
+      @application_fees = Data.mock_application_fees(['fee_05RsQX2eZvKYlo2C0FRTGSSA','fee_15RsQX2eZvKYlo2C0ERTYUIA', 'fee_25RsQX2eZvKYlo2C0ZXCVBNM', 'fee_35RsQX2eZvKYlo2C0QAZXSWE', 'fee_45RsQX2eZvKYlo2C0EDCVFRT', 'fee_55RsQX2eZvKYlo2C0OIKLJUY', 'fee_65RsQX2eZvKYlo2C0ASDFGHJ', 'fee_75RsQX2eZvKYlo2C0EDCXSWQ', 'fee_85RsQX2eZvKYlo2C0UJMCDET', 'fee_95RsQX2eZvKYlo2C0EDFRYUI'])
       @balance_transactions = Data.mock_balance_transactions(['txn_05RsQX2eZvKYlo2C0FRTGSSA','txn_15RsQX2eZvKYlo2C0ERTYUIA', 'txn_25RsQX2eZvKYlo2C0ZXCVBNM', 'txn_35RsQX2eZvKYlo2C0QAZXSWE', 'txn_45RsQX2eZvKYlo2C0EDCVFRT', 'txn_55RsQX2eZvKYlo2C0OIKLJUY', 'txn_65RsQX2eZvKYlo2C0ASDFGHJ', 'txn_75RsQX2eZvKYlo2C0EDCXSWQ', 'txn_85RsQX2eZvKYlo2C0UJMCDET', 'txn_95RsQX2eZvKYlo2C0EDFRYUI'])
       @bank_tokens = {}
       @card_tokens = {}
@@ -71,6 +71,7 @@ module StripeMock
       @error_queue = ErrorQueue.new
       @id_counter = 0
       @balance_transaction_counter = 0
+      @application_fee_counter = 0
 
       # This is basically a cache for ParamValidators
       @base_strategy = TestStrategies::Base.new
@@ -137,6 +138,13 @@ module StripeMock
         params[:fee] ||= 30 + (amount * 0.029).ceil
       end
       @balance_transactions[id] = Data.mock_balance_transaction(params.merge(id: id))
+      id
+    end
+
+    def new_application_fee(prefix, params = {})
+      # application fee ids must be strings
+      id = "#{StripeMock.global_id_prefix}#{prefix}_#{@application_fee_counter += 1}"
+      @application_fees[id] = Data.mock_application_fee(params.merge(id: id))
       id
     end
 

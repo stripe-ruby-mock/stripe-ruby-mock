@@ -42,11 +42,21 @@ module StripeMock
         end
 
         ensure_required_params(params)
-        bal_trans_params = { amount: params[:amount], source: params[:source] }
+        if params[:capture] != false
+           bal_trans_params = { amount: params[:amount], source: params[:source] }
+           params[:balance_transaction] = new_balance_transaction('txn', bal_trans_params)
+        end
 
-        charges[id] = Data.mock_charge(
-            params.merge :id => id,
-            :balance_transaction => new_balance_transaction('txn', bal_trans_params))
+        charges[id] = Data.mock_charge(params.merge :id => id)
+
+        if params[:capture] != false && params[:application_fee]
+          charges[id][:application_fee] = new_application_fee('fee',
+                                                            amount: params[:application_fee],
+                                                            balance_transaction: charges[id][:balance_transaction],
+                                                            charge: id
+          )
+        end
+        charges[id]
       end
 
       def update_charge(route, method_url, params, headers)
@@ -87,6 +97,10 @@ module StripeMock
         charge = assert_existence :charge, $1, charges[$1]
 
         if params[:amount]
+
+          bal_trans_params = { amount: params[:amount], source: params[:source] }
+          charge[:balance_transaction] = new_balance_transaction('txn', bal_trans_params)
+
           refund = Data.mock_refund(
             :balance_transaction => new_balance_transaction('txn'),
             :id => new_id('re'),
@@ -96,8 +110,10 @@ module StripeMock
         end
 
         if params[:application_fee]
-          # TODO - need to create application fee here instead of passing on application_fee_amount
-          charge[:application_fee] = params[:application_fee]
+          charge[:application_fee] = new_application_fee('fee',
+                                                         amount: params[:application_fee],
+                                                         balance_transaction: charge[:balance_transaction],
+                                                         charge: charge[:id])
         end
 
         charge[:captured] = true
@@ -112,6 +128,8 @@ module StripeMock
           :id => new_id('re')
         )
         add_refund_to_charge(refund, charge)
+
+        #TODO - need to refund application_fee if refund_application_fee parameter is true
         charge
       end
 
@@ -124,6 +142,8 @@ module StripeMock
           :charge => charge[:id]
         )
         add_refund_to_charge(refund, charge)
+
+        #TODO - need to refund application_fee if refund_application_fee parameter is true
         refund
       end
 

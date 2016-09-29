@@ -910,5 +910,44 @@ module StripeMock
         type: "charge"
       }.merge(params)
     end
+
+    def self.mock_application_fees(ids=[])
+      afs = {}
+      ids.each do |id|
+        afs[id] = self.mock_application_fee(id: id)
+      end
+      afs
+    end
+
+    def self.mock_application_fee(params = {})
+      af_id = params[:id] || 'test_af_default'
+      account = params[:account] || 'acct_test'
+      amount = params[:amount] || 200
+      application = params[:application] || 'ca_test'
+      balance_transaction = params[:balance_transaction] || 'txn_test'
+      charge = params[:charge] || 'ch_test'
+      {
+          id: af_id,
+          object: "application_fee",
+          account: account,
+          amount: amount,
+          amount_refunded: 0,
+          application: application,
+          balance_transaction: balance_transaction,
+          charge: charge,
+          created: 1475176828,
+          currency: "usd",
+          originating_transaction: nil,
+          refunded: false,
+          refunds: {
+              object: "list",
+              data: [],
+              has_more: false,
+              total_count: 0,
+              url: "/v1/application_fees/#{af_id}"
+          }
+      }.merge(params)
+    end
+
   end
 end
