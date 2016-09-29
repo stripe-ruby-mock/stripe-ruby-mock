@@ -58,6 +58,7 @@ module StripeMock
     end
 
     def generate_card_token(card_params)
+puts "in StripeMock.Client.generate_card_token"
       timeout_wrap { @pipe.generate_card_token(card_params) }
     end
 

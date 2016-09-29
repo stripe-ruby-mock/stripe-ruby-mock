@@ -54,6 +54,7 @@ module StripeMock
     end
 
     def generate_card_token(card_params)
+puts "in StripeMock.Server.generate_card_token"
       @instance.generate_card_token(card_params)
     end
 
