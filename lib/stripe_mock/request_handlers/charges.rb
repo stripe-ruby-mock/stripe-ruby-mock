@@ -96,6 +96,7 @@ module StripeMock
         end
 
         if params[:application_fee]
+          # TODO - need to create application fee here instead of passing on application_fee_amount
           charge[:application_fee] = params[:application_fee]
         end
 

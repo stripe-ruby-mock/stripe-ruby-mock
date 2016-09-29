@@ -6,6 +6,7 @@ end
 
 def it_behaves_like_stripe(&block)
   it_behaves_like 'Account API', &block
+  it_behaves_like 'Application Fee API', &block
   it_behaves_like 'Balance Transaction API', &block
   it_behaves_like 'Bank Account Token Mocking', &block
   it_behaves_like 'Card Token Mocking', &block
