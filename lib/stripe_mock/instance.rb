@@ -114,7 +114,7 @@ module StripeMock
       @events[ event_data[:id] ] = symbolize_names(event_data)
     end
 
-    def renew_subscription(subscription_id)
+    def generate_subscription_renewal_invoice(subscription_id)
       # Returns the invoice id created by the subscription renewal
       if @subscriptions.has_key?(subscription_id)
         subscription = assert_existence :subscription, subscription_id, @subscriptions[subscription_id]

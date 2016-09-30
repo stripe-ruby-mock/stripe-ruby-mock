@@ -73,8 +73,8 @@ module StripeMock
       timeout_wrap { @pipe.clear_data }
     end
 
-    def renew_subscription(subscription_id)
-      timeout_wrap { @pipe.renew_subscription(subscription_id) }
+    def generate_subscription_renewal_invoice(subscription_id)
+      timeout_wrap { @pipe.generate_subscription_renewal_invoice(subscription_id) }
     end
 
     def close!

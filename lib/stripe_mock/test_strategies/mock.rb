@@ -14,12 +14,12 @@ module StripeMock
         end
       end
 
-      def renew_subscription(subscription_id)
+      def generate_subscription_renewal_invoice(subscription_id)
 puts "StripeMock.state=#{StripeMock.state}"
         if StripeMock.state == 'remote'
-          StripeMock.client.renew_subscription(subscription_id)
+          StripeMock.client.generate_subscription_renewal_invoice(subscription_id)
         elsif StripeMock.state == 'local'
-          StripeMock.instance.renew_subscription(subscription_id)
+          StripeMock.instance.generate_subscription_renewal_invoice(subscription_id)
         end
       end
 
