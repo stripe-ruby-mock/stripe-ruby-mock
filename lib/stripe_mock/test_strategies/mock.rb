@@ -15,6 +15,7 @@ module StripeMock
       end
 
       def renew_subscription(subscription_id)
+puts "StripeMock.state=#{StripeMock.state}"
         if StripeMock.state == 'remote'
           StripeMock.client.renew_subscriptions(subscription_list)
         elsif StripeMock.state == 'local'
