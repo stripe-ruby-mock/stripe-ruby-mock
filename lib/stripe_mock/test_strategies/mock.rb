@@ -19,8 +19,9 @@ puts "StripeMock.state=#{StripeMock.state}"
         if StripeMock.state == 'remote'
           StripeMock.client.renew_subscription(subscription_id)
         elsif StripeMock.state == 'local'
-          if StripeMock.instance.subscriptions.has_key?(subscription_id)
-            StripeMock.instance.subscriptions[subscription_id].renew_subscription
+          subscription = StripeMock.instance.subscriptions[subscription_id]
+          if subscription.present?
+            subscription.renew_subscription
           else
             raise "Unable to renew subscription #{subscription_id} because this subscription does not exist"
           end
