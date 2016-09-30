@@ -119,6 +119,7 @@ module StripeMock
         subscription = assert_existence :subscription, subscription_id, @subscriptions[subscription_id]
       end
       if subscription.present?
+puts "subscription=#{subscription}"
         subscription.renew_subscription
       else
         raise "Unable to renew subscription #{subscription_id} because this subscription does not exist"
