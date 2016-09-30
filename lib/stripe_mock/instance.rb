@@ -114,6 +114,10 @@ module StripeMock
       @events[ event_data[:id] ] = symbolize_names(event_data)
     end
 
+    def renew_subscription(subscription_id)
+      @subscriptions[subscription_id].renew_subscription
+    end
+
     private
 
     def assert_existence(type, id, obj, message=nil)

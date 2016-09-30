@@ -77,8 +77,8 @@ module StripeMock
       true
     end
 
-    def renew_subscriptions(subscription_list)
-      @instance.renew_subscriptions(subscription_list)
+    def renew_subscription(subscription_id)
+      @instance.renew_subscription(subscription_id)
     end
 
   end
