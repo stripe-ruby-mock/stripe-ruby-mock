@@ -119,9 +119,11 @@ module StripeMock
       if @subscriptions.has_key?(subscription_id)
         subscription = assert_existence :subscription, subscription_id, @subscriptions[subscription_id]
       end
-      if subscription.present?
 
 puts "subscription=#{subscription}"
+
+      if subscription.present?
+
 
         id = new_id('in')
         invoice_item = Data.mock_line_item({id: subscription_id,
