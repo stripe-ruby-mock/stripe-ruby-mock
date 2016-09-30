@@ -19,7 +19,7 @@ puts "StripeMock.state=#{StripeMock.state}"
         if StripeMock.state == 'remote'
           StripeMock.client.renew_subscription(subscription_id)
         elsif StripeMock.state == 'local'
-          subscription = StripeMock.instance.subscriptions[subscription_id]
+          subscription = assert_existence :subscription, subscription_id, StripeMock.instance.subscriptions[subscription_id]
           if subscription.present?
             subscription.renew_subscription
           else
