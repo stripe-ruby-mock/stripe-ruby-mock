@@ -52,7 +52,30 @@ module StripeMock
       def pay_invoice(route, method_url, params, headers)
         route =~ method_url
         assert_existence :invoice, $1, invoices[$1]
-        invoices[$1].merge!(:paid => true, :attempted => true, :charge => 'ch_1fD6uiR9FAA2zc')
+
+        invoice_attributes = {:paid => true, :attempted => true, :closed => true}
+        invoice_amount = invoices[$1][:amount_due]
+
+        charge_id = new_id('ch')
+        charges[charge_id] = Data.mock_charge(:id => charge_id, :customer => invoices[$1][:customer], :amount => invoice_amount)
+        invoice_attributes[:charge] = charge_id
+
+        bal_trans_params = { amount: invoice_amount, source: charge_id }
+        invoice_attributes[:balance_transaction] = new_balance_transaction('txn', bal_trans_params)
+
+        if subscriptions.has_key?(invoices[$1].subscription)
+          application_fee_percent = subscriptions[invoices[$1]].application_fee_percent
+          application_fee_percent = 0 if application_fee_percent.nil?
+          if application_fee_percent != 0
+            application_fee_amount = application_fee_percent * invoice_amount
+            charges[id][:application_fee] = new_application_fee('fee',
+                                                                amount: application_fee_amount,
+                                                                balance_transaction: invoice_attributes[:balance_transaction],
+                                                                charge: charge_id)
+            invoice_attributes[:application_fee] = application_fee_amount
+          end
+        end
+        invoices[$1].merge!(invoice_attributes)
       end
 
       def upcoming_invoice(route, method_url, params, headers)
