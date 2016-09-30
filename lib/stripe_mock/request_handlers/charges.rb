@@ -43,18 +43,14 @@ module StripeMock
 
         ensure_required_params(params)
         if params[:capture] != false
-           bal_trans_params = { amount: params[:amount], source: params[:source] }
-           params[:balance_transaction] = new_balance_transaction('txn', bal_trans_params)
+           params[:balance_transaction] = new_balance_transaction('txn', { amount: params[:amount], source: params[:source] })
         end
 
         charges[id] = Data.mock_charge(params.merge :id => id)
 
         if params[:capture] != false && params[:application_fee]
-          charges[id][:application_fee] = new_application_fee('fee',
-                                                            amount: params[:application_fee],
-                                                            balance_transaction: charges[id][:balance_transaction],
-                                                            charge: id
-          )
+          charges[id][:application_fee] = new_application_fee('fee', amount: params[:application_fee], charge: id)
+          charges[id][:application_fee][:balance_transaction] = new_balance_transaction('txn', {amount: params[:application_fee], source: charges[id][:application_fee]})
         end
         charges[id]
       end
@@ -98,8 +94,7 @@ module StripeMock
 
         if params[:amount]
 
-          bal_trans_params = { amount: params[:amount], source: params[:source] }
-          charge[:balance_transaction] = new_balance_transaction('txn', bal_trans_params)
+          charge[:balance_transaction] = new_balance_transaction('txn', { amount: params[:amount], source: params[:source] })
 
           refund = Data.mock_refund(
             :balance_transaction => new_balance_transaction('txn'),
@@ -110,10 +105,8 @@ module StripeMock
         end
 
         if params[:application_fee]
-          charge[:application_fee] = new_application_fee('fee',
-                                                         amount: params[:application_fee],
-                                                         balance_transaction: charge[:balance_transaction],
-                                                         charge: charge[:id])
+          charge[:application_fee] = new_application_fee('fee', amount: params[:application_fee], charge: charge[:id])
+          charge[:application_fee][:balance_transaction] = new_balance_transaction('txn', {amount: params[:application_fee], source: charge[:application_fee]})
         end
 
         charge[:captured] = true

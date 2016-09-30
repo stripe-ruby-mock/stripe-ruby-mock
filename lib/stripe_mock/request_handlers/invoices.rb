@@ -60,8 +60,7 @@ module StripeMock
         charges[charge_id] = Data.mock_charge(:id => charge_id, :customer => invoices[$1][:customer], :amount => invoice_amount)
         invoice_attributes[:charge] = charge_id
 
-        bal_trans_params = { amount: invoice_amount, source: charge_id }
-        invoice_attributes[:balance_transaction] = new_balance_transaction('txn', bal_trans_params)
+        charges[charge_id][:balance_transaction] = new_balance_transaction('txn', { amount: invoice_amount, source: charge_id })
 
         if subscriptions.has_key?(invoices[$1][:subscription])
           application_fee_percent = subscriptions[invoices[$1][:subscription]][:application_fee_percent]
@@ -69,9 +68,8 @@ module StripeMock
             application_fee_amount = 0
           else
             application_fee_amount = (application_fee_percent * invoice_amount / 100).to_i
-            charges[charge_id][:application_fee] = new_application_fee('fee', amount: application_fee_amount,
-                                                                              balance_transaction: invoice_attributes[:balance_transaction],
-                                                                              charge: charge_id)
+            charges[charge_id][:application_fee] = new_application_fee('fee', amount: application_fee_amount, charge: charge_id)
+            charges[charge_id][:application_fee][:balance_transaction] = new_balance_transaction('txn', {amount: application_fee_amount, source: charges[charge_id][:application_fee]})
           end
           invoice_attributes[:application_fee] = application_fee_amount
         end
