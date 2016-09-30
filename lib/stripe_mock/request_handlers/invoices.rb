@@ -74,7 +74,7 @@ module StripeMock
               stripe_account = customer.has_key?(:stripe_account) ? customer[:stripe_account] : nil
             end
             charges[charge_id][:application_fee] = new_application_fee('fee', amount: application_fee_amount, charge: charge_id, account: stripe_account)
-            application_fees[charges[charge_id][:application_fee]][:balance_transaction] = new_balance_transaction('txn', {amount: application_fee_amount, source: charges[charge_id][:application_fee]})
+            application_fees[charges[charge_id][:application_fee]][:balance_transaction] = new_balance_transaction('txn', {amount: application_fee_amount, source: charges[charge_id][:application_fee], type: "application_fee"})
           end
           invoice_attributes[:application_fee] = application_fee_amount
         end

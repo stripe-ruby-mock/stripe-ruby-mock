@@ -126,7 +126,7 @@ puts "customer=#{customer}"
         invoice_item = Data.mock_line_item({id: subscription_id,
                                            amount: @subscriptions[subscription_id][:plan][:amount],
                                            type: "subscription"})
-        params = {:id => id, customer: customer[:id], subscription: subscription_id, stripe_account: customer[:stripe_account_id]}
+        params = {:id => id, customer: customer[:id], subscription: subscription_id}
         @invoices[id] = Data.mock_invoice([invoice_item], params)
 puts "invoice=#{@invoices[id]}"
         id

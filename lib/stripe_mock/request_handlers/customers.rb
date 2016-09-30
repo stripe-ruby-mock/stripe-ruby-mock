@@ -14,7 +14,6 @@ module StripeMock
         params[:id] ||= new_id('cus')
         sources = []
 
-puts "params for new_customer=#{params} and headers=#{headers}"
         if params[:source]
           new_card =
             if params[:source].is_a?(Hash)
