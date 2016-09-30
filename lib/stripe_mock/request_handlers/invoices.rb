@@ -63,8 +63,8 @@ module StripeMock
         bal_trans_params = { amount: invoice_amount, source: charge_id }
         invoice_attributes[:balance_transaction] = new_balance_transaction('txn', bal_trans_params)
 
-        if subscriptions.has_key?(invoices[$1].subscription)
-          application_fee_percent = subscriptions[invoices[$1]].application_fee_percent
+        if subscriptions.has_key?(invoices[$1][:subscription])
+          application_fee_percent = subscriptions[invoices[$1]][:application_fee_percent]
           application_fee_percent = 0 if application_fee_percent.nil?
           if application_fee_percent != 0
             application_fee_amount = application_fee_percent * invoice_amount
