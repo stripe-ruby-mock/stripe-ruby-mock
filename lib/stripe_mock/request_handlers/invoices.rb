@@ -51,29 +51,34 @@ module StripeMock
 
       def pay_invoice(route, method_url, params, headers)
         route =~ method_url
-        assert_existence :invoice, $1, invoices[$1]
+        invoice = assert_existence :invoice, $1, invoices[$1]
 
         invoice_attributes = {:paid => true, :attempted => true, :closed => true}
-        invoice_amount = invoices[$1][:amount_due]
+        invoice_amount = invoice[:amount_due]
 
         charge_id = new_id('ch')
-        charges[charge_id] = Data.mock_charge(:id => charge_id, :customer => invoices[$1][:customer], :amount => invoice_amount, invoice: invoices[$1][:id])
+        charges[charge_id] = Data.mock_charge(:id => charge_id, :customer => invoice[:customer], :amount => invoice_amount, invoice: invoice[:id])
         invoice_attributes[:charge] = charge_id
 
         charges[charge_id][:balance_transaction] = new_balance_transaction('txn', { amount: invoice_amount, source: charge_id })
 
-        if subscriptions.has_key?(invoices[$1][:subscription])
-          application_fee_percent = subscriptions[invoices[$1][:subscription]][:application_fee_percent]
+        if subscriptions.has_key?(invoice[:subscription])
+          subscription = subscriptions[invoice[:subscription]]
+          application_fee_percent = subscription[:application_fee_percent]
           if application_fee_percent == 0 || application_fee_percent.nil?
             application_fee_amount = 0
           else
             application_fee_amount = (application_fee_percent * invoice_amount / 100).to_i
-            charges[charge_id][:application_fee] = new_application_fee('fee', amount: application_fee_amount, charge: charge_id)
+            if customers.has_key?(subscription[:customer])
+              customer = customers[subscription[:customer]]
+              stripe_account = customer.has_key?(:stripe_account) ? customer[:stripe_account] : nil
+            end
+            charges[charge_id][:application_fee] = new_application_fee('fee', amount: application_fee_amount, charge: charge_id, account: stripe_account)
             application_fees[charges[charge_id][:application_fee]][:balance_transaction] = new_balance_transaction('txn', {amount: application_fee_amount, source: charges[charge_id][:application_fee]})
           end
           invoice_attributes[:application_fee] = application_fee_amount
         end
-        invoices[$1].merge!(invoice_attributes)
+        invoice.merge!(invoice_attributes)
       end
 
       def upcoming_invoice(route, method_url, params, headers)

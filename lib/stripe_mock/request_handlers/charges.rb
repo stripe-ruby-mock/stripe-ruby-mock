@@ -49,7 +49,7 @@ module StripeMock
         charges[id] = Data.mock_charge(params.merge :id => id)
 
         if params[:capture] != false && params[:application_fee]
-          charges[id][:application_fee] = new_application_fee('fee', amount: params[:application_fee], charge: id)
+          charges[id][:application_fee] = new_application_fee('fee', amount: params[:application_fee], charge: id, account: params[:stripe_account])
           application_fees[charges[id][:application_fee]][:balance_transaction] = new_balance_transaction('txn', {amount: params[:application_fee], source: charges[id][:application_fee]})
         end
         charges[id]
@@ -105,7 +105,7 @@ module StripeMock
         end
 
         if params[:application_fee]
-          charge[:application_fee] = new_application_fee('fee', amount: params[:application_fee], charge: charge[:id])
+          charge[:application_fee] = new_application_fee('fee', amount: params[:application_fee], charge: charge[:id], account: charge[:stripe_account])
           application_fees[charge[:application_fee]][:balance_transaction] = new_balance_transaction('txn', {amount: params[:application_fee], source: charge[:application_fee]})
         end
 

@@ -879,25 +879,27 @@ module StripeMock
     def self.mock_balance_transaction(params = {})
       bt_id = params[:id] || 'test_txn_default'
       source = params[:source] || 'ch_test_charge'
+      stripe_fee_amount = params[:fee] || 320
+      amount = params[:amount] || 10000
       {
         id: bt_id,
         object: "balance_transaction",
-        amount: 10000,
+        amount: amount,
         available_on: 1462406400,
         created: 1461880226,
         currency: "usd",
         description: nil,
-        fee: 320,
+        fee: stripe_fee_amount,
         fee_details: [
           {
-            amount: 320,
+            amount: stripe_fee_amount,
             application: nil,
             currency: "usd",
             description: "Stripe processing fees",
             type: "stripe_fee"
           }
         ],
-        net: 9680,
+        net: amount - stripe_fee_amount,
         source: source,
         sourced_transfers: {
           object: "list",

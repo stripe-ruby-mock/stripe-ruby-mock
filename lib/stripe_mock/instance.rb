@@ -119,13 +119,14 @@ module StripeMock
       if @subscriptions.has_key?(subscription_id)
 
 #puts "subscription=#{subscription}"
+        customer = @customers[@subscriptions[subscription_id][:customer]]
+puts "customer=#{customer}"
 
         id = new_id('in')
         invoice_item = Data.mock_line_item({id: subscription_id,
                                            amount: @subscriptions[subscription_id][:plan][:amount],
                                            type: "subscription"})
-puts "invoice_item=#{invoice_item}"
-        params = {:id => id, customer: @subscriptions[subscription_id][:customer], subscription: subscription_id}
+        params = {:id => id, customer: customer[:id], subscription: subscription_id, stripe_account: customer[:stripe_account_id]}
         @invoices[id] = Data.mock_invoice([invoice_item], params)
 puts "invoice=#{@invoices[id]}"
         id
