@@ -74,7 +74,7 @@ module StripeMock
     end
 
     def renew_subscription(subscription_id)
-      timeout_wrap { @pipe.renew_subscriptions(subscription_list) }
+      timeout_wrap { @pipe.renew_subscription(subscription_id) }
     end
 
     def close!
