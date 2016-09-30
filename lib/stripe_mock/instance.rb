@@ -115,7 +115,11 @@ module StripeMock
     end
 
     def renew_subscription(subscription_id)
-      @subscriptions[subscription_id].renew_subscription
+      if @subscriptions.has_key?(subscription_id)
+        @subscriptions[subscription_id].renew_subscription
+      else
+        raise "Unable to renew subscription #{subscription_id} because this subscription does not exist"
+      end
     end
 
     private
