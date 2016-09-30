@@ -74,7 +74,6 @@ module StripeMock
                                                                               charge: charge_id)
           end
           invoice_attributes[:application_fee] = application_fee_amount
-          end
         end
         invoices[$1].merge!(invoice_attributes)
       end
