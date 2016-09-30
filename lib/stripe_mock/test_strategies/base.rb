@@ -72,11 +72,6 @@ module StripeMock
         StripeMock.prepare_card_error(:card_error, :new_customer) if StripeMock.state == 'local'
       end
 
-#      def renew_subscriptions(subscription_list = [])
-#        # This method creates invoice that is automatically created by Stripe when subscription renews
-#        puts "i need to work on #{subscription_list}"
-#
-#      end
     end
   end
 end
