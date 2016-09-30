@@ -29,6 +29,10 @@ puts "params for new_customer=#{params} and headers=#{headers}"
           params[:default_source] = sources.first[:id]
         end
 
+        if headers[:stripe_account]
+          params[:stripe_account] = headers[:stripe_account]
+        end
+
         customers[ params[:id] ] = Data.mock_customer(sources, params)
 
         if params[:plan]
