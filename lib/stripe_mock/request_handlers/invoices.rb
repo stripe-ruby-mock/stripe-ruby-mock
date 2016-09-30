@@ -65,14 +65,15 @@ module StripeMock
 
         if subscriptions.has_key?(invoices[$1][:subscription])
           application_fee_percent = subscriptions[invoices[$1][:subscription]][:application_fee_percent]
-          application_fee_percent = 0 if application_fee_percent.nil?
-          if application_fee_percent != 0
-            application_fee_amount = application_fee_percent * invoice_amount
-            charges[charge_id][:application_fee] = new_application_fee('fee',
-                                                                amount: application_fee_amount,
-                                                                balance_transaction: invoice_attributes[:balance_transaction],
-                                                                charge: charge_id)
-            invoice_attributes[:application_fee] = application_fee_amount
+          if application_fee_percent == 0 || application_fee_percent.nil?
+            application_fee_amount = 0
+          else
+            application_fee_amount = (application_fee_percent * invoice_amount / 100).to_i
+            charges[charge_id][:application_fee] = new_application_fee('fee', amount: application_fee_amount,
+                                                                              balance_transaction: invoice_attributes[:balance_transaction],
+                                                                              charge: charge_id)
+          end
+          invoice_attributes[:application_fee] = application_fee_amount
           end
         end
         invoices[$1].merge!(invoice_attributes)
