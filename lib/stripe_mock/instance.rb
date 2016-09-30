@@ -115,12 +115,23 @@ module StripeMock
     end
 
     def renew_subscription(subscription_id)
+      # Returns the invoice id created by the subscription renewal
       if @subscriptions.has_key?(subscription_id)
         subscription = assert_existence :subscription, subscription_id, @subscriptions[subscription_id]
       end
       if subscription.present?
+
 puts "subscription=#{subscription}"
-        subscription.renew_subscription
+
+        id = new_id('in')
+        invoice_item = Data.mock_line_item({id: subscription_id,
+                                           amount: @subscriptions[subscription_id][:plan][:amount],
+                                           type: "subscription"})
+puts "invoice_item=#{invoice_item}"
+        params = {:id => id, customer: @subscriptions[subscription_id][:customer], subscription: subscription_id}
+        @invoices[id] = Data.mock_invoice([invoice_item], params)
+puts "invoice=#{@invoices[id]}"
+        id
       else
         raise "Unable to renew subscription #{subscription_id} because this subscription does not exist"
       end

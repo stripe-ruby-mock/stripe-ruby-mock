@@ -921,20 +921,15 @@ module StripeMock
 
     def self.mock_application_fee(params = {})
       af_id = params[:id] || 'test_af_default'
-      account = params[:account] || 'acct_test'
-      amount = params[:amount] || 200
-      application = params[:application] || 'ca_test'
-      balance_transaction = params[:balance_transaction] || 'txn_test'
-      charge = params[:charge] || 'ch_test'
       {
           id: af_id,
           object: "application_fee",
-          account: account,
-          amount: amount,
+          account: "acct_test",
+          amount: 200,
           amount_refunded: 0,
-          application: application,
-          balance_transaction: balance_transaction,
-          charge: charge,
+          application: "ca_test",
+          balance_transaction: "txn_test",
+          charge: "ch_test",
           created: 1475176828,
           currency: "usd",
           originating_transaction: nil,

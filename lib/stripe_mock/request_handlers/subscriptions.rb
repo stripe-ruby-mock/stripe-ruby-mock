@@ -214,13 +214,6 @@ module StripeMock
         subscription
       end
 
-      def renew_subscription
-        # Returns the invoice created by the subscription renewal
-        subscription = assert_existence :subscription, $1, subscriptions[$1]
-        puts "need to generate invoice for subscription renewal of subscription #{subscription}"
-        "in_123"
-      end
-
       private
 
       def verify_card_present(customer, plan, params={})
