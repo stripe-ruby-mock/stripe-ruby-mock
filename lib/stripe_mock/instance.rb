@@ -153,6 +153,9 @@ module StripeMock
         # Fee calculation
         params[:fee] ||= 30 + (amount * 0.029).ceil
       end
+
+puts "source: #{params[:source]}"
+puts "source type = #{params[:source].class}"
       @balance_transactions[id] = Data.mock_balance_transaction(params.merge(id: id))
       id
     end
