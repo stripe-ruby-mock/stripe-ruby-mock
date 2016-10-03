@@ -171,7 +171,7 @@ puts "charge=#{@charges[params[:charge]]}"
 puts "charge_balance_transaction before=#{charge_balance_transaction}"
 puts "cbtxn class=#{charge_balance_transaction.class}"
 puts "cbtxn is null = #{charge_balance_transaction == nil}"
-      if charge_balance_transaction.present? && charge_balance_transaction.has_key?(:fee_details)
+      if charge_balance_transaction != nil && charge_balance_transaction.has_key?(:fee_details)
         charge_balance_transaction[:fee_details] << {
             amount: params[:amount],
             application: "acct_test",  # TODO - possible to derive this?
