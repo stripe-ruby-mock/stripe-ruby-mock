@@ -71,7 +71,6 @@ module StripeMock
       def prepare_card_error
         StripeMock.prepare_card_error(:card_error, :new_customer) if StripeMock.state == 'local'
       end
-
     end
   end
 end
