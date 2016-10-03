@@ -161,6 +161,26 @@ module StripeMock
       # application fee ids must be strings
       id = "#{StripeMock.global_id_prefix}#{prefix}_#{@application_fee_counter += 1}"
       @application_fees[id] = Data.mock_application_fee(params.merge(id: id))
+
+      # When an application fee is created for a charge, the charge's balance_transaction includes
+      # the application_fee_amount in the fee_details attribute.
+puts "charge_id=#{params[:charge]}"
+puts "charge=#{@charges[params[:charge]]}"
+      charge_balance_transaction = @balance_transactions[@charges[params[:charge]]][:balance_transaction]
+puts "charge_balance_transaction before=#{charge_balance_transaction}"
+      if charge_balance_transaction.present? && charge_balance_transaction.has_key?(:fee_details)
+        charge_balance_transaction[:fee_details] << {
+            amount: params[:amount],
+            application: "acct_test",  # TODO - possible to derive this?
+            currency: "usd",
+            description: "application_fee",
+            type: "application_fee"
+        }
+        charge_balance_transaction[:fee] += params[:amount]
+        charge_balance_transaction[:net] -= params[:amount]
+      end
+puts "charge_balance_transaction after=#{charge_balance_transaction}"
+
       id
     end
 
