@@ -166,8 +166,10 @@ module StripeMock
       # the application_fee_amount in the fee_details attribute.
 puts "charge_id=#{params[:charge]}"
 puts "charge=#{@charges[params[:charge]]}"
+#      charge_balance_transaction_id = @charges[params[:charge]][:balance_transaction]
       charge_balance_transaction = @balance_transactions[@charges[params[:charge]][:balance_transaction]]
 puts "charge_balance_transaction before=#{charge_balance_transaction}"
+puts "cbtxn class=#{charge_balance_transaction.class}"      
       if charge_balance_transaction.present? && charge_balance_transaction.has_key?(:fee_details)
         charge_balance_transaction[:fee_details] << {
             amount: params[:amount],
