@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'pry'
 
 shared_examples 'Customer API' do
 
