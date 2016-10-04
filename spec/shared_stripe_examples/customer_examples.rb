@@ -344,6 +344,14 @@ shared_examples 'Customer API' do
     expect(original.subscriptions.total_count).to eq(1)
   end
 
+  it "should add a customer to a subscription" do
+    plan     = stripe_helper.create_plan(id: 'silver')
+    customer = Stripe::Customer.create(source: gen_card_tk)
+    customer.subscriptions.create(plan: plan.id)
+
+    expect(Stripe::Customer.retrieve(customer.id).subscriptions.total_count).to eq(1)
+  end
+
   it "deletes a customer" do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     customer = customer.delete
