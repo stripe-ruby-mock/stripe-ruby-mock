@@ -3,6 +3,7 @@ module StripeMock
 
     def self.mock_account(params = {})
       id = params[:id] || 'acct_103ED82ePvKYlo2C'
+      currency = params[:currency] || 'usd'
       {
         id: id,
         email: "bob@example.com",
@@ -15,7 +16,7 @@ module StripeMock
         currencies_supported: [
           "usd"
         ],
-        default_currency: "usd",
+        default_currency: currency,
         country: "US",
         object: "account",
         business_name: "Stripe.com",
@@ -102,6 +103,7 @@ module StripeMock
 
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
+      currency = params[:currency] || nil
       sources.each {|source| source[:customer] = cus_id}
       {
         email: 'stripe_mock@example.com',
@@ -113,7 +115,7 @@ module StripeMock
         delinquent: false,
         discount: nil,
         account_balance: 0,
-        currency: nil,
+        currency: currency,
         sources: {
           object: "list",
           total_count: sources.size,
@@ -132,6 +134,7 @@ module StripeMock
 
     def self.mock_charge(params={})
       charge_id = params[:id] || "ch_1fD6uiR9FAA2zc"
+      currency = params[:currency] || 'usd'
       {
         id: charge_id,
         object: "charge",
@@ -140,7 +143,7 @@ module StripeMock
         paid: true,
         amount: 0,
         application_fee: nil,
-        currency: "usd",
+        currency: currency,
         destination: nil,
         fraud_details: {},
         receipt_email: nil,
@@ -193,10 +196,11 @@ module StripeMock
     end
 
     def self.mock_refund(params={})
+      currency = params[:currency] || 'usd'
       {
         id: "re_4fWhgUh5si7InF",
         amount: 1,
-        currency: "usd",
+        currency: currency,
         created: 1409165988,
         object: "refund",
         balance_transaction: "txn_4fWh2RKvgxcXqV",
@@ -242,13 +246,14 @@ module StripeMock
     end
 
     def self.mock_bank_account(params={})
+      currency = params[:currency] || 'usd'
       {
         object: "bank_account",
         bank_name: "STRIPEMOCK TEST BANK",
         last4: "6789",
         routing_number: '110000000',
         country: "US",
-        currency: "usd",
+        currency: currency,
         validated: false,
         status: 'new',
         account_holder_name: 'John Doe',
@@ -303,6 +308,7 @@ module StripeMock
 
     def self.mock_invoice(lines, params={})
       in_id = params[:id] || "test_in_default"
+      currency = params[:currency] || 'usd'
       lines << Data.mock_line_item() if lines.empty?
       {
         id: 'in_test_invoice',
@@ -334,7 +340,7 @@ module StripeMock
         livemode: false,
         attempt_count: 0,
         amount_due: lines.map {|line| line[:amount]}.reduce(0, :+),
-        currency: 'usd',
+        currency: currency,
         starting_balance: 0,
         ending_balance: nil,
         next_payment_attempt: 1349825350,
@@ -345,13 +351,14 @@ module StripeMock
     end
 
     def self.mock_line_item(params = {})
+      currency = params[:currency] || 'usd'
       {
         id: "ii_test",
         object: "line_item",
         type: "invoiceitem",
         livemode: false,
         amount: 1000,
-        currency: "usd",
+        currency: currency,
         discountable: false,
         proration: false,
         period: {
@@ -367,6 +374,7 @@ module StripeMock
     end
 
     def self.mock_invoice_item(params = {})
+      currency = params[:currency] || 'usd'
       {
         id: "test_ii",
         object: "invoiceitem",
@@ -374,7 +382,7 @@ module StripeMock
         amount: 1099,
         livemode: false,
         proration: false,
-        currency: "usd",
+        currency: currency,
         customer: "cus_test",
         description: "invoice item desc",
         metadata: {},
@@ -405,6 +413,7 @@ module StripeMock
 
     def self.mock_order(order_items, params)
       or_id = params[:id] || "test_or_default"
+      currency = params[:currency] || 'eur'
       order_items << Data.mock_order_item if order_items.empty?
       {
         id: or_id,
@@ -414,7 +423,7 @@ module StripeMock
         application_fee: nil,
         charge: nil,
         created: 1448272783,
-        currency: "eur",
+        currency: currency,
         customer: nil,
         email: nil,
         items: order_items,
@@ -440,10 +449,11 @@ module StripeMock
     end
 
     def self.mock_order_item(params={})
+      currency = params[:currency] || 'eur'
       {
         object: "order_item",
         amount: 5000,
-        currency: "eur",
+        currency: currency,
         description: "Anyitem",
         parent: "sku_parent",
         quantity: 1,
@@ -452,12 +462,13 @@ module StripeMock
     end
 
     def self.mock_plan(params={})
+      currency = params[:currency] || 'usd'
       {
         id: "2",
         object: "plan",
         amount: 2300,
         created: 1466698898,
-        currency: "usd",
+        currency: currency,
         interval: "month",
         interval_count: 1,
         livemode: false,
@@ -552,6 +563,7 @@ module StripeMock
     end
 
     def self.mock_transfer(params={})
+      currency = params[:currency] || 'usd'
       id = params[:id] || 'tr_test_transfer'
       {
         :status => 'pending',
@@ -567,7 +579,7 @@ module StripeMock
         :fee_details => [],
         :id => id,
         :livemode => false,
-        :currency => "usd",
+        :currency => currency,
         :object => "transfer",
         :date => 1304114826,
         :description => "Transfer description",
@@ -590,6 +602,7 @@ module StripeMock
     end
 
     def self.mock_dispute(params={})
+      currency = params[:currency] || 'usd'
       id = params[:id] || "dp_test_dispute"
       {
         :id => id,
@@ -598,7 +611,7 @@ module StripeMock
         :balance_transactions => [],
         :charge => "ch_15RsQR2eZvKYlo2CA8IfzCX0",
         :created => 1422915137,
-        :currency => "usd",
+        :currency => currency,
         :evidence => self.mock_dispute_evidence,
         :evidence_details => self.mock_dispute_evidence_details,
         :is_charge_refundable => false,
@@ -867,7 +880,7 @@ module StripeMock
         "verification_fields"=> {"individual"=>{"minimum"=>["external_account","legal_entity.address.city","legal_entity.address.line1","legal_entity.address.postal_code","legal_entity.address.state","legal_entity.dob.day","legal_entity.dob.month","legal_entity.dob.year","legal_entity.first_name","legal_entity.last_name","legal_entity.personal_id_number","legal_entity.ssn_last_4","legal_entity.type","tos_acceptance.date","tos_acceptance.ip"],"additional"=>["legal_entity.personal_id_number","legal_entity.verification.document"]},"company"=>{"minimum"=>["external_account","legal_entity.address.city","legal_entity.address.line1","legal_entity.address.postal_code","legal_entity.address.state","legal_entity.business_name","legal_entity.business_tax_id","legal_entity.dob.day","legal_entity.dob.month","legal_entity.dob.year","legal_entity.first_name","legal_entity.last_name","legal_entity.ssn_last_4","legal_entity.type","tos_acceptance.date","tos_acceptance.ip"],"additional"=>["legal_entity.personal_id_number","legal_entity.verification.document"]}}
       }
     end
-    
+
     def self.mock_balance_transactions(ids=[])
       bts = {}
       ids.each do |id|
@@ -877,6 +890,7 @@ module StripeMock
     end
 
     def self.mock_balance_transaction(params = {})
+      currency = params[:currency] || 'usd'
       bt_id = params[:id] || 'test_txn_default'
       source = params[:source] || 'ch_test_charge'
       stripe_fee_amount = params[:fee] || 320
@@ -887,14 +901,14 @@ module StripeMock
         amount: amount,
         available_on: 1462406400,
         created: 1461880226,
-        currency: "usd",
+        currency: currency,
         description: nil,
         fee: stripe_fee_amount,
         fee_details: [
           {
             amount: stripe_fee_amount,
             application: nil,
-            currency: "usd",
+            currency: currency,
             description: "Stripe processing fees",
             type: "stripe_fee"
           }
