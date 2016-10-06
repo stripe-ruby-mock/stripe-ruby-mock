@@ -936,6 +936,7 @@ module StripeMock
     end
 
     def self.mock_application_fee(params = {})
+      currency = params[:currency] || 'usd'
       af_id = params[:id] || 'test_af_default'
       {
           id: af_id,
@@ -947,7 +948,7 @@ module StripeMock
           balance_transaction: "txn_test",
           charge: "ch_test",
           created: 1475176828,
-          currency: "usd",
+          currency: currency,
           originating_transaction: nil,
           refunded: false,
           refunds: {
