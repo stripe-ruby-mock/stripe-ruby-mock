@@ -5,7 +5,8 @@ module StripeMock
       def create_plan(params={})
         raise "create_plan requires an :id" if params[:id].nil?
         delete_plan(params[:id])
-        Stripe::Plan.create create_plan_params(params)
+        account = params.has_key?(:stripe_account) ? {:stripe_account => params[:stripe_account]} : {}
+        Stripe::Plan.create(create_plan_params(params), account)
       end
 
       def delete_plan(plan_id)

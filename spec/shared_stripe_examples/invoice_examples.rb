@@ -90,6 +90,57 @@ shared_examples 'Invoice API' do
     end
   end
 
+  context "invoices associated with a subscription renewal" do
+
+    it "creates invoice for customer subscription" do
+      customer = Stripe::Customer.create({
+         email: 'johnny@appleseed.com',
+         source: stripe_helper.generate_card_token
+      })
+
+      stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999)
+      subscription = Stripe::Subscription.create({ plan: 'silver', customer: customer.id})
+      invoice = Stripe::Invoice.retrieve(stripe_helper.generate_subscription_renewal_invoice(subscription.id))
+
+      expect(invoice.customer).to eq(customer.id)
+      expect(invoice.total).to eq(4999)
+      expect(invoice.closed).to eq(false)
+      expect(invoice.subscription).to eq(subscription.id)
+      expect(invoice.charge).to eq(nil)
+      expect(invoice.paid).to eq(false)
+    end
+
+    it 'creates invoice for subscription of customer in managed account' do
+      account = Stripe::Account.create(managed: true, country: 'US')
+      customer = Stripe::Customer.create({
+        email: 'johnny@appleseed.com',
+        source: stripe_helper.generate_card_token
+      }, {stripe_account: account.id})
+
+      stripe_helper.create_plan(id: 'gold', name: 'Gold Plan', amount: 5999, stripe_account: account.id)
+      subscription = Stripe::Subscription.create({ plan: 'gold', customer: customer.id, application_fee_percent: 15.0}, {stripe_account: account.id})
+      invoice = Stripe::Invoice.retrieve(stripe_helper.generate_subscription_renewal_invoice(subscription.id))
+
+      expect(invoice.customer).to eq(customer.id)
+      expect(invoice.total).to eq(5999)
+      expect(invoice.closed).to eq(false)
+      expect(invoice.subscription).to eq(subscription.id)
+      expect(invoice.application_fee).to eq(nil)
+      expect(invoice.charge).to eq(nil)
+      expect(invoice.paid).to eq(false)
+
+      # Now pay invoice and verify invoice is updated with application fee amount
+      invoice.pay
+      invoice = Stripe::Invoice.retrieve(invoice.id)
+
+      expect(invoice.closed).to eq(true)
+      expect(invoice.paid).to eq(true)
+      expect(invoice.application_fee).to eq(899)
+      charge = Stripe::Charge.retrieve(invoice.charge, {stripe_account: account.id})
+      expect(charge.amount).to eq(5999)
+    end
+  end
+
   context "retrieving upcoming invoice" do
     before do
       @customer = Stripe::Customer.create(email: 'johnny@appleseed.com', source: stripe_helper.generate_card_token)

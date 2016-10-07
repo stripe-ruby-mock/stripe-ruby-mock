@@ -3,7 +3,8 @@ module StripeMock
     class Mock < Base
 
       def create_plan(params={})
-        Stripe::Plan.create create_plan_params(params)
+        account = params.has_key?(:stripe_account) ? {:stripe_account => params[:stripe_account]} : {}
+        Stripe::Plan.create(create_plan_params(params), account)
       end
 
       def delete_plan(plan_id)

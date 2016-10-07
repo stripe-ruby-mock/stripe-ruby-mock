@@ -46,11 +46,22 @@ module StripeMock
            params[:balance_transaction] = new_balance_transaction('txn', { amount: params[:amount], source: id })
         end
 
+        if headers[:stripe_account]
+          params[:account] = headers[:stripe_account]
+        end
+
         charges[id] = Data.mock_charge(params.merge :id => id)
 
-        if params[:capture] != false && params[:application_fee]
-          charges[id][:application_fee] = new_application_fee('fee', amount: params[:application_fee], charge: id, account: params[:stripe_account])
-          application_fees[charges[id][:application_fee]][:balance_transaction] = new_balance_transaction('txn', {amount: params[:application_fee], source: charges[id][:application_fee], type: "application_fee"})
+        if params[:application_fee]
+          if params[:capture] != false
+            charges[id][:application_fee] = new_application_fee('fee', amount: params[:application_fee], charge: id, account: params[:account])
+            application_fees[charges[id][:application_fee]][:balance_transaction] = new_balance_transaction('txn', {amount: params[:application_fee], source: charges[id][:application_fee], type: "application_fee", fee: 0})
+          else
+            # Stripe saves the application fee amount so that if the charge is later captured, the initial application fee amount is applied.  However, the
+            # application_fee attribute of the Stripe charge is null so we need to save the amount for later.
+            charges[id][:application_fee_amount] = params[:application_fee]
+            charges[id][:application_fee] = nil
+          end
         end
         charges[id]
       end
@@ -104,9 +115,18 @@ module StripeMock
           add_refund_to_charge(refund, charge)
         end
 
-        if params[:application_fee]
-          charge[:application_fee] = new_application_fee('fee', amount: params[:application_fee], charge: charge[:id], account: charge[:stripe_account])
-          application_fees[charge[:application_fee]][:balance_transaction] = new_balance_transaction('txn', {amount: params[:application_fee], source: charge[:application_fee], type: "application_fee"})
+        if params.has_key?(:application_fee) || charge.has_key?(:application_fee_amount)
+          # When the charge is captured, the application fee amount originally specified when the charge was created will be collected unless
+          # an updated application fee amount is supplied when the charge is captured.
+          if params.has_key?(:application_fee)
+            application_fee_amount = params[:application_fee]
+          else
+            application_fee_amount = charge[:application_fee_amount]
+          end
+          if application_fee_amount > 0
+            charge[:application_fee] = new_application_fee('fee', amount: application_fee_amount, charge: charge[:id], account: charge[:account])
+            application_fees[charge[:application_fee]][:balance_transaction] = new_balance_transaction('txn', {amount: application_fee_amount, source: charge[:application_fee], type: "application_fee", fee: 0})
+          end
         end
 
         charge[:captured] = true

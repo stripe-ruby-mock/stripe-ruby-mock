@@ -71,7 +71,7 @@ module StripeMock
             application_fee_amount = (application_fee_percent * invoice_amount / 100).to_i
             if customers.has_key?(subscription[:customer])
               customer = customers[subscription[:customer]]
-              stripe_account = customer.has_key?(:stripe_account) ? customer[:stripe_account] : nil
+              stripe_account = customer.has_key?(:account) ? customer[:account] : nil
             end
             charges[charge_id][:application_fee] = new_application_fee('fee', amount: application_fee_amount, charge: charge_id, account: stripe_account)
             application_fees[charges[charge_id][:application_fee]][:balance_transaction] = new_balance_transaction('txn', {amount: application_fee_amount, source: charges[charge_id][:application_fee], type: "application_fee"})

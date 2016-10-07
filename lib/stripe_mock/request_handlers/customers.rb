@@ -29,7 +29,7 @@ module StripeMock
         end
 
         if headers[:stripe_account]
-          params[:stripe_account] = headers[:stripe_account]
+          params[:account] = headers[:stripe_account]
         end
 
         customers[ params[:id] ] = Data.mock_customer(sources, params)
