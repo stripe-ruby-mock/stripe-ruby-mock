@@ -150,6 +150,16 @@ shared_examples 'Charge API' do
     expect(bal_trans.source).to eq(charge.source)
   end
 
+  it "can expand balance transaction" do
+    charge = Stripe::Charge.create({
+      amount: 300,
+      currency: 'USD',
+      source: stripe_helper.generate_card_token,
+      expand: ['balance_transaction']
+    })
+    expect(charge.balance_transaction).to be_a(Stripe::BalanceTransaction)
+  end
+
   it "retrieves a stripe charge" do
     original = Stripe::Charge.create({
       amount: 777,
