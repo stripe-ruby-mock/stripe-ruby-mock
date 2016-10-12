@@ -22,7 +22,16 @@ module StripeMock
               end
               card_from_params(params[:source])
             else
-              get_card_or_bank_by_token(params.delete(:source))
+              source = get_card_or_bank_by_token(params.delete(:source))
+              if headers[:stripe_account]
+                # need to generate a new card or bank_account id since this is in a managed account
+                if source[:object] == 'card'
+                  source[:id] = new_id 'cc'
+                elsif source[:object] == 'bank_account'
+                  source[:id] = new_id 'bank_account'
+                end
+              end
+              source
             end
           sources << new_card
           params[:default_source] = sources.first[:id]

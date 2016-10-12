@@ -4,14 +4,22 @@ module StripeMock
 
       def generate_bank_token(bank_params = {})
         token = new_id 'btok'
-        bank_params[:id] = new_id 'bank_account'
+        if bank_params.has_key?(:account)
+          bank_params.delete(:account)
+        else
+          bank_params[:id] = new_id 'bank_account'
+        end
         @bank_tokens[token] = Data.mock_bank_account bank_params
         token
       end
 
       def generate_card_token(card_params = {})
         token = new_id 'tok'
-        card_params[:id] = new_id 'cc'
+        if card_params.has_key?(:account)
+          card_params.delete(:account)
+        else
+          card_params[:id] = new_id 'cc'
+        end
         @card_tokens[token] = Data.mock_card symbolize_names(card_params)
         token
       end
