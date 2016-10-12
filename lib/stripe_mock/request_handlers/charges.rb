@@ -52,6 +52,11 @@ module StripeMock
 
         charges[id] = Data.mock_charge(params.merge :id => id)
 
+        if params[:expand] == ['balance_transaction'] && params[:capture] != false
+          charges[id][:balance_transaction] =
+              balance_transactions[params[:balance_transaction]]
+        end
+
         if params[:application_fee]
           if params[:capture] != false
             charges[id][:application_fee] = new_application_fee('fee', amount: params[:application_fee], charge: id, account: params[:account])
