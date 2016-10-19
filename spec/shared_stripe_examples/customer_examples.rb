@@ -350,7 +350,7 @@ shared_examples 'Customer API' do
     expect(customer.deleted).to eq(true)
   end
   
-  it 'works with the update_subscription method', focus:true do
+  it 'works with the update_subscription method' do
     stripe_helper.create_plan(id: 'silver')
     cus   = Stripe::Customer.create(source: gen_card_tk)
     expect {
