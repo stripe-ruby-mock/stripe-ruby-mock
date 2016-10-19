@@ -2,7 +2,7 @@ require 'spec_helper'
 
 shared_examples 'Bank Account Token Mocking' do
 
-  it "generates a bank token with with default values" do
+  it "generates a bank token with default values" do
     bank_token = StripeMock.generate_bank_token
     tokens = test_data_source(:bank_tokens)
     expect(tokens[bank_token]).to_not be_nil

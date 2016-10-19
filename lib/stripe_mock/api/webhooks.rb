@@ -38,6 +38,9 @@ module StripeMock
       @__list = [
         'account.updated',
         'account.application.deauthorized',
+        'account.external_account.created',
+        'account.external_account.updated',
+        'account.external_account.deleted',
         'balance.available',
         'charge.succeeded',
         'charge.failed',

@@ -34,6 +34,9 @@ shared_examples 'Account API' do
       expect(account.keys).not_to be_nil
       expect(account.keys.secret).to match /sk_(live|test)_[\d\w]+/
       expect(account.keys.publishable).to match /pk_(live|test)_[\d\w]+/
+      expect(account.external_accounts).not_to be_nil
+      expect(account.external_accounts.data).to be_an Array
+      expect(account.external_accounts.url).to match /\/v1\/accounts\/.*\/external_accounts/
     end
   end
   describe 'updates account' do

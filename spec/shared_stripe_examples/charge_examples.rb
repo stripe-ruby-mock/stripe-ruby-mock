@@ -138,6 +138,28 @@ shared_examples 'Charge API' do
     expect(data[charge2.id][:amount]).to eq(777)
   end
 
+  it "creates a balance transaction" do
+    charge = Stripe::Charge.create({
+      amount: 300,
+      currency: 'USD',
+      source: stripe_helper.generate_card_token
+    })
+    bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
+    expect(bal_trans.amount).to eq(charge.amount)
+    expect(bal_trans.fee).to eq(39)
+    expect(bal_trans.source).to eq(charge.source)
+  end
+
+  it "can expand balance transaction" do
+    charge = Stripe::Charge.create({
+      amount: 300,
+      currency: 'USD',
+      source: stripe_helper.generate_card_token,
+      expand: ['balance_transaction']
+    })
+    expect(charge.balance_transaction).to be_a(Stripe::BalanceTransaction)
+  end
+
   it "retrieves a stripe charge" do
     original = Stripe::Charge.create({
       amount: 777,
@@ -291,7 +313,8 @@ shared_examples 'Charge API' do
             object: 'card',
             number: '4242424242424242',
             exp_month: 12,
-            exp_year: 2024
+            exp_year: 2024,
+            cvc: 123
         }
     )
     12.times do
@@ -371,6 +394,33 @@ shared_examples 'Charge API' do
       expect(returned_charge.application_fee).to eq(123)
       expect(returned_charge.id).to eq(charge.id)
       expect(returned_charge.captured).to eq(true)
+    end
+  end
+
+  describe "idempotency" do
+    let(:idempotent_charge_params) {{
+      amount: 777,
+      currency: 'USD',
+      card: stripe_helper.generate_card_token,
+      capture: true,
+      idempotency_key: 'onceisenough'
+    }}
+
+    it "returns the original charge if the same idempotency_key is passed in" do
+      charge1 = Stripe::Charge.create(idempotent_charge_params)
+      charge2 = Stripe::Charge.create(idempotent_charge_params)
+
+      expect(charge1).to eq(charge2)
+    end
+
+    it "returns different charges if different idempotency_keys are used for each charge" do
+      idempotent_charge_params2 = idempotent_charge_params.clone
+      idempotent_charge_params2[:idempotency_key] = 'thisoneisdifferent'
+
+      charge1 = Stripe::Charge.create(idempotent_charge_params)
+      charge2 = Stripe::Charge.create(idempotent_charge_params2)
+
+      expect(charge1).not_to eq(charge2)
     end
   end
 
