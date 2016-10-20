@@ -3,7 +3,7 @@ module StripeMock
     module Helpers
 
       def get_card(object, card_id, class_name='Customer')
-        cards = object[:cards] || object[:sources]
+        cards = object[:cards] || object[:sources] || object[:external_accounts]
         card = cards[:data].find{|cc| cc[:id] == card_id }
         if card.nil?
           if class_name == 'Recipient'
@@ -36,7 +36,7 @@ module StripeMock
 
       def add_card_to_object(type, card, object, replace_current=false)
         card[type] = object[:id]
-        cards_or_sources = object[:cards] || object[:sources]
+        cards_or_sources = object[:cards] || object[:sources] || object[:external_accounts]
 
         is_customer = object.has_key?(:sources)
 
@@ -58,7 +58,7 @@ module StripeMock
 
       def retrieve_object_cards(type, type_id, objects)
         resource = assert_existence type, type_id, objects[type_id]
-        cards = resource[:cards] || resource[:sources]
+        cards = resource[:cards] || resource[:sources] || resource[:external_accounts]
 
         Data.mock_list_object(cards[:data])
       end
@@ -69,7 +69,7 @@ module StripeMock
         assert_existence :card, card_id, get_card(resource, card_id)
 
         card = { id: card_id, deleted: true }
-        cards_or_sources = resource[:cards] || resource[:sources]
+        cards_or_sources = resource[:cards] || resource[:sources] || resource[:external_accounts]
         cards_or_sources[:data].reject!{|cc|
           cc[:id] == card[:id]
         }
@@ -102,7 +102,7 @@ module StripeMock
       def add_card_to(type, type_id, params, objects)
         resource = assert_existence type, type_id, objects[type_id]
 
-        card = card_from_params(params[:card] || params[:source])
+        card = card_from_params(params[:card] || params[:source] || params[:external_accounts])
         add_card_to_object(type, card, resource)
       end
 
