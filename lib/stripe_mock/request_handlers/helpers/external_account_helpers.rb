@@ -5,7 +5,7 @@ module StripeMock
       def add_external_account_to(type, type_id, params, objects)
         resource = assert_existence type, type_id, objects[type_id]
 
-        source = bank_from_params(params[:external_account])
+        source =
           if params[:card]
             card_from_params(params[:card])
           elsif params[:bank_account]
