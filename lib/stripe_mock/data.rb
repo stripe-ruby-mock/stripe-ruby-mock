@@ -248,6 +248,7 @@ module StripeMock
     def self.mock_bank_account(params={})
       currency = params[:currency] || 'usd'
       {
+        id: "test_ba_default",
         object: "bank_account",
         bank_name: "STRIPEMOCK TEST BANK",
         last4: "6789",
