@@ -24,6 +24,27 @@ shared_examples 'Customer API' do
     expect { customer.source }.to raise_error
   end
 
+  it "creates a stripe customer with multiple cards and updates the default card" do
+    card_a   = gen_card_tk
+    card_b   = gen_card_tk
+    customer = Stripe::Customer.create({
+      email: 'johnny.multiple@appleseed.com',
+      source: card_a,
+      description: "a description"
+    })
+
+    original_card = customer.sources.data.first.id
+
+    customer.sources.create(source: card_b)
+    retrieved_customer = Stripe::Customer.retrieve(customer.id)
+
+    expect(retrieved_customer.sources.data.length).to eq(2)
+    retrieved_customer.default_source = retrieved_customer.sources.data.last.id
+    retrieved_customer.save
+    expect(Stripe::Customer.retrieve(customer.id).default_source).to eq(retrieved_customer.sources.data.last.id)
+    expect(Stripe::Customer.retrieve(customer.id).default_source).to_not eq(original_card)
+  end
+
   it "creates a stripe customer without a card" do
     customer = Stripe::Customer.create({
       email: 'cardless@appleseed.com',
