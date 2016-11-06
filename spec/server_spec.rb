@@ -24,7 +24,7 @@ describe 'StripeMock Server', :mock_server => true do
     charge = Stripe::Charge.create(
       amount: 987,
       currency: 'USD',
-      card: stripe_helper.generate_card_token,
+      source: stripe_helper.generate_card_token,
       description: 'card charge'
     )
     expect(charge.amount).to eq(987)
