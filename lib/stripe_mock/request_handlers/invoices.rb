@@ -68,7 +68,7 @@ module StripeMock
           if application_fee_percent == 0 || application_fee_percent.nil?
             application_fee_amount = 0
           else
-            application_fee_amount = (application_fee_percent * invoice_amount / 100).to_i
+            application_fee_amount = (application_fee_percent * invoice_amount / 100).round
             if customers.has_key?(subscription[:customer])
               customer = customers[subscription[:customer]]
               stripe_account = customer.has_key?(:account) ? customer[:account] : nil
