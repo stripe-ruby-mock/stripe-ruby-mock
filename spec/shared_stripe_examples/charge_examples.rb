@@ -65,6 +65,21 @@ shared_examples 'Charge API' do
     expect(charge.status).to eq('succeeded')
   end
 
+  it "creates a stripe charge item with a bank token" do
+    charge = Stripe::Charge.create(
+      amount: 999,
+      currency: 'USD',
+      source: stripe_helper.generate_bank_token,
+      description: 'bank charge'
+    )
+
+    expect(charge.id).to match(/^test_ch/)
+    expect(charge.amount).to eq(999)
+    expect(charge.description).to eq('bank charge')
+    expect(charge.captured).to eq(true)
+    expect(charge.status).to eq('succeeded')
+  end
+
   it 'creates a stripe charge item with a customer', :live => true do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
