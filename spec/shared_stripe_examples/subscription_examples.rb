@@ -203,6 +203,7 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.id).to eq(sub.id)
       expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
       expect(customer.subscriptions.data.first.customer).to eq(customer.id)
+      expect(customer.charges.count).to eq(0)
     end
 
     it "subscribes a customer with no card to a free plan" do
