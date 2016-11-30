@@ -64,7 +64,10 @@ shared_examples 'Stripe Error Mocking' do
     custom_error = StandardError.new("Please knock first.")
     StripeMock.prepare_error(custom_error, :new_customer)
 
-    expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to_not raise_error
+    expect {
+      Stripe::Charge.create(amount: 1, currency: 'usd', source: stripe_helper.generate_card_token)
+    }.to_not raise_error
+
     expect { Stripe::Customer.create }.to raise_error {|e|
       expect(e).to be_a StandardError
       expect(e.message).to eq("Please knock first.")
@@ -89,7 +92,9 @@ shared_examples 'Stripe Error Mocking' do
 
   it "mocks a card error with a given handler" do
     StripeMock.prepare_card_error(:incorrect_cvc, :new_customer)
-    expect { Stripe::Charge.create(amount: 1, currency: 'usd') }.to_not raise_error
+    expect {
+      Stripe::Charge.create(amount: 1, currency: 'usd', source: stripe_helper.generate_card_token)
+    }.to_not raise_error
 
     expect { Stripe::Customer.create() }.to raise_error {|e|
       expect(e).to be_a(Stripe::CardError)
