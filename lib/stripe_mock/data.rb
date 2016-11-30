@@ -282,6 +282,7 @@ module StripeMock
     #FIXME nested overrides would be better than hardcoding plan_id
     def self.mock_subscription(params={})
       StripeMock::Util.rmerge({
+        :created => 1478204116,
         :current_period_start => 1308595038,
         :current_period_end => 1308681468,
         :status => "trialing",
