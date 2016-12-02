@@ -12,6 +12,7 @@ shared_examples 'Card Token Mocking' do
       expect(card.last4).to eq("4242")
       expect(card.exp_month).to eq(4)
       expect(card.exp_year).to eq(2016)
+      expect(card.tokenization_method).to eq(nil)
     end
 
     it "generates and reads a card token for create charge" do
