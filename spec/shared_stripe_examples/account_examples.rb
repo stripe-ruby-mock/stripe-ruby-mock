@@ -50,4 +50,12 @@ shared_examples 'Account API' do
       expect(account.support_phone).to eq '1234567'
     end
   end
+
+  it 'deauthorizes the stripe account', live: false do
+    account = Stripe::Account.retrieve
+    result = account.deauthorize('CLIENT_ID')
+
+    expect(result).to be_a Stripe::StripeObject
+    expect(result[:stripe_user_id]).to eq account[:id]
+  end
 end
