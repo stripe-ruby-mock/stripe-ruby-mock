@@ -182,7 +182,7 @@ module StripeMock
           data: []
         },
         transfer: nil,
-        balance_transaction: "txn_2dyYXXP90MN26R",
+        balance_transaction: nil,
         failure_message: nil,
         failure_code: nil,
         amount_refunded: 0,
@@ -896,25 +896,27 @@ module StripeMock
       currency = params[:currency] || 'usd'
       bt_id = params[:id] || 'test_txn_default'
       source = params[:source] || 'ch_test_charge'
+      stripe_fee_amount = params[:fee] || 320
+      amount = params[:amount] || 10000
       {
         id: bt_id,
         object: "balance_transaction",
-        amount: 10000,
+        amount: amount,
         available_on: 1462406400,
         created: 1461880226,
         currency: currency,
         description: nil,
-        fee: 320,
+        fee: stripe_fee_amount,
         fee_details: [
           {
-            amount: 320,
+            amount: stripe_fee_amount,
             application: nil,
             currency: currency,
             description: "Stripe processing fees",
             type: "stripe_fee"
           }
         ],
-        net: 9680,
+        net: amount - stripe_fee_amount,
         source: source,
         sourced_transfers: {
           object: "list",
@@ -927,5 +929,40 @@ module StripeMock
         type: "charge"
       }.merge(params)
     end
+
+    def self.mock_application_fees(ids=[])
+      afs = {}
+      ids.each do |id|
+        afs[id] = self.mock_application_fee(id: id)
+      end
+      afs
+    end
+
+    def self.mock_application_fee(params = {})
+      currency = params[:currency] || 'usd'
+      af_id = params[:id] || 'test_af_default'
+      {
+          id: af_id,
+          object: "application_fee",
+          account: "acct_test",
+          amount: 200,
+          amount_refunded: 0,
+          application: "ca_test",
+          balance_transaction: "txn_test",
+          charge: "ch_test",
+          created: 1475176828,
+          currency: currency,
+          originating_transaction: nil,
+          refunded: false,
+          refunds: {
+              object: "list",
+              data: [],
+              has_more: false,
+              total_count: 0,
+              url: "/v1/application_fees/#{af_id}"
+          }
+      }.merge(params)
+    end
+
   end
 end

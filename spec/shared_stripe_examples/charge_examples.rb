@@ -162,16 +162,183 @@ shared_examples 'Charge API' do
     expect(data[charge2.id][:amount]).to eq(777)
   end
 
-  it "creates a balance transaction" do
-    charge = Stripe::Charge.create({
-      amount: 300,
-      currency: 'USD',
-      source: stripe_helper.generate_card_token
-    })
-    bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
-    expect(bal_trans.amount).to eq(charge.amount)
-    expect(bal_trans.fee).to eq(39)
-    expect(bal_trans.source).to eq(charge.source)
+  describe 'balance transaction for charge' do
+    it "creates a balance transaction by default" do
+      charge = Stripe::Charge.create({
+        amount: 300,
+        currency: 'USD',
+        source: stripe_helper.generate_card_token
+      })
+      bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
+      expect(bal_trans.amount).to eq(charge.amount)
+      expect(bal_trans.fee).to eq(39)
+      expect(bal_trans.net).to eq(261)
+      expect(bal_trans.source).to eq(charge.id)
+    end
+
+    it "creates a balance transaction if capture requested" do
+      charge = Stripe::Charge.create({
+        amount: 1000,
+        currency: 'USD',
+        source: stripe_helper.generate_card_token,
+        capture: true
+      })
+      # This is identical to previous test ("creates a balance transaction by default") which checks all amounts so only
+      # verify the balance transaction exists here
+      expect(charge.balance_transaction).not_to eq(nil)
+    end
+
+    it "does not create a balance transaction if charge not captured" do
+      charge = Stripe::Charge.create({
+        amount: 1500,
+        currency: 'USD',
+        source: stripe_helper.generate_card_token,
+        capture: false
+      })
+      expect(charge.balance_transaction).to eq(nil)
+    end
+
+    it "creates a balance transaction when existing uncaptured charge is captured" do
+      charge = Stripe::Charge.create({
+        amount: 2000,
+        currency: 'USD',
+        source: stripe_helper.generate_card_token,
+        capture: false
+      })
+      expect(charge.balance_transaction).to eq(nil)
+      expect(charge.captured).to eq(false)
+      charge.capture({ amount: 2000 })
+      bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
+      expect(bal_trans.amount).to eq(charge.amount)
+      expect(bal_trans.fee).to eq(88)
+      expect(bal_trans.net).to eq(1912)
+      expect(bal_trans.source).to eq(charge.id)
+    end
+  end
+
+  context 'application fee for customer charge in managed account' do
+    before do
+      @account = Stripe::Account.create(managed: true, country: 'US')
+      @customer = Stripe::Customer.create({
+        email: 'johnny@appleseed.com',
+        source: stripe_helper.generate_card_token
+      }, {stripe_account: @account.id})
+    end
+
+    it "creates an application fee for customer charge by default" do
+      charge = Stripe::Charge.create({
+        amount: 2000,
+        currency: 'USD',
+        customer: @customer,
+        application_fee: 100
+      }, {stripe_account: @account.id})
+
+      app_fee = Stripe::ApplicationFee.retrieve(charge.application_fee)
+      expect(app_fee.amount).to eq(100)
+      expect(app_fee.account).to eq(@account.id)
+      expect(app_fee.charge).to eq(charge.id)
+
+      bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction, {stripe_account: @account})
+      expect(bal_trans.amount).to eq(charge.amount)
+      expect(bal_trans.fee).to eq(188)  # note that fee includes Stripe processing fee as well as application fee
+      expect(bal_trans.net).to eq(1812)
+
+      # also verify balance transaction created for the application fee
+      app_fee_bal_trans = Stripe::BalanceTransaction.retrieve(app_fee.balance_transaction)
+      expect(app_fee_bal_trans.amount).to eq(app_fee.amount)
+      expect(app_fee_bal_trans.fee).to eq(0)
+      expect(app_fee_bal_trans.net).to eq(app_fee.amount)
+      expect(app_fee_bal_trans.source).to eq(app_fee.id)
+    end
+
+    it "creates an application fee for customer charge if capture requested" do
+      charge = Stripe::Charge.create({
+        amount: 2000,
+        currency: 'USD',
+        customer: @customer,
+        application_fee: 100,
+        capture: true
+      }, {stripe_account: @account.id})
+
+      # This is identical to previous test ("creates an application fee for customer charge by default") which checks all amounts so only
+      # verify the application fee and balance transactions exist here
+      app_fee = Stripe::ApplicationFee.retrieve(charge.application_fee)
+      expect(app_fee).not_to eq(nil)
+      expect(app_fee.balance_transaction).not_to eq(nil)
+    end
+
+    it "does not create an application fee for customer charge if charge not captured" do
+      charge = Stripe::Charge.create({
+        amount: 2000,
+        currency: 'USD',
+        customer: @customer,
+        application_fee: 100,
+        capture: false
+      }, {stripe_account: @account.id})
+
+      expect(charge.application_fee).to eq(nil)
+    end
+
+    it "creates an application fee for customer charge when existing uncaptured charge is captured with no updated application fee amount" do
+      charge = Stripe::Charge.create({
+        amount: 3000,
+        currency: 'USD',
+        customer: @customer,
+        application_fee: 200,
+        capture: false
+      }, {stripe_account: @account.id})
+      expect(charge.application_fee).to eq(nil)
+      expect(charge.captured).to eq(false)
+      charge.capture({ amount: 3000 })
+
+      app_fee = Stripe::ApplicationFee.retrieve(charge.application_fee)
+      expect(app_fee.amount).to eq(200)
+      expect(app_fee.account).to eq(@account.id)
+      expect(app_fee.charge).to eq(charge.id)
+
+      bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction, {stripe_account: @account})
+      expect(bal_trans.amount).to eq(charge.amount)
+      expect(bal_trans.fee).to eq(317)  # note that fee includes Stripe processing fee as well as application fee
+      expect(bal_trans.net).to eq(2683)
+
+      # also verify balance transaction created for the application fee
+      app_fee_bal_trans = Stripe::BalanceTransaction.retrieve(app_fee.balance_transaction)
+      expect(app_fee_bal_trans.amount).to eq(app_fee.amount)
+      expect(app_fee_bal_trans.fee).to eq(0)
+      expect(app_fee_bal_trans.net).to eq(app_fee.amount)
+      expect(app_fee_bal_trans.source).to eq(app_fee.id)
+    end
+
+    it "creates an application fee for customer charge when existing uncaptured charge is captured with updated application fee amount" do
+      charge = Stripe::Charge.create({
+        amount: 4000,
+        currency: 'USD',
+        customer: @customer,
+        application_fee: 500,
+        capture: false
+      }, {stripe_account: @account.id})
+      expect(charge.application_fee).to eq(nil)
+      expect(charge.captured).to eq(false)
+      charge.capture({ amount: 4000, application_fee: 1700 })
+
+      app_fee = Stripe::ApplicationFee.retrieve(charge.application_fee)
+      expect(app_fee.amount).to eq(1700)
+      expect(app_fee.account).to eq(@account.id)
+      expect(app_fee.charge).to eq(charge.id)
+
+      bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction, {stripe_account: @account})
+      expect(bal_trans.amount).to eq(charge.amount)
+      expect(bal_trans.fee).to eq(1846)  # note that fee includes Stripe processing fee as well as application fee
+      expect(bal_trans.net).to eq(2154)
+
+      # also verify balance transaction created for the application fee
+      app_fee_bal_trans = Stripe::BalanceTransaction.retrieve(app_fee.balance_transaction)
+      expect(app_fee_bal_trans.amount).to eq(app_fee.amount)
+      expect(app_fee_bal_trans.fee).to eq(0)
+      expect(app_fee_bal_trans.net).to eq(app_fee.amount)
+      expect(app_fee_bal_trans.source).to eq(app_fee.id)
+    end
+
   end
 
   it "can expand balance transaction" do
@@ -417,7 +584,8 @@ shared_examples 'Charge API' do
       returned_charge = charge.capture({ amount: 677, application_fee: 123 })
       expect(charge.captured).to eq(true)
       expect(returned_charge.amount_refunded).to eq(100)
-      expect(returned_charge.application_fee).to eq(123)
+      application_fee = Stripe::ApplicationFee.retrieve(returned_charge.application_fee)
+      expect(application_fee.amount).to eq(123)
       expect(returned_charge.id).to eq(charge.id)
       expect(returned_charge.captured).to eq(true)
     end

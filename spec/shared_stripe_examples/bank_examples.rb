@@ -199,4 +199,30 @@ shared_examples 'Bank API' do
     end
   end
 
+  it 'retrieval with customers in top-level and cloned in managed accounts' do
+    account = Stripe::Account.create(managed: true, country: 'US')
+    bank_token_id = stripe_helper.generate_bank_token(country: "US", currency: "USD", account_holder_name: "Benjamin Anderson", account_holder_type: "individual", routing_number: "110000000", account_number: "000123456789")
+    top_level_customer = Stripe::Customer.create({ email: 'johnny@appleseed.com',
+                                                   source: bank_token_id
+                                                 })
+    token = Stripe::Token.retrieve(bank_token_id)
+    expect(top_level_customer.default_source).to eq(token.bank_account.id)
+
+    customer_token_for_managed_account = Stripe::Token.create({ customer: top_level_customer.id,
+                                                                bank_account: top_level_customer.default_source
+                                                              }, {:stripe_account => account.id})
+
+    # reload the top level customer and confirm that Stripe bank id has not changed
+    top_level_customer = Stripe::Customer.retrieve(top_level_customer.id)
+    expect(top_level_customer.default_source).to eq(token.bank_account.id)
+
+    cloned_customer = Stripe::Customer.create({ email: top_level_customer.email,
+                                                source: customer_token_for_managed_account.id
+                                              }, {stripe_account: account.id})
+
+    # the bank id for the cloned customer should not be the same as the bank id for the top level customer - even though
+    # the bank account originated from a token created by the top level customer's bank account
+    expect(cloned_customer.default_source).not_to eq(top_level_customer.default_source)
+  end
+
 end

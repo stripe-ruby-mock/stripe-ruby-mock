@@ -73,6 +73,10 @@ module StripeMock
       timeout_wrap { @pipe.clear_data }
     end
 
+    def generate_subscription_renewal_invoice(subscription_id)
+      timeout_wrap { @pipe.generate_subscription_renewal_invoice(subscription_id) }
+    end
+
     def close!
       self.cleanup
       StripeMock.stop_client(:clear_server_data => false)

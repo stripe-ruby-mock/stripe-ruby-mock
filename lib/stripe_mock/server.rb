@@ -76,5 +76,10 @@ module StripeMock
     def ping
       true
     end
+
+    def generate_subscription_renewal_invoice(subscription_id)
+      @instance.generate_subscription_renewal_invoice(subscription_id)
+    end
+
   end
 end

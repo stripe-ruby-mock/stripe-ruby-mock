@@ -297,4 +297,31 @@ shared_examples 'Card API' do
     end
   end
 
+  it 'retrieval with customers in top-level and cloned in managed accounts' do
+    account = Stripe::Account.create(managed: true, country: 'US')
+
+    card_token_id = stripe_helper.generate_card_token(last4: "1234", exp_month: 11, exp_year: 2099)
+    top_level_customer = Stripe::Customer.create({ email: 'johnny@appleseed.com',
+                                                   source: card_token_id
+                                                 })
+    token = Stripe::Token.retrieve(card_token_id)
+    expect(top_level_customer.default_source).to eq(token.card.id)
+
+    customer_token_for_managed_account = Stripe::Token.create({ customer: top_level_customer.id,
+                                                                card: top_level_customer.default_source
+                                                              }, {:stripe_account => account.id})
+
+    # reload the top level customer and confirm that Stripe card id has not changed
+    top_level_customer = Stripe::Customer.retrieve(top_level_customer.id)
+    expect(top_level_customer.default_source).to eq(token.card.id)
+
+    cloned_customer = Stripe::Customer.create({ email: top_level_customer.email,
+                                                source: customer_token_for_managed_account.id
+                                              }, {stripe_account: account.id})
+
+    # the card id for the cloned customer should not be the same as the card id for the top level customer - even though
+    # the card originated from a token created by the top level customer's card
+    expect(cloned_customer.default_source).not_to eq(top_level_customer.default_source)
+  end
+
 end
