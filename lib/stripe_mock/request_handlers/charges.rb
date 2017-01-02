@@ -129,7 +129,8 @@ module StripeMock
         refund = Data.mock_refund params.merge(
           :balance_transaction => new_balance_transaction('txn'),
           :id => new_id('re'),
-          :charge => charge[:id]
+          :charge => charge[:id],
+          :amount => (params[:amount] || charge[:amount])
         )
         add_refund_to_charge(refund, charge)
         refund
