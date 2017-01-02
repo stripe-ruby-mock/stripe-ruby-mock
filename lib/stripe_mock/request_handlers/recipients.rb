@@ -12,6 +12,18 @@ module StripeMock
         params[:id] ||= new_id('rp')
         cards = []
 
+        if params[:name].nil?
+          raise StripeMock::StripeMockError.new("Missing required parameter name for recipients.")
+        end
+
+        if params[:type].nil?
+          raise StripeMock::StripeMockError.new("Missing required parameter type for recipients.")
+        end
+
+        unless %w(individual corporation).include?(params[:type])
+          raise StripeMock::StripeMockError.new("Type must be either individual or corporation..")
+        end
+
         if params[:bank_account]
           params[:active_account] = get_bank_by_token(params.delete(:bank_account))
         end

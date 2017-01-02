@@ -22,7 +22,13 @@ shared_examples 'Card API' do
   end
 
   it 'creates/returns a card when using recipient.cards.create given a card token' do
-    recipient = Stripe::Recipient.create(id: 'test_recipient_sub')
+    params = {
+      id: 'test_recipient_sub',
+      name: 'MyRec',
+      type: 'individual'
+    }
+
+    recipient = Stripe::Recipient.create(params)
     card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
     card = recipient.cards.create(card: card_token)
 
@@ -64,7 +70,12 @@ shared_examples 'Card API' do
   end
 
   it 'creates/returns a card when using recipient.cards.create given card params' do
-    recipient = Stripe::Recipient.create(id: 'test_recipient_sub')
+    params = {
+      id: 'test_recipient_sub',
+      name: 'MyRec',
+      type: 'individual'
+    }
+    recipient = Stripe::Recipient.create(params)
     card = recipient.cards.create(card: {
       number: '4000056655665556',
       exp_month: '11',
