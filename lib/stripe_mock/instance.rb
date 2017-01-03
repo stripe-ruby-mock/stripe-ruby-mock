@@ -134,7 +134,7 @@ module StripeMock
       amount = params[:amount]
       unless amount.nil?
         # Fee calculation
-        params[:fee] ||= 30 + (amount * 0.029).ceil
+        params[:fee] ||= (30 + (amount.abs * 0.029).ceil) * (amount > 0 ? 1 : -1)
       end
       @balance_transactions[id] = Data.mock_balance_transaction(params.merge(id: id))
       id
