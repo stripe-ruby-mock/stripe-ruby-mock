@@ -110,10 +110,10 @@ shared_examples 'Refund API' do
 
     it 'returns Stripe::Refund object', live: true do
       charge = Stripe::Charge.create(
-          amount: 999,
-          currency: 'USD',
-          source: stripe_helper.generate_card_token,
-          description: 'card charge'
+        amount: 999,
+        currency: 'USD',
+        source: stripe_helper.generate_card_token,
+        description: 'card charge'
       )
       refund = Stripe::Refund.create(
         charge: charge.id,
@@ -121,6 +121,19 @@ shared_examples 'Refund API' do
       )
 
       expect(refund).to be_a(Stripe::Refund)
+      expect(refund.amount).to eq(500)
+    end
+
+    it 'refunds entire charge if amount is not set', live: true do
+      charge = Stripe::Charge.create(
+        amount: 999,
+        currency: 'USD',
+        source: stripe_helper.generate_card_token,
+        description: 'card charge'
+      )
+      refund = Stripe::Refund.create(charge: charge.id)
+
+      expect(refund.amount).to eq(charge.amount)
     end
 
     it "stores a created stripe refund in memory" do
