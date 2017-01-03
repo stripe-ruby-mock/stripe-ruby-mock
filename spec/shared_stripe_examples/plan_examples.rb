@@ -118,6 +118,17 @@ shared_examples 'Plan API' do
     expect(all.count).to eq(100)
   end
 
+  it 'validates the amount' do
+    expect {
+      Stripe::Plan.create(
+        :id => 'pid_1',
+        :name => 'The Mock Plan',
+        :amount => 99.99,
+        :currency => 'USD',
+        :interval => 'month'
+      )
+    }.to raise_error(Stripe::InvalidRequestError, "Invalid integer: 99.99")
+  end
 
   describe "Validation", :live => true do
     let(:params) { stripe_helper.create_plan_params }
