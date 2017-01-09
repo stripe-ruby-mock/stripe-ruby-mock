@@ -18,6 +18,16 @@ module StripeMock
     @state = 'ready'
   end
 
+  # Yield the given block between StripeMock.start and StripeMock.stop
+  def self.mock(&block)
+    begin
+      self.start
+      yield
+    ensure
+      self.stop
+    end
+  end
+
   def self.alias_stripe_method(new_name, method_object)
     Stripe.define_singleton_method(new_name) {|*args| method_object.call(*args) }
   end
