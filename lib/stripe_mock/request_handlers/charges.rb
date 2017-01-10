@@ -87,7 +87,14 @@ module StripeMock
       def get_charge(route, method_url, params, headers)
         route =~ method_url
         charge_id = $1 || params[:charge]
-        assert_existence :charge, charge_id, charges[charge_id]
+        charge = assert_existence :charge, charge_id, charges[charge_id]
+
+        if params[:expand] == ['balance_transaction']
+          balance_transaction = balance_transactions[charge[:balance_transaction]]
+          charge[:balance_transaction] = balance_transaction
+        end
+
+        charge
       end
 
       def capture_charge(route, method_url, params, headers)
