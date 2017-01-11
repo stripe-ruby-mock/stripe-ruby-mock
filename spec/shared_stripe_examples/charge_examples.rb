@@ -197,12 +197,16 @@ shared_examples 'Charge API' do
   end
 
   it "can expand balance transaction when retrieving a charge" do
-    charge = Stripe::Charge.create({
+    original = Stripe::Charge.create({
       amount: 300,
       currency: 'USD',
-      source: stripe_helper.generate_card_token,
-      expand: ['balance_transaction']
+      source: stripe_helper.generate_card_token
     })
+    charge = Stripe::Charge.retrieve(
+      id: original.id,
+      expand: ['balance_transaction']
+    )
+
     expect(charge.balance_transaction).to be_a(Stripe::BalanceTransaction)
   end
 
