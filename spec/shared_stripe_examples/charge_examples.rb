@@ -174,6 +174,22 @@ shared_examples 'Charge API' do
     expect(bal_trans.source).to eq(charge.source)
   end
 
+  context 'when conversion rate is set' do
+    it "balance transaction stores amount converted from charge currency to USD" do
+      StripeMock.set_conversion_rate(1.2)
+
+      charge = Stripe::Charge.create({
+        amount: 300,
+        currency: 'CAD',
+        source: stripe_helper.generate_card_token
+      })
+      bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
+      expect(bal_trans.amount).to be > charge.amount
+      expect(bal_trans.fee).to eq(39)
+      expect(bal_trans.currency).to eq('usd')
+    end
+  end
+
   it "can expand balance transaction when creating a charge" do
     charge = Stripe::Charge.create({
       amount: 300,

@@ -1,4 +1,5 @@
 require 'set'
+require 'pry'
 
 gem 'rspec', '~> 3.1'
 require 'rspec'
@@ -46,7 +47,7 @@ RSpec.configure do |c|
       StripeMock.stub(:stop).and_return(nil)
       Stripe.api_key = api_key
     end
-    c.after(:each) { sleep 1 }
+    c.after(:each) { sleep 0.01 }
   else
     c.filter_run_excluding :oauth => true
     Stripe.api_key ||= ''

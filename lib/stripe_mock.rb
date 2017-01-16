@@ -26,6 +26,7 @@ require 'stripe_mock/api/client'
 require 'stripe_mock/api/server'
 
 require 'stripe_mock/api/bank_tokens'
+require 'stripe_mock/api/conversion_rate'
 require 'stripe_mock/api/card_tokens'
 require 'stripe_mock/api/debug'
 require 'stripe_mock/api/errors'
