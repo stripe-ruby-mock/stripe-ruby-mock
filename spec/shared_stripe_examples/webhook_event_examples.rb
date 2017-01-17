@@ -183,8 +183,8 @@ shared_examples 'Webhook Events API' do
       events = Stripe::Event.all(limit: 3)
 
       expect(events.count).to eq(3)
-      expect(events.map &:id).to include(customer_created_event.id, plan_created_event.id, coupon_created_event.id)
-      expect(events.map &:type).to include('customer.created', 'plan.created', 'coupon.created')
+      expect(events.map &:id).to include(invoice_item_created_event.id, invoice_created_event.id, coupon_created_event.id)
+      expect(events.map &:type).to include('invoiceitem.created', 'invoice.created', 'coupon.created')
     end
 
   end
