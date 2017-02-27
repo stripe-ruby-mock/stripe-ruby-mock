@@ -56,7 +56,7 @@ shared_examples 'Coupon API' do
     it "cannot retrieve a stripe coupon that doesn't exist" do
       expect { Stripe::Coupon.retrieve('nope') }.to raise_error {|e|
         expect(e).to be_a Stripe::InvalidRequestError
-        expect(e.param).to eq('id')
+        expect(e.param).to eq('coupon')
         expect(e.http_status).to eq(404)
       }
     end
@@ -71,7 +71,7 @@ shared_examples 'Coupon API' do
 
       expect { Stripe::Coupon.retrieve(coupon.id) }.to raise_error {|e|
         expect(e).to be_a Stripe::InvalidRequestError
-        expect(e.param).to eq('id')
+        expect(e.param).to eq('coupon')
         expect(e.http_status).to eq(404)
       }
     end
