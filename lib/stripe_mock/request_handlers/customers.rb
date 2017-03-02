@@ -8,6 +8,7 @@ module StripeMock
         klass.add_handler 'get /v1/customers/([^/]*)',              :get_customer
         klass.add_handler 'delete /v1/customers/([^/]*)',           :delete_customer
         klass.add_handler 'get /v1/customers',                      :list_customers
+        klass.add_handler 'delete /v1/customers/([^/]*)/discount',  :delete_customer_discount
       end
 
       def new_customer(route, method_url, params, headers)
@@ -114,6 +115,14 @@ module StripeMock
         Data.mock_list_object(customers.values, params)
       end
 
+      def delete_customer_discount(route, method_url, params, headers)
+        route =~ method_url
+        cus = assert_existence :customer, $1, customers[$1]
+      
+        cus[:discount] = nil
+        
+        cus
+      end
     end
   end
 end
