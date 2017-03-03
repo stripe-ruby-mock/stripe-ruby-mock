@@ -76,5 +76,10 @@ module StripeMock
     def ping
       true
     end
+
+    def upsert_stripe_object(object, attributes)
+      @instance.upsert_stripe_object(object, attributes)
+    end
+
   end
 end

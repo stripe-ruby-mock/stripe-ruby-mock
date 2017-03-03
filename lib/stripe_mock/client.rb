@@ -73,6 +73,10 @@ module StripeMock
       timeout_wrap { @pipe.clear_data }
     end
 
+    def upsert_stripe_object(object, attributes)
+      timeout_wrap { @pipe.upsert_stripe_object(object, attributes) }
+    end
+
     def close!
       self.cleanup
       StripeMock.stop_client(:clear_server_data => false)
