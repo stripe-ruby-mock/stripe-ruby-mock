@@ -25,7 +25,12 @@ module StripeMock
       end
 
       def get_card_by_token(token)
-        if token.nil? || @card_tokens[token].nil?
+        card_token = @card_tokens[token]
+        unless card_token
+          card_token = @card_tokens.select { |k, v| v[:id] == token }.values[0]
+        end
+
+        if token.nil? || card_token.nil?
           # TODO: Make this strict
           msg = "Invalid token id: #{token}"
           raise Stripe::InvalidRequestError.new(msg, 'tok', 404)
@@ -35,7 +40,12 @@ module StripeMock
       end
 
       def get_card_or_bank_by_token(token)
-        @card_tokens[token] || @bank_tokens[token] || raise(Stripe::InvalidRequestError.new("Invalid token id: #{token}", 'tok', 404))
+        card_token = @card_tokens[token]
+        unless card_token
+          card_token = @card_tokens.select { |k, v| v[:id] == token }.values[0]
+        end
+
+        card_token || @bank_tokens[token] || raise(Stripe::InvalidRequestError.new("Invalid token id: #{token}", 'tok', 404))
       end
 
     end
