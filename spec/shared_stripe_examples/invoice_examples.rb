@@ -76,17 +76,33 @@ shared_examples 'Invoice API' do
   context "paying an invoice" do
     before do
       @invoice = Stripe::Invoice.create
-      @invoice.pay
     end
 
     it 'updates attempted and paid flags' do
+      @invoice.pay
       expect(@invoice.attempted).to eq(true)
       expect(@invoice.paid).to eq(true)
     end
 
+    it 'creates a new charge object' do
+      expect{ @invoice.pay }.to change { Stripe::Charge.list.data.count }.by 1
+    end
+
     it 'sets the charge attribute' do
+      @invoice.pay
       expect(@invoice.charge).to be_a String
       expect(@invoice.charge.length).to be > 0
+    end
+
+    it 'charges the invoice customers default card' do
+      customer = Stripe::Customer.create({
+        source: stripe_helper.generate_card_token
+      })
+      customer_invoice = Stripe::Invoice.create({customer: customer})
+
+      customer_invoice.pay
+
+      expect(Stripe::Charge.list.data.first.customer).to eq customer.id
     end
   end
 

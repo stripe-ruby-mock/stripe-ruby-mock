@@ -52,7 +52,8 @@ module StripeMock
       def pay_invoice(route, method_url, params, headers)
         route =~ method_url
         assert_existence :invoice, $1, invoices[$1]
-        invoices[$1].merge!(:paid => true, :attempted => true, :charge => 'ch_1fD6uiR9FAA2zc')
+        charge = invoice_charge(invoices[$1])
+        invoices[$1].merge!(:paid => true, :attempted => true, :charge => charge[:id])
       end
 
       def upcoming_invoice(route, method_url, params, headers)
@@ -91,6 +92,16 @@ module StripeMock
             start: subscription[:current_period_end],
             end: get_ending_time(subscription[:current_period_start], subscription[:plan], 2)
           })
+      end
+
+      ## charge the customer on the invoice, if one does not exist, create
+      #anonymous charge
+      def invoice_charge(invoice)
+        begin
+          new_charge(nil, nil, {customer: invoice[:customer]["id"], amount: invoice[:amount_due], currency: 'usd'}, nil)
+        rescue Stripe::InvalidRequestError
+          new_charge(nil, nil, {source: generate_card_token, amount: invoice[:amount_due], currency: 'usd'}, nil)
+        end
       end
 
     end

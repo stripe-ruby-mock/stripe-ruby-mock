@@ -15,7 +15,7 @@ module StripeMock
           return refunds[original_refund[:id]] if original_refund
         end
 
-        charge = get_charge(route, method_url, params, headers)
+        charge = assert_existence :charge, params[:charge], charges[params[:charge]]
         params[:amount] ||= charge[:amount]
         id = new_id('re')
         bal_trans_params = {

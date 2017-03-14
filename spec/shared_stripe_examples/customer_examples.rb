@@ -387,4 +387,18 @@ shared_examples 'Customer API' do
     }.not_to raise_error
   end
   
+  it "deletes a stripe customer discount" do
+    original = Stripe::Customer.create(id: 'test_customer_update')
+
+    coupon = Stripe::Coupon.create(id: "10PERCENT", duration: 'once')
+    original.coupon = coupon.id
+    original.save
+
+    expect(original.discount.coupon).to be_a Stripe::Coupon
+    
+    original.delete_discount
+
+    customer = Stripe::Customer.retrieve("test_customer_update")
+    expect(customer.discount).to be nil
+  end
 end
