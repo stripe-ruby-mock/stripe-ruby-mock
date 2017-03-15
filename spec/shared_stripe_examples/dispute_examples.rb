@@ -79,7 +79,7 @@ shared_examples 'Dispute API' do
       disputes = Stripe::Dispute.all(limit: 3)
 
       expect(disputes.count).to eq(3)
-      expect(disputes.map &:id).to include('dp_05RsQX2eZvKYlo2C0FRTGSSA','dp_15RsQX2eZvKYlo2C0ERTYUIA', 'dp_25RsQX2eZvKYlo2C0ZXCVBNM')
+      expect(disputes.map &:id).to include('dp_95RsQX2eZvKYlo2C0EDFRYUI','dp_85RsQX2eZvKYlo2C0UJMCDET', 'dp_75RsQX2eZvKYlo2C0EDCXSWQ')
     end
 
   end

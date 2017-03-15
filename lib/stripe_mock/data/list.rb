@@ -7,6 +7,13 @@ module StripeMock
         @data = Array(data.clone)
         @limit = [[options[:limit] || 10, 100].min, 1].max # restrict @limit to 1..100
         @starting_after = options[:starting_after]
+        if @data.first.is_a?(Hash) && @data.first[:created]
+          @data.sort_by! { |x| x[:created] }
+          @data.reverse!
+        elsif @data.first.respond_to?(:created)
+          @data.sort_by { |x| x.created }
+          @data.reverse!
+        end
       end
 
       def url

@@ -324,7 +324,7 @@ shared_examples 'Charge API' do
     end
 
     it "stores all charges in memory" do
-      expect(Stripe::Charge.all.data.map(&:id)).to eq([@charge.id, @charge2.id])
+      expect(Stripe::Charge.all.data.map(&:id).reverse).to eq([@charge.id, @charge2.id])
     end
 
     it "defaults count to 10 charges" do
