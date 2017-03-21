@@ -27,7 +27,7 @@ module StripeMock
       def update_account(route, method_url, params, headers)
         route =~ method_url
         assert_existence :account, $1, accounts[$1]
-        accounts[$1].merge!(params)
+        # accounts[$1].merge!(params)
       end
 
       def list_accounts(route, method_url, params, headers)
