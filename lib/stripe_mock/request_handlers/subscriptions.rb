@@ -79,7 +79,8 @@ module StripeMock
         plan_id = params[:plan].to_s
         plan = assert_existence :plan, plan_id, plans[plan_id]
 
-        customer_id = params[:customer].to_s
+        customer = params[:customer]
+        customer_id = customer.is_a?(Stripe::Customer) ? customer[:id] : customer.to_s
         customer = assert_existence :customer, customer_id, customers[customer_id]
 
         if params[:source]

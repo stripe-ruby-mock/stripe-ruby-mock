@@ -35,6 +35,36 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
     end
 
+    it 'when customer object provided' do
+      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      expect(customer.subscriptions.data).to be_empty
+      expect(customer.subscriptions.count).to eq(0)
+
+      sub = Stripe::Subscription.create({ plan: 'silver', customer: customer, metadata: { foo: "bar", example: "yes" } })
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
+      expect(sub.metadata.foo).to eq( "bar" )
+      expect(sub.metadata.example).to eq( "yes" )
+
+      customer = Stripe::Customer.retrieve(customer.id)
+      expect(customer.subscriptions.data).to_not be_empty
+      expect(customer.subscriptions.count).to eq(1)
+      expect(customer.subscriptions.data.length).to eq(1)
+      expect(customer.charges.data.length).to eq(1)
+      expect(customer.currency).to eq( "usd" )
+
+      expect(customer.subscriptions.data.first.id).to eq(sub.id)
+      expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
+
+      expect(customer.subscriptions.data.first.customer).to eq(customer.id)
+
+      expect(customer.subscriptions.data.first.metadata.foo).to eq( "bar" )
+      expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
+    end
+
     it "adds a new subscription to customer (string/symbol agnostic)" do
       customer = Stripe::Customer.create(source: gen_card_tk)
       expect(customer.subscriptions.count).to eq(0)
