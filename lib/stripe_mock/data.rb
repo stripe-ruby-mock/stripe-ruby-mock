@@ -100,7 +100,7 @@ module StripeMock
 
     def self.mock_charge_array
       {
-        :data => [test_charge, test_charge, test_charge],
+        :data => [],
         :object => 'list',
         :url => '/v1/charges'
       }
@@ -271,7 +271,7 @@ module StripeMock
 
     def self.mock_invoice_customer_array
       {
-        :data => [test_invoice],
+        :data => [],
         :object => 'list',
         :url => '/v1/invoices?customer=test_customer'
       }

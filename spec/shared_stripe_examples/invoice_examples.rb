@@ -60,6 +60,16 @@ shared_examples 'Invoice API' do
       expect(Stripe::Invoice.all.count).to eq(10)
     end
 
+    context "when scoped to a customer" do
+      it "raises an error if the customer does not exist" do
+        expect{Stripe::Invoice.all(customer: 'not_here')}.to raise_error(Stripe::InvalidRequestError)
+      end
+
+      it "returns a List of charges" do
+        expect(Stripe::Invoice.all(customer: @customer.id).data.map(&:id)).to match_array([@invoice.id])
+      end
+    end
+
     context "when passing count" do
       it "gets that many invoices" do
         expect(Stripe::Invoice.all(count: 1).count).to eq(1)

@@ -29,10 +29,11 @@ module StripeMock
 
         clone = charges.clone
 
-        if params[:customer]
-          clone.delete_if { |k,v| v[:customer] != params[:customer] }
+        if customer_id = params[:customer]
+          clone.delete_if { |k,v| v[:customer] != customer_id }
+          raise Stripe::InvalidRequestError.new("No such customer: #{customer_id}", customer_id, 400) if clone.empty?
+          return Data.mock_charge_array.merge(data: clone.values[params[:offset], params[:count]])
         end
-
         clone.values[params[:offset], params[:count]]
       end
 
