@@ -184,7 +184,7 @@ shared_examples 'Charge API' do
         source: stripe_helper.generate_card_token
       })
       bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
-      expect(bal_trans.amount).to be > charge.amount
+      expect(bal_trans.amount).to eq(charge.amount * 1.2)
       expect(bal_trans.fee).to eq(39)
       expect(bal_trans.currency).to eq('usd')
     end
