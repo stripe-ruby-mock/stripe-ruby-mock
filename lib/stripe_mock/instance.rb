@@ -114,6 +114,33 @@ module StripeMock
       @events[ event_data[:id] ] = symbolize_names(event_data)
     end
 
+    def upsert_stripe_object(object, attributes)
+      # Most Stripe entities can be created via the API.  However, some entities are created when other Stripe entities are
+      # created - such as when BalanceTransactions are created when Charges are created.  This method provides the ability
+      # to create these internal entities.
+      # It also provides the ability to modify existing Stripe entities.
+      id = attributes[:id]
+      if id.nil? || id == ""
+        # Insert new Stripe object
+        case object
+          when :balance_transaction
+            id = new_balance_transaction('txn', attributes)
+          else
+            raise UnsupportedRequestError.new "Unsupported stripe object `#{object}`"
+        end
+      else
+        # Update existing Stripe object
+        case object
+          when :balance_transaction
+            btxn = assert_existence :balance_transaction, id, @balance_transactions[id]
+            btxn.merge!(attributes)
+          else
+            raise UnsupportedRequestError.new "Unsupported stripe object `#{object}`"
+        end
+      end
+      id
+    end
+
     private
 
     def assert_existence(type, id, obj, message=nil)

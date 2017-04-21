@@ -14,6 +14,14 @@ module StripeMock
         end
       end
 
+      def upsert_stripe_object(object, attributes = {})
+        if StripeMock.state == 'remote'
+          StripeMock.client.upsert_stripe_object(object, attributes)
+        elsif StripeMock.state == 'local'
+          StripeMock.instance.upsert_stripe_object(object, attributes)
+        end
+      end
+
     end
   end
 end

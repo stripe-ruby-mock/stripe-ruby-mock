@@ -34,6 +34,20 @@ describe StripeMock::Data::List do
     expect(list.url).to eq("/v1/customers")
   end
 
+  it "returns in descending order if created available" do
+    charge_newer = Stripe::Charge.create(amount: 1, currency: 'usd', source: stripe_helper.generate_card_token, created: 5)
+    charge_older = Stripe::Charge.create(amount: 1, currency: 'usd', source: stripe_helper.generate_card_token, created: 4)
+    list = StripeMock::Data::List.new([charge_older, charge_newer])
+    hash = list.to_h
+
+    expect(hash).to eq(
+      object: "list",
+      data: [charge_newer, charge_older],
+      url: "/v1/charges",
+      has_more: false
+    )
+  end
+
   it "eventually gets turned into a hash" do
     charge1 = Stripe::Charge.create(amount: 1, currency: 'usd', source: stripe_helper.generate_card_token)
     charge2 = Stripe::Charge.create(amount: 1, currency: 'usd', source: stripe_helper.generate_card_token)
@@ -43,7 +57,7 @@ describe StripeMock::Data::List do
 
     expect(hash).to eq(
       object: "list",
-      data: [charge1, charge2, charge3],
+      data: [charge3, charge2, charge1],
       url: "/v1/charges",
       has_more: false
     )
@@ -111,9 +125,8 @@ describe StripeMock::Data::List do
       data[89] = new_charge
       list = StripeMock::Data::List.new(data, starting_after: new_charge.id)
       hash = list.to_h
-
       expect(hash[:data].size).to eq(10)
-      expect(hash[:data]).to eq(data[90, 10])
+      expect(hash[:data]).to eq(data[79, 10].reverse)
     end
 
     it "raises an error if starting_after cursor is not found" do

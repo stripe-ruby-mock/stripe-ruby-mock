@@ -45,7 +45,7 @@ module StripeMock
           end
         end
 
-        if [:created, :paid, :canceled, :fulfilled, :returned].includes? params[:status]
+        if %w(created paid canceled fulfilled returned).include? params[:status]
           order[:status] = params[:status]
         end
         order

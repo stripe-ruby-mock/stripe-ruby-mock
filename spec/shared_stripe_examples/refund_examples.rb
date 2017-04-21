@@ -262,7 +262,7 @@ shared_examples 'Refund API' do
       end
 
       it "stores all charges in memory" do
-        expect(Stripe::Refund.all.data.map(&:id)).to eq([@refund.id, @refund2.id])
+        expect(Stripe::Refund.all.data.map(&:id)).to eq([@refund2.id, @refund.id])
       end
 
       it "defaults count to 10 charges" do
