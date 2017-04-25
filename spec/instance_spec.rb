@@ -47,4 +47,9 @@ describe StripeMock::Instance do
     StripeMock.start
     expect(StripeMock.instance.debug).to eq(false)
   end
+
+  it "can set a conversion rate" do
+    StripeMock.set_conversion_rate(1.25)
+    expect(StripeMock.instance.conversion_rate).to eq(1.25)
+  end
 end

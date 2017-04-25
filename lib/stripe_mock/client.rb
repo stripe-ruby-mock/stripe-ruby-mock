@@ -65,6 +65,14 @@ module StripeMock
       timeout_wrap { Stripe::Util.symbolize_names @pipe.generate_webhook_event(event_data) }
     end
 
+    def get_conversion_rate
+      timeout_wrap { @pipe.get_data(:conversion_rate) }
+    end
+
+    def set_conversion_rate(value)
+      timeout_wrap { @pipe.set_conversion_rate(value) }
+    end
+
     def destroy_resource(type, id)
       timeout_wrap { @pipe.destroy_resource(type, id) }
     end

@@ -132,4 +132,8 @@ describe 'StripeMock Server', :mock_server => true do
     end
   end
 
+  it "can set a conversion rate" do
+    StripeMock.set_conversion_rate(1.2)
+    expect(StripeMock.client.get_conversion_rate).to eq(1.2)
+  end
 end
