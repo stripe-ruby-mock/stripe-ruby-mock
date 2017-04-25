@@ -1,5 +1,4 @@
 require 'set'
-require 'pry'
 
 gem 'rspec', '~> 3.1'
 require 'rspec'
