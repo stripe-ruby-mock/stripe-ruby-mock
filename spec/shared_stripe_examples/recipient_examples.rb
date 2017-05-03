@@ -17,6 +17,7 @@ shared_examples 'Recipient API' do
     expect(recipient.default_card).to_not be_nil
 
     expect(recipient.active_account).to_not be_nil
+    expect(recipient.active_account.id).to_not be_nil
     expect(recipient.active_account.bank_name).to_not be_nil
     expect(recipient.active_account.last4).to_not be_nil
 

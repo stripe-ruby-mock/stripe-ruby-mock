@@ -492,6 +492,7 @@ module StripeMock
         object: "recipient",
         id: rp_id,
         active_account: {
+          id: "test_ba_default",
           last4: "6789",
           bank_name: "STRIPE TEST BANK",
           country: "US",
@@ -573,7 +574,9 @@ module StripeMock
         :amount => 100,
         :account => {
           :object => 'bank_account',
+          :id => 'test_ba_default',
           :country => 'US',
+          :currency => 'usd',
           :bank_name => 'STRIPE TEST BANK',
           :last4 => '6789'
         },
