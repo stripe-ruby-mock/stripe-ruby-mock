@@ -204,6 +204,26 @@ shared_examples 'Invoice API' do
       end
     end
 
+    context 'create invoice line item' do
+      it 'adds a line item on an individual invoice' do
+        invoice = Stripe::Invoice.create(customer: @customer.id)
+        line_items = invoice.lines.create(
+          amount: 1_00,
+          description: "Test new line"
+        )
+
+        expect(invoice).to be_a Stripe::Invoice
+        expect(line_items.count).to eq(2)
+        expect(line_items.data[0].object).to eq('line_item')
+        expect(line_items.data[0].description).to eq('Test invoice item')
+        expect(line_items.data[0].type).to eq('invoiceitem')
+        expect(line_items.data[1].object).to eq('line_item')
+        expect(line_items.data[1].description).to eq('Test new line')
+        expect(line_items.data[1].amount).to eq(1_00)
+        expect(line_items.data[1].type).to eq('invoiceitem')
+      end
+    end
+
     context 'calculates month and year offsets correctly' do
 
       it 'for one month plan on the 1st' do
