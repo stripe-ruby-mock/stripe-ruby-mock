@@ -9,7 +9,7 @@ module StripeMock
 
       def create_token(route, method_url, params, headers)
         if params[:customer].nil? && params[:card].nil? && params[:bank_account].nil?
-          raise Stripe::InvalidRequestError.new('You must supply either a card, customer, or bank account to create a token.', nil, 400)
+          raise Stripe::InvalidRequestError.new('You must supply either a card, customer, or bank account to create a token.', nil, http_status: 400)
         end
 
         cus_id = params[:customer]

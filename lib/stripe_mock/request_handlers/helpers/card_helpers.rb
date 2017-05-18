@@ -8,10 +8,10 @@ module StripeMock
         if card.nil?
           if class_name == 'Recipient'
             msg = "#{class_name} #{object[:id]} does not have a card with ID #{card_id}"
-            raise Stripe::InvalidRequestError.new(msg, 'card', 404)
+            raise Stripe::InvalidRequestError.new(msg, 'card', http_status: 404)
           else
             msg = "There is no source with ID #{card_id}"
-            raise Stripe::InvalidRequestError.new(msg, 'id', 404)
+            raise Stripe::InvalidRequestError.new(msg, 'id', http_status: 404)
           end
         end
         card

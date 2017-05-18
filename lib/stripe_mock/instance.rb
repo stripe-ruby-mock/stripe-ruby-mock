@@ -77,7 +77,7 @@ module StripeMock
       @base_strategy = TestStrategies::Base.new
     end
 
-    def mock_request(method, url, api_key, params={}, headers={}, api_base_url=nil)
+    def mock_request(method, url, api_key: nil, api_base: nil, params: {}, headers: {})
       return {} if method == :xtest
 
       api_key ||= (Stripe.api_key || DUMMY_API_KEY)
@@ -100,7 +100,7 @@ module StripeMock
         else
           res = self.send(handler[:name], handler[:route], method_url, params, headers)
           puts "           [res]  #{res}" if @debug == true
-          [res, api_key]
+          [to_faraday_hash(res), api_key]
         end
       else
         puts "[StripeMock] Warning : Unrecognized endpoint + method : [#{method} #{url}]"
@@ -146,7 +146,7 @@ module StripeMock
     def assert_existence(type, id, obj, message=nil)
       if obj.nil?
         msg = message || "No such #{type}: #{id}"
-        raise Stripe::InvalidRequestError.new(msg, type.to_s, 404)
+        raise Stripe::InvalidRequestError.new(msg, type.to_s, http_status: 404)
       end
       obj
     end
@@ -173,5 +173,9 @@ module StripeMock
       Stripe::Util.symbolize_names(hash)
     end
 
+    def to_faraday_hash(hash)
+      response = Struct.new(:data)
+      response.new(hash)
+    end
   end
 end

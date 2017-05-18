@@ -13,9 +13,9 @@ module StripeMock
       @state = 'ready'
     end
 
-    def mock_request(method, url, api_key, params={}, headers={})
+    def mock_request(method, url, api_key: nil, params: {}, headers: {})
       timeout_wrap do
-        @pipe.mock_request(method, url, api_key, params, headers).tap {|result|
+        @pipe.mock_request(method, url, api_key: api_key, params: params, headers: headers).tap {|result|
           response, api_key = result
           if response.is_a?(Hash) && response[:error_raised] == 'invalid_request'
             raise Stripe::InvalidRequestError.new(*response[:error_params])

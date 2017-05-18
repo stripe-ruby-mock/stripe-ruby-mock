@@ -605,6 +605,7 @@ module StripeMock
     end
 
     def self.mock_dispute(params={})
+      @timestamp ||= Time.now.to_i
       currency = params[:currency] || 'usd'
       id = params[:id] || "dp_test_dispute"
       {
@@ -613,7 +614,7 @@ module StripeMock
         :amount => 195,
         :balance_transactions => [],
         :charge => "ch_15RsQR2eZvKYlo2CA8IfzCX0",
-        :created => 1422915137,
+        :created => @timestamp += 1,
         :currency => currency,
         :evidence => self.mock_dispute_evidence,
         :evidence_details => self.mock_dispute_evidence_details,

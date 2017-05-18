@@ -47,7 +47,7 @@ module StripeMock
         allowed = allowed_refund_params(params)
         disallowed = params.keys - allowed
         if disallowed.count > 0
-          raise Stripe::InvalidRequestError.new("Received unknown parameters: #{disallowed.join(', ')}" , '', 400)
+          raise Stripe::InvalidRequestError.new("Received unknown parameters: #{disallowed.join(', ')}" , '', http_status: 400)
         end
 
         refunds[id] = Util.rmerge(refund, params)
@@ -72,9 +72,9 @@ module StripeMock
 
       def ensure_refund_required_params(params)
         if non_integer_charge_amount?(params)
-          raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', 400)
+          raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', http_status: 400)
         elsif non_positive_charge_amount?(params)
-          raise Stripe::InvalidRequestError.new('Invalid positive integer', 'amount', 400)
+          raise Stripe::InvalidRequestError.new('Invalid positive integer', 'amount', http_status: 400)
         elsif params[:charge].nil?
           raise Stripe::InvalidRequestError.new('Must provide the identifier of the charge to refund.', nil)
         end

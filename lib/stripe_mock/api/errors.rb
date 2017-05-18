@@ -24,18 +24,18 @@ module StripeMock
 
     def self.argument_map
       @__map ||= {
-        incorrect_number: add_json_body(["The card number is incorrect", 'number', 'incorrect_number', 402]),
-        invalid_number: add_json_body(["The card number is not a valid credit card number", 'number', 'invalid_number', 402]),
-        invalid_expiry_month: add_json_body(["The card's expiration month is invalid", 'exp_month', 'invalid_expiry_month', 402]),
-        invalid_expiry_year: add_json_body(["The card's expiration year is invalid", 'exp_year', 'invalid_expiry_year', 402]),
-        invalid_cvc: add_json_body(["The card's security code is invalid", 'cvc', 'invalid_cvc', 402]),
-        expired_card: add_json_body(["The card has expired", 'exp_month', 'expired_card', 402]),
-        incorrect_cvc: add_json_body(["The card's security code is incorrect", 'cvc', 'incorrect_cvc', 402]),
-        card_declined: add_json_body(["The card was declined", nil, 'card_declined', 402]),
-        missing: add_json_body(["There is no card on a customer that is being charged.", nil, 'missing', 402]),
-        processing_error: add_json_body(["An error occurred while processing the card", nil, 'processing_error', 402]),
-        card_error: add_json_body(['The card number is not a valid credit card number.', 'number', 'invalid_number', 402]), 
-        incorrect_zip: add_json_body(['The zip code you supplied failed validation.', 'address_zip', 'incorrect_zip', 402])
+        incorrect_number: add_json_body(["The card number is incorrect", 'number', 'incorrect_number', http_status: 402]),
+        invalid_number: add_json_body(["The card number is not a valid credit card number", 'number', 'invalid_number', http_status: 402]),
+        invalid_expiry_month: add_json_body(["The card's expiration month is invalid", 'exp_month', 'invalid_expiry_month', http_status: 402]),
+        invalid_expiry_year: add_json_body(["The card's expiration year is invalid", 'exp_year', 'invalid_expiry_year', http_status: 402]),
+        invalid_cvc: add_json_body(["The card's security code is invalid", 'cvc', 'invalid_cvc', http_status: 402]),
+        expired_card: add_json_body(["The card has expired", 'exp_month', 'expired_card', http_status: 402]),
+        incorrect_cvc: add_json_body(["The card's security code is incorrect", 'cvc', 'incorrect_cvc', http_status: 402]),
+        card_declined: add_json_body(["The card was declined", nil, 'card_declined', http_status: 402]),
+        missing: add_json_body(["There is no card on a customer that is being charged.", nil, 'missing', http_status: 402]),
+        processing_error: add_json_body(["An error occurred while processing the card", nil, 'processing_error', http_status: 402]),
+        card_error: add_json_body(['The card number is not a valid credit card number.', 'number', 'invalid_number', http_status: 402]),
+        incorrect_zip: add_json_body(['The zip code you supplied failed validation.', 'address_zip', 'incorrect_zip', http_status: 402])
       }
     end
 
@@ -45,8 +45,7 @@ module StripeMock
       json_hash = Hash[error_keys.zip error_values]
       json_hash[:type] = 'card_error'
 
-      error_values.push(error: json_hash) # http_body
-      error_values.push(error: json_hash) # json_body
+      error_values.last.merge!(json_body: { error: json_hash }, http_body: { error: json_hash })
 
       error_values
     end

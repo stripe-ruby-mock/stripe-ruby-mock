@@ -23,7 +23,7 @@ module StripeMock
         {
           :error_raised => 'invalid_request',
           :error_params => [
-            e.message, e.param, e.http_status, e.http_body, e.json_body
+            e.message, e.param, { http_status: e.http_status, http_body: e.http_body, json_body: e.json_body}
           ]
         }
       end

@@ -34,7 +34,7 @@ module StripeMock
         if cus[:currency].nil?
           cus[:currency] = sub[:plan][:currency]
         elsif cus[:currency] != sub[:plan][:currency]
-          raise Stripe::InvalidRequestError.new( "Can't combine currencies on a single customer. This customer has had a subscription, coupon, or invoice item with currency #{cus[:currency]}", 'currency', 400)
+          raise Stripe::InvalidRequestError.new( "Can't combine currencies on a single customer. This customer has had a subscription, coupon, or invoice item with currency #{cus[:currency]}", 'currency', http_status: 400)
         end
         cus[:subscriptions][:total_count] = (cus[:subscriptions][:total_count] || 0) + 1
         cus[:subscriptions][:data].unshift sub
@@ -65,11 +65,11 @@ module StripeMock
       def verify_trial_end(trial_end)
         if trial_end != "now"
           if !trial_end.is_a? Integer
-            raise Stripe::InvalidRequestError.new('Invalid timestamp: must be an integer', nil, 400)
+            raise Stripe::InvalidRequestError.new('Invalid timestamp: must be an integer', nil, http_status: 400)
           elsif trial_end < Time.now.utc.to_i
-            raise Stripe::InvalidRequestError.new('Invalid timestamp: must be an integer Unix timestamp in the future', nil, 400)
+            raise Stripe::InvalidRequestError.new('Invalid timestamp: must be an integer Unix timestamp in the future', nil, http_status: 400)
           elsif trial_end > Time.now.utc.to_i + 31557600*5 # five years
-            raise Stripe::InvalidRequestError.new('Invalid timestamp: can be no more than five years in the future', nil, 400)
+            raise Stripe::InvalidRequestError.new('Invalid timestamp: can be no more than five years in the future', nil, http_status: 400)
           end
         end
       end

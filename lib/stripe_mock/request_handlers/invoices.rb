@@ -58,12 +58,12 @@ module StripeMock
 
       def upcoming_invoice(route, method_url, params, headers)
         route =~ method_url
-        raise Stripe::InvalidRequestError.new('Missing required param: customer', nil, 400) if params[:customer].nil?
+        raise Stripe::InvalidRequestError.new('Missing required param: customer', nil, http_status: 400) if params[:customer].nil?
 
         customer = customers[params[:customer]]
         assert_existence :customer, params[:customer], customer
 
-        raise Stripe::InvalidRequestError.new("No upcoming invoices for customer: #{customer[:id]}", nil, 404) if customer[:subscriptions][:data].length == 0
+        raise Stripe::InvalidRequestError.new("No upcoming invoices for customer: #{customer[:id]}", nil, http_status: 404) if customer[:subscriptions][:data].length == 0
 
         most_recent = customer[:subscriptions][:data].min_by { |sub| sub[:current_period_end] }
         invoice_item = get_mock_subscription_line_item(most_recent)
