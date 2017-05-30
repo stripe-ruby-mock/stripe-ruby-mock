@@ -215,6 +215,18 @@ shared_examples 'Customer Subscriptions' do
       }
     end
 
+    it 'when attempting to create a new subscription with the params trial', focus: true, live: true do
+      plan = stripe_helper.create_plan(id: 'trial', amount: 999)
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      expect{ Stripe::Subscription.create(plan: plan.id, customer: customer.id, trial: 10) }.to raise_error {|e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.http_status).to eq(400)
+        expect(e.param).to eq('trial')
+        expect(e.message).to match /Received unknown parameter/
+      }
+    end
+
     it "subscribes a customer with no card to a plan with a free trial" do
       plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'cardless')

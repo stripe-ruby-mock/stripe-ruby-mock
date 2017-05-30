@@ -89,6 +89,12 @@ module StripeMock
           customer[:default_source] = new_card[:id]
         end
 
+        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days)
+        unknown_params = params.keys - allowed_params.map(&:to_sym)
+        if unknown_params.length > 0
+          raise Stripe::InvalidRequestError.new("Received unknown parameter: #{unknown_params.join}", unknown_params.first.to_s, 400)
+        end
+
         subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')) })
         subscription.merge!(custom_subscription_params(plan, customer, params))
 
