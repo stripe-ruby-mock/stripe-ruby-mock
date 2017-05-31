@@ -166,6 +166,13 @@ shared_examples 'Card API' do
       expect(retrieved_cus.default_source).to be_nil
     end
 
+    it 'updates total_count if deleted' do
+      card.delete
+      sources = Stripe::Customer.retrieve(customer.id).sources
+
+      expect(sources.total_count).to eq 0
+    end
+
     context "deletion when the user has two cards" do
       let!(:card_token_2) { stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099) }
       let!(:card_2) { customer.sources.create(source: card_token_2) }
