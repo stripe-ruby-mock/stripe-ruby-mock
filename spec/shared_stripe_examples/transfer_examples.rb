@@ -78,4 +78,20 @@ shared_examples 'Transfer API' do
       expect(e.http_status).to eq(400)
     }
   end
+
+  it 'when amount is negative', focus: true, live: true do
+    rec = Stripe::Recipient.create({
+                                       type:  'individual',
+                                       name: 'Alex Smith',
+                                   })
+    expect { Stripe::Transfer.create(amount: '-400',
+                                     currency: 'usd',
+                                     recipient: rec.id,
+                                     description: 'Transfer for test@example.com') }.to raise_error { |e|
+      expect(e).to be_a Stripe::InvalidRequestError
+      expect(e.param).to eq('amount')
+      expect(e.message).to match(/^Invalid.*integer/)
+      expect(e.http_status).to eq(400)
+    }
+  end
 end
