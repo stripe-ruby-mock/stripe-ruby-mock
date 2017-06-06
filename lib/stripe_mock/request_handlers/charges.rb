@@ -19,6 +19,9 @@ module StripeMock
         end
 
         id = new_id('ch')
+        if !params[:source] && !params[:customer]
+          raise Stripe::InvalidRequestError.new("Must provide source or customer.", 'card', 400)
+        end
 
         if params[:source]
           if params[:source].is_a?(String)
