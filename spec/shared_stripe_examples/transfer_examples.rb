@@ -79,7 +79,7 @@ shared_examples 'Transfer API' do
     }
   end
 
-  it 'when amount is negative', focus: true, live: true do
+  it 'when amount is negative', live: true do
     rec = Stripe::Recipient.create({
                                        type:  'individual',
                                        name: 'Alex Smith',

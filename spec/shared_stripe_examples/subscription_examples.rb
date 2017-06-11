@@ -215,7 +215,7 @@ shared_examples 'Customer Subscriptions' do
       }
     end
 
-    it 'when attempting to create a new subscription with the params trial', focus: true, live: true do
+    it 'when attempting to create a new subscription with the params trial', live: true do
       plan = stripe_helper.create_plan(id: 'trial', amount: 999)
       customer = Stripe::Customer.create(source: gen_card_tk)
 
