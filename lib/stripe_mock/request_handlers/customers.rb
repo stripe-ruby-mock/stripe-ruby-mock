@@ -19,7 +19,7 @@ module StripeMock
           new_card =
             if params[:source].is_a?(Hash)
               unless params[:source][:object] && params[:source][:number] && params[:source][:exp_month] && params[:source][:exp_year]
-                raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
+                raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, http_status: 400)
               end
               card_from_params(params[:source])
             else
@@ -36,7 +36,7 @@ module StripeMock
           plan = assert_existence :plan, plan_id, plans[plan_id]
 
           if params[:default_source].nil? && params[:trial_end].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0
-            raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
+            raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, http_status: 400)
           end
 
           subscription = Data.mock_subscription({ id: new_id('su') })
@@ -44,7 +44,7 @@ module StripeMock
           add_subscription_to_customer(customers[ params[:id] ], subscription)
           subscriptions[subscription[:id]] = subscription
         elsif params[:trial_end]
-          raise Stripe::InvalidRequestError.new('Received unknown parameter: trial_end', nil, 400)
+          raise Stripe::InvalidRequestError.new('Received unknown parameter: trial_end', nil, http_status: 400)
         end
 
         if params[:coupon]
@@ -78,7 +78,7 @@ module StripeMock
             new_card = get_card_or_bank_by_token(params.delete(:source))
           elsif params[:source].is_a?(Hash)
             unless params[:source][:object] && params[:source][:number] && params[:source][:exp_month] && params[:source][:exp_year]
-              raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, 400)
+              raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, http_status: 400)
             end
             new_card = card_from_params(params.delete(:source))
           end
@@ -118,9 +118,9 @@ module StripeMock
       def delete_customer_discount(route, method_url, params, headers)
         route =~ method_url
         cus = assert_existence :customer, $1, customers[$1]
-      
+
         cus[:discount] = nil
-        
+
         cus
       end
     end

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 shared_examples 'Transfer API' do
 
-  it "creates a stripe transfer" do
+  it "creates a stripe transfer", skip: 'Stripe has deprecated Recipients' do
     recipient = Stripe::Recipient.create(type:  "corporation", name: "MyCo")
     transfer = Stripe::Transfer.create(amount:  "100", currency: "usd", recipient: recipient.id)
 
@@ -13,7 +13,7 @@ shared_examples 'Transfer API' do
     expect(transfer.reversed).to eq(false)
   end
 
-  describe "listing transfers" do
+  describe "listing transfers", skip: 'Stripe has deprecated Recipients' do
     let(:recipient) { Stripe::Recipient.create(type: "corporation", name: "MyCo") }
 
     before do
@@ -51,9 +51,9 @@ shared_examples 'Transfer API' do
 
   it "canceles a stripe transfer " do
     original = Stripe::Transfer.create(amount:  "100", currency: "usd")
-    res, api_key = Stripe.request(:post, "/v1/transfers/#{original.id}/cancel", 'api_key', {})
+    res, api_key = Stripe::StripeClient.active_client.execute_request(:post, "/v1/transfers/#{original.id}/cancel", api_key: 'api_key')
 
-    expect(res[:status]).to eq("canceled")
+    expect(res.data[:status]).to eq("canceled")
   end
 
   it "cannot retrieve a transfer that doesn't exist" do
@@ -64,7 +64,7 @@ shared_examples 'Transfer API' do
     }
   end
 
-  it 'when amount is not integer', live: true do
+  it 'when amount is not integer', live: true, skip: 'Stripe has deprecated Recipients' do
     rec = Stripe::Recipient.create({
                                        type:  'individual',
                                        name: 'Alex Smith',
@@ -79,7 +79,7 @@ shared_examples 'Transfer API' do
     }
   end
 
-  it 'when amount is negative', live: true do
+  it 'when amount is negative', live: true, skip: 'Stripe has deprecated Recipients' do
     rec = Stripe::Recipient.create({
                                        type:  'individual',
                                        name: 'Alex Smith',

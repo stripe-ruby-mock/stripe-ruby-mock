@@ -21,7 +21,7 @@ shared_examples 'Card API' do
     expect(card.exp_year).to eq(2099)
   end
 
-  it 'creates/returns a card when using recipient.cards.create given a card token' do
+  it 'creates/returns a card when using recipient.cards.create given a card token', skip: 'Stripe has deprecated Recipients' do
     params = {
       id: 'test_recipient_sub',
       name: 'MyRec',
@@ -69,7 +69,7 @@ shared_examples 'Card API' do
     expect(card.exp_year).to eq(3031)
   end
 
-  it 'creates/returns a card when using recipient.cards.create given card params' do
+  it 'creates/returns a card when using recipient.cards.create given card params', skip: 'Stripe has deprecated Recipients' do
     params = {
       id: 'test_recipient_sub',
       name: 'MyRec',
@@ -192,7 +192,7 @@ shared_examples 'Card API' do
     end
   end
 
-  describe "retrieval and deletion with recipients", :live => true do
+  describe "retrieval and deletion with recipients", :live => true, skip: 'Stripe has deprecated Recipients' do
     let!(:recipient) { Stripe::Recipient.create(name: 'Test Recipient', type: 'individual') }
     let!(:card_token) { stripe_helper.generate_card_token(number: "4000056655665556") }
     let!(:card) { recipient.cards.create(card: card_token) }

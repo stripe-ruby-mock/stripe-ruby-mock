@@ -2,7 +2,7 @@ require 'spec_helper'
 
 shared_examples 'Recipient API' do
 
-  it "creates a stripe recipient with a default bank and card" do
+  it "creates a stripe recipient with a default bank and card", skip: 'Stripe has deprecated Recipients' do
     recipient = Stripe::Recipient.create({
       type:  "corporation",
       name: "MyCo",
@@ -28,14 +28,14 @@ shared_examples 'Recipient API' do
     expect { recipient.card }.to raise_error
   end
 
-  it "raises a error if params are invalid" do
+  it "raises a error if params are invalid", skip: 'Stripe has deprecated Recipients' do
     expect { Stripe::Recipient.create(name: "foo") }.to raise_error
     expect { Stripe::Recipient.create(type: "individual") }.to raise_error
     expect { Stripe::Recipient.create(name: "foo", type: "bar") }.to raise_error
     expect { Stripe::Recipient.create(name: "foo", type: "individual") }.not_to raise_error
   end
 
-  it "creates a stripe recipient without a card" do
+  it "creates a stripe recipient without a card", skip: 'Stripe has deprecated Recipients' do
     recipient = Stripe::Recipient.create({
       type:  "corporation",
       name: "MyCo",
@@ -51,7 +51,7 @@ shared_examples 'Recipient API' do
     expect(recipient.default_card).to be_nil
   end
 
-  it "stores a created stripe recipient in memory" do
+  it "stores a created stripe recipient in memory", skip: 'Stripe has deprecated Recipients' do
     recipient = Stripe::Recipient.create({
       type:  "individual",
       name: "Customer One",
@@ -76,7 +76,7 @@ shared_examples 'Recipient API' do
     expect(data[recipient2.id][:default_card]).to_not be_nil
   end
 
-  it "retrieves a stripe recipient" do
+  it "retrieves a stripe recipient", skip: 'Stripe has deprecated Recipients' do
     original = Stripe::Recipient.create({
       type:  "individual",
       name: "Bob",
@@ -92,7 +92,7 @@ shared_examples 'Recipient API' do
     expect(recipient.default_card).to_not be_nil
   end
 
-  it "cannot retrieve a recipient that doesn't exist" do
+  it "cannot retrieve a recipient that doesn't exist", skip: 'Stripe has deprecated Recipients' do
     expect { Stripe::Recipient.retrieve('nope') }.to raise_error {|e|
       expect(e).to be_a Stripe::InvalidRequestError
       expect(e.param).to eq('recipient')
@@ -100,7 +100,7 @@ shared_examples 'Recipient API' do
     }
   end
 
-  describe "Errors", :live => true do
+  describe "Errors", :live => true, skip: 'Stripe has deprecated Recipients' do
     it "throws an error when the customer does not have the retrieving card id" do
       recipient = Stripe::Recipient.create(:name => "Bob Bobber", :type => "individual")
       card_id = "card_123"

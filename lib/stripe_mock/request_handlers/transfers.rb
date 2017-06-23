@@ -36,7 +36,7 @@ module StripeMock
         end
 
         unless params[:amount].is_a?(Integer) || (params[:amount].is_a?(String) && /^\d+$/.match(params[:amount]))
-          raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', 400)
+          raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', http_status: 400)
         end
 
         transfers[id] = Data.mock_transfer(params.merge :id => id)

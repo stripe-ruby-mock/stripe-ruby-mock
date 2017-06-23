@@ -1,3 +1,4 @@
+require 'stripe_mock'
 
 describe 'README examples' do
   let(:stripe_helper) { StripeMock.create_test_helper }
