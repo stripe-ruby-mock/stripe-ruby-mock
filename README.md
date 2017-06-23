@@ -12,7 +12,7 @@ This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 2.4.1', :require => 'stripe_mock'
+    gem 'stripe-ruby-mock', '~> 2.5.0', :require => 'stripe_mock'
 
 ## Features
 
@@ -21,12 +21,18 @@ In your gemfile:
 * Mock and customize stripe webhooks
 * Flip a switch to run your tests against Stripe's **live test servers**
 
+### Requirements
+
+* ruby >= 2.0.0
+* stripe >= 2.0.3
+
 ### Specifications
 
-**STRIPE API TARGET VERSION:** 2015-09-08 (master)
+**STRIPE API TARGET VERSION:** 2017-06-05 (master)
 
 Older API version branches:
 
+- api-2015-09-08 - use gem version 2.4.1
 - [api-2014-06-17](https://github.com/rebelidealist/stripe-ruby-mock/tree/api-2014-06-17)
 
 ### Versioning System
