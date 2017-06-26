@@ -294,9 +294,9 @@ it "mocks a stripe webhook" do
 end
 
 it "mocks stripe connect webhooks" do
-  event = StripeMock.mock_webhook_event('customer.created', user_id: 'acc_123123')
+  event = StripeMock.mock_webhook_event('customer.created', account: 'acc_123123')
 
-  expect(event.user_id).to eq('acc_123123')
+  expect(event.account).to eq('acc_123123')
 end
 ```
 

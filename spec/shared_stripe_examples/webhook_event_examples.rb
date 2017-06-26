@@ -70,10 +70,10 @@ shared_examples 'Webhook Events API' do
     expect(data[event_b.id][:id]).to eq(event_b.id)
   end
 
-  it "handles stripe connect event when user_id is present" do
+  it "handles stripe connect event when account is present" do
   	acc_12314 = 'acc_12314'
-    event = StripeMock.mock_webhook_event('customer.created', user_id: acc_12314)
-    expect(event[:user_id]).to eq(acc_12314)
+    event = StripeMock.mock_webhook_event('customer.created', account: acc_12314)
+    expect(event[:account]).to eq(acc_12314)
   end
 
   it "retrieves an eveng using the event resource" do
