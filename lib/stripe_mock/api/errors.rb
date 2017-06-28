@@ -39,11 +39,23 @@ module StripeMock
       }
     end
 
+    def self.get_decline_code(code)
+      decline_code_map = {
+        card_declined: 'do_not_honor',
+        missing: nil
+      }
+      decline_code_map.default = code.to_s
+
+      code_key = code.to_sym
+      decline_code_map[code_key]
+    end
+
     def self.add_json_body(error_values)
       error_keys = [:message, :param, :code]
 
       json_hash = Hash[error_keys.zip error_values]
       json_hash[:type] = 'card_error'
+      json_hash[:decline_code] = get_decline_code(json_hash[:code])
 
       error_values.last.merge!(json_body: { error: json_hash }, http_body: { error: json_hash })
 

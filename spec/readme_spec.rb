@@ -25,6 +25,7 @@ describe 'README examples' do
       expect(e).to be_a Stripe::CardError
       expect(e.http_status).to eq(402)
       expect(e.code).to eq('card_declined')
+      expect(e.json_body[:error][:decline_code]).to eq('do_not_honor')
     }
   end
 
