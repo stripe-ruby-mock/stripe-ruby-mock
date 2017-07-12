@@ -139,7 +139,7 @@ shared_examples 'Invoice API' do
     it 'works when customer has a subscription', :live => true do
       plan = stripe_helper.create_plan(:id => 'has_sub')
       quantity = 3
-      subscription = Stripe::Subscription.create(plan: plan.id, customer: @customer.id, quantity: 3)
+      subscription = Stripe::Subscription.create(plan: plan.id, customer: @customer.id, quantity: quantity)
       upcoming = Stripe::Invoice.upcoming(customer: @customer.id)
 
       expect(upcoming).to be_a Stripe::Invoice
