@@ -11,6 +11,7 @@ shared_examples 'Transfer API' do
     expect(transfer.currency).to eq('usd')
     expect(transfer.recipient).to eq recipient.id
     expect(transfer.reversed).to eq(false)
+    expect(transfer.metadata).to eq({})
   end
 
   describe "listing transfers", skip: 'Stripe has deprecated Recipients' do
@@ -47,6 +48,7 @@ shared_examples 'Transfer API' do
     expect(transfer.amount).to eq(original.amount)
     expect(transfer.currency).to eq(original.currency)
     expect(transfer.recipient).to eq(original.recipient)
+    expect(transfer.metadata).to eq(original.metadata)
   end
 
   it "canceles a stripe transfer " do

@@ -582,6 +582,7 @@ module StripeMock
         :fee_details => [],
         :id => id,
         :livemode => false,
+        :metadata => {},
         :currency => currency,
         :object => "transfer",
         :date => 1304114826,
