@@ -1,4 +1,5 @@
 dist: trusty
+group: deprecated-2017Q2
 sudo: required
 language: ruby
 rvm:
