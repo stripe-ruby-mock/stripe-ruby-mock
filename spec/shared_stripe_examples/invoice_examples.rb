@@ -135,18 +135,21 @@ shared_examples 'Invoice API' do
         expect(e.http_status).to eq(404)
         expect(e.message).to eq("No upcoming invoices for customer: #{@customer.id}") }
     end
-
-    describe 'parameters validation' do
+    
+    describe 'with a customer, a plan, and a subscription' do
       let!(:customer) { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
-      it 'fails without a subscription or subscription plan if subscription proration date is specified', live: true do
-        expect { Stripe::Invoice.upcoming(customer: customer.id, subscription_proration_date: Time.now.to_i) }.to raise_error do |e|
-          expect(e).to be_a Stripe::InvalidRequestError
-          expect(e.http_status).to eq 400
-          expect(e.message).to eq 'When previewing changes to a subscription, you must specify either `subscription` or `subscription_plan`'
+      let!(:plan) { Stripe::Plan.create(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
+      let!(:quantity) { 3 }
+      let!(:subscription) { Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: quantity) }
+
+      describe 'parameter validation' do
+        it 'fails without a subscription or subscription plan if subscription proration date is specified', live: true do
+          expect { Stripe::Invoice.upcoming(customer: customer.id, subscription_proration_date: Time.now.to_i) }.to raise_error do |e|
+            expect(e).to be_a Stripe::InvalidRequestError
+            expect(e.http_status).to eq 400
+            expect(e.message).to eq 'When previewing changes to a subscription, you must specify either `subscription` or `subscription_plan`'
+          end
         end
-      end
-      context 'with a plan' do
-        let!(:plan) { Stripe::Plan.create(id: '50m', amount: 5000, interval: 'month', name: '50m', currency: 'usd') }
         it 'fails without a subscription if proration date is specified', live: true do
           expect { Stripe::Invoice.upcoming(customer: customer.id, subscription_plan: plan.id, subscription_proration_date: Time.now.to_i) }.to raise_error do |e|
             expect(e).to be_a Stripe::InvalidRequestError
@@ -154,20 +157,9 @@ shared_examples 'Invoice API' do
             expect(e.message).to eq 'Cannot specify proration date without specifying a subscription'
           end
         end
-        after { plan.delete }
       end
-      after { customer.delete }
-    end
 
-    describe 'with a customer and a plan' do
-      let!(:customer) { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
-      let!(:plan) { Stripe::Plan.create(id: '50m', amount: 5000, interval: 'month', name: '50m', currency: 'usd') }
-
-      it 'works when customer has a subscription', :live => true do
-        # Given
-        quantity = 3
-        subscription = Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: quantity)
-
+      it 'works when customer has a subscription', live: true do
         # When
         upcoming = Stripe::Invoice.upcoming(customer: customer.id)
 
@@ -183,47 +175,111 @@ shared_examples 'Invoice API' do
         expect(upcoming.subscription).to eq(subscription.id)
       end
 
-      [false, true].each do |with_trial|
-        describe "prorating a subscription with a new plan, with_trial: #{with_trial}" do
-          let!(:new_plan) { Stripe::Plan.create(id: '100y', amount: 10000, interval: 'year', name: '100y', currency: 'usd') }
-          it 'prorates', live: true do
-            # Given
-            initial_quantity = 3
-            subscription = Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: initial_quantity)
-            proration_date = Time.now + 5 * 24 * 3600 # 5 days later
-            new_quantity = 2
-            unused_amount = plan.amount * initial_quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)
-            prorated_amount_due = new_plan.amount * new_quantity - unused_amount
-            credit_balance = 1000
-            customer.account_balance = -credit_balance
-            customer.save
-            query = { customer: customer.id, subscription: subscription.id, subscription_plan: new_plan.id, subscription_proration_date: proration_date.to_i, subscription_quantity: new_quantity }
-            query[:subscription_trial_end] = (DateTime.now >> 1).to_time.to_i if with_trial
-
-            # When
-            upcoming = Stripe::Invoice.upcoming(query)
-
-            # Then
-            expect(upcoming).to be_a Stripe::Invoice
-            expect(upcoming.customer).to eq(customer.id)
-            if with_trial
-              expect(upcoming.amount_due).to eq 0
-            else
-              expect(upcoming.amount_due).to be_within(1).of prorated_amount_due - credit_balance
-            end
-            expect(upcoming.starting_balance).to eq -credit_balance
-            expect(upcoming.ending_balance).to be_nil
-            expect(upcoming.subscription).to eq(subscription.id)
-            expect(upcoming.lines.data[0].proration).to be_truthy
-            expect(upcoming.lines.data[0].plan.id).to eq '50m'
-            expect(upcoming.lines.data[0].amount).to be_within(1).of -unused_amount
-            expect(upcoming.lines.data[0].quantity).to eq initial_quantity
-            expect(upcoming.lines.data[1].proration).to be_falsey
-            expect(upcoming.lines.data[1].plan.id).to eq '100y'
-            expect(upcoming.lines.data[1].amount).to eq with_trial ? 0 : 20000
-            expect(upcoming.lines.data[1].quantity).to eq new_quantity
+      describe 'proration' do
+        shared_examples 'failing when proration date is outside of the subscription current period' do
+          it 'fails', live: true do
+            expect { Stripe::Invoice.upcoming(
+                customer: customer.id,
+                subscription: subscription.id,
+                subscription_plan: plan.id,
+                subscription_quantity: quantity,
+                subscription_proration_date: proration_date.to_i,
+                subscription_trial_end: nil
+            ) }.to raise_error {|e|
+              expect(e).to be_a(Stripe::InvalidRequestError)
+              expect(e.http_status).to eq(400)
+              expect(e.message).to eq('Cannot specify proration date outside of current subscription period') }
           end
-          after { new_plan.delete }
+        end
+        it_behaves_like 'failing when proration date is outside of the subscription current period' do
+          let(:proration_date) { subscription.current_period_start - 1 }
+        end
+        it_behaves_like 'failing when proration date is outside of the subscription current period' do
+          let(:proration_date) { subscription.current_period_end + 1 }
+        end
+
+        [false, true].each do |with_trial|
+          describe "prorating a subscription with a new plan, with_trial: #{with_trial}" do
+            let!(:new_plan) { Stripe::Plan.create(id: '100y', amount: 10000, interval: 'year', name: '100y', currency: 'usd') }
+            it 'prorates', live: true do
+              # Given
+              proration_date = Time.now + 5 * 24 * 3600 # 5 days later
+              new_quantity = 2
+              unused_amount = plan.amount * quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)
+              prorated_amount_due = new_plan.amount * new_quantity - unused_amount
+              credit_balance = 1000
+              customer.account_balance = -credit_balance
+              customer.save
+              query = { customer: customer.id, subscription: subscription.id, subscription_plan: new_plan.id, subscription_proration_date: proration_date.to_i, subscription_quantity: new_quantity }
+              query[:subscription_trial_end] = (DateTime.now >> 1).to_time.to_i if with_trial
+
+              # When
+              upcoming = Stripe::Invoice.upcoming(query)
+
+              # Then
+              expect(upcoming).to be_a Stripe::Invoice
+              expect(upcoming.customer).to eq(customer.id)
+              if with_trial
+                expect(upcoming.amount_due).to eq 0
+              else
+                expect(upcoming.amount_due).to be_within(1).of prorated_amount_due - credit_balance
+              end
+              expect(upcoming.starting_balance).to eq -credit_balance
+              expect(upcoming.ending_balance).to be_nil
+              expect(upcoming.subscription).to eq(subscription.id)
+              expect(upcoming.lines.data[0].proration).to be_truthy
+              expect(upcoming.lines.data[0].plan.id).to eq '50m'
+              expect(upcoming.lines.data[0].amount).to be_within(1).of -unused_amount
+              expect(upcoming.lines.data[0].quantity).to eq quantity
+              expect(upcoming.lines.data[1].proration).to be_falsey
+              expect(upcoming.lines.data[1].plan.id).to eq '100y'
+              expect(upcoming.lines.data[1].amount).to eq with_trial ? 0 : 20000
+              expect(upcoming.lines.data[1].quantity).to eq new_quantity
+            end
+            after { new_plan.delete }
+          end
+        end
+
+        shared_examples 'no proration is done' do
+          it 'generates a preview without performing an actual proration', live: true do
+            expect(preview.subtotal).to eq 150_00
+            # this is a future invoice (generted at the end of the current subscription cycle), rather than a proration invoice
+            expect(preview.date).to be_within(1).of subscription.current_period_end
+            expect(preview.period_start).to eq subscription.current_period_start
+            expect(preview.period_end).to eq subscription.current_period_end
+            expect(preview.lines.count).to eq 1
+            line = preview.lines.first
+            expect(line.type).to eq 'subscription'
+            expect(line.amount).to eq 150_00
+            # line period is for the NEXT subscription cycle
+            expect(line.period.start).to be_within(1).of subscription.current_period_end
+            expect(line.period.end).to be_within(1).of (Time.at(subscription.current_period_end).to_datetime >> 1).to_time.to_i # +1 month
+          end
+        end
+
+        describe 'upcoming invoice with no proration parameters specified' do
+          let(:preview) do
+            Stripe::Invoice.upcoming(
+                customer: customer.id,
+                subscription: subscription.id
+            )
+          end
+          it_behaves_like 'no proration is done'
+        end
+
+        describe 'upcoming invoice with same subscription plan and quantity specified' do
+          let(:preview) do
+            proration_date = Time.now + 60
+            Stripe::Invoice.upcoming(
+                customer: customer.id,
+                subscription: subscription.id,
+                subscription_plan: plan.id,
+                subscription_quantity: quantity,
+                subscription_proration_date: proration_date.to_i,
+                subscription_trial_end: nil
+            )
+          end
+          it_behaves_like 'no proration is done'
         end
       end
 

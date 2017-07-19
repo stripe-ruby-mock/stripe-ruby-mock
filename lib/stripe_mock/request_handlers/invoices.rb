@@ -73,23 +73,32 @@ module StripeMock
           else
             customer[:subscriptions][:data].min_by { |sub| sub[:current_period_end] }
           end
+        
+        if params[:subscription_proration_date] && !((subscription[:current_period_start]..subscription[:current_period_end]) === params[:subscription_proration_date])
+          raise Stripe::InvalidRequestError.new('Cannot specify proration date outside of current subscription period', nil, http_status: 400)
+        end
 
-        subscription_plan_id = params[:subscription_plan]
-        if subscription_plan_id
+        prorating = false
+        subscription_proration_date = nil
+        subscription_plan_id = params[:subscription_plan] || subscription[:plan][:id]
+        subscription_quantity = params[:subscription_quantity] || subscription[:quantity]
+        if subscription_plan_id != subscription[:plan][:id] || subscription_quantity != subscription[:quantity]
+          prorating = true
+          invoice_date = Time.now.to_i
           subscription_plan = assert_existence :plan, subscription_plan_id, plans[subscription_plan_id.to_s]
           preview_subscription = Data.mock_subscription
           preview_subscription.merge!(custom_subscription_params(subscription_plan, customer, { trial_end: params[:subscription_trial_end] }))
           preview_subscription[:id] = subscription[:id]
-          preview_subscription[:quantity] = params[:subscription_quantity] if params[:subscription_quantity]
+          preview_subscription[:quantity] = subscription_quantity
+          subscription_proration_date = params[:subscription_proration_date] || Time.now
         else
           preview_subscription = subscription
+          invoice_date = subscription[:current_period_end]
         end
-
-        subscription_proration_date = params[:subscription_proration_date] || Time.now
 
         invoice_lines = []
 
-        if params[:subscription_prorate] || params[:subscription_proration_date]
+        if prorating
           unused_amount = subscription[:plan][:amount] * subscription[:quantity] * (subscription[:current_period_end] - subscription_proration_date.to_i) / (subscription[:current_period_end] - subscription[:current_period_start])
           invoice_lines << Data.mock_line_item(
                                    id: new_id('ii'),
@@ -105,16 +114,18 @@ module StripeMock
           )
         end
 
-        invoice_lines << get_mock_subscription_line_item(preview_subscription)
+        subscription_line = get_mock_subscription_line_item(preview_subscription)
+        invoice_lines << subscription_line
 
         id = new_id('in')
         invoices[id] = Data.mock_invoice(invoice_lines,
           id: id,
           customer: customer[:id],
+          date: invoice_date,
           starting_balance: customer[:account_balance],
           subscription: preview_subscription[:id],
-          period_start: preview_subscription[:current_period_start],
-          period_end: preview_subscription[:current_period_end],
+          period_start: prorating ? invoice_date : preview_subscription[:current_period_start],
+          period_end: prorating ? invoice_date : preview_subscription[:current_period_end],
           next_payment_attempt: preview_subscription[:current_period_end] + 3600 )
       end
 
