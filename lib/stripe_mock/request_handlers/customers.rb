@@ -108,7 +108,16 @@ module StripeMock
 
       def get_customer(route, method_url, params, headers)
         route =~ method_url
-        assert_existence :customer, $1, customers[$1]
+        customer = assert_existence :customer, $1, customers[$1]
+
+        customer = customer.clone
+        if params[:expand] == ['default_source']
+          customer[:default_source] = customer[:sources][:data].detect do |source|
+            source[:id] == customer[:default_source]
+          end
+        end
+
+        customer
       end
 
       def list_customers(route, method_url, params, headers)
