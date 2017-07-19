@@ -215,6 +215,21 @@ shared_examples 'Customer API' do
     customer = Stripe::Customer.retrieve('test_cus_coupon')
     expect(customer.discount).to_not be_nil
     expect(customer.discount.coupon).to_not be_nil
+    expect(customer.discount.customer).to eq customer.id
+    expect(customer.discount.start).to be_within(1).of Time.now.to_i
+  end
+
+  describe 'repeating coupon with duration limit', live: true do
+    let!(:coupon) { Stripe::Coupon.create(id: '10OFF', amount_off: 1000, currency: 'usd', duration: 'repeating', duration_in_months: 12) }
+    let!(:customer) { Stripe::Customer.create(coupon: '10OFF') }
+    it 'creates the discount with the end date', live: true do
+      discount = Stripe::Customer.retrieve(customer.id).discount
+      expect(discount).to_not be_nil
+      expect(discount.coupon).to_not be_nil
+      expect(discount.end).to be_within(1).of (Time.now + 365 * 24 * 3600).to_i
+    end
+    after { Stripe::Coupon.retrieve(coupon.id).delete }
+    after { Stripe::Customer.retrieve(customer.id).delete }
   end
 
   it 'cannot create a customer with a coupon that does not exist' do

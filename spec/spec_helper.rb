@@ -43,8 +43,8 @@ RSpec.configure do |c|
     end
 
     c.before(:each) do
-      StripeMock.stub(:start).and_return(nil)
-      StripeMock.stub(:stop).and_return(nil)
+      allow(StripeMock).to receive(:start).and_return(nil)
+      allow(StripeMock).to receive(:stop).and_return(nil)
       Stripe.api_key = api_key
     end
     c.after(:each) { sleep 0.01 }
