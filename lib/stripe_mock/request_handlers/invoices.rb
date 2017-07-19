@@ -121,6 +121,7 @@ module StripeMock
         invoices[id] = Data.mock_invoice(invoice_lines,
           id: id,
           customer: customer[:id],
+          discount: customer[:discount],
           date: invoice_date,
           starting_balance: customer[:account_balance],
           subscription: preview_subscription[:id],

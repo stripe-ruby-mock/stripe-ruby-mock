@@ -215,6 +215,8 @@ shared_examples 'Customer API' do
     customer = Stripe::Customer.retrieve('test_cus_coupon')
     expect(customer.discount).to_not be_nil
     expect(customer.discount.coupon).to_not be_nil
+    expect(customer.discount.customer).to eq customer.id
+    expect(customer.discount.start).to be_within(1).of Time.now.to_i
   end
 
   describe 'repeating coupon with duration limit', live: true do
