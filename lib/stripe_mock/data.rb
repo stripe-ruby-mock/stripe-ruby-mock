@@ -313,7 +313,7 @@ module StripeMock
       in_id = params[:id] || "test_in_default"
       currency = params[:currency] || 'usd'
       lines << Data.mock_line_item() if lines.empty?
-      {
+      invoice = {
         id: 'in_test_invoice',
         date: 1349738950,
         period_end: 1349738950,
@@ -325,7 +325,6 @@ module StripeMock
           data: lines
         },
         subtotal: lines.map {|line| line[:amount]}.reduce(0, :+),
-        total: lines.map {|line| line[:amount]}.reduce(0, :+),
         customer: "test_customer",
         object: 'invoice',
         attempted: false,
@@ -342,7 +341,7 @@ module StripeMock
         webhooks_delivered_at: 1349825350,
         livemode: false,
         attempt_count: 0,
-        amount_due: lines.map {|line| line[:amount]}.reduce(0, :+),
+        amount_due: nil,
         currency: currency,
         starting_balance: 0,
         ending_balance: nil,
@@ -351,6 +350,15 @@ module StripeMock
         discount: nil,
         subscription: nil
       }.merge(params)
+      if invoice[:discount]
+        invoice[:total] = [0, invoice[:subtotal] - invoice[:discount][:coupon][:amount_off]].max if invoice[:discount][:coupon][:amount_off]
+        invoice[:total] = invoice[:subtotal] * invoice[:discount][:coupon][:percent_off] / 100 if invoice[:discount][:coupon][:percent_off]
+      else
+        invoice[:total] = invoice[:subtotal]
+      end
+      due = invoice[:total] + invoice[:starting_balance]
+      invoice[:amount_due] = due < 0 ? 0 : due
+      invoice
     end
 
     def self.mock_line_item(params = {})
