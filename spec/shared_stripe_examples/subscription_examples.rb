@@ -452,24 +452,32 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.plan.to_hash).to eq(free.to_hash)
     end
 
-    it "throws an error when updating a customer with no card" do
-      free = stripe_helper.create_plan(id: 'free', amount: 0)
-      paid = stripe_helper.create_plan(id: 'enterprise', amount: 499)
-      customer = Stripe::Customer.create(id: 'cardless', plan: 'free')
+    [nil, 0].each do |trial_period_days|
+      it "throws an error when updating a customer with no card, and plan trail_period_days = #{trial_period_days}", live: true do
+        begin
+          free = stripe_helper.create_plan(id: 'free', amount: 0)
+          paid = stripe_helper.create_plan(id: 'enterprise', amount: 499, trial_period_days: trial_period_days)
+          customer = Stripe::Customer.create(description: 'cardless', plan: 'free')
 
-      sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
-      sub.plan = 'enterprise'
+          sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+          sub.plan = 'enterprise'
 
-      expect { sub.save }.to raise_error {|e|
-        expect(e).to be_a Stripe::InvalidRequestError
-        expect(e.http_status).to eq(400)
-        expect(e.message).to_not be_nil
-      }
+          expect { sub.save }.to raise_error {|e|
+            expect(e).to be_a Stripe::InvalidRequestError
+            expect(e.http_status).to eq(400)
+            expect(e.message).to_not be_nil
+          }
 
-      customer = Stripe::Customer.retrieve('cardless')
-      expect(customer.subscriptions.count).to eq(1)
-      expect(customer.subscriptions.data.length).to eq(1)
-      expect(customer.subscriptions.data.first.plan.to_hash).to eq(free.to_hash)
+          customer = Stripe::Customer.retrieve(customer.id)
+          expect(customer.subscriptions.count).to eq(1)
+          expect(customer.subscriptions.data.length).to eq(1)
+          expect(customer.subscriptions.data.first.plan.to_hash).to eq(free.to_hash)
+        ensure
+          customer.delete if customer
+          paid.delete if paid
+          free.delete if free
+        end
+      end
     end
 
     it 'updates a subscription if the customer has a free trial', live: true do
