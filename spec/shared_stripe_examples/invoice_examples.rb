@@ -160,7 +160,7 @@ shared_examples 'Invoice API' do
         expect { Stripe::Invoice.upcoming(customer: customer.id, subscription_proration_date: Time.now.to_i) }.to raise_error do |e|
           expect(e).to be_a Stripe::InvalidRequestError
           expect(e.http_status).to eq 400
-          expect(e.message).to eq 'When previewing changes to a subscription, you must specify either `subscription` or `subscription_plan`'
+          expect(e.message).to eq 'When previewing changes to a subscription, you must specify either `subscription` or `subscription_items`'
         end
       end
 
