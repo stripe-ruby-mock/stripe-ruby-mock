@@ -11,15 +11,15 @@ module StripeMock
 
         start_time = options[:current_period_start] || Time.now.utc.to_i
         params = { plan: plan, customer: cus[:id], current_period_start: start_time }
-        params.merge! options.select {|k,v| k =~ /application_fee_percent|quantity|metadata|tax_percent/}
+        params.merge! options.select {|k,v| k =~ /application_fee_percent|quantity|metadata|tax_percent|cancel_at_period_end/}
         # TODO: Implement coupon logic
 
         if ((plan[:trial_period_days]||0) == 0 && options[:trial_end].nil?) || options[:trial_end] == "now"
           end_time = get_ending_time(start_time, plan)
-          params.merge!({status: 'active', current_period_end: end_time, trial_start: nil, trial_end: nil})
+          params.merge!(status: 'active', current_period_end: end_time, trial_start: nil, trial_end: nil)
         else
           end_time = options[:trial_end] || (Time.now.utc.to_i + plan[:trial_period_days]*86400)
-          params.merge!({status: 'trialing', current_period_end: end_time, trial_start: start_time, trial_end: end_time})
+          params.merge!(status: 'trialing', current_period_end: end_time, trial_start: start_time, trial_end: end_time)
         end
 
         params
@@ -73,7 +73,6 @@ module StripeMock
           end
         end
       end
-
     end
   end
 end

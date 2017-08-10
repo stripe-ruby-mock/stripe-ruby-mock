@@ -609,7 +609,7 @@ shared_examples 'Customer Subscriptions' do
     end
   end
 
-  context "cancelling a subscription" do
+  context "canceling a subscription" do
 
     it "cancels a stripe customer's subscription", :live => true do
       truth = stripe_helper.create_plan(id: 'the truth')
@@ -651,7 +651,7 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.canceled_at).to_not be_nil
     end
 
-    it "resumes an at period end cancelled subscription" do
+    it "resumes an at period end canceled subscription" do
       truth = stripe_helper.create_plan(id: 'the_truth')
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: "the_truth")
 
@@ -673,7 +673,7 @@ shared_examples 'Customer Subscriptions' do
     end
   end
 
-  it "doesn't change status of subscription when cancelling at period end" do
+  it "doesn't change status of subscription when canceling at period end" do
     trial = stripe_helper.create_plan(id: 'trial', trial_period_days: 14)
     customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: "trial")
 
@@ -757,4 +757,55 @@ shared_examples 'Customer Subscriptions' do
     end
   end
 
+  describe "subscription states" do
+    let(:plan) { stripe_helper.create_plan(id: 'the_truth') }
+
+    context 'a recurrent subscription upon expiration' do
+      let(:customer) { Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: plan.id) }
+      let!(:subscription) { Stripe::Subscription.retrieve(customer.subscriptions.data.first.id) }
+
+      it 'defaults to active' do
+        expect(subscription.status).to eq 'active'
+      end
+
+      before do
+        Timecop.travel(Time.at(subscription.current_period_end + 1))
+      end
+
+      it 'is past_due' do
+        subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+        expect(subscription.status).to eq 'past_due'
+      end
+
+      it 'retrieved via a customer is past_due' do
+        Stripe::Customer.retrieve(customer.id).subscriptions.each do |subscription|
+          expect(subscription.status).to eq 'past_due'
+        end
+      end
+    end
+
+    context 'a canceling subscription upon expiration' do
+      let(:customer) { Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: plan.id, cancel_at_period_end: true  ) }
+      let!(:subscription) { Stripe::Subscription.retrieve(customer.subscriptions.data.first.id) }
+
+      it 'defaults to active' do
+        expect(subscription.status).to eq 'active'
+      end
+
+      before do
+        Timecop.travel(Time.at(subscription.current_period_end + 1))
+      end
+
+      it 'is canceled' do
+        subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+        expect(subscription.status).to eq 'canceled'
+      end
+
+      it 'retrieved via a customer is canceled' do
+        Stripe::Customer.retrieve(customer.id).subscriptions.each do |subscription|
+          expect(subscription.status).to eq 'canceled'
+        end
+      end
+    end
+  end
 end
