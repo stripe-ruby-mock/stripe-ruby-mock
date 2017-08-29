@@ -295,6 +295,7 @@ module StripeMock
           id: '__test_plan_id__'
         },
         items: {
+          object: 'list',
           data: [{
             id: 'si_1AwFf62eZvKYlo2C9u6Dhf9',
             created: 1504035973,

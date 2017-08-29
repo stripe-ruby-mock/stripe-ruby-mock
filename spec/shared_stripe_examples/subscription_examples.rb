@@ -709,6 +709,34 @@ shared_examples 'Customer Subscriptions' do
     Stripe::Subscription.create options
   end
 
+  context 'retrieving a single subscription' do
+    let(:customer) { Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: 'free') }
+    let(:subscription) { Stripe::Subscription.retrieve(customer.subscriptions.data.first.id) }
+
+    before do
+      stripe_helper.create_plan(id: 'free', amount: 0)
+      Stripe::Subscription.create({ plan: 'free', customer: customer.id })
+    end
+
+    it 'retrieves a single subscription' do
+      expect(subscription).to be_truthy
+    end
+
+    it "includes 'items' object on retrieved subscription" do
+      expect(subscription.items).to be_truthy
+      expect(subscription.items.object).to eq('list')
+      expect(subscription.items.data.class).to eq(Array)
+      expect(subscription.items.data.count).to eq(1)
+      expect(subscription.items.data.first.id).to eq('si_1AwFf62eZvKYlo2C9u6Dhf9')
+      expect(subscription.items.data.first.created).to eq(1504035973)
+      expect(subscription.items.data.first.object).to eq('subscription_item')
+      expect(subscription.items.data.first.plan.amount).to eq(999)
+      expect(subscription.items.data.first.plan.created).to eq(1504035972)
+      expect(subscription.items.data.first.plan.currency).to eq('usd')
+      expect(subscription.items.data.first.quantity).to eq(1)
+    end
+  end
+
   context "retrieve multiple subscriptions" do
 
     it "retrieves a list of multiple subscriptions" do
