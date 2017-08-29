@@ -283,29 +283,44 @@ module StripeMock
     #FIXME nested overrides would be better than hardcoding plan_id
     def self.mock_subscription(params={})
       StripeMock::Util.rmerge({
-        :created => 1478204116,
-        :current_period_start => 1308595038,
-        :current_period_end => 1308681468,
-        :status => "trialing",
-        :plan => {
-          :interval => "month",
-          :amount => 7500,
-          :trial_period_days => 30,
-          :object => "plan",
-          :id => '__test_plan_id__'
+        created: 1478204116,
+        current_period_start: 1308595038,
+        current_period_end: 1308681468,
+        status: 'trialing',
+        plan: {
+          interval: 'month',
+          amount: 7500,
+          trial_period_days: 30,
+          object: 'plan',
+          id: '__test_plan_id__'
         },
-        :cancel_at_period_end => false,
-        :canceled_at => nil,
-        :ended_at => nil,
-        :start => 1308595038,
-        :object => "subscription",
-        :trial_start => 1308595038,
-        :trial_end => 1308681468,
-        :customer => "c_test_customer",
-        :quantity => 1,
-        :tax_percent => nil,
-        :discount => nil,
-        :metadata => {}
+        items: {
+          object: 'list',
+          data: [{
+            id: 'si_1AwFf62eZvKYlo2C9u6Dhf9',
+            created: 1504035973,
+            metadata: {},
+            object: 'subscription_item',
+            plan: {
+              amount: 999,
+              created: 1504035972,
+              currency: 'usd'
+            },
+            quantity: 1
+          }]
+        },
+        cancel_at_period_end: false,
+        canceled_at: nil,
+        ended_at: nil,
+        start: 1308595038,
+        object: 'subscription',
+        trial_start: 1308595038,
+        trial_end: 1308681468,
+        customer: 'c_test_customer',
+        quantity: 1,
+        tax_percent: nil,
+        discount: nil,
+        metadata: {}
       }, params)
     end
 
