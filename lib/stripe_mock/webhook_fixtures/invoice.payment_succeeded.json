@@ -54,6 +54,39 @@
           "subscription": null,
           "subscription_item": "si_18ZfWyLrgDIZ7iq8fSlSNGIV",
           "type": "subscription"
+        },
+        {
+          "id": "sub_00000000000000",
+          "object": "line_item",
+          "amount": 50,
+          "currency": "eur",
+          "description": null,
+          "discountable": true,
+          "livemode": true,
+          "metadata": {},
+          "period": {
+            "start": 1500637196,
+            "end": 1532173196
+          },
+          "plan": {
+            "id": "gold",
+            "object": "plan",
+            "amount": 300,
+            "created": 1499943155,
+            "currency": "eur",
+            "interval": "month",
+            "interval_count": 1,
+            "livemode": false,
+            "metadata": {},
+            "name": "New gold Plan Test",
+            "statement_descriptor": null,
+            "trial_period_days": null
+          },
+          "proration": false,
+          "quantity": 1,
+          "subscription": null,
+          "subscription_item": "si_18ZfWyLrgDIZ7iq8fSlSNGIV",
+          "type": "subscription"
         }],
         "total_count": 1,
         "object": "list",
