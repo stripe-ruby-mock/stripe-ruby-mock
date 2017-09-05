@@ -22,6 +22,8 @@ module StripeMock
         customer = assert_existence :customer, $1, customers[$1]
         subscription = get_customer_subscription(customer, $2)
 
+        subscription_lifecycle(subscription)
+
         assert_existence :subscription, $2, subscription
       end
 
@@ -29,6 +31,11 @@ module StripeMock
         route =~ method_url
 
         customer = assert_existence :customer, $1, customers[$1]
+
+        customer[:subscriptions].each do |subscription|
+          subscription_lifecycle(subscription)
+        end
+
         customer[:subscriptions]
       end
 
@@ -125,11 +132,17 @@ module StripeMock
       def retrieve_subscription(route, method_url, params, headers)
         route =~ method_url
 
-        assert_existence :subscription, $1, subscriptions[$1]
+        subscription = subscriptions[$1]
+        subscription_lifecycle(subscription) if subscription
+        assert_existence :subscription, $1, subscription
       end
 
       def retrieve_subscriptions(route, method_url, params, headers)
         route =~ method_url
+
+        subscriptions.values.each do |subscription|
+          subscription_lifecycle(subscription)
+        end
 
         Data.mock_list_object(subscriptions.values, params)
         #customer = assert_existence :customer, $1, customers[$1]
@@ -222,6 +235,12 @@ module StripeMock
       end
 
       private
+
+      def subscription_lifecycle(subscription)
+        if (subscription[:status] == 'active' && subscription[:current_period_end] < Time.now.utc.to_i)
+          subscription.merge!(status: subscription[:cancel_at_period_end] ? 'canceled' : 'past_due')
+        end
+      end
 
       def verify_card_present(customer, plan, subscription, params={})
         if customer[:default_source].nil? && customer[:trial_end].nil? && (plan[:trial_period_days]||0)==0 && plan[:amount] != 0 && plan[:trial_end].nil? && params[:trial_end].nil? && (subscription.nil? || subscription[:trial_end].nil? || subscription[:trial_end] == 'now')

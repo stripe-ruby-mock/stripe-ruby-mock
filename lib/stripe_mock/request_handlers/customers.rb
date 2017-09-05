@@ -117,6 +117,10 @@ module StripeMock
           end
         end
 
+        customer[:subscriptions][:data].each do |subscription|
+          subscription_lifecycle(subscription)
+        end
+
         customer
       end
 
