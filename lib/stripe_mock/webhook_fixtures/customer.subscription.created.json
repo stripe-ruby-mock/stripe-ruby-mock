@@ -7,16 +7,46 @@
   "data": {
     "object": {
       "id": "su_00000000000000",
-      "plan": {
-        "interval": "month",
-        "name": "Member's Club",
-        "amount": 100,
-        "currency": "usd",
-        "id": "fkx0AFo_00000000000000",
-        "object": "plan",
-        "livemode": false,
-        "interval_count": 1,
-        "trial_period_days": null
+        "items": {
+          "object": "list",
+          "data": [
+          {
+            "id": "si_00000000000000",
+            "object": "subscription_item",
+            "created": 1497881783,
+            "plan": {
+              "interval": "month",
+              "name": "Member's Club",
+              "amount": 100,
+              "currency": "usd",
+              "id": "fkx0AFo_00000000000000",
+              "object": "plan",
+              "livemode": false,
+              "interval_count": 1,
+              "trial_period_days": null,
+              "metadata": {}
+            },
+            "quantity": 1
+          },
+          {
+            "id": "si_00000000000001",
+            "object": "subscription_item",
+            "created": 1497881788,
+            "plan": {
+              "interval": "month",
+              "name": "Vistor's Club",
+              "amount": 200,
+              "currency": "eur",
+              "id": "fkx0AFo_00000000000001",
+              "object": "plan",
+              "livemode": false,
+              "interval_count": 1,
+              "trial_period_days": null,
+              "metadata": {}
+            },
+            "quantity": 5
+          }
+        ]
       },
       "object": "subscription",
       "start": 1381080557,
