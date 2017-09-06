@@ -43,7 +43,7 @@ module StripeMock
 
     attr_reader :accounts, :balance_transactions, :bank_tokens, :charges, :coupons, :customers,
                 :disputes, :events, :invoices, :invoice_items, :orders, :plans, :recipients,
-                :refunds, :transfers, :subscriptions, :country_spec
+                :refunds, :transfers, :subscriptions, :country_spec, :subscriptions_items
 
     attr_accessor :error_queue, :debug, :conversion_rate
 
@@ -65,6 +65,7 @@ module StripeMock
       @refunds = {}
       @transfers = {}
       @subscriptions = {}
+      @subscriptions_items = []
       @country_spec = {}
 
       @debug = false
