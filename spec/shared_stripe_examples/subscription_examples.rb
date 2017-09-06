@@ -333,7 +333,6 @@ shared_examples 'Customer Subscriptions' do
 
       plan2 = stripe_helper.create_plan(id: 'PER_USER_PLAN1')
       customer = Stripe::Customer.create(
-        id: 'cus_ABC4',
         source: {
           object: 'card',
           exp_month: 11,
