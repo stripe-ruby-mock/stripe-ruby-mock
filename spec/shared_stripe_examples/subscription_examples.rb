@@ -328,6 +328,32 @@ shared_examples 'Customer Subscriptions' do
       }
     end
 
+    it 'when plan defined inside items', live: true do
+      plan = stripe_helper.create_plan(id: 'BASE_PRICE_PLAN1')
+
+      plan2 = stripe_helper.create_plan(id: 'PER_USER_PLAN1')
+      customer = Stripe::Customer.create(
+        source: {
+          object: 'card',
+          exp_month: 11,
+          exp_year: 2019,
+          number: '4242424242424242',
+          cvc: '123'
+        }
+      )
+      subscription = Stripe::Subscription.create(
+        customer: customer.id,
+        items: [
+          { plan: plan.id, quantity: 1 },
+          { plan: plan2.id, quantity: 2 }
+        ]
+      )
+
+      expect(subscription.id).to match /(test_su_|sub_).+/
+      expect(subscription.plan).to eq nil
+      expect(subscription.items.data[0].plan.id).to eq plan.id
+      expect(subscription.items.data[1].plan.id).to eq plan2.id
+    end
   end
 
   context "updating a subscription" do
