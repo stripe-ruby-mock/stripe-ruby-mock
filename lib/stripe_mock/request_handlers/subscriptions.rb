@@ -76,12 +76,17 @@ module StripeMock
       def create_subscription(route, method_url, params, headers)
         route =~ method_url
 
-        plan_id = params[:plan].to_s
-        plan = assert_existence :plan, plan_id, plans[plan_id]
+        plan = params[:plan] ? assert_existence(:plan, params[:plan].to_s, plans[params[:plan].to_s]) : nil
 
         customer = params[:customer]
         customer_id = customer.is_a?(Stripe::Customer) ? customer[:id] : customer.to_s
         customer = assert_existence :customer, customer_id, customers[customer_id]
+
+        if plan && customer
+          unless customer[:currency] == plan[:currency]
+            raise Stripe::InvalidRequestError.new('lol', 'currency', http_status: 400)
+          end
+        end
 
         if params[:source]
           new_card = get_card_by_token(params.delete(:source))
@@ -97,6 +102,7 @@ module StripeMock
 
         subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')) })
         subscription.merge!(custom_subscription_params(plan, customer, params))
+        subscription[:items][:data] = mock_subscription_items(params[:items].values) if params[:items]
 
         # Ensure customer has card to charge if plan has no trial and is not free
         verify_card_present(customer, plan, subscription, params)
@@ -224,7 +230,9 @@ module StripeMock
       private
 
       def verify_card_present(customer, plan, subscription, params={})
-        if customer[:default_source].nil? && customer[:trial_end].nil? && (plan[:trial_period_days]||0)==0 && plan[:amount] != 0 && plan[:trial_end].nil? && params[:trial_end].nil? && (subscription.nil? || subscription[:trial_end].nil? || subscription[:trial_end] == 'now')
+        if customer[:default_source].nil? && customer[:trial_end].nil? &&
+            ((plan && plan[:trial_period_days]) || 0) == 0 && plan[:amount] != 0 && plan[:trial_end].nil? &&
+            params[:trial_end].nil? && (subscription.nil? || subscription[:trial_end].nil? || subscription[:trial_end] == 'now')
           raise Stripe::InvalidRequestError.new('You must supply a valid card xoxo', nil, http_status: 400)
         end
       end
