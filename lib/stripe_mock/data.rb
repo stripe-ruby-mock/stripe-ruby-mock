@@ -103,7 +103,7 @@ module StripeMock
 
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
-      currency = params[:currency] || nil
+      currency = params[:currency] || 'usd'
       sources.each {|source| source[:customer] = cus_id}
       {
         email: 'stripe_mock@example.com',
@@ -950,6 +950,32 @@ module StripeMock
         },
         status: "pending",
         type: "charge"
+      }.merge(params)
+    end
+
+    def self.mock_subscription_item(params = {})
+      iid = params[:id] || 'test_txn_default'
+      {
+        id: iid,
+        object: 'subscription_item',
+        created: 1504716183,
+        metadata: {
+      },
+        plan: {
+          id: 'PER_USER_PLAN1',
+          object: 'plan',
+          amount: 1337,
+          created: 1504716177,
+          currency: 'usd',
+          interval: 'month',
+          interval_count: 1,
+          livemode: false,
+          metadata: {},
+          name: 'StripeMock Default Plan ID',
+          statement_descriptor: nil,
+          trial_period_days: nil
+        },
+        quantity: 2
       }.merge(params)
     end
   end
