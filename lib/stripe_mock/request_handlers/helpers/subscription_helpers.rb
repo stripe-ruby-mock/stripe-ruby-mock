@@ -9,8 +9,10 @@ module StripeMock
       def custom_subscription_params(plan, cus, options = {})
         verify_trial_end(options[:trial_end]) if options[:trial_end]
 
-        start_time = options[:current_period_start] || Time.now.utc.to_i
-        params = { plan: plan, customer: cus[:id], current_period_start: start_time }
+        now = Time.now.utc.to_i
+        created_time = options[:created] || now
+        start_time = options[:current_period_start] || now
+        params = { plan: plan, customer: cus[:id], current_period_start: start_time, created: created_time }
         params.merge! options.select {|k,v| k =~ /application_fee_percent|quantity|metadata|tax_percent/}
         # TODO: Implement coupon logic
 
