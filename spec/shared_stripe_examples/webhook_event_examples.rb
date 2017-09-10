@@ -129,6 +129,22 @@ shared_examples 'Webhook Events API' do
     }.to raise_error StripeMock::UnsupportedRequestError
   end
 
+  it 'has actual created attribute' do
+    time = Time.now.to_i
+
+    evnt = StripeMock.mock_webhook_event('customer.subscription.updated')
+
+    expect(evnt.created).to eq time
+  end
+
+  it 'when created param can be overrided' do
+    time = Time.now.to_i - 1000
+
+    evnt = StripeMock.mock_webhook_event('customer.subscription.updated', created: time)
+
+    expect(evnt.created).to eq time
+  end
+
   describe "listing events" do
 
     it "retrieves all events" do
