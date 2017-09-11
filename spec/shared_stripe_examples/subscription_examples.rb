@@ -136,6 +136,22 @@ shared_examples 'Customer Subscriptions' do
       expect(subscription.tax_percent).to eq(20)
     end
 
+    it "correctly sets created when it's not provided as a parameter", live: true do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
+      subscription = Stripe::Subscription.create({ plan: 'silver', customer: customer.id })
+
+      expect(subscription.created).to eq(subscription.current_period_start)
+    end
+
+    it "correctly sets created when it's provided as a parameter" do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
+      subscription = Stripe::Subscription.create({ plan: 'silver', customer: customer.id, created: 1473576318 })
+
+      expect(subscription.created).to eq(1473576318)
+    end
+
     it "adds additional subscription to customer with existing subscription" do
       silver =  stripe_helper.create_plan(id: 'silver')
       gold =    stripe_helper.create_plan(id: 'gold')
