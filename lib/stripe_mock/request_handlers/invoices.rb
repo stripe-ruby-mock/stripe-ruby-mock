@@ -73,7 +73,7 @@ module StripeMock
           else
             customer[:subscriptions][:data].min_by { |sub| sub[:current_period_end] }
           end
-        
+
         if params[:subscription_proration_date] && !((subscription[:current_period_start]..subscription[:current_period_end]) === params[:subscription_proration_date])
           raise Stripe::InvalidRequestError.new('Cannot specify proration date outside of current subscription period', nil, http_status: 400)
         end
@@ -117,9 +117,8 @@ module StripeMock
         subscription_line = get_mock_subscription_line_item(preview_subscription)
         invoice_lines << subscription_line
 
-        id = new_id('in')
-        invoices[id] = Data.mock_invoice(invoice_lines,
-          id: id,
+        Data.mock_invoice(invoice_lines,
+          id: new_id('in'),
           customer: customer[:id],
           discount: customer[:discount],
           date: invoice_date,

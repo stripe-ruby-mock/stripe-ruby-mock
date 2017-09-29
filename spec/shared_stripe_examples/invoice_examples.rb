@@ -362,6 +362,12 @@ shared_examples 'Invoice API' do
       expect(@upcoming.subscription).to eq(@shortsub.id)
     end
 
+    it 'does not store the stripe invoice in memory since its only a preview', with_subscription: true do
+      invoice = Stripe::Invoice.upcoming(customer: customer.id)
+      data = test_data_source(:invoices)
+      expect(data[invoice.id]).to be_nil
+    end
+
     context 'retrieving invoice line items' do
       it 'returns all line items for created invoice' do
         invoice = Stripe::Invoice.create(customer: customer.id)
@@ -378,7 +384,7 @@ shared_examples 'Invoice API' do
         plan = stripe_helper.create_plan()
         subscription = Stripe::Subscription.create(plan: plan.id, customer: customer.id)
         upcoming = Stripe::Invoice.upcoming(customer: customer.id)
-        line_items = upcoming.lines.all
+        line_items = upcoming.lines
 
         expect(upcoming).to be_a Stripe::Invoice
         expect(line_items.count).to eq(1)
