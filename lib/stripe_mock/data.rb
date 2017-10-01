@@ -207,7 +207,8 @@ module StripeMock
         metadata: {},
         charge: "ch_4fWhYjzQ23UFWT",
         receipt_number: nil,
-        status: "succeeded"
+        status: "succeeded",
+        reason: "requested_by_customer"
       }.merge(params)
     end
 
