@@ -134,9 +134,8 @@ module StripeMock
         subscription_line = get_mock_subscription_line_item(preview_subscription)
         invoice_lines << subscription_line
 
-        id = new_id('in')
-        invoices[id] = Data.mock_invoice(invoice_lines,
-          id: id,
+        Data.mock_invoice(invoice_lines,
+          id: new_id('in'),
           customer: customer[:id],
           discount: customer[:discount],
           date: invoice_date,
