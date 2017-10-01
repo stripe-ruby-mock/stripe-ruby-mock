@@ -73,7 +73,7 @@ module StripeMock
           else
             customer[:subscriptions][:data].min_by { |sub| sub[:current_period_end] }
           end
-        
+
         if params[:subscription_proration_date] && !((subscription[:current_period_start]..subscription[:current_period_end]) === params[:subscription_proration_date])
           raise Stripe::InvalidRequestError.new('Cannot specify proration date outside of current subscription period', nil, http_status: 400)
         end
@@ -112,6 +112,23 @@ module StripeMock
                                    quantity: subscription[:quantity],
                                    proration: true
           )
+
+          preview_plan = assert_existence :plan, params[:subscription_plan], plans[params[:subscription_plan]]
+          if preview_plan[:interval] == subscription[:plan][:interval] && preview_plan[:interval_count] == subscription[:plan][:interval_count] && params[:subscription_trial_end].nil?
+            remaining_amount = preview_plan[:amount] * subscription_quantity * (subscription[:current_period_end] - subscription_proration_date.to_i) / (subscription[:current_period_end] - subscription[:current_period_start])
+            invoice_lines << Data.mock_line_item(
+                                     id: new_id('ii'),
+                                     amount: remaining_amount,
+                                     description: 'Remaining time',
+                                     plan: preview_plan,
+                                     period: {
+                                         start: subscription_proration_date.to_i,
+                                         end: subscription[:current_period_end]
+                                     },
+                                     quantity: subscription_quantity,
+                                     proration: true
+            )
+          end
         end
 
         subscription_line = get_mock_subscription_line_item(preview_subscription)

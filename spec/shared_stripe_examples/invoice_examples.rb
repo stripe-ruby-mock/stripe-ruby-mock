@@ -248,18 +248,71 @@ shared_examples 'Invoice API' do
 
       [false, true].each do |with_trial|
         describe "prorating a subscription with a new plan, with_trial: #{with_trial}" do
-          let!(:new_plan) { Stripe::Plan.create(id: '100y', amount: 10000, interval: 'year', name: '100y', currency: 'usd') }
+          let(:new_monthly_plan) { @teardown_monthly_plan = true; Stripe::Plan.create(id: '100m', amount: 100_00, interval: 'month', name: '100m', currency: 'usd') }
+          let(:new_yearly_plan) { @teardown_yearly_plan = true; Stripe::Plan.create(id: '100y', amount: 100_00, interval: 'year', name: '100y', currency: 'usd') }
 
-          it 'prorates', live: true do
+          it 'prorates while maintaining billing interval', live: true do
             # Given
             proration_date = Time.now + 5 * 24 * 3600 # 5 days later
             new_quantity = 2
             unused_amount = plan.amount * quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)
-            prorated_amount_due = new_plan.amount * new_quantity - unused_amount
+            remaining_amount = new_monthly_plan.amount * new_quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)
+            prorated_amount_due = new_monthly_plan.amount * new_quantity - unused_amount + remaining_amount
             credit_balance = 1000
             customer.account_balance = -credit_balance
             customer.save
-            query = { customer: customer.id, subscription: subscription.id, subscription_plan: new_plan.id, subscription_proration_date: proration_date.to_i, subscription_quantity: new_quantity }
+            query = { customer: customer.id, subscription: subscription.id, subscription_plan: new_monthly_plan.id, subscription_proration_date: proration_date.to_i, subscription_quantity: new_quantity }
+            query[:subscription_trial_end] = (DateTime.now >> 1).to_time.to_i if with_trial
+
+            # When
+            upcoming = Stripe::Invoice.upcoming(query)
+
+            # Then
+            expect(upcoming).to be_a Stripe::Invoice
+            expect(upcoming.customer).to eq(customer.id)
+            if with_trial
+              expect(upcoming.amount_due).to be_within(1).of 0
+            else
+              expect(upcoming.amount_due).to be_within(1).of prorated_amount_due - credit_balance
+            end
+            expect(upcoming.starting_balance).to eq -credit_balance
+            expect(upcoming.ending_balance).to be_nil
+            expect(upcoming.subscription).to eq(subscription.id)
+
+            if with_trial
+              expect(upcoming.lines.data.length).to eq(2)
+            else
+              expect(upcoming.lines.data.length).to eq(3)
+            end
+
+            expect(upcoming.lines.data[0].proration).to be_truthy
+            expect(upcoming.lines.data[0].plan.id).to eq '50m'
+            expect(upcoming.lines.data[0].amount).to be_within(1).of -unused_amount
+            expect(upcoming.lines.data[0].quantity).to eq quantity
+
+            unless with_trial
+              expect(upcoming.lines.data[1].proration).to be_truthy
+              expect(upcoming.lines.data[1].plan.id).to eq '100m'
+              expect(upcoming.lines.data[1].amount).to be_within(1).of remaining_amount
+              expect(upcoming.lines.data[1].quantity).to eq new_quantity
+            end
+
+            expect(upcoming.lines.data.last.proration).to be_falsey
+            expect(upcoming.lines.data.last.plan.id).to eq '100m'
+            expect(upcoming.lines.data.last.amount).to eq with_trial ? 0 : 20000
+            expect(upcoming.lines.data.last.quantity).to eq new_quantity
+          end
+
+          it 'prorates while changing billing intervals', live: true do
+            # Given
+            proration_date = Time.now + 5 * 24 * 3600 # 5 days later
+            new_quantity = 2
+            unused_amount = plan.amount * quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)
+            prorated_amount_due = new_yearly_plan.amount * new_quantity - unused_amount
+            credit_balance = 1000
+            customer.account_balance = -credit_balance
+            customer.save
+            query = { customer: customer.id, subscription: subscription.id, subscription_plan: new_yearly_plan.id, subscription_proration_date: proration_date.to_i, subscription_quantity: new_quantity }
             query[:subscription_trial_end] = (DateTime.now >> 1).to_time.to_i if with_trial
 
             # When
@@ -276,17 +329,20 @@ shared_examples 'Invoice API' do
             expect(upcoming.starting_balance).to eq -credit_balance
             expect(upcoming.ending_balance).to be_nil
             expect(upcoming.subscription).to eq(subscription.id)
+
             expect(upcoming.lines.data[0].proration).to be_truthy
             expect(upcoming.lines.data[0].plan.id).to eq '50m'
             expect(upcoming.lines.data[0].amount).to be_within(1).of -unused_amount
             expect(upcoming.lines.data[0].quantity).to eq quantity
+
             expect(upcoming.lines.data[1].proration).to be_falsey
             expect(upcoming.lines.data[1].plan.id).to eq '100y'
             expect(upcoming.lines.data[1].amount).to eq with_trial ? 0 : 20000
             expect(upcoming.lines.data[1].quantity).to eq new_quantity
           end
 
-          after { new_plan.delete }
+          after { new_monthly_plan.delete rescue nil if @teardown_monthly_plan }
+          after { new_yearly_plan.delete rescue nil if @teardown_yearly_plan }
         end
       end
 
