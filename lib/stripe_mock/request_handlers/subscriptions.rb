@@ -83,8 +83,8 @@ module StripeMock
         customer = assert_existence :customer, customer_id, customers[customer_id]
 
         if plan && customer
-          unless customer[:currency] == plan[:currency]
-            raise Stripe::InvalidRequestError.new('lol', 'currency', http_status: 400)
+          unless customer[:currency].downcase == plan[:currency].downcase
+            raise Stripe::InvalidRequestError.new("Invalid currency #{customer[:currency]}", 'currency', http_status: 400)
           end
         end
 
