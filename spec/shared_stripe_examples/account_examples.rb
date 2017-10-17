@@ -49,6 +49,14 @@ shared_examples 'Account API' do
 
       expect(account.support_phone).to eq '1234567'
     end
+
+    it 'raises when sending an empty tos date' do
+      account = Stripe::Account.retrieve
+      account.tos_acceptance.date = nil
+      expect {
+        account.save
+      }.to raise_error
+    end
   end
 
   it 'deauthorizes the stripe account', live: false do
