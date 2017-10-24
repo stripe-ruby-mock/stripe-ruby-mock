@@ -620,6 +620,21 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_payout(params={})
+      currency = params[:currency] || 'usd'
+      id = params[:id] || 'po_test_payout'
+      {
+        :amount => 100,
+        :id => id,
+        :livemode => false,
+        :metadata => {},
+        :currency => currency,
+        :object => "payout",
+        :date => 1304114826,
+        :description => "Payout description",
+      }.merge(params)
+    end
+
     def self.mock_disputes(ids=[])
       disputes = {}
       ids.each do |id|
