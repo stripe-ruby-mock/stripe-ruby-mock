@@ -12,6 +12,7 @@ def it_behaves_like_stripe(&block)
   it_behaves_like 'Card API', &block
   it_behaves_like 'Charge API', &block
   it_behaves_like 'Bank API', &block
+  it_behaves_like 'External Account API', &block
   it_behaves_like 'Coupon API', &block
   it_behaves_like 'Customer API', &block
   it_behaves_like 'Dispute API', &block
