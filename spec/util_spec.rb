@@ -19,12 +19,20 @@ describe StripeMock::Util do
       expect(result).to eq({ x: { y: 999, z: { m: 44, n: 55 } } })
     end
 
-    it "merges array elements" do
+    it "merges array elements (that are hashes)" do
       dest = { x: [ {a: 1}, {b: 2}, {c: 3} ] }
       source = { x: [ {a: 0}, {a: 0} ] }
       result = StripeMock::Util.rmerge(dest, source)
 
       expect(result).to eq({ x: [ {a: 0}, {a: 0, b: 2}, {c: 3} ] })
+    end
+
+    it "merges array elements (that are arrays)" do
+      dest = { x: [ 1, 2 ] }
+      source = { x: [ 3, 4 ] }
+      result = StripeMock::Util.rmerge(dest, source)
+
+      expect(result).to eq({ x: [ 1, 3, 2, 4 ] })
     end
 
     it "does not truncate the array when merging" do
