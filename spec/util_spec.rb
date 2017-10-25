@@ -27,7 +27,7 @@ describe StripeMock::Util do
       expect(result).to eq({ x: [ {a: 0}, {a: 0, b: 2}, {c: 3} ] })
     end
 
-    context "array elements (that are arrays)" do
+    context "array elements (that are simple values)" do
       it "merges arrays" do
         dest = { x: [ 1, 2 ] }
         source = { x: [ 3, 4 ] }
