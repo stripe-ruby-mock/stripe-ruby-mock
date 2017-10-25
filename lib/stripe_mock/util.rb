@@ -14,7 +14,7 @@ module StripeMock
             elsif elems[1].is_a?(Hash) && elems[1].is_a?(Hash)
               rmerge(elems[0], elems[1])
             else
-              [elems[0], elems[1]]
+              [elems[0], elems[1]].compact
             end
           }.flatten
         elsif oldval.is_a?(Hash) && newval.is_a?(Hash)
