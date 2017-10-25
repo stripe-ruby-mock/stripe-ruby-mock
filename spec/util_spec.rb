@@ -27,12 +27,38 @@ describe StripeMock::Util do
       expect(result).to eq({ x: [ {a: 0}, {a: 0, b: 2}, {c: 3} ] })
     end
 
-    it "merges array elements (that are arrays)" do
-      dest = { x: [ 1, 2 ] }
-      source = { x: [ 3, 4 ] }
-      result = StripeMock::Util.rmerge(dest, source)
+    context "array elements (that are simple values)" do
+      it "merges arrays" do
+        dest = { x: [ 1, 2 ] }
+        source = { x: [ 3, 4 ] }
+        result = StripeMock::Util.rmerge(dest, source)
 
-      expect(result).to eq({ x: [ 1, 3, 2, 4 ] })
+        expect(result).to eq({ x: [ 1, 3, 2, 4 ] })
+      end
+
+      it "ignores empty arrays" do
+        dest = { x: [] }
+        source = { x: [ 3, 4 ] }
+        result = StripeMock::Util.rmerge(dest, source)
+
+        expect(result).to eq({ x: [ 3, 4 ] })
+      end
+
+      it "removes nil values" do
+        dest = { x: [ 1, 2, nil ] }
+        source = { x: [ nil, 3, 4 ] }
+        result = StripeMock::Util.rmerge(dest, source)
+
+        expect(result).to eq({ x: [ 1, 2, 3, 4 ] })
+      end
+
+      it "respects duplicate values" do
+        dest = { x: [ 1, 2, 3 ] }
+        source = { x: [ 3, 4 ] }
+        result = StripeMock::Util.rmerge(dest, source)
+
+        expect(result).to eq({ x: [ 1, 3, 2, 4, 3 ] })
+      end
     end
 
     it "does not truncate the array when merging" do
