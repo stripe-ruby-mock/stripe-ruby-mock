@@ -924,6 +924,38 @@ module StripeMock
       }
     end
 
+    def self.mock_balance(usd_balance = 10000)
+      {
+        object: "balance",
+        available: [
+          {
+            currency: "usd",
+            amount: usd_balance,
+            source_types: {
+              card: 25907032203,
+              bank_account: 108476658,
+              bitcoin_receiver: 1545182
+            }
+          }],
+        connect_reserved: [
+          {
+            currency: "usd",
+            amount: 4700
+          }],
+        livemode: false,
+        pending: [
+          {
+            currency: "usd",
+            amount: 22738833554,
+            source_types: {
+              card: 22738826610,
+              bank_account: 0,
+              bitcoin_receiver: 6944
+            }
+          }]
+      }
+    end
+
     def self.mock_balance_transactions(ids=[])
       bts = {}
       ids.each do |id|

@@ -21,6 +21,7 @@ module StripeMock
     end
 
     include StripeMock::RequestHandlers::Accounts
+    include StripeMock::RequestHandlers::Balance
     include StripeMock::RequestHandlers::BalanceTransactions
     include StripeMock::RequestHandlers::Charges
     include StripeMock::RequestHandlers::Cards
@@ -41,15 +42,15 @@ module StripeMock
     include StripeMock::RequestHandlers::CountrySpec
     include StripeMock::RequestHandlers::Payouts
 
-
-    attr_reader :accounts, :balance_transactions, :bank_tokens, :charges, :coupons, :customers,
+    attr_reader :accounts, :balance, :balance_transactions, :bank_tokens, :charges, :coupons, :customers,
                 :disputes, :events, :invoices, :invoice_items, :orders, :plans, :recipients,
                 :refunds, :transfers, :payouts, :subscriptions, :country_spec, :subscriptions_items
 
-    attr_accessor :error_queue, :debug, :conversion_rate
+    attr_accessor :error_queue, :debug, :conversion_rate, :account_balance
 
     def initialize
       @accounts = {}
+      @balance = Data.mock_balance
       @balance_transactions = Data.mock_balance_transactions(['txn_05RsQX2eZvKYlo2C0FRTGSSA','txn_15RsQX2eZvKYlo2C0ERTYUIA', 'txn_25RsQX2eZvKYlo2C0ZXCVBNM', 'txn_35RsQX2eZvKYlo2C0QAZXSWE', 'txn_45RsQX2eZvKYlo2C0EDCVFRT', 'txn_55RsQX2eZvKYlo2C0OIKLJUY', 'txn_65RsQX2eZvKYlo2C0ASDFGHJ', 'txn_75RsQX2eZvKYlo2C0EDCXSWQ', 'txn_85RsQX2eZvKYlo2C0UJMCDET', 'txn_95RsQX2eZvKYlo2C0EDFRYUI'])
       @bank_tokens = {}
       @card_tokens = {}
@@ -75,6 +76,7 @@ module StripeMock
       @id_counter = 0
       @balance_transaction_counter = 0
       @conversion_rate = 1.0
+      @account_balance = 10000
 
       # This is basically a cache for ParamValidators
       @base_strategy = TestStrategies::Base.new
