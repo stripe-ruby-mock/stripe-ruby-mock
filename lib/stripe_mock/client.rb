@@ -73,6 +73,10 @@ module StripeMock
       timeout_wrap { @pipe.set_conversion_rate(value) }
     end
 
+    def set_account_balance(value)
+      timeout_wrap { @pipe.set_account_balance(value) }
+    end
+
     def destroy_resource(type, id)
       timeout_wrap { @pipe.destroy_resource(type, id) }
     end
