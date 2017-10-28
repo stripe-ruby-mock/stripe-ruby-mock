@@ -11,7 +11,7 @@
       "statement_descriptor": "TEST",
       "details_submitted": true,
       "charge_enabled": false,
-      "transfer_enabled": false,
+      "payouts_enabled": false,
       "currencies_supported": [
         "USD"
       ],

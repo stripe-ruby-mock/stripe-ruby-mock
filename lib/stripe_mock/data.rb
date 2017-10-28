@@ -12,7 +12,7 @@ module StripeMock
         timezone: "US/Pacific",
         details_submitted: false,
         charges_enabled: false,
-        transfers_enabled: false,
+        payouts_enabled: false,
         currencies_supported: [
           "usd"
         ],
