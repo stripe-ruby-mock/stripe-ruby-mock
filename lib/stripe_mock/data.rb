@@ -617,6 +617,7 @@ module StripeMock
           :has_more => false,
           :url => "/v1/transfers/#{id}/reversals"
         },
+        :balance_transaction => "txn_2dyYXXP90MN26R",
       }.merge(params)
     end
 
