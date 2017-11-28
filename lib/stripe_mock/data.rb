@@ -190,6 +190,13 @@ module StripeMock
         invoice: nil,
         description: nil,
         dispute: nil,
+        outcome: {
+          network_status: "approved_by_network",
+          reason: nil,
+          risk_level: "normal",
+          seller_message: "Payment complete.",
+          type: "authorized"
+        },
         metadata: {
         }
       }.merge(params)
