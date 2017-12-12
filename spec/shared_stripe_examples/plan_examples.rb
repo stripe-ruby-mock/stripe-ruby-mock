@@ -137,7 +137,13 @@ shared_examples 'Plan API' do
     describe "Required Parameters" do
       after do
         params.delete(@name)
-        expect { subject }.to raise_error(Stripe::InvalidRequestError, "Missing required param: #{@name}.")
+        message =
+          if @name == :amount
+            "Plans require an `#{@name}` parameter to be set."
+          else
+            "Missing required param: #{@name}."
+          end
+        expect { subject }.to raise_error(Stripe::InvalidRequestError, message)
       end
 
       it("requires a name") { @name = :name }
