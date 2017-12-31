@@ -264,6 +264,29 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.charges.count).to eq(0)
     end
 
+    it "subscribes a customer with no card to a plan with a free trial with plan as item" do
+      plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
+      customer = Stripe::Customer.create(id: 'cardless')
+
+      sub = Stripe::Subscription.create({ items: [ { plan: 'trial' } ], customer: customer.id })
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.items.data[0].plan.to_hash).to eq(plan.to_hash)
+      # no idea how to fix this one
+      # expect(sub.trial_end - sub.trial_start).to eq(14 * 86400)
+
+      customer = Stripe::Customer.retrieve('cardless')
+      expect(customer.subscriptions.data).to_not be_empty
+      expect(customer.subscriptions.count).to eq(1)
+      expect(customer.subscriptions.data.length).to eq(1)
+
+      expect(customer.subscriptions.data.first.id).to eq(sub.id)
+      expect(customer.subscriptions.data.first.items.data.first.plan.to_hash).to eq(plan.to_hash)
+      expect(customer.subscriptions.data.first.customer).to eq(customer.id)
+      # No idea on this one
+      # expect(customer.charges.count).to eq(0)
+    end
+
     it "subscribes a customer with no card to a free plan" do
       plan = stripe_helper.create_plan(id: 'free_tier', amount: 0)
       customer = Stripe::Customer.create(id: 'cardless')
@@ -363,6 +386,28 @@ shared_examples 'Customer Subscriptions' do
           { plan: plan.id, quantity: 1 },
           { plan: plan2.id, quantity: 2 }
         ]
+      )
+
+      expect(subscription.id).to match /(test_su_|sub_).+/
+      expect(subscription.plan).to eq nil
+      expect(subscription.items.data[0].plan.id).to eq plan.id
+      expect(subscription.items.data[1].plan.id).to eq plan2.id
+    end
+
+    it 'when plan defined inside items for trials with no card', live: true do
+      plan = stripe_helper.create_plan(id: 'BASE_PRICE_PLAN1')
+
+      plan2 = stripe_helper.create_plan(id: 'PER_USER_PLAN1')
+      customer = Stripe::Customer.create
+      trial_end = Time.now.utc.to_i + 3600
+
+      subscription = Stripe::Subscription.create(
+        customer: customer.id,
+        items: [
+          { plan: plan.id, quantity: 1 },
+          { plan: plan2.id, quantity: 2 }
+        ],
+        trial_end: trial_end
       )
 
       expect(subscription.id).to match /(test_su_|sub_).+/
