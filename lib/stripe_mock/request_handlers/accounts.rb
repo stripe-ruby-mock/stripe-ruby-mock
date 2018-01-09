@@ -27,7 +27,7 @@ module StripeMock
       def update_account(route, method_url, params, headers)
         route =~ method_url
         account = assert_existence :account, $1, accounts[$1]
-        # account.merge!(params)
+        account.merge!(params)
         if blank_value?(params[:tos_acceptance], :date)
           raise Stripe::InvalidRequestError.new("Invalid integer: ", "tos_acceptance[date]", http_status: 400)
         end
