@@ -3,7 +3,7 @@ require 'spec_helper'
 shared_examples 'External Account API' do
 
   it 'creates/returns a bank when using account.external_accounts.create given a bank token' do
-    account = Stripe::Account.create(id: 'test_account', managed: true, country: "US")
+    account = Stripe::Account.create(id: 'test_account', type: 'custom', country: "US")
     bank_token = stripe_helper.generate_bank_token(last4: "1123", exp_month: 11, exp_year: 2099)
     bank = account.external_accounts.create(external_account: bank_token)
 
@@ -22,7 +22,7 @@ shared_examples 'External Account API' do
   end
 
   it 'creates/returns a bank when using account.external_accounts.create given bank params' do
-    account = Stripe::Account.create(id: 'test_account', managed: true, country: "US")
+    account = Stripe::Account.create(id: 'test_account', type: 'custom', country: "US")
     bank = account.external_accounts.create(external_account: {
                                               object: 'bank_account',
                                               account_number: '000123456789',
@@ -46,7 +46,7 @@ shared_examples 'External Account API' do
   end
 
   it "creates a single bank with a generated bank token", :live => true do
-    account = Stripe::Account.create(managed: true, country: "US")
+    account = Stripe::Account.create(type: 'custom', country: "US")
     expect(account.external_accounts.count).to eq 0
 
     account.external_accounts.create external_account: stripe_helper.generate_bank_token
@@ -58,7 +58,7 @@ shared_examples 'External Account API' do
   end
 
   describe "retrieval and deletion with accounts" do
-    let!(:account) { Stripe::Account.create(id: 'test_account', managed: true, country: "US") }
+    let!(:account) { Stripe::Account.create(id: 'test_account', type: 'custom', country: "US") }
     let!(:bank_token) { stripe_helper.generate_bank_token(last4: "1123", exp_month: 11, exp_year: 2099) }
     let!(:bank) { account.external_accounts.create(external_account: bank_token) }
 
@@ -98,7 +98,7 @@ shared_examples 'External Account API' do
 
   describe "Errors", :live => true do
     it "throws an error when the account does not have the retrieving bank id" do
-      account = Stripe::Account.create(managed: true, country: "US")
+      account = Stripe::Account.create(type: 'custom', country: "US")
       bank_id = "bank_123"
       expect { account.external_accounts.retrieve(bank_id) }.to raise_error {|e|
         expect(e).to be_a Stripe::InvalidRequestError
@@ -111,7 +111,7 @@ shared_examples 'External Account API' do
   end
 
   context "update bank" do
-    let!(:account) { Stripe::Account.create(id: 'test_account', managed: true, country: "US") }
+    let!(:account) { Stripe::Account.create(id: 'test_account', type: 'custom', country: "US") }
     let!(:bank_token) { stripe_helper.generate_bank_token(last4: "1123", exp_month: 11, exp_year: 2099) }
     let!(:bank) { account.external_accounts.create(external_account: bank_token) }
 
@@ -133,7 +133,7 @@ shared_examples 'External Account API' do
   context "retrieve multiple banks" do
 
     it "retrieves a list of multiple banks" do
-      account = Stripe::Account.create(id: 'test_account', managed: true, country: "US")
+      account = Stripe::Account.create(id: 'test_account', type: 'custom', country: "US")
 
       bank_token = stripe_helper.generate_bank_token(last4: "1123", exp_month: 11, exp_year: 2099)
       bank1 = account.external_accounts.create(external_accout: bank_token)
@@ -156,7 +156,7 @@ shared_examples 'External Account API' do
     end
 
     it "retrieves an empty list if there's no subscriptions" do
-      Stripe::Account.create(id: 'no_banks', managed: true, country: "US")
+      Stripe::Account.create(id: 'no_banks', type: 'custom', country: "US")
       account = Stripe::Account.retrieve('no_banks')
 
       list = account.external_accounts.all
