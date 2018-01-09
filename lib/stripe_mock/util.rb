@@ -9,8 +9,14 @@ module StripeMock
         if oldval.is_a?(Array) && newval.is_a?(Array)
           oldval.fill(nil, oldval.length...newval.length)
           oldval.zip(newval).map {|elems|
-            elems[1].nil? ? elems[0] : rmerge(elems[0], elems[1])
-          }
+            if elems[1].nil?
+              elems[0]
+            elsif elems[1].is_a?(Hash) && elems[1].is_a?(Hash)
+              rmerge(elems[0], elems[1])
+            else
+              [elems[0], elems[1]].compact
+            end
+          }.flatten
         elsif oldval.is_a?(Hash) && newval.is_a?(Hash)
           rmerge(oldval, newval)
         else

@@ -8,10 +8,10 @@ module StripeMock
         if card.nil?
           if class_name == 'Recipient'
             msg = "#{class_name} #{object[:id]} does not have a card with ID #{card_id}"
-            raise Stripe::InvalidRequestError.new(msg, 'card', 404)
+            raise Stripe::InvalidRequestError.new(msg, 'card', http_status: 404)
           else
             msg = "There is no source with ID #{card_id}"
-            raise Stripe::InvalidRequestError.new(msg, 'id', 404)
+            raise Stripe::InvalidRequestError.new(msg, 'id', http_status: 404)
           end
         end
         card
@@ -77,6 +77,7 @@ module StripeMock
         is_customer = resource.has_key?(:sources)
         new_default = cards_or_sources[:data].count > 0 ? cards_or_sources[:data].first[:id] : nil
         resource[:default_card]   = new_default unless is_customer
+        resource[:sources][:total_count] = cards_or_sources[:data].count if is_customer
         resource[:default_source] = new_default if is_customer
         card
       end

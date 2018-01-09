@@ -70,10 +70,10 @@ shared_examples 'Webhook Events API' do
     expect(data[event_b.id][:id]).to eq(event_b.id)
   end
 
-  it "handles stripe connect event when user_id is present" do
+  it "handles stripe connect event when account is present" do
   	acc_12314 = 'acc_12314'
-    event = StripeMock.mock_webhook_event('customer.created', user_id: acc_12314)
-    expect(event[:user_id]).to eq(acc_12314)
+    event = StripeMock.mock_webhook_event('customer.created', account: acc_12314)
+    expect(event[:account]).to eq(acc_12314)
   end
 
   it "retrieves an eveng using the event resource" do
@@ -127,6 +127,22 @@ shared_examples 'Webhook Events API' do
     expect {
       StripeMock.mock_webhook_payload('cow.bell')
     }.to raise_error StripeMock::UnsupportedRequestError
+  end
+
+  it 'has actual created attribute' do
+    time = Time.now.to_i
+
+    evnt = StripeMock.mock_webhook_event('customer.subscription.updated')
+
+    expect(evnt.created).to eq time
+  end
+
+  it 'when created param can be overrided' do
+    time = Time.now.to_i - 1000
+
+    evnt = StripeMock.mock_webhook_event('customer.subscription.updated', created: time)
+
+    expect(evnt.created).to eq time
   end
 
   describe "listing events" do
@@ -188,5 +204,58 @@ shared_examples 'Webhook Events API' do
     end
 
   end
+  
+  describe 'Subscription events' do 
+    it "Checks for billing items in customer.subscription.created" do 
+      subscription_created_event = StripeMock.mock_webhook_event('customer.subscription.created')
+      expect(subscription_created_event).to be_a(Stripe::Event)
+      expect(subscription_created_event.id).to_not be_nil
+      expect(subscription_created_event.data.object.items.data.class).to be Array
+      expect(subscription_created_event.data.object.items.data.length).to be 2
+      expect(subscription_created_event.data.object.items.data.first).to respond_to(:plan)
+      expect(subscription_created_event.data.object.items.data.first.id).to eq('si_00000000000000')
+    end
 
+    it "Checks for billing items in customer.subscription.deleted" do 
+      subscription_deleted_event = StripeMock.mock_webhook_event('customer.subscription.deleted')
+      expect(subscription_deleted_event).to be_a(Stripe::Event)
+      expect(subscription_deleted_event.id).to_not be_nil
+      expect(subscription_deleted_event.data.object.items.data.class).to be Array
+      expect(subscription_deleted_event.data.object.items.data.length).to be 2
+      expect(subscription_deleted_event.data.object.items.data.first).to respond_to(:plan)
+      expect(subscription_deleted_event.data.object.items.data.first.id).to eq('si_00000000000000')
+    end
+    
+    it "Checks for billing items in customer.subscription.updated" do 
+      subscription_updated_event = StripeMock.mock_webhook_event('customer.subscription.updated')
+      expect(subscription_updated_event).to be_a(Stripe::Event)
+      expect(subscription_updated_event.id).to_not be_nil
+      expect(subscription_updated_event.data.object.items.data.class).to be Array
+      expect(subscription_updated_event.data.object.items.data.length).to be 2
+      expect(subscription_updated_event.data.object.items.data.first).to respond_to(:plan)
+      expect(subscription_updated_event.data.object.items.data.first.id).to eq('si_00000000000000')
+    end
+    
+    it "Checks for billing items in customer.subscription.trial_will_end" do 
+      subscription_trial_will_end_event = StripeMock.mock_webhook_event('customer.subscription.trial_will_end')
+      expect(subscription_trial_will_end_event).to be_a(Stripe::Event)
+      expect(subscription_trial_will_end_event.id).to_not be_nil
+      expect(subscription_trial_will_end_event.data.object.items.data.class).to be Array
+      expect(subscription_trial_will_end_event.data.object.items.data.length).to be 2
+      expect(subscription_trial_will_end_event.data.object.items.data.first).to respond_to(:plan)
+      expect(subscription_trial_will_end_event.data.object.items.data.first.id).to eq('si_00000000000000')
+    end
+  end
+
+  describe 'Invoices events' do 
+    it "Checks for billing items in invoice.payment_succeeded" do
+      invoice_payment_succeeded = StripeMock.mock_webhook_event('invoice.payment_succeeded')
+      expect(invoice_payment_succeeded).to be_a(Stripe::Event)
+      expect(invoice_payment_succeeded.id).to_not be_nil
+      expect(invoice_payment_succeeded.data.object.lines.data.class).to be Array
+      expect(invoice_payment_succeeded.data.object.lines.data.length).to be 2
+      expect(invoice_payment_succeeded.data.object.lines.data.first).to respond_to(:plan)
+      expect(invoice_payment_succeeded.data.object.lines.data.first.id).to eq('sub_00000000000000')
+    end
+  end
 end

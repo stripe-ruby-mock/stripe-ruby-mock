@@ -13,9 +13,9 @@ module StripeMock
       @state = 'ready'
     end
 
-    def mock_request(method, url, api_key, params={}, headers={})
+    def mock_request(method, url, api_key: nil, params: {}, headers: {})
       timeout_wrap do
-        @pipe.mock_request(method, url, api_key, params, headers).tap {|result|
+        @pipe.mock_request(method, url, api_key: api_key, params: params, headers: headers).tap {|result|
           response, api_key = result
           if response.is_a?(Hash) && response[:error_raised] == 'invalid_request'
             raise Stripe::InvalidRequestError.new(*response[:error_params])
@@ -65,12 +65,28 @@ module StripeMock
       timeout_wrap { Stripe::Util.symbolize_names @pipe.generate_webhook_event(event_data) }
     end
 
+    def get_conversion_rate
+      timeout_wrap { @pipe.get_data(:conversion_rate) }
+    end
+
+    def set_conversion_rate(value)
+      timeout_wrap { @pipe.set_conversion_rate(value) }
+    end
+
+    def set_account_balance(value)
+      timeout_wrap { @pipe.set_account_balance(value) }
+    end
+
     def destroy_resource(type, id)
       timeout_wrap { @pipe.destroy_resource(type, id) }
     end
 
     def clear_server_data
       timeout_wrap { @pipe.clear_data }
+    end
+
+    def upsert_stripe_object(object, attributes)
+      timeout_wrap { @pipe.upsert_stripe_object(object, attributes) }
     end
 
     def close!

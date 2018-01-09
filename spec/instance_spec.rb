@@ -17,9 +17,9 @@ describe StripeMock::Instance do
       "id" => "str_abcde",
       :name => "String Plan"
     )
-    res, api_key = StripeMock.instance.mock_request('post', '/v1/plans', 'api_key', string_params)
-    expect(res[:id]).to eq('str_abcde')
-    expect(res[:name]).to eq('String Plan')
+    res, api_key = StripeMock.instance.mock_request('post', '/v1/plans', api_key: 'api_key', params: string_params)
+    expect(res.data[:id]).to eq('str_abcde')
+    expect(res.data[:name]).to eq('String Plan')
   end
 
   it "exits gracefully on an unrecognized handler url" do
@@ -28,7 +28,7 @@ describe StripeMock::Instance do
       "name" => "PLAN"
     }
 
-    expect { res, api_key = StripeMock.instance.mock_request('post', '/v1/unrecongnized_method', 'api_key', dummy_params) }.to_not raise_error
+    expect { res, api_key = StripeMock.instance.mock_request('post', '/v1/unrecongnized_method', api_key: 'api_key', params: dummy_params) }.to_not raise_error
   end
 
   it "can toggle debug" do
@@ -46,5 +46,10 @@ describe StripeMock::Instance do
 
     StripeMock.start
     expect(StripeMock.instance.debug).to eq(false)
+  end
+
+  it "can set a conversion rate" do
+    StripeMock.set_conversion_rate(1.25)
+    expect(StripeMock.instance.conversion_rate).to eq(1.25)
   end
 end

@@ -15,16 +15,16 @@ module StripeMock
         order_items = []
 
         unless params[:currency].to_s.size == 3
-          raise Stripe::InvalidRequestError.new('You must supply a currency', nil, 400)
+          raise Stripe::InvalidRequestError.new('You must supply a currency', nil, http_status: 400)
         end
 
         if params[:items]
           unless params[:items].is_a? Array
-            raise Stripe::InvalidRequestError.new('You must supply a list of items', nil, 400)
+            raise Stripe::InvalidRequestError.new('You must supply a list of items', nil, http_status: 400)
           end
 
           unless params[:items].first.is_a? Hash
-            raise Stripe::InvalidRequestError.new('You must supply an item', nil, 400)
+            raise Stripe::InvalidRequestError.new('You must supply an item', nil, http_status: 400)
           end
         end
 
@@ -61,7 +61,7 @@ module StripeMock
         order = assert_existence :order, $1, orders[$1]
 
         if params[:source].blank? && params[:customer].blank?
-          raise Stripe::InvalidRequestError.new('You must supply a source or customer', nil, 400)
+          raise Stripe::InvalidRequestError.new('You must supply a source or customer', nil, http_status: 400)
         end
 
         charge_id = new_id('ch')

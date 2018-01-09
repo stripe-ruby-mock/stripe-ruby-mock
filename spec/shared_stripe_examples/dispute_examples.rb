@@ -3,6 +3,8 @@ require 'pp'
 
 shared_examples 'Dispute API' do
 
+  let(:stripe_helper) { StripeMock.create_test_helper }
+
   it "returns an error if dispute does not exist" do
     dispute_id = 'dp_xxxxxxxxxxxxxxxxxxxxxxxx'
 
@@ -18,7 +20,7 @@ shared_examples 'Dispute API' do
     dispute_id = 'dp_05RsQX2eZvKYlo2C0FRTGSSA'
     dispute = Stripe::Dispute.retrieve(dispute_id)
 
-    expect(dispute).to be_a(Stripe::Dispute) 
+    expect(dispute).to be_a(Stripe::Dispute)
     expect(dispute.id).to eq(dispute_id)
   end
 
@@ -36,7 +38,7 @@ shared_examples 'Dispute API' do
       :customer_name => 'Rebel Idealist',
       :product_description => 'Lorem ipsum dolor sit amet.',
       :shipping_documentation => 'fil_15BZxW2eZvKYlo2CvQbrn9dc',
-    }    
+    }
     dispute.save
 
     dispute = Stripe::Dispute.retrieve(dispute_id)
@@ -50,13 +52,13 @@ shared_examples 'Dispute API' do
 
   it "closes a dispute" do
     dispute_id = 'dp_75RsQX2eZvKYlo2C0EDCXSWQ'
-    
+
     dispute = Stripe::Dispute.retrieve(dispute_id)
-    
+
     expect(dispute).to be_a(Stripe::Dispute)
     expect(dispute.id).to eq(dispute_id)
     expect(dispute.status).to eq('under_review')
-    
+
     dispute.close
 
     dispute = Stripe::Dispute.retrieve(dispute_id)
@@ -67,7 +69,7 @@ shared_examples 'Dispute API' do
   end
 
   describe "listing disputes" do
-    
+
     it "retrieves all disputes" do
       disputes = Stripe::Dispute.all
 
@@ -79,9 +81,18 @@ shared_examples 'Dispute API' do
       disputes = Stripe::Dispute.all(limit: 3)
 
       expect(disputes.count).to eq(3)
-      expect(disputes.map &:id).to include('dp_95RsQX2eZvKYlo2C0EDFRYUI','dp_85RsQX2eZvKYlo2C0UJMCDET', 'dp_75RsQX2eZvKYlo2C0EDCXSWQ')
+      expected = ['dp_95RsQX2eZvKYlo2C0EDFRYUI','dp_85RsQX2eZvKYlo2C0UJMCDET', 'dp_75RsQX2eZvKYlo2C0EDCXSWQ']
+      expect(disputes.map &:id).to include(*expected)
     end
 
   end
-  
+
+  it "creates a dispute" do
+    card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+    charge = Stripe::Charge.create(amount: 1000, currency: "usd", source: card_token)
+    stripe_dispute_id = stripe_helper.upsert_stripe_object(:dispute, {amount: charge.amount, charge: charge.id})
+    stripe_dispute = Stripe::Dispute.retrieve(stripe_dispute_id)
+    expect(stripe_dispute.charge).to eq(charge.id)
+  end
+
 end

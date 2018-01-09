@@ -31,7 +31,7 @@ module StripeMock
               params[:source] = get_card_or_bank_by_token(params[:source])
             end
           elsif params[:source][:id]
-            raise Stripe::InvalidRequestError.new("Invalid token id: #{params[:source]}", 'card', 400)
+            raise Stripe::InvalidRequestError.new("Invalid token id: #{params[:source]}", 'card', http_status: 400)
           end
         elsif params[:customer]
           customer = customers[params[:customer]]
@@ -66,7 +66,7 @@ module StripeMock
         allowed = allowed_params(params)
         disallowed = params.keys - allowed
         if disallowed.count > 0
-          raise Stripe::InvalidRequestError.new("Received unknown parameters: #{disallowed.join(', ')}" , '', 400)
+          raise Stripe::InvalidRequestError.new("Received unknown parameters: #{disallowed.join(', ')}" , '', http_status: 400)
         end
 
         charges[id] = Util.rmerge(charge, params)
@@ -139,11 +139,11 @@ module StripeMock
         elsif params[:currency].nil?
           require_param(:currency)
         elsif non_integer_charge_amount?(params)
-          raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', 400)
+          raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', http_status: 400)
         elsif non_positive_charge_amount?(params)
-          raise Stripe::InvalidRequestError.new('Invalid positive integer', 'amount', 400)
+          raise Stripe::InvalidRequestError.new('Invalid positive integer', 'amount', http_status: 400)
         elsif params[:source].nil? && params[:customer].nil?
-          raise Stripe::InvalidRequestError.new('Must provide source or customer.', nil)
+          raise Stripe::InvalidRequestError.new('Must provide source or customer.', http_status: nil)
         end
       end
 
@@ -156,7 +156,7 @@ module StripeMock
       end
 
       def require_param(param)
-        raise Stripe::InvalidRequestError.new("Missing required param: #{param}", param.to_s, 400)
+        raise Stripe::InvalidRequestError.new("Missing required param: #{param}", param.to_s, http_status: 400)
       end
 
       def allowed_params(params)

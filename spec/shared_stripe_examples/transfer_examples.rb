@@ -2,7 +2,7 @@ require 'spec_helper'
 
 shared_examples 'Transfer API' do
 
-  it "creates a stripe transfer" do
+  it "creates a stripe transfer", skip: 'Stripe has deprecated Recipients' do
     recipient = Stripe::Recipient.create(type:  "corporation", name: "MyCo")
     transfer = Stripe::Transfer.create(amount:  "100", currency: "usd", recipient: recipient.id)
 
@@ -11,9 +11,10 @@ shared_examples 'Transfer API' do
     expect(transfer.currency).to eq('usd')
     expect(transfer.recipient).to eq recipient.id
     expect(transfer.reversed).to eq(false)
+    expect(transfer.metadata).to eq({})
   end
 
-  describe "listing transfers" do
+  describe "listing transfers", skip: 'Stripe has deprecated Recipients' do
     let(:recipient) { Stripe::Recipient.create(type: "corporation", name: "MyCo") }
 
     before do
@@ -47,13 +48,14 @@ shared_examples 'Transfer API' do
     expect(transfer.amount).to eq(original.amount)
     expect(transfer.currency).to eq(original.currency)
     expect(transfer.recipient).to eq(original.recipient)
+    expect(transfer.metadata).to eq(original.metadata)
   end
 
   it "canceles a stripe transfer " do
     original = Stripe::Transfer.create(amount:  "100", currency: "usd")
-    res, api_key = Stripe.request(:post, "/v1/transfers/#{original.id}/cancel", 'api_key', {})
+    res, api_key = Stripe::StripeClient.active_client.execute_request(:post, "/v1/transfers/#{original.id}/cancel", api_key: 'api_key')
 
-    expect(res[:status]).to eq("canceled")
+    expect(res.data[:status]).to eq("canceled")
   end
 
   it "cannot retrieve a transfer that doesn't exist" do
@@ -64,7 +66,7 @@ shared_examples 'Transfer API' do
     }
   end
 
-  it 'when amount is not integer', live: true do
+  it 'when amount is not integer', live: true, skip: 'Stripe has deprecated Recipients' do
     rec = Stripe::Recipient.create({
                                        type:  'individual',
                                        name: 'Alex Smith',
@@ -75,6 +77,22 @@ shared_examples 'Transfer API' do
                                        description: 'Transfer for test@example.com') }.to raise_error { |e|
       expect(e).to be_a Stripe::InvalidRequestError
       expect(e.param).to eq('amount')
+      expect(e.http_status).to eq(400)
+    }
+  end
+
+  it 'when amount is negative', live: true, skip: 'Stripe has deprecated Recipients' do
+    rec = Stripe::Recipient.create({
+                                       type:  'individual',
+                                       name: 'Alex Smith',
+                                   })
+    expect { Stripe::Transfer.create(amount: '-400',
+                                     currency: 'usd',
+                                     recipient: rec.id,
+                                     description: 'Transfer for test@example.com') }.to raise_error { |e|
+      expect(e).to be_a Stripe::InvalidRequestError
+      expect(e.param).to eq('amount')
+      expect(e.message).to match(/^Invalid.*integer/)
       expect(e.http_status).to eq(400)
     }
   end

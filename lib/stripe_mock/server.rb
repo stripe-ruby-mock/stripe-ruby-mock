@@ -23,7 +23,7 @@ module StripeMock
         {
           :error_raised => 'invalid_request',
           :error_params => [
-            e.message, e.param, e.http_status, e.http_body, e.json_body
+            e.message, e.param, { http_status: e.http_status, http_body: e.http_body, json_body: e.json_body}
           ]
         }
       end
@@ -65,6 +65,14 @@ module StripeMock
       @instance.generate_webhook_event(event_data)
     end
 
+    def set_conversion_rate(value)
+      @instance.conversion_rate = value
+    end
+
+    def set_account_balance(value)
+      @instance.account_balance = value
+    end
+
     def error_queue
       @instance.error_queue
     end
@@ -76,5 +84,10 @@ module StripeMock
     def ping
       true
     end
+
+    def upsert_stripe_object(object, attributes)
+      @instance.upsert_stripe_object(object, attributes)
+    end
+
   end
 end

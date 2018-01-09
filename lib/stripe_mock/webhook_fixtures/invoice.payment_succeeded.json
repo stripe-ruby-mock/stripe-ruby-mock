@@ -6,100 +6,107 @@
   "object": "event",
   "data": {
     "object": {
-      "date": 1394018368,
       "id": "in_00000000000000",
-      "period_start": 1394018368,
-      "period_end": 1394018368,
-      "lines": {
-        "object": "list",
-        "count": 3,
-        "url": "/v1/invoices/in_00000000000000/lines",
-        "data": [
-          {
-            "id": "ii_00000000000000",
-            "object": "line_item",
-            "type": "invoiceitem",
-            "livemode": false,
-            "amount": 19000,
-            "currency": "usd",
-            "proration": true,
-            "period": {
-              "start": 1393765661,
-              "end": 1393765661
-            },
-            "quantity": null,
-            "plan": null,
-            "description": "Remaining time on Platinum after 02 Mar 2014",
-            "metadata": {}
-          },
-          {
-            "id": "ii_00000000000001",
-            "object": "line_item",
-            "type": "invoiceitem",
-            "livemode": false,
-            "amount": -9000,
-            "currency": "usd",
-            "proration": true,
-            "period": {
-              "start": 1393765661,
-              "end": 1393765661
-            },
-            "quantity": null,
-            "plan": null,
-            "description": "Unused time on Gold after 05 Mar 2014",
-            "metadata": {}
-          },
-          {
-            "id": "su_00000000000000",
-            "object": "line_item",
-            "type": "subscription",
-            "livemode": false,
-            "amount": 20000,
-            "currency": "usd",
-            "proration": false,
-            "period": {
-              "start": 1383759053,
-              "end": 1386351053
-            },
-            "quantity": 1,
-            "plan": {
-              "interval": "month",
-              "name": "Platinum",
-              "created": 1300000000,
-              "amount": 20000,
-              "currency": "usd",
-              "id": "platinum",
-              "object": "plan",
-              "livemode": false,
-              "interval_count": 1,
-              "trial_period_days": null,
-              "metadata": {}
-            },
-            "description": null,
-            "metadata": null
-          }
-        ]
-      },
-      "subtotal": 30000,
-      "total": 30000,
-      "customer": "cus_00000000000000",
       "object": "invoice",
-      "attempted": true,
-      "closed": true,
-      "paid": true,
-      "livemode": false,
-      "attempt_count": 1,
-      "amount_due": 0,
-      "currency": "usd",
-      "starting_balance": 0,
-      "ending_balance": 0,
-      "next_payment_attempt": null,
-      "charge": "ch_00000000000000",
-      "discount": null,
+      "amount_due": 999,
       "application_fee": null,
-      "subscription": "su_00000000000000",
+      "attempt_count": 1,
+      "attempted": true,
+      "charge": "ch_18EcOcLrgDIZ7iq8TaNlErVv",
+      "closed": true,
+      "currency": "eur",
+      "customer": "cus_00000000000000",
+      "date": 1464084258,
+      "description": null,
+      "discount": null,
+      "ending_balance": 0,
+      "forgiven": false,
+      "lines": {
+        "data": [{
+          "id": "sub_00000000000000",
+          "object": "line_item",
+          "amount": 50,
+          "currency": "eur",
+          "description": null,
+          "discountable": true,
+          "livemode": true,
+          "metadata": {},
+          "period": {
+            "start": 1500637196,
+            "end": 1532173196
+          },
+          "plan": {
+            "id": "platinum",
+            "object": "plan",
+            "amount": 500,
+            "created": 1499943145,
+            "currency": "eur",
+            "interval": "month",
+            "interval_count": 1,
+            "livemode": false,
+            "metadata": {},
+            "name": "New Plan Test",
+            "statement_descriptor": null,
+            "trial_period_days": null
+          },
+          "proration": false,
+          "quantity": 1,
+          "subscription": null,
+          "subscription_item": "si_18ZfWyLrgDIZ7iq8fSlSNGIV",
+          "type": "subscription"
+        },
+        {
+          "id": "sub_00000000000000",
+          "object": "line_item",
+          "amount": 50,
+          "currency": "eur",
+          "description": null,
+          "discountable": true,
+          "livemode": true,
+          "metadata": {},
+          "period": {
+            "start": 1500637196,
+            "end": 1532173196
+          },
+          "plan": {
+            "id": "gold",
+            "object": "plan",
+            "amount": 300,
+            "created": 1499943155,
+            "currency": "eur",
+            "interval": "month",
+            "interval_count": 1,
+            "livemode": false,
+            "metadata": {},
+            "name": "New gold Plan Test",
+            "statement_descriptor": null,
+            "trial_period_days": null
+          },
+          "proration": false,
+          "quantity": 1,
+          "subscription": null,
+          "subscription_item": "si_18ZfWyLrgDIZ7iq8fSlSNGIV",
+          "type": "subscription"
+        }],
+        "total_count": 1,
+        "object": "list",
+        "url": "/v1/invoices/in_18EcOcLrgDIZ7iq8zsDkunZ0/lines"
+      },
+      "livemode": false,
       "metadata": {},
-      "description": null
+      "next_payment_attempt": null,
+      "paid": true,
+      "period_end": 1464084258,
+      "period_start": 1464084258,
+      "receipt_number": null,
+      "starting_balance": 0,
+      "statement_descriptor": null,
+      "subscription": "sub_00000000000000",
+      "subtotal": 999,
+      "tax": null,
+      "tax_percent": null,
+      "total": 999,
+      "webhooks_delivered_at": 1464084258
     }
   }
 }

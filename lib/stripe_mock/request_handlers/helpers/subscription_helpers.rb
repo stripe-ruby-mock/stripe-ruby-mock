@@ -9,12 +9,14 @@ module StripeMock
       def custom_subscription_params(plan, cus, options = {})
         verify_trial_end(options[:trial_end]) if options[:trial_end]
 
-        start_time = options[:current_period_start] || Time.now.utc.to_i
-        params = { plan: plan, customer: cus[:id], current_period_start: start_time }
+        now = Time.now.utc.to_i
+        created_time = options[:created] || now
+        start_time = options[:current_period_start] || now
+        params = { plan: plan, customer: cus[:id], current_period_start: start_time, created: created_time }
         params.merge! options.select {|k,v| k =~ /application_fee_percent|quantity|metadata|tax_percent/}
         # TODO: Implement coupon logic
 
-        if (plan[:trial_period_days].nil? && options[:trial_end].nil?) || options[:trial_end] == "now"
+        if (((plan && plan[:trial_period_days]) || 0) == 0 && options[:trial_end].nil?) || options[:trial_end] == "now"
           end_time = get_ending_time(start_time, plan)
           params.merge!({status: 'active', current_period_end: end_time, trial_start: nil, trial_end: nil})
         else
@@ -28,13 +30,17 @@ module StripeMock
       def add_subscription_to_customer(cus, sub)
         if sub[:trial_end].nil? || sub[:trial_end] == "now"
           id = new_id('ch')
-          charges[id] = Data.mock_charge(:id => id, :customer => cus[:id], :amount => sub[:plan][:amount])
+          charges[id] = Data.mock_charge(
+            :id => id,
+            :customer => cus[:id],
+            :amount => (sub[:plan] ? sub[:plan][:amount] : total_items_amount(sub[:items][:data]))
+          )
         end
 
         if cus[:currency].nil?
-          cus[:currency] = sub[:plan][:currency]
-        elsif cus[:currency] != sub[:plan][:currency]
-          raise Stripe::InvalidRequestError.new( "Can't combine currencies on a single customer. This customer has had a subscription, coupon, or invoice item with currency #{cus[:currency]}", 'currency', 400)
+          cus[:currency] = sub[:items][:data][0][:plan][:currency]
+        elsif cus[:currency] != sub[:items][:data][0][:plan][:currency]
+          raise Stripe::InvalidRequestError.new( "Can't combine currencies on a single customer. This customer has had a subscription, coupon, or invoice item with currency #{cus[:currency]}", 'currency', http_status: 400)
         end
         cus[:subscriptions][:total_count] = (cus[:subscriptions][:total_count] || 0) + 1
         cus[:subscriptions][:data].unshift sub
@@ -50,6 +56,8 @@ module StripeMock
       # `intervals` is set to 1 when calculating current_period_end from current_period_start & plan
       # `intervals` is set to 2 when calculating Stripe::Invoice.upcoming end from current_period_start & plan
       def get_ending_time(start_time, plan, intervals = 1)
+        return start_time unless plan
+
         case plan[:interval]
         when "week"
           start_time + (604800 * (plan[:interval_count] || 1) * intervals)
@@ -65,15 +73,28 @@ module StripeMock
       def verify_trial_end(trial_end)
         if trial_end != "now"
           if !trial_end.is_a? Integer
-            raise Stripe::InvalidRequestError.new('Invalid timestamp: must be an integer', nil, 400)
+            raise Stripe::InvalidRequestError.new('Invalid timestamp: must be an integer', nil, http_status: 400)
           elsif trial_end < Time.now.utc.to_i
-            raise Stripe::InvalidRequestError.new('Invalid timestamp: must be an integer Unix timestamp in the future', nil, 400)
+            raise Stripe::InvalidRequestError.new('Invalid timestamp: must be an integer Unix timestamp in the future', nil, http_status: 400)
           elsif trial_end > Time.now.utc.to_i + 31557600*5 # five years
-            raise Stripe::InvalidRequestError.new('Invalid timestamp: can be no more than five years in the future', nil, 400)
+            raise Stripe::InvalidRequestError.new('Invalid timestamp: can be no more than five years in the future', nil, http_status: 400)
           end
         end
       end
 
+      def total_items_amount(items)
+        total = 0
+        items.each { |i| total += (i[:quantity] || 1) * i[:plan][:amount] }
+        total
+      end
+
+      def mock_subscription_items(items = [])
+        data = []
+        items.each do |i|
+          data << Data.mock_subscription_item(i.merge(plan: plans[i[:plan].to_s]))
+        end
+        data
+      end
     end
   end
 end

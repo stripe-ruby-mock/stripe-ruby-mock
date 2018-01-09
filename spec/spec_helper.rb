@@ -30,9 +30,10 @@ RSpec.configure do |c|
     if ENV['IS_TRAVIS']
       puts "Travis ruby version: #{RUBY_VERSION}"
       api_key = case RUBY_VERSION
-      when '1.9.3' then ENV['STRIPE_TEST_SECRET_KEY_A']
-      when '2.0.0' then ENV['STRIPE_TEST_SECRET_KEY_B']
-      when '2.1.6' then ENV['STRIPE_TEST_SECRET_KEY_C']
+      when '2.0.0'  then ENV['STRIPE_TEST_SECRET_KEY_A']
+      when '2.1.10' then ENV['STRIPE_TEST_SECRET_KEY_B']
+      when '2.2.7'  then ENV['STRIPE_TEST_SECRET_KEY_C']
+      when '2.3.4'  then ENV['STRIPE_TEST_SECRET_KEY_D']
       end
     else
       api_key = ENV['STRIPE_TEST_SECRET_KEY']
@@ -42,11 +43,11 @@ RSpec.configure do |c|
     end
 
     c.before(:each) do
-      StripeMock.stub(:start).and_return(nil)
-      StripeMock.stub(:stop).and_return(nil)
+      allow(StripeMock).to receive(:start).and_return(nil)
+      allow(StripeMock).to receive(:stop).and_return(nil)
       Stripe.api_key = api_key
     end
-    c.after(:each) { sleep 1 }
+    c.after(:each) { sleep 0.01 }
   else
     c.filter_run_excluding :oauth => true
     Stripe.api_key ||= ''
