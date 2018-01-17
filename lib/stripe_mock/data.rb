@@ -103,7 +103,6 @@ module StripeMock
 
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
-      puts @default_currency
       currency = params[:currency] || StripeMock.default_currency
       sources.each {|source| source[:customer] = cus_id}
       {
