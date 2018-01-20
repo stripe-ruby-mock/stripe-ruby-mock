@@ -31,6 +31,7 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.id).to eq(sub.id)
       expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
       expect(customer.subscriptions.data.first.customer).to eq(customer.id)
+      expect(customer.subscriptions.data.first.billing).to eq('charge_automatically')
       expect(customer.subscriptions.data.first.metadata.foo).to eq( "bar" )
       expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
     end
@@ -46,6 +47,7 @@ shared_examples 'Customer Subscriptions' do
 
       expect(sub.object).to eq('subscription')
       expect(sub.plan.to_hash).to eq(plan.to_hash)
+      expect(sub.billing).to eq('charge_automatically')
       expect(sub.metadata.foo).to eq( "bar" )
       expect(sub.metadata.example).to eq( "yes" )
 
@@ -60,7 +62,7 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
 
       expect(customer.subscriptions.data.first.customer).to eq(customer.id)
-
+      expect(customer.subscriptions.data.first.billing).to eq('charge_automatically')
       expect(customer.subscriptions.data.first.metadata.foo).to eq( "bar" )
       expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
     end
