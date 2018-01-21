@@ -7,6 +7,35 @@ shared_examples 'Customer Subscriptions' do
   end
 
   context "creating a new subscription" do
+    it "adds a new subscription to customer with none using items", :live => true do
+      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      expect(customer.subscriptions.data).to be_empty
+      expect(customer.subscriptions.count).to eq(0)
+
+      sub = Stripe::Subscription.create({ items: [{ plan: 'silver' }],
+                                          customer: customer.id, metadata: { foo: "bar", example: "yes" } })
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
+      expect(sub.metadata.foo).to eq( "bar" )
+      expect(sub.metadata.example).to eq( "yes" )
+
+      customer = Stripe::Customer.retrieve(customer.id)
+      expect(customer.subscriptions.data).to_not be_empty
+      expect(customer.subscriptions.count).to eq(1)
+      expect(customer.subscriptions.data.length).to eq(1)
+      expect(customer.charges.data.length).to eq(1)
+      expect(customer.currency).to eq( "usd" )
+
+      expect(customer.subscriptions.data.first.id).to eq(sub.id)
+      expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
+      expect(customer.subscriptions.data.first.customer).to eq(customer.id)
+      expect(customer.subscriptions.data.first.metadata.foo).to eq( "bar" )
+      expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
+    end
+
     it "adds a new subscription to customer with none", :live => true do
       plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
       customer = Stripe::Customer.create(source: gen_card_tk)
@@ -432,7 +461,19 @@ shared_examples 'Customer Subscriptions' do
       }
     end
 
-    it "updates a stripe customer's existing subscription" do
+    it "updates a stripe customer's existing subscription with one plan inside items" do
+      silver = stripe_helper.create_plan(id: 'silver')
+      customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
+
+      sub = Stripe::Subscription.create({ items: [ { plan: 'silver' } ], customer: customer.id })
+      sub.delete(at_period_end: true)
+
+      expect(sub.cancel_at_period_end).to be_truthy
+      expect(sub.save).to be_truthy
+      expect(sub.cancel_at_period_end).to be_falsey
+    end
+
+    it "updates a stripe customer's existing subscription when plan inside of items" do
       silver = stripe_helper.create_plan(id: 'silver')
       gold = stripe_helper.create_plan(id: 'gold')
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: 'silver')
