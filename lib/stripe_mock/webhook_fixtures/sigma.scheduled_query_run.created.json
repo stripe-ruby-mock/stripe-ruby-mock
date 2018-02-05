@@ -1,0 +1,35 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "sigma.scheduled_query_run.created",
+  "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
+  "data": {
+    "object": {
+      "id": "sqr_00000000000000",
+      "object": "scheduled_query_run",
+      "created": 1517798384,
+      "data_load_time": 1517616000,
+      "error": null,
+      "file": {
+        "id": "file_00000000000000",
+        "object": "file",
+        "created": 1516483091,
+        "filename": "path",
+        "purpose": "sigma_scheduled_query",
+        "size": 500,
+        "title": null,
+        "type": "csv",
+        "url": "https://files.stripe.com/v1/files/file_CApN8N0RYB1H3X/contents"
+      },
+      "livemode": false,
+      "result_available_until": 1549324800,
+      "sql": "SELECT count(*) from charges",
+      "status": "completed",
+      "title": "Count all charges"
+    }
+  }
+}

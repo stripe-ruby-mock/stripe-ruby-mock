@@ -1,12 +1,17 @@
 {
-  "type": "account.application.deauthorized",
-  "object": "event",
   "created": 1326853478,
   "livemode": false,
   "id": "evt_00000000000000",
+  "type": "account.application.deauthorized",
+  "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
   "data": {
     "object": {
-      "id": "cus_00000000000000"
+      "id": "ca_00000000000000",
+      "object": "application",
+      "name": "ApplicationName"
     }
   }
 }

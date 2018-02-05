@@ -4,25 +4,33 @@
   "id": "evt_00000000000000",
   "type": "customer.discount.deleted",
   "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
   "data": {
     "object": {
+      "object": "discount",
       "coupon": {
         "id": "25OFF_00000000000000",
-        "percent_off": 25,
-        "amount_off": null,
-        "currency": "usd",
         "object": "coupon",
-        "livemode": false,
+        "amount_off": null,
+        "created": 1517721057,
+        "currency": null,
         "duration": "repeating",
-        "redeem_by": null,
+        "duration_in_months": 3,
+        "livemode": false,
         "max_redemptions": null,
+        "metadata": {
+        },
+        "percent_off": 25,
+        "redeem_by": null,
         "times_redeemed": 0,
-        "duration_in_months": 3
+        "valid": true
       },
-      "start": 1381080512,
-      "object": "discount",
       "customer": "cus_00000000000000",
-      "end": 1389029312
+      "end": 1525410657,
+      "start": 1517721057,
+      "subscription": null
     }
   }
 }

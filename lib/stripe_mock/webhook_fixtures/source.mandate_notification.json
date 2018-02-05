@@ -1,0 +1,53 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "source.mandate_notification",
+  "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
+  "data": {
+    "object": {
+      "id": "src_00000000000000",
+      "object": "source",
+      "amount": null,
+      "client_secret": "src_client_secret_CGX4lBHXYfEc9IC8DyhuAPzl",
+      "created": 1517798828,
+      "currency": "usd",
+      "flow": "receiver",
+      "livemode": false,
+      "metadata": {
+      },
+      "owner": {
+        "address": null,
+        "email": "jenny.rosen@example.com",
+        "name": null,
+        "phone": null,
+        "verified_address": null,
+        "verified_email": null,
+        "verified_name": null,
+        "verified_phone": null
+      },
+      "receiver": {
+        "address": "121042882-38381234567890123",
+        "amount_charged": 0,
+        "amount_received": 0,
+        "amount_returned": 0,
+        "refund_attributes_method": "email",
+        "refund_attributes_status": "missing"
+      },
+      "statement_descriptor": null,
+      "status": "pending",
+      "type": "ach_credit_transfer",
+      "usage": "reusable",
+      "ach_credit_transfer": {
+        "account_number": "test_52796e3294dc",
+        "routing_number": "110000000",
+        "fingerprint": "ecpwEzmBOSMOqQTL",
+        "bank_name": "TEST BANK",
+        "swift_code": "TSTEZ122"
+      }
+    }
+  }
+}

@@ -4,62 +4,80 @@
   "id": "evt_00000000000000",
   "type": "customer.subscription.deleted",
   "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
   "data": {
     "object": {
-      "id": "su_00000000000000",
+      "id": "sub_00000000000000",
+      "object": "subscription",
+      "application_fee_percent": null,
+      "billing": "charge_automatically",
+      "cancel_at_period_end": false,
+      "canceled_at": 1517179808,
+      "created": 1517178878,
+      "current_period_end": 1518388478,
+      "current_period_start": 1517178878,
+      "customer": "cus_00000000000000",
+      "days_until_due": null,
+      "discount": null,
+      "ended_at": 1517719366,
       "items": {
         "object": "list",
-        "data": [{
-            "id": "si_00000000000000",
-            "object": "subscription_item",
-            "created": 1497881783,
-            "plan": {
-              "interval": "month",
-              "name": "Member's Club",
-              "amount": 100,
-              "currency": "usd",
-              "id": "fkx0AFo_00000000000000",
-              "object": "plan",
-              "livemode": false,
-              "interval_count": 1,
-              "trial_period_days": null,
-              "metadata": {}
-            },
-            "quantity": 1
-          },
+        "data": [
           {
-            "id": "si_00000000000001",
+            "id": "si_CDqQLQNlZuf1cZ",
             "object": "subscription_item",
-            "created": 1497881788,
-            "plan": {
-              "interval": "month",
-              "name": "Vistor's Club",
-              "amount": 200,
-              "currency": "eur",
-              "id": "fkx0AFo_00000000000001",
-              "object": "plan",
-              "livemode": false,
-              "interval_count": 1,
-              "trial_period_days": null,
-              "metadata": {}
+            "created": 1517178879,
+            "metadata": {
             },
-            "quantity": 5
+            "plan": {
+              "id": "2bf80c62-01d6-403d-85d7-d54d9039d140",
+              "object": "plan",
+              "amount": 1500,
+              "created": 1517178791,
+              "currency": "usd",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "metadata": {
+              },
+              "name": "Pro",
+              "statement_descriptor": null,
+              "trial_period_days": 14
+            },
+            "quantity": 1,
+            "subscription": "sub_CDqQUvN3MzGURX"
           }
-        ]
+        ],
+        "has_more": false,
+        "total_count": 1,
+        "url": "/v1/subscription_items?subscription=sub_CDqQUvN3MzGURX"
       },
-      "object": "subscription",
-      "start": 1381080564,
-      "status": "canceled",
-      "customer": "cus_00000000000000",
-      "cancel_at_period_end": false,
-      "current_period_start": 1381080564,
-      "current_period_end": 1383758964,
-      "ended_at": 1381021514,
-      "trial_start": null,
-      "trial_end": null,
-      "canceled_at": null,
+      "livemode": false,
+      "metadata": {
+      },
+      "plan": {
+        "id": "2bf80c62-01d6-403d-85d7-d54d9039d140_00000000000000",
+        "object": "plan",
+        "amount": 1500,
+        "created": 1517178791,
+        "currency": "usd",
+        "interval": "month",
+        "interval_count": 1,
+        "livemode": false,
+        "metadata": {
+        },
+        "name": "Pro",
+        "statement_descriptor": null,
+        "trial_period_days": 14
+      },
       "quantity": 1,
-      "application_fee_percent": null
+      "start": 1517178878,
+      "status": "canceled",
+      "tax_percent": null,
+      "trial_end": 1518388478,
+      "trial_start": 1517178878
     }
   }
 }

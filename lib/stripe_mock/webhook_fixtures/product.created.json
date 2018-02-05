@@ -1,0 +1,48 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "product.created",
+  "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
+  "data": {
+    "object": {
+      "id": "prod_00000000000000",
+      "object": "product",
+      "active": null,
+      "attributes": [
+
+      ],
+      "caption": null,
+      "created": 1517531439,
+      "deactivate_on": [
+
+      ],
+      "description": null,
+      "images": [
+
+      ],
+      "livemode": false,
+      "metadata": {
+      },
+      "name": "World Domination",
+      "package_dimensions": null,
+      "shippable": null,
+      "skus": {
+        "object": "list",
+        "data": [
+
+        ],
+        "has_more": false,
+        "total_count": 0,
+        "url": "/v1/skus?product=prod_CFNCn4bRmJzvPj\u0026active=true"
+      },
+      "statement_descriptor": null,
+      "type": "service",
+      "updated": 1517531439,
+      "url": null
+    }
+  }
+}

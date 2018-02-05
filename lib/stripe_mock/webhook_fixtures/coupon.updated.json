@@ -1,0 +1,31 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "coupon.updated",
+  "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
+  "data": {
+    "object": {
+      "id": "25OFF_00000000000000",
+      "object": "coupon",
+      "amount_off": null,
+      "created": 1517720937,
+      "currency": null,
+      "duration": "repeating",
+      "duration_in_months": 3,
+      "livemode": false,
+      "max_redemptions": null,
+      "metadata": {
+      },
+      "percent_off": 25,
+      "redeem_by": null,
+      "times_redeemed": 0,
+      "valid": true
+    },
+    "previous_attributes": {
+    }
+  }
+}
