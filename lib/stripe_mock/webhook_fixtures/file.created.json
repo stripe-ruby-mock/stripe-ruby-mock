@@ -1,0 +1,23 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "file.created",
+  "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
+  "data": {
+    "object": {
+      "id": "file_00000000000000",
+      "object": "file",
+      "created": 1516483091,
+      "filename": "path",
+      "purpose": "sigma_scheduled_query",
+      "size": 500,
+      "title": null,
+      "type": "csv",
+      "url": "https://files.stripe.com/v1/files/file_CApN8N0RYB1H3X/contents"
+    }
+  }
+}

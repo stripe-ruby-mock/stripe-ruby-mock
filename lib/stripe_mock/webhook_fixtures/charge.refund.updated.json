@@ -1,0 +1,28 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "charge.refund.updated",
+  "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
+  "data": {
+    "object": {
+      "id": "re_00000000000000",
+      "object": "refund",
+      "amount": 100,
+      "balance_transaction": null,
+      "charge": "ch_00000000000000",
+      "created": 1517720849,
+      "currency": "usd",
+      "metadata": {
+      },
+      "reason": null,
+      "receipt_number": null,
+      "status": "succeeded"
+    },
+    "previous_attributes": {
+    }
+  }
+}

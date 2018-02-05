@@ -1,0 +1,36 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "application_fee.refunded",
+  "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
+  "data": {
+    "object": {
+      "id": "fee_00000000000000",
+      "object": "application_fee",
+      "account": "acct_00000000000000",
+      "amount": 100,
+      "amount_refunded": 50,
+      "application": "ca_00000000000000",
+      "balance_transaction": "txn_00000000000000",
+      "charge": "ch_00000000000000",
+      "created": 1517720142,
+      "currency": "usd",
+      "livemode": false,
+      "originating_transaction": null,
+      "refunded": true,
+      "refunds": {
+        "object": "list",
+        "data": [
+
+        ],
+        "has_more": false,
+        "total_count": 0,
+        "url": "/v1/application_fees/fee_0BrfXWe0k7cmFyFX4Zz7eHGF/refunds"
+      }
+    }
+  }
+}

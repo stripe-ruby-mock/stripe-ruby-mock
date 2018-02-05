@@ -4,17 +4,24 @@
   "id": "evt_00000000000000",
   "type": "plan.deleted",
   "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
   "data": {
     "object": {
-      "interval": "month",
-      "name": "Member's Club",
-      "amount": 100,
-      "currency": "usd",
-      "id": "fkx0AFo_00000000000000",
+      "id": "d4154bd1-f33d-4313-8f22-ecb665362682_00000000000000",
       "object": "plan",
-      "livemode": false,
+      "amount": 900,
+      "created": 1517179572,
+      "currency": "usd",
+      "interval": "month",
       "interval_count": 1,
-      "trial_period_days": null
+      "livemode": false,
+      "metadata": {
+      },
+      "name": "Basic",
+      "statement_descriptor": null,
+      "trial_period_days": 14
     }
   }
 }

@@ -1,0 +1,33 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "order_return.created",
+  "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
+  "data": {
+    "object": {
+      "id": "orret_00000000000000",
+      "object": "order_return",
+      "amount": 1500,
+      "created": 1517797710,
+      "currency": "usd",
+      "items": [
+        {
+          "object": "order_item",
+          "amount": 1500,
+          "currency": "usd",
+          "description": "World Domination",
+          "parent": "sk_0Brzice0k7cmFyFXVldUNv6q",
+          "quantity": null,
+          "type": "sku"
+        }
+      ],
+      "livemode": false,
+      "order": "or_00000000000000",
+      "refund": "re_00000000000000"
+    }
+  }
+}

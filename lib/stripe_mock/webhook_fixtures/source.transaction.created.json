@@ -1,0 +1,21 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "source.transaction.created",
+  "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
+  "data": {
+    "object": {
+      "id": "btctxn_00000000000000",
+      "object": "bitcoin_transaction",
+      "amount": 100,
+      "bitcoin_amount": 1757908,
+      "created": 1517798841,
+      "currency": "usd",
+      "receiver": "btcrcv_15XzVv2oVGQoAYHvWdQfXtSV"
+    }
+  }
+}

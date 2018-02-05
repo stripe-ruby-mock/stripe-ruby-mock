@@ -4,22 +4,37 @@
   "id": "evt_00000000000000",
   "type": "balance.available",
   "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
   "data": {
     "object": {
-      "pending": [
-        {
-          "amount": 2217,
-          "currency": "usd"
-        }
-      ],
+      "object": "balance",
       "available": [
         {
+          "currency": "usd",
           "amount": 0,
-          "currency": "usd"
+          "source_types": {
+            "card": 0
+          }
+        }
+      ],
+      "connect_reserved": [
+        {
+          "currency": "usd",
+          "amount": 0
         }
       ],
       "livemode": false,
-      "object": "balance"
+      "pending": [
+        {
+          "currency": "usd",
+          "amount": 0,
+          "source_types": {
+            "card": 0
+          }
+        }
+      ]
     }
   }
 }

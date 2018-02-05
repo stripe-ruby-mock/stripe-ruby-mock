@@ -4,18 +4,31 @@
   "id": "evt_00000000000000",
   "type": "invoiceitem.deleted",
   "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
   "data": {
     "object": {
-      "object": "invoiceitem",
       "id": "ii_00000000000000",
-      "date": 1372126711,
-      "amount": 2500,
-      "livemode": false,
-      "proration": false,
+      "object": "invoiceitem",
+      "amount": 1000,
       "currency": "usd",
       "customer": "cus_00000000000000",
-      "description": "Plan: Veteran's Club Signup Fee Plan Id: 4",
-      "invoice": "in_00000000000000"
+      "date": 1517722660,
+      "description": "My First Invoice Item (created for API docs)",
+      "discountable": true,
+      "invoice": null,
+      "livemode": false,
+      "metadata": {
+      },
+      "period": {
+        "start": 1517722660,
+        "end": 1517722660
+      },
+      "plan": null,
+      "proration": false,
+      "quantity": null,
+      "subscription": null
     }
   }
 }

@@ -4,29 +4,50 @@
   "id": "evt_00000000000000",
   "type": "customer.source.created",
   "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
   "data": {
     "object": {
-      "id": "card_VALID",
-      "object": "card",
-      "last4": "4242",
-      "type": "Visa",
-      "brand": "Visa",
-      "funding": "credit",
-      "exp_month": 3,
-      "exp_year": 2020,
-      "fingerprint": "wXWJT135mEK107G8",
-      "customer": "cus_VALID",
-      "country": "US",
-      "name": "Testy Tester",
-      "address_line1": null,
-      "address_line2": null,
-      "address_city": null,
-      "address_state": null,
-      "address_zip": null,
-      "address_country": null,
-      "cvc_check": "pass",
-      "address_line1_check": null,
-      "address_zip_check": null
+      "id": "src_00000000000000",
+      "object": "source",
+      "amount": null,
+      "client_secret": "src_client_secret_CGCD0y1gLr6AvGQrZtIqsh81",
+      "created": 1517721214,
+      "currency": "usd",
+      "flow": "receiver",
+      "livemode": false,
+      "metadata": {
+      },
+      "owner": {
+        "address": null,
+        "email": "jenny.rosen@example.com",
+        "name": null,
+        "phone": null,
+        "verified_address": null,
+        "verified_email": null,
+        "verified_name": null,
+        "verified_phone": null
+      },
+      "receiver": {
+        "address": "121042882-38381234567890123",
+        "amount_charged": 0,
+        "amount_received": 0,
+        "amount_returned": 0,
+        "refund_attributes_method": "email",
+        "refund_attributes_status": "missing"
+      },
+      "statement_descriptor": null,
+      "status": "pending",
+      "type": "ach_credit_transfer",
+      "usage": "reusable",
+      "ach_credit_transfer": {
+        "account_number": "test_52796e3294dc",
+        "routing_number": "110000000",
+        "fingerprint": "ecpwEzmBOSMOqQTL",
+        "bank_name": "TEST BANK",
+        "swift_code": "TSTEZ122"
+      }
     }
   }
 }

@@ -1,0 +1,40 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "transfer.reversed",
+  "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
+  "data": {
+    "object": {
+      "id": "tr_00000000000000",
+      "object": "transfer",
+      "amount": 1100,
+      "amount_reversed": 0,
+      "balance_transaction": "txn_00000000000000",
+      "created": 1517798973,
+      "currency": "usd",
+      "description": null,
+      "destination": "acct_2C3ke0k7cmFyFXW6zwQ0",
+      "destination_payment": "py_CGX7ip41zWXzHd",
+      "livemode": false,
+      "metadata": {
+      },
+      "reversals": {
+        "object": "list",
+        "data": [
+
+        ],
+        "has_more": false,
+        "total_count": 0,
+        "url": "/v1/transfers/tr_CGX766sjrVrEEb/reversals"
+      },
+      "reversed": false,
+      "source_transaction": null,
+      "source_type": "card",
+      "transfer_group": null
+    }
+  }
+}

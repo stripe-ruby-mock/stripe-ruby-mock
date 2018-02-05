@@ -4,19 +4,25 @@
   "id": "evt_00000000000000",
   "type": "coupon.created",
   "object": "event",
+  "request": null,
+  "pending_webhooks": 1,
+  "api_version": "2018-01-23",
   "data": {
     "object": {
       "id": "25OFF_00000000000000",
-      "percent_off": 25,
-      "amount_off": null,
-      "currency": "usd",
       "object": "coupon",
-      "livemode": false,
+      "amount_off": null,
+      "created": 1517720911,
+      "currency": null,
       "duration": "repeating",
-      "redeem_by": null,
-      "max_redemptions": null,
-      "times_redeemed": 0,
       "duration_in_months": 3,
+      "livemode": false,
+      "max_redemptions": null,
+      "metadata": {
+      },
+      "percent_off": 25,
+      "redeem_by": null,
+      "times_redeemed": 0,
       "valid": true
     }
   }
