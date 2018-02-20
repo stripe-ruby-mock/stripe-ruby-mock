@@ -257,6 +257,23 @@ shared_examples 'Charge API' do
     expect(updated.fraud_details.to_hash).to eq(charge.fraud_details.to_hash)
   end
 
+  it "updates a stripe charge with no changes" do
+    original = Stripe::Charge.create({
+      amount: 777,
+      currency: 'USD',
+      source: stripe_helper.generate_card_token,
+      description: 'Original description',
+      destination: {
+        account: "acct_SOMEBOGUSID",
+        amount: 150
+      }
+    })
+
+    expect {
+      updated = original.save
+    }.not_to raise_error
+  end
+
   it "marks a charge as safe" do
     original = Stripe::Charge.create({
       amount: 777,
