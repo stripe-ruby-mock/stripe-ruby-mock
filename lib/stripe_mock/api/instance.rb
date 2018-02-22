@@ -2,18 +2,18 @@ module StripeMock
 
   @state = 'ready'
   @instance = nil
-  @original_request_method = Stripe::StripeClient.active_client.method(:execute_request)
+  @original_execute_request_method = Stripe::StripeClient.instance_method(:execute_request)
 
   def self.start
     return false if @state == 'live'
-    @instance = Instance.new
-    alias_stripe_method :execute_request, @instance.method(:mock_request)
+    @instance = instance = Instance.new
+    Stripe::StripeClient.send(:define_method, :execute_request) { |*args| instance.mock_request(*args) }
     @state = 'local'
   end
 
   def self.stop
     return unless @state == 'local'
-    alias_stripe_method :execute_request, @original_request_method
+    restore_stripe_execute_request_method
     @instance = nil
     @state = 'ready'
   end
@@ -28,8 +28,8 @@ module StripeMock
     end
   end
 
-  def self.alias_stripe_method(new_name, method_object)
-    Stripe::StripeClient.active_client.define_singleton_method(new_name) {|*args| method_object.call(*args) }
+  def self.restore_stripe_execute_request_method
+    Stripe::StripeClient.send(:define_method, :execute_request, @original_execute_request_method)
   end
 
   def self.instance; @instance; end
