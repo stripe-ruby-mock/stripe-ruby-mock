@@ -100,7 +100,7 @@ module StripeMock
 
         if plan && customer
           unless customer[:currency].to_s == plan[:currency].to_s
-            raise Stripe::InvalidRequestError.new('lol', 'currency', http_status: 400)
+            raise Stripe::InvalidRequestError.new("Customer's currency of #{customer[:currency]} does not match plan's currency of #{plan[:currency]}", 'currency', http_status: 400)
           end
         end
 
