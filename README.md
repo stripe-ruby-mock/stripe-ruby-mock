@@ -170,6 +170,7 @@ StripeMock.prepare_card_error(:incorrect_cvc)
 StripeMock.prepare_card_error(:card_declined)
 StripeMock.prepare_card_error(:missing)
 StripeMock.prepare_card_error(:processing_error)
+StripeMock.prepare_card_error(:incorrect_zip)
 ```
 
 You can see the details of each error in [lib/stripe_mock/api/errors.rb](lib/stripe_mock/api/errors.rb)
