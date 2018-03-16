@@ -171,7 +171,7 @@ shared_examples 'Charge API' do
     bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
     expect(bal_trans.amount).to eq(charge.amount)
     expect(bal_trans.fee).to eq(39)
-    expect(bal_trans.source).to eq(charge.source)
+    expect(bal_trans.source).to eq(charge.id)
   end
 
   context 'when conversion rate is set' do
