@@ -40,7 +40,7 @@ module StripeMock
           end
 
           subscription = Data.mock_subscription({ id: new_id('su') })
-          subscription.merge!(custom_subscription_params(plan, customers[ params[:id] ], params))
+          subscription = resolve_subscription_changes(subscription, [plan], customers[ params[:id] ], params)
           add_subscription_to_customer(customers[ params[:id] ], subscription)
           subscriptions[subscription[:id]] = subscription
         elsif params[:trial_end]
