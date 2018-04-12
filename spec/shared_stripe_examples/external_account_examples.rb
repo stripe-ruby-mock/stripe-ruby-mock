@@ -96,7 +96,7 @@ shared_examples 'External Account API' do
     end
   end
 
-  describe "Errors", :live => true do
+  describe "Errors" do
     it "throws an error when the account does not have the retrieving bank id" do
       account = Stripe::Account.create(type: 'custom', country: "US")
       bank_id = "bank_123"
