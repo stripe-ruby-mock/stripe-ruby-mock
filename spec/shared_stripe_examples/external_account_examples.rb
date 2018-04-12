@@ -45,7 +45,7 @@ shared_examples 'External Account API' do
     expect(bank.currency).to eq('usd')
   end
 
-  it "creates a single bank with a generated bank token", :live => true do
+  it "creates a single bank with a generated bank token" do
     account = Stripe::Account.create(type: 'custom', country: "US")
     expect(account.external_accounts.count).to eq 0
 
