@@ -96,7 +96,7 @@ module StripeMock
         end
 
         allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate)
-        unknown_params = params.keys - allowed_params.map(&:to_sym)
+        unknown_params = params.keys.map(&:to_sym) - allowed_params.map(&:to_sym)
         if unknown_params.length > 0
           raise Stripe::InvalidRequestError.new("Received unknown parameter: #{unknown_params.join}", unknown_params.first.to_s, http_status: 400)
         end
