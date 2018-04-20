@@ -261,7 +261,7 @@ module StripeMock
             end
             return if trial
           end
-
+          return if params[:coupon] && params[:coupon][:percent_off] == 100
           raise Stripe::InvalidRequestError.new('You must supply a valid card xoxo', nil, http_status: 400)
         end
       end
