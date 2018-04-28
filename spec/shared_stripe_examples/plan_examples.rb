@@ -77,6 +77,17 @@ shared_examples 'Plan API' do
     ) }.to raise_error(Stripe::InvalidRequestError, 'No such product: unknown_product')
   end
 
+  it "creates a stripe plan without specifying ID" do
+    plan = Stripe::Plan.create(
+      :name => 'The Mock Plan',
+      :amount => 9900,
+      :currency => 'USD',
+      :interval => 1,
+    )
+
+    expect(plan.id).to match(/^test_plan/)
+  end
+
   it "stores a created stripe plan in memory" do
     plan = Stripe::Plan.create(
       :id => 'pid_2',

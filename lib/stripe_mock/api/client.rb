@@ -8,7 +8,7 @@ module StripeMock
     return false if @state == 'live'
     return @client unless @client.nil?
 
-    alias_stripe_method :execute_request, StripeMock.method(:redirect_to_mock_server)
+    Stripe::StripeClient.send(:define_method, :execute_request) { |*args| StripeMock.redirect_to_mock_server(*args) }
     @client = StripeMock::Client.new(port)
     @state = 'remote'
     @client
@@ -18,7 +18,7 @@ module StripeMock
     return false unless @state == 'remote'
     @state = 'ready'
 
-    alias_stripe_method :request, @original_request_method
+    restore_stripe_execute_request_method
     @client.clear_server_data if opts[:clear_server_data] == true
     @client.cleanup
     @client = nil

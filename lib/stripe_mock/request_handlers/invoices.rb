@@ -87,7 +87,7 @@ module StripeMock
           invoice_date = Time.now.to_i
           subscription_plan = assert_existence :plan, subscription_plan_id, plans[subscription_plan_id.to_s]
           preview_subscription = Data.mock_subscription
-          preview_subscription.merge!(custom_subscription_params(subscription_plan, customer, { trial_end: params[:subscription_trial_end] }))
+          preview_subscription = resolve_subscription_changes(preview_subscription, [subscription_plan], customer, { trial_end: params[:subscription_trial_end] })
           preview_subscription[:id] = subscription[:id]
           preview_subscription[:quantity] = subscription_quantity
           subscription_proration_date = params[:subscription_proration_date] || Time.now
