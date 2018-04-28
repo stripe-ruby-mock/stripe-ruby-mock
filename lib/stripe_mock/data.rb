@@ -501,16 +501,16 @@ module StripeMock
         interval_count: 1,
         livemode: false,
         metadata: {},
-        product: 'pr_1',
+        product: 'prod_1',
         statement_descriptor: nil,
         trial_period_days: nil
       }.merge(params)
     end
 
     def self.mock_product(params={})
-      pr_id = params[:id] || "test_pr_default"
+      prod_id = params[:id] || "test_prod_default"
       {
-        id: pr_id,
+        id: prod_id,
         name: "The Basic Product",
         type: 'service',
         active: true,
