@@ -3,7 +3,7 @@ module StripeMock
 
     def self.mock_account(params = {})
       id = params[:id] || 'acct_103ED82ePvKYlo2C'
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       {
         id: id,
         email: "bob@example.com",
@@ -103,7 +103,8 @@ module StripeMock
 
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
-      currency = params[:currency] || 'usd'
+      puts @default_currency
+      currency = params[:currency] || StripeMock.default_currency
       sources.each {|source| source[:customer] = cus_id}
       {
         email: 'stripe_mock@example.com',
@@ -134,7 +135,7 @@ module StripeMock
 
     def self.mock_charge(params={})
       charge_id = params[:id] || "ch_1fD6uiR9FAA2zc"
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       {
         id: charge_id,
         object: "charge",
@@ -196,7 +197,7 @@ module StripeMock
     end
 
     def self.mock_refund(params={})
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       {
         id: "re_4fWhgUh5si7InF",
         amount: 1,
@@ -248,7 +249,7 @@ module StripeMock
     end
 
     def self.mock_bank_account(params={})
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       {
         id: "test_ba_default",
         object: "bank_account",
@@ -306,7 +307,7 @@ module StripeMock
             plan: {
               amount: 999,
               created: 1504035972,
-              currency: 'usd'
+              currency: StripeMock.default_currency
             },
             quantity: 1
           }]
@@ -328,7 +329,7 @@ module StripeMock
 
     def self.mock_invoice(lines, params={})
       in_id = params[:id] || "test_in_default"
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       lines << Data.mock_line_item() if lines.empty?
       invoice = {
         id: 'in_test_invoice',
@@ -379,7 +380,7 @@ module StripeMock
     end
 
     def self.mock_line_item(params = {})
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       {
         id: "ii_test",
         object: "line_item",
@@ -402,7 +403,7 @@ module StripeMock
     end
 
     def self.mock_invoice_item(params = {})
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       {
         id: "test_ii",
         object: "invoiceitem",
@@ -490,7 +491,7 @@ module StripeMock
     end
 
     def self.mock_plan(params={})
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       {
         id: "2",
         object: "plan",
@@ -591,7 +592,7 @@ module StripeMock
     end
 
     def self.mock_transfer(params={})
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       id = params[:id] || 'tr_test_transfer'
       {
         :status => 'pending',
@@ -623,7 +624,7 @@ module StripeMock
     end
 
     def self.mock_payout(params={})
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       id = params[:id] || 'po_test_payout'
       {
         :amount => 100,
@@ -647,7 +648,7 @@ module StripeMock
 
     def self.mock_dispute(params={})
       @timestamp ||= Time.now.to_i
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       id = params[:id] || "dp_test_dispute"
       {
         :id => id,
@@ -967,7 +968,7 @@ module StripeMock
     end
 
     def self.mock_balance_transaction(params = {})
-      currency = params[:currency] || 'usd'
+      currency = params[:currency] || StripeMock.default_currency
       bt_id = params[:id] || 'test_txn_default'
       source = params[:source] || 'ch_test_charge'
       {
@@ -1015,7 +1016,7 @@ module StripeMock
           object: 'plan',
           amount: 1337,
           created: 1504716177,
-          currency: 'usd',
+          currency: StripeMock.default_currency,
           interval: 'month',
           interval_count: 1,
           livemode: false,
