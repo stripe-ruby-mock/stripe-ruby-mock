@@ -110,7 +110,7 @@ shared_examples 'Invoice API' do
     let(:customer)      { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
     let(:coupon_amtoff) { stripe_helper.create_coupon(id: '100OFF', currency: 'usd', amount_off: 100_00, duration: 'repeating', duration_in_months: 6) }
     let(:coupon_pctoff) { stripe_helper.create_coupon(id: '50%OFF', currency: 'usd', percent_off: 50, amount_off: nil, duration: 'repeating', duration_in_months: 6) }
-    let(:plan)          { stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
+    let!(:plan)          { stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
     let(:quantity)      { 3 }
     let(:subscription)  { Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: quantity) }
 
@@ -250,6 +250,7 @@ shared_examples 'Invoice API' do
         describe "prorating a subscription with a new plan, with_trial: #{with_trial}" do
           let(:new_monthly_plan) { stripe_helper.create_plan(id: '100m', amount: 100_00, interval: 'month', name: '100m', currency: 'usd') }
           let(:new_yearly_plan) { stripe_helper.create_plan(id: '100y', amount: 100_00, interval: 'year', name: '100y', currency: 'usd') }
+          let(:plan) { stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
 
           it 'prorates while maintaining billing interval', live: true do
             # Given
