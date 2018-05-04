@@ -220,8 +220,8 @@ shared_examples 'Customer API' do
   end
 
   describe 'repeating coupon with duration limit', live: true do
-    let!(:coupon) { Stripe::Coupon.create(id: '10OFF', amount_off: 1000, currency: 'usd', duration: 'repeating', duration_in_months: 12) }
-    let!(:customer) { Stripe::Customer.create(coupon: '10OFF') }
+    let!(:coupon) { stripe_helper.create_coupon(id: '10OFF', amount_off: 1000, currency: 'usd', duration: 'repeating', duration_in_months: 12) }
+    let!(:customer) { Stripe::Customer.create(coupon: coupon.id) }
     it 'creates the discount with the end date', live: true do
       discount = Stripe::Customer.retrieve(customer.id).discount
       expect(discount).to_not be_nil

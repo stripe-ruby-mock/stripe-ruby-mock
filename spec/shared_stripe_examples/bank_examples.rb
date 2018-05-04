@@ -40,7 +40,7 @@ shared_examples 'Bank API' do
     expect(bank.last4).to eq("6789")
   end
 
-  it "creates a single bank with a generated bank token", :live => true do
+  it "creates a single bank with a generated bank token" do
     customer = Stripe::Customer.create
     expect(customer.sources.count).to eq 0
 
