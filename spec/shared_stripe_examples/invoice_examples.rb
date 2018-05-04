@@ -109,7 +109,7 @@ shared_examples 'Invoice API' do
   context "retrieving upcoming invoice" do
     let(:customer)      { @teardown_customer = true; Stripe::Customer.create(source: stripe_helper.generate_card_token) }
     let(:coupon_amtoff) { @teardown_coupon_amtoff = true; stripe_helper.create_coupon(id: '100OFF', currency: 'usd', amount_off: 100_00, duration: 'repeating', duration_in_months: 6) }
-    let(:coupon_pctoff) { @teardown_coupon_pctoff = true; stripe_helper.create_coupon(id: '50%OFF', currency: 'usd', percent_off: 50, duration: 'repeating', duration_in_months: 6) }
+    let(:coupon_pctoff) { @teardown_coupon_pctoff = true; stripe_helper.create_coupon(id: '50%OFF', currency: 'usd', percent_off: 50, amount_off: nil, duration: 'repeating', duration_in_months: 6) }
     let(:plan)          { @teardown_plan = true; stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
     let(:quantity)      { 3 }
     let(:subscription)  { @teardown_subscription = true; Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: quantity) }
