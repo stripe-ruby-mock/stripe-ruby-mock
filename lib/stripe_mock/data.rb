@@ -1027,5 +1027,24 @@ module StripeMock
         quantity: 2
       }.merge(params)
     end
+
+    def self.mock_ephemeral_key(**params)
+      created = Time.now.to_i
+      expires = created + 34_000
+      {
+        id: "ephkey_default",
+        object: "ephemeral_key",
+        associated_objects: [
+          {
+            id: params[:customer],
+            type: "customer"
+          }
+        ],
+        created: created,
+        expires: expires,
+        livemode: false,
+        secret: "ek_test_default"
+      }
+    end
   end
 end

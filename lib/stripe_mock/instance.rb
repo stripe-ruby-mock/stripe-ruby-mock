@@ -42,6 +42,7 @@ module StripeMock
     include StripeMock::RequestHandlers::Tokens
     include StripeMock::RequestHandlers::CountrySpec
     include StripeMock::RequestHandlers::Payouts
+    include StripeMock::RequestHandlers::EphemeralKey
 
     attr_reader :accounts, :balance, :balance_transactions, :bank_tokens, :charges, :coupons, :customers,
                 :disputes, :events, :invoices, :invoice_items, :orders, :plans, :recipients,
