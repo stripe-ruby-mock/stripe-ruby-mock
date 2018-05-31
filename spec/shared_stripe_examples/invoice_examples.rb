@@ -360,7 +360,7 @@ shared_examples 'Invoice API' do
           expect(line.amount).to eq 150_00
           # line period is for the NEXT subscription cycle
           expect(line.period.start).to be_within(1).of subscription.current_period_end
-          expect(line.period.end).to be_within(1).of (Time.at(subscription.current_period_end).to_datetime >> 1).to_time.to_i # +1 month
+          expect(Time.at(line.period.end).month).to be_within(1).of (Time.at(subscription.current_period_end).to_datetime >> 1).month # +1 month
         end
       end
 
