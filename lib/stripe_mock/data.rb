@@ -594,31 +594,29 @@ module StripeMock
       currency = params[:currency] || StripeMock.default_currency
       id = params[:id] || 'tr_test_transfer'
       {
-        :status => 'pending',
         :amount => 100,
-        :account => {
-          :object => 'bank_account',
-          :country => 'US',
-          :bank_name => 'STRIPE TEST BANK',
-          :last4 => '6789'
-        },
-        :recipient => 'test_recipient',
-        :fee => 0,
-        :fee_details => [],
+        :amount_reversed => 0,
+        :balance_transaction => "txn_2dyYXXP90MN26R",
         :id => id,
         :livemode => false,
         :metadata => {},
         :currency => currency,
         :object => "transfer",
-        :date => 1304114826,
+        :created => 1304114826,
         :description => "Transfer description",
         :reversed => false,
         :reversals => {
           :object => "list",
+          :data => [],
           :total_count => 0,
           :has_more => false,
           :url => "/v1/transfers/#{id}/reversals"
         },
+        :destination => "acct_164wxjKbnvuxQXGu",
+        :destination_payment => "py_164xRvKbnvuxQXGuVFV2pZo1",
+        :source_transaction => "ch_164xRv2eZvKYlo2Clu1sIJWB",
+        :source_type => "card",
+        :transfer_group => "group_ch_164xRv2eZvKYlo2Clu1sIJWB",
       }.merge(params)
     end
 
