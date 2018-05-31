@@ -69,6 +69,7 @@ require 'stripe_mock/request_handlers/payouts.rb'
 require 'stripe_mock/request_handlers/subscriptions.rb'
 require 'stripe_mock/request_handlers/tokens.rb'
 require 'stripe_mock/request_handlers/country_spec.rb'
+require 'stripe_mock/request_handlers/ephemeral_key.rb'
 require 'stripe_mock/instance'
 
 require 'stripe_mock/test_strategies/base.rb'
