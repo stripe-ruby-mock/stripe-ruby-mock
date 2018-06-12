@@ -45,6 +45,7 @@ module StripeMock
         end
 
         subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')) })
+        # TODO: mock quantity and deleted here
         subscription = resolve_subscription_changes(subscription, subscription_plans, customer, params)
 
         # Ensure customer has card to charge if plan has no trial and is not free
@@ -189,7 +190,8 @@ module StripeMock
         end
 
         params[:current_period_start] = subscription[:current_period_start]
-        subscription = resolve_subscription_changes(subscription, subscription_plans, customer, params)
+        items_arr = params[:items].values
+        subscription = resolve_subscription_changes(subscription, subscription_plans, customer, items_arr: items_arr)
 
         # delete the old subscription, replace with the new subscription
         customer[:subscriptions][:data].reject! { |sub| sub[:id] == subscription[:id] }
