@@ -44,6 +44,7 @@ module StripeMock
         'account.external_account.deleted',
         'balance.available',
         'charge.succeeded',
+        'charge.updated',
         'charge.failed',
         'charge.refunded',
         'charge.dispute.created',

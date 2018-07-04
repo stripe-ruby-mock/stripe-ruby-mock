@@ -10,13 +10,19 @@ module StripeMock
       end
 
       def get_all_transfers(route, method_url, params, headers)
-        if recipient = params[:recipient]
-          assert_existence :recipient, recipient, recipients[recipient]
+        extra_params = params.keys - [:created, :destination, :ending_before,
+          :limit, :starting_after, :transfer_group]
+        unless extra_params.empty?
+          raise Stripe::InvalidRequestError.new("Received unknown parameter: #{extra_params[0]}", extra_params[0].to_s, http_status: 400)
+        end
+
+        if destination = params[:destination]
+          assert_existence :destination, destination, accounts[destination]
         end
 
         _transfers = transfers.each_with_object([]) do |(_, transfer), array|
-          if recipient
-            array << transfer if transfer[:recipient] == recipient
+          if destination
+            array << transfer if transfer[:destination] == destination
           else
             array << transfer
           end

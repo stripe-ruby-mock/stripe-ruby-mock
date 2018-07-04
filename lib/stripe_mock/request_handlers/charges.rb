@@ -41,7 +41,7 @@ module StripeMock
         end
 
         ensure_required_params(params)
-        bal_trans_params = { amount: params[:amount], source: params[:source] }
+        bal_trans_params = { amount: params[:amount], source: id }
 
         balance_transaction_id = new_balance_transaction('txn', bal_trans_params)
 
@@ -160,7 +160,7 @@ module StripeMock
       end
 
       def allowed_params(params)
-        allowed = [:description, :metadata, :receipt_email, :fraud_details, :shipping]
+        allowed = [:description, :metadata, :receipt_email, :fraud_details, :shipping, :destination]
 
         # This is a workaround for the way the Stripe API sends params even when they aren't modified.
         # Stipe will include those params even when they aren't modified.

@@ -26,8 +26,12 @@ module StripeMock
 
       def update_account(route, method_url, params, headers)
         route =~ method_url
-        assert_existence :account, $1, accounts[$1]
-        accounts[$1].merge!(params)
+        account = assert_existence :account, $1, accounts[$1]
+        account.merge!(params)
+        if blank_value?(params[:tos_acceptance], :date)
+          raise Stripe::InvalidRequestError.new("Invalid integer: ", "tos_acceptance[date]", http_status: 400)
+        end
+        account
       end
 
       def list_accounts(route, method_url, params, headers)
@@ -48,6 +52,18 @@ module StripeMock
           acc = Data.mock_account
           accounts[acc[:id]] = acc
         end
+      end
+
+      # Checks if setting a blank value
+      #
+      # returns true if the key is included in the hash
+      # and its value is empty or nil
+      def blank_value?(hash, key)
+        if hash.key?(key)
+          value = hash[key]
+          return true if value.nil? || "" == value
+        end
+        false
       end
     end
   end

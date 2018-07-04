@@ -107,12 +107,12 @@ shared_examples 'Invoice API' do
   end
 
   context "retrieving upcoming invoice" do
-    let(:customer)      { @teardown_customer = true; Stripe::Customer.create(source: stripe_helper.generate_card_token) }
-    let(:coupon_amtoff) { @teardown_coupon_amtoff = true; Stripe::Coupon.create(id: '100OFF', currency: 'usd', amount_off: 100_00, duration: 'repeating', duration_in_months: 6) }
-    let(:coupon_pctoff) { @teardown_coupon_pctoff = true; Stripe::Coupon.create(id: '50%OFF', currency: 'usd', percent_off: 50, duration: 'repeating', duration_in_months: 6) }
-    let(:plan)          { @teardown_plan = true; Stripe::Plan.create(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
+    let(:customer)      { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
+    let(:coupon_amtoff) { stripe_helper.create_coupon(id: '100OFF', currency: 'usd', amount_off: 100_00, duration: 'repeating', duration_in_months: 6) }
+    let(:coupon_pctoff) { stripe_helper.create_coupon(id: '50%OFF', currency: 'usd', percent_off: 50, amount_off: nil, duration: 'repeating', duration_in_months: 6) }
+    let(:plan)          { stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
     let(:quantity)      { 3 }
-    let(:subscription)  { @teardown_subscription = true; Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: quantity) }
+    let(:subscription)  { Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: quantity) }
 
     before(with_customer:         true) { customer }
     before(with_coupon_amtoff:    true) { coupon_amtoff }
@@ -122,11 +122,11 @@ shared_examples 'Invoice API' do
     before(with_plan:             true) { plan }
     before(with_subscription:     true) { subscription }
 
-    after { subscription.delete   rescue nil if @teardown_subscription }
-    after { plan.delete           rescue nil if @teardown_plan }
-    after { coupon_pctoff.delete  rescue nil if @teardown_coupon_pctoff }
-    after { coupon_amtoff.delete  rescue nil if @teardown_coupon_amtoff }
-    after { customer.delete       rescue nil if @teardown_customer }
+    # after { subscription.delete   rescue nil if @teardown_subscription }
+    # after { plan.delete           rescue nil if @teardown_plan }
+    # after { coupon_pctoff.delete  rescue nil if @teardown_coupon_pctoff }
+    # after { coupon_amtoff.delete  rescue nil if @teardown_coupon_amtoff }
+    # after { customer.delete       rescue nil if @teardown_customer }
 
     describe 'parameter validation' do
       it 'fails without parameters' do
@@ -248,18 +248,72 @@ shared_examples 'Invoice API' do
 
       [false, true].each do |with_trial|
         describe "prorating a subscription with a new plan, with_trial: #{with_trial}" do
-          let!(:new_plan) { Stripe::Plan.create(id: '100y', amount: 10000, interval: 'year', name: '100y', currency: 'usd') }
+          let(:new_monthly_plan) { stripe_helper.create_plan(id: '100m', amount: 100_00, interval: 'month', name: '100m', currency: 'usd') }
+          let(:new_yearly_plan) { stripe_helper.create_plan(id: '100y', amount: 100_00, interval: 'year', name: '100y', currency: 'usd') }
+          let(:plan) { stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
 
-          it 'prorates', live: true do
+          it 'prorates while maintaining billing interval', live: true do
             # Given
             proration_date = Time.now + 5 * 24 * 3600 # 5 days later
             new_quantity = 2
             unused_amount = plan.amount * quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)
-            prorated_amount_due = new_plan.amount * new_quantity - unused_amount
+            remaining_amount = new_monthly_plan.amount * new_quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)
+            prorated_amount_due = new_monthly_plan.amount * new_quantity - unused_amount + remaining_amount
             credit_balance = 1000
             customer.account_balance = -credit_balance
             customer.save
-            query = { customer: customer.id, subscription: subscription.id, subscription_plan: new_plan.id, subscription_proration_date: proration_date.to_i, subscription_quantity: new_quantity }
+            query = { customer: customer.id, subscription: subscription.id, subscription_plan: new_monthly_plan.id, subscription_proration_date: proration_date.to_i, subscription_quantity: new_quantity }
+            query[:subscription_trial_end] = (DateTime.now >> 1).to_time.to_i if with_trial
+
+            # When
+            upcoming = Stripe::Invoice.upcoming(query)
+
+            # Then
+            expect(upcoming).to be_a Stripe::Invoice
+            expect(upcoming.customer).to eq(customer.id)
+            if with_trial
+              expect(upcoming.amount_due).to be_within(1).of 0
+            else
+              expect(upcoming.amount_due).to be_within(1).of prorated_amount_due - credit_balance
+            end
+            expect(upcoming.starting_balance).to eq -credit_balance
+            expect(upcoming.ending_balance).to be_nil
+            expect(upcoming.subscription).to eq(subscription.id)
+
+            if with_trial
+              expect(upcoming.lines.data.length).to eq(2)
+            else
+              expect(upcoming.lines.data.length).to eq(3)
+            end
+
+            expect(upcoming.lines.data[0].proration).to be_truthy
+            expect(upcoming.lines.data[0].plan.id).to eq '50m'
+            expect(upcoming.lines.data[0].amount).to be_within(1).of -unused_amount
+            expect(upcoming.lines.data[0].quantity).to eq quantity
+
+            unless with_trial
+              expect(upcoming.lines.data[1].proration).to be_truthy
+              expect(upcoming.lines.data[1].plan.id).to eq '100m'
+              expect(upcoming.lines.data[1].amount).to be_within(1).of remaining_amount
+              expect(upcoming.lines.data[1].quantity).to eq new_quantity
+            end
+
+            expect(upcoming.lines.data.last.proration).to be_falsey
+            expect(upcoming.lines.data.last.plan.id).to eq '100m'
+            expect(upcoming.lines.data.last.amount).to eq with_trial ? 0 : 20000
+            expect(upcoming.lines.data.last.quantity).to eq new_quantity
+          end
+
+          it 'prorates while changing billing intervals', live: true do
+            # Given
+            proration_date = Time.now + 5 * 24 * 3600 # 5 days later
+            new_quantity = 2
+            unused_amount = plan.amount * quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)
+            prorated_amount_due = new_yearly_plan.amount * new_quantity - unused_amount
+            credit_balance = 1000
+            customer.account_balance = -credit_balance
+            customer.save
+            query = { customer: customer.id, subscription: subscription.id, subscription_plan: new_yearly_plan.id, subscription_proration_date: proration_date.to_i, subscription_quantity: new_quantity }
             query[:subscription_trial_end] = (DateTime.now >> 1).to_time.to_i if with_trial
 
             # When
@@ -276,17 +330,20 @@ shared_examples 'Invoice API' do
             expect(upcoming.starting_balance).to eq -credit_balance
             expect(upcoming.ending_balance).to be_nil
             expect(upcoming.subscription).to eq(subscription.id)
+
             expect(upcoming.lines.data[0].proration).to be_truthy
             expect(upcoming.lines.data[0].plan.id).to eq '50m'
             expect(upcoming.lines.data[0].amount).to be_within(1).of -unused_amount
             expect(upcoming.lines.data[0].quantity).to eq quantity
+
             expect(upcoming.lines.data[1].proration).to be_falsey
             expect(upcoming.lines.data[1].plan.id).to eq '100y'
             expect(upcoming.lines.data[1].amount).to eq with_trial ? 0 : 20000
             expect(upcoming.lines.data[1].quantity).to eq new_quantity
           end
 
-          after { new_plan.delete }
+          # after { new_monthly_plan.delete rescue nil if @teardown_monthly_plan }
+          # after { new_yearly_plan.delete rescue nil if @teardown_yearly_plan }
         end
       end
 
@@ -303,7 +360,7 @@ shared_examples 'Invoice API' do
           expect(line.amount).to eq 150_00
           # line period is for the NEXT subscription cycle
           expect(line.period.start).to be_within(1).of subscription.current_period_end
-          expect(line.period.end).to be_within(1).of (Time.at(subscription.current_period_end).to_datetime >> 1).to_time.to_i # +1 month
+          expect(Time.at(line.period.end).month).to be_within(1).of (Time.at(subscription.current_period_end).to_datetime >> 1).month # +1 month
         end
       end
 
@@ -362,6 +419,12 @@ shared_examples 'Invoice API' do
       expect(@upcoming.subscription).to eq(@shortsub.id)
     end
 
+    it 'does not store the stripe invoice in memory since its only a preview', with_subscription: true do
+      invoice = Stripe::Invoice.upcoming(customer: customer.id)
+      data = test_data_source(:invoices)
+      expect(data[invoice.id]).to be_nil
+    end
+
     context 'retrieving invoice line items' do
       it 'returns all line items for created invoice' do
         invoice = Stripe::Invoice.create(customer: customer.id)
@@ -378,7 +441,7 @@ shared_examples 'Invoice API' do
         plan = stripe_helper.create_plan()
         subscription = Stripe::Subscription.create(plan: plan.id, customer: customer.id)
         upcoming = Stripe::Invoice.upcoming(customer: customer.id)
-        line_items = upcoming.lines.all
+        line_items = upcoming.lines
 
         expect(upcoming).to be_a Stripe::Invoice
         expect(line_items.count).to eq(1)

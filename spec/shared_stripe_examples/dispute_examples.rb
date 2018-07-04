@@ -3,6 +3,8 @@ require 'pp'
 
 shared_examples 'Dispute API' do
 
+  let(:stripe_helper) { StripeMock.create_test_helper }
+
   it "returns an error if dispute does not exist" do
     dispute_id = 'dp_xxxxxxxxxxxxxxxxxxxxxxxx'
 
@@ -83,6 +85,14 @@ shared_examples 'Dispute API' do
       expect(disputes.map &:id).to include(*expected)
     end
 
+  end
+
+  it "creates a dispute" do
+    card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
+    charge = Stripe::Charge.create(amount: 1000, currency: "usd", source: card_token)
+    stripe_dispute_id = stripe_helper.upsert_stripe_object(:dispute, {amount: charge.amount, charge: charge.id})
+    stripe_dispute = Stripe::Dispute.retrieve(stripe_dispute_id)
+    expect(stripe_dispute.charge).to eq(charge.id)
   end
 
 end

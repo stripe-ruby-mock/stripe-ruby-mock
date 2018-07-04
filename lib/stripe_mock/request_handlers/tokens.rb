@@ -31,6 +31,12 @@ module StripeMock
           params[:card][:fingerprint] = StripeMock::Util.fingerprint(params[:card][:number])
           params[:card][:last4] = params[:card][:number][-4,4]
           customer_card = params[:card]
+        elsif params[:bank_account].is_a?(String)
+          customer = assert_existence :customer, cus_id, customers[cus_id]
+
+          # params[:bank_account] is an id; grab it from the db
+          bank_account = verify_bank_account(customer, params[:bank_account])
+          assert_existence :bank_account, params[:bank_account], bank_account
         elsif params[:bank_account]
           # params[:card] is a hash of cc info; "Sanitize" the card number
           bank_account = params[:bank_account]

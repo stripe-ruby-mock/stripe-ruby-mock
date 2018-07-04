@@ -69,6 +69,10 @@ module StripeMock
       @instance.conversion_rate = value
     end
 
+    def set_account_balance(value)
+      @instance.account_balance = value
+    end
+
     def error_queue
       @instance.error_queue
     end

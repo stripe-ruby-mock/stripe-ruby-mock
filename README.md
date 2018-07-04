@@ -12,7 +12,7 @@ This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 2.5.0', :require => 'stripe_mock'
+    gem 'stripe-ruby-mock', '~> 2.5.4', :require => 'stripe_mock'
 
 ## Features
 
@@ -68,7 +68,7 @@ describe MyApp do
     # Specify :source in place of :card (with same value) to return customer with source data
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
-      card: stripe_helper.generate_card_token
+      source: stripe_helper.generate_card_token
     })
     expect(customer.email).to eq('johnny@appleseed.com')
   end
@@ -170,6 +170,7 @@ StripeMock.prepare_card_error(:incorrect_cvc)
 StripeMock.prepare_card_error(:card_declined)
 StripeMock.prepare_card_error(:missing)
 StripeMock.prepare_card_error(:processing_error)
+StripeMock.prepare_card_error(:incorrect_zip)
 ```
 
 You can see the details of each error in [lib/stripe_mock/api/errors.rb](lib/stripe_mock/api/errors.rb)

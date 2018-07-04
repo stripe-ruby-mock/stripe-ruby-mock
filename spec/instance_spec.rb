@@ -52,4 +52,18 @@ describe StripeMock::Instance do
     StripeMock.set_conversion_rate(1.25)
     expect(StripeMock.instance.conversion_rate).to eq(1.25)
   end
+
+  it "allows non-usd default currency" do
+    old_default_currency = StripeMock.default_currency
+    customer = begin
+      StripeMock.default_currency = "jpy"
+      Stripe::Customer.create({
+        email: 'johnny@appleseed.com',
+        source: stripe_helper.generate_card_token
+      })
+    ensure
+      StripeMock.default_currency = old_default_currency
+    end
+    expect(customer.currency).to eq("jpy")
+  end
 end
