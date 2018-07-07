@@ -17,13 +17,11 @@ module StripeMock
 
         charge = assert_existence :charge, params[:charge], charges[params[:charge]]
         params[:amount] ||= charge[:amount]
-        id = new_id('re')
-        bal_trans_params = {
-          amount: params[:amount] * -1,
-          source: id,
-          type: 'refund'
-        }
+        id = params[:id] || new_id('re')
+
+        bal_trans_params = params[:balance_transaction] || { amount: params[:amount], source: id }
         balance_transaction_id = new_balance_transaction('txn', bal_trans_params)
+
         refund = Data.mock_refund params.merge(
           :balance_transaction => balance_transaction_id,
           :id => id,

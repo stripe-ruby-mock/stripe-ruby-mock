@@ -128,13 +128,18 @@ module StripeMock
           url: "/v1/customers/#{cus_id}/subscriptions",
           data: []
         },
-        default_source: nil
+        default_card: nil,
+        default_bank_account: nil,
+        default_source: nil,
+        metadata: {},
       }.merge(params)
     end
 
     def self.mock_charge(params={})
       charge_id = params[:id] || "ch_1fD6uiR9FAA2zc"
       currency = params[:currency] || StripeMock.default_currency
+      source = params[:source] || mock_card
+      default_status = source[:object] == 'card' ? 'succeeded' : 'processing'
       {
         id: charge_id,
         object: "charge",
@@ -151,28 +156,8 @@ module StripeMock
         refunded: false,
         shipping: {},
         statement_descriptor: "Charge #{charge_id}",
-        status: 'succeeded',
-        source: {
-          object: "card",
-          last4: "4242",
-          type: "Visa",
-          brand: "Visa",
-          funding: "credit",
-          exp_month: 12,
-          exp_year: 2013,
-          fingerprint: "3TQGpK9JoY1GgXPw",
-          country: "US",
-          name: "name",
-          address_line1: nil,
-          address_line2: nil,
-          address_city: nil,
-          address_state: nil,
-          address_zip: nil,
-          address_country: nil,
-          cvc_check: nil,
-          address_line1_check: nil,
-          address_zip_check: nil
-        },
+        status: default_status,
+        source: source,
         captured: params.has_key?(:capture) ? params.delete(:capture) : true,
         refunds: {
           object: "list",
@@ -190,8 +175,7 @@ module StripeMock
         invoice: nil,
         description: nil,
         dispute: nil,
-        metadata: {
-        }
+        metadata: {},
       }.merge(params)
     end
 
@@ -208,7 +192,8 @@ module StripeMock
         charge: "ch_4fWhYjzQ23UFWT",
         receipt_number: nil,
         status: "succeeded",
-        reason: "requested_by_customer"
+        reason: "requested_by_customer",
+        metadata: {},
       }.merge(params)
     end
 
@@ -243,14 +228,15 @@ module StripeMock
         cvc_check: nil,
         address_line1_check: nil,
         address_zip_check: nil,
-        tokenization_method: nil
+        tokenization_method: nil,
+        metadata: {},
       }, params)
     end
 
     def self.mock_bank_account(params={})
       currency = params[:currency] || StripeMock.default_currency
-      {
-        id: "test_ba_default",
+      StripeMock::Util.bank_merge({
+        id: "test_bank_account_default",
         object: "bank_account",
         bank_name: "STRIPEMOCK TEST BANK",
         last4: "6789",
@@ -261,8 +247,9 @@ module StripeMock
         status: 'new',
         account_holder_name: 'John Doe',
         account_holder_type: 'individual',
-        fingerprint: "aBcFinGerPrINt123"
-      }.merge(params)
+        fingerprint: "aBcFinGerPrINt123",
+        metadata: {},
+      }, params)
     end
 
     def self.mock_coupon(params={})

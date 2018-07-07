@@ -24,6 +24,7 @@ module StripeMock
     include StripeMock::RequestHandlers::Accounts
     include StripeMock::RequestHandlers::Balance
     include StripeMock::RequestHandlers::BalanceTransactions
+    include StripeMock::RequestHandlers::BankAccounts
     include StripeMock::RequestHandlers::Charges
     include StripeMock::RequestHandlers::Cards
     include StripeMock::RequestHandlers::Sources
@@ -170,7 +171,7 @@ module StripeMock
 
     def new_balance_transaction(prefix, params = {})
       # balance transaction ids must be strings
-      id = "#{StripeMock.global_id_prefix}#{prefix}_#{@balance_transaction_counter += 1}"
+      id = params[:id] || "#{StripeMock.global_id_prefix}#{prefix}_#{@balance_transaction_counter += 1}"
       amount = params[:amount]
       unless amount.nil?
         # Fee calculation

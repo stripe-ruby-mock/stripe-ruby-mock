@@ -29,6 +29,17 @@ module StripeMock
       Digest::SHA1.base64digest(source).gsub(/[^a-z]/i, '')[0..15]
     end
 
+    def self.bank_merge(old_param, new_param)
+      if new_param[:account_number] ||= old_param[:account_number]
+        if new_param[:last4]
+          new_param[:account_number] = new_param[:account_number][0..-5] + new_param[:last4]
+        else
+          new_param[:last4] = new_param[:account_number][-4..-1]
+        end
+      end
+      old_param.merge(new_param)
+    end
+
     def self.card_merge(old_param, new_param)
       if new_param[:number] ||= old_param[:number]
         if new_param[:last4]

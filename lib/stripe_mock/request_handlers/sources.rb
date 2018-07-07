@@ -46,7 +46,13 @@ module StripeMock
         route =~ method_url
         customer = assert_existence :customer, $1, customers[$1]
 
-        bank_account = assert_existence :bank_account, $2, verify_bank_account(customer, $2)
+        if params[:amounts] == [32, 45] || params[:verification_method] == 'skip'
+          bank_account = assert_existence :bank_account, $2, verify_bank_account(customer, $2)
+        else
+          msg = "The verification amounts provided do not match"
+          raise Stripe::InvalidRequestError.new(msg, 'amounts', http_status: 404)
+        end
+
         bank_account
       end
 

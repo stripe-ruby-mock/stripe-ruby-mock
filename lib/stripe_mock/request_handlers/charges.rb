@@ -18,7 +18,7 @@ module StripeMock
           return charges[original_charge[:id]] if original_charge
         end
 
-        id = new_id('ch')
+        params[:id] ||= new_id('ch')
 
         if params[:source]
           if params[:source].is_a?(String)
@@ -41,20 +41,20 @@ module StripeMock
         end
 
         ensure_required_params(params)
-        bal_trans_params = { amount: params[:amount], source: id }
 
-        balance_transaction_id = new_balance_transaction('txn', bal_trans_params)
+        bal_trans_params = params.delete(:balance_transaction) || { amount: params[:amount], source: params[:id] }
+        params[:balance_transaction] = new_balance_transaction('txn', bal_trans_params)
+        charges[params[:id]] = Data.mock_charge(params)
 
-        charges[id] = Data.mock_charge(
-            params.merge :id => id,
-            :balance_transaction => balance_transaction_id)
-
-        charge = charges[id].clone
+        charge = charges[params[:id]].clone
         if params[:expand] == ['balance_transaction']
           charge[:balance_transaction] =
-            balance_transactions[balance_transaction_id]
+            balance_transactions[params[:balance_transaction]]
         end
-
+        if params[:capture] == false
+          charge[:captured] = false
+          charge[:status] = 'succeeded'
+        end
         charge
       end
 
@@ -88,10 +88,11 @@ module StripeMock
       def get_charge(route, method_url, params, headers)
         route =~ method_url
         charge_id = $1 || params[:charge]
-        charge = assert_existence :charge, charge_id, charges[charge_id]
 
+        charge = assert_existence :charge, charge_id, charges[charge_id]
         charge = charge.clone
-        if params[:expand] == ['balance_transaction']
+
+        if params[:expand]&.include? 'balance_transaction'
           balance_transaction = balance_transactions[charge[:balance_transaction]]
           charge[:balance_transaction] = balance_transaction
         end

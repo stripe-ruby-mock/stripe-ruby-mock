@@ -45,17 +45,20 @@ module StripeMock
           customer_card = get_card(customer, customer[:default_source])
         end
 
-        if bank_account
-          token_id = generate_bank_token(bank_account)
+        if params[:bank_account]
+          # params[:card] is a hash of cc info; "Sanitize" the card number
+          params[:bank_account][:fingerprint] = StripeMock::Util.fingerprint(params[:bank_account][:account_number])
+          params[:bank_account][:last4] = params[:bank_account][:account_number][-4,4]
+          customer_bank_account = params[:bank_account]
+
+          token_id = generate_bank_token(customer_bank_account)
           bank_account = @bank_tokens[token_id]
-
-          Data.mock_bank_account_token(params.merge :id => token_id, :bank_account => bank_account)
         else
-          token_id = generate_card_token(customer_card)
+          token_id = generate_card_token(customer_bank_account || customer_card)
           card = @card_tokens[token_id]
-
-          Data.mock_card_token(params.merge :id => token_id, :card => card)
         end
+
+        Data.mock_token(params.merge :id => token_id, :card => card, bank_account: bank_account)
       end
 
       def get_token(route, method_url, params, headers)
