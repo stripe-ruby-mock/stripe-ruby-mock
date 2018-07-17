@@ -188,7 +188,6 @@ module StripeMock
         created: 1409165988,
         object: "refund",
         balance_transaction: "txn_4fWh2RKvgxcXqV",
-        metadata: {},
         charge: "ch_4fWhYjzQ23UFWT",
         receipt_number: nil,
         status: "succeeded",
