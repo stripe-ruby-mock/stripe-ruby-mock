@@ -3,7 +3,7 @@ module StripeMock
     class Base
 
       def create_plan_params(params={})
-        currency = params[:currency] || 'usd'
+        currency = params[:currency] || StripeMock.default_currency
         {
           :id => 'stripe_mock_default_plan_id',
           :product => {
@@ -33,7 +33,7 @@ module StripeMock
       end
 
       def generate_bank_token(bank_account_params={})
-        currency = bank_account_params[:currency] || 'usd'
+        currency = bank_account_params[:currency] || StripeMock.default_currency
         bank_account = {
           :country => "US",
           :currency => currency,
@@ -49,7 +49,7 @@ module StripeMock
       end
 
       def create_coupon_params(params = {})
-        currency = params[:currency] || 'usd'
+        currency = params[:currency] || StripeMock.default_currency
         {
           id: '10BUCKS',
           amount_off: 1000,

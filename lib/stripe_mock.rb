@@ -1,6 +1,7 @@
 require 'ostruct'
 require 'multi_json'
 require 'dante'
+require 'time'
 
 require 'stripe'
 
@@ -37,6 +38,7 @@ require 'stripe_mock/api/test_helpers'
 require 'stripe_mock/api/webhooks'
 
 require 'stripe_mock/request_handlers/helpers/bank_account_helpers.rb'
+require 'stripe_mock/request_handlers/helpers/external_account_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/card_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/charge_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/coupon_helpers.rb'
@@ -47,6 +49,7 @@ require 'stripe_mock/request_handlers/helpers/token_helpers.rb'
 require 'stripe_mock/request_handlers/validators/param_validators.rb'
 
 require 'stripe_mock/request_handlers/accounts.rb'
+require 'stripe_mock/request_handlers/external_accounts.rb'
 require 'stripe_mock/request_handlers/balance.rb'
 require 'stripe_mock/request_handlers/balance_transactions.rb'
 require 'stripe_mock/request_handlers/charges.rb'
@@ -68,6 +71,7 @@ require 'stripe_mock/request_handlers/payouts.rb'
 require 'stripe_mock/request_handlers/subscriptions.rb'
 require 'stripe_mock/request_handlers/tokens.rb'
 require 'stripe_mock/request_handlers/country_spec.rb'
+require 'stripe_mock/request_handlers/ephemeral_key.rb'
 require 'stripe_mock/instance'
 
 require 'stripe_mock/test_strategies/base.rb'
@@ -76,11 +80,13 @@ require 'stripe_mock/test_strategies/live.rb'
 
 module StripeMock
 
+  @default_currency = 'usd'
   lib_dir = File.expand_path(File.dirname(__FILE__), '../..')
   @webhook_fixture_path = './spec/fixtures/stripe_webhooks/'
   @webhook_fixture_fallback_path = File.join(lib_dir, 'stripe_mock/webhook_fixtures')
 
   class << self
+    attr_accessor :default_currency
     attr_accessor :webhook_fixture_path
   end
 end

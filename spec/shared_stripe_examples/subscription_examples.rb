@@ -294,6 +294,7 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.object).to eq('subscription')
       expect(sub.plan.to_hash).to eq(plan.to_hash)
       expect(sub.trial_end - sub.trial_start).to eq(14 * 86400)
+      expect(sub.billing_cycle_anchor).to be_nil
 
       customer = Stripe::Customer.retrieve('cardless')
       expect(customer.subscriptions.data).to_not be_empty
@@ -407,6 +408,18 @@ shared_examples 'Customer Subscriptions' do
         expect(e.http_status).to eq(400)
         expect(e.message).to eq("Invalid timestamp: can be no more than five years in the future")
       }
+    end
+
+    it 'overrides current period end when billing cycle anchor is set' do
+      plan = stripe_helper.create_plan(id: 'plan', amount: 999)
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      billing_cycle_anchor = Time.now.utc.to_i + 3600
+
+      sub = Stripe::Subscription.create({ plan: 'plan', customer: customer.id, billing_cycle_anchor: billing_cycle_anchor })
+
+      expect(sub.status).to eq('active')
+      expect(sub.current_period_end).to eq(billing_cycle_anchor)
+      expect(sub.billing_cycle_anchor).to eq(billing_cycle_anchor)
     end
 
     it 'when plan defined inside items', live: true do

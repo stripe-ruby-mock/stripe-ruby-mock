@@ -166,9 +166,9 @@ module StripeMock
       #anonymous charge
       def invoice_charge(invoice)
         begin
-          new_charge(nil, nil, {customer: invoice[:customer]["id"], amount: invoice[:amount_due], currency: 'usd'}, nil)
+          new_charge(nil, nil, {customer: invoice[:customer]["id"], amount: invoice[:amount_due], currency: StripeMock.default_currency}, nil)
         rescue Stripe::InvalidRequestError
-          new_charge(nil, nil, {source: generate_card_token, amount: invoice[:amount_due], currency: 'usd'}, nil)
+          new_charge(nil, nil, {source: generate_card_token, amount: invoice[:amount_due], currency: StripeMock.default_currency}, nil)
         end
       end
 
