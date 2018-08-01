@@ -8,7 +8,8 @@ shared_examples 'Customer Subscriptions' do
 
   context "creating a new subscription" do
     it "adds a new subscription to customer with none using items", :live => true do
-      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
+      plan = stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' },
+                                       amount: 4999, currency: 'usd')
       customer = Stripe::Customer.create(source: gen_card_tk)
 
       expect(customer.subscriptions.data).to be_empty
@@ -37,7 +38,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "adds a new subscription to customer with none", :live => true do
-      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
+      plan = stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' },
+                                       amount: 4999, currency: 'usd')
       customer = Stripe::Customer.create(source: gen_card_tk)
 
       expect(customer.subscriptions.data).to be_empty
@@ -66,7 +68,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it 'when customer object provided' do
-      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
+      plan = stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' }, amount: 4999, currency: 'usd')
       customer = Stripe::Customer.create(source: gen_card_tk)
 
       expect(customer.subscriptions.data).to be_empty
@@ -100,13 +102,15 @@ shared_examples 'Customer Subscriptions' do
       customer = Stripe::Customer.create(source: gen_card_tk)
       expect(customer.subscriptions.count).to eq(0)
 
-      plan = stripe_helper.create_plan(id: :silver, name: 'Silver Plan', amount: 4999, currency: 'usd')
+      plan = stripe_helper.create_plan(id: :silver, product: { name: 'Silver Plan' },
+                                       amount: 4999, currency: 'usd')
       sub = Stripe::Subscription.create({ plan: 'silver', customer: customer.id })
       customer = Stripe::Customer.retrieve(customer.id)
       expect(sub.plan.to_hash).to eq(plan.to_hash)
       expect(customer.subscriptions.count).to eq(1)
 
-      plan = stripe_helper.create_plan(id: 'gold', name: 'Gold Plan', amount: 14999, currency: 'usd')
+      plan = stripe_helper.create_plan(id: 'gold', product: { name: 'Gold Plan' },
+                                       amount: 14999, currency: 'usd')
       sub = Stripe::Subscription.create({ plan: 'gold', customer: customer.id })
       customer = Stripe::Customer.retrieve(customer.id)
       expect(sub.plan.to_hash).to eq(plan.to_hash)
@@ -114,7 +118,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it 'creates a charge for the customer', live: true do
-      stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999)
+      stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' },
+                                amount: 4999)
 
       customer = Stripe::Customer.create(source: gen_card_tk)
       Stripe::Subscription.create({ plan: 'silver', customer: customer.id, metadata: { foo: "bar", example: "yes" } })
@@ -125,7 +130,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it 'contains coupon object', live: true do
-      plan = stripe_helper.create_plan(id: 'plan_with_coupon', name: 'One More Test Plan', amount: 777)
+      plan = stripe_helper.create_plan(id: 'plan_with_coupon', product: { name: 'One More Test Plan' },
+                                       amount: 777)
       coupon = stripe_helper.create_coupon(id: 'free_coupon', duration: 'repeating', duration_in_months: 3)
       customer = Stripe::Customer.create(source: gen_card_tk)
       Stripe::Subscription.create(plan: plan.id, customer: customer.id, coupon: coupon.id)
@@ -139,7 +145,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it 'when coupon is not exist', live: true do
-      plan = stripe_helper.create_plan(id: 'plan_with_coupon', name: 'One More Test Plan', amount: 777)
+      plan = stripe_helper.create_plan(id: 'plan_with_coupon', product: { name: 'One More Test Plan' },
+                                       amount: 777)
       customer = Stripe::Customer.create(source: gen_card_tk)
 
       expect { Stripe::Subscription.create(plan: plan.id, customer: customer.id, coupon: 'none') }.to raise_error {|e|
@@ -153,7 +160,9 @@ shared_examples 'Customer Subscriptions' do
       Stripe::Plan.create(
         :amount => 2500,
         :interval => 'month',
-        :name => 'Test plan',
+        :product => {
+          :name => 'Test plan'
+        },
         :currency => 'usd',
         :id => 'silver',
         :statement_description => "testPlan"
@@ -169,7 +178,8 @@ shared_examples 'Customer Subscriptions' do
 
     it "correctly sets created when it's not provided as a parameter", live: true do
       customer = Stripe::Customer.create(source: gen_card_tk)
-      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
+      plan = stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' },
+                                       amount: 4999, currency: 'usd')
       subscription = Stripe::Subscription.create({ plan: 'silver', customer: customer.id })
 
       expect(subscription.created).to eq(subscription.current_period_start)
@@ -177,7 +187,8 @@ shared_examples 'Customer Subscriptions' do
 
     it "correctly sets created when it's provided as a parameter" do
       customer = Stripe::Customer.create(source: gen_card_tk)
-      plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
+      plan = stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' },
+                                       amount: 4999, currency: 'usd')
       subscription = Stripe::Subscription.create({ plan: 'silver', customer: customer.id, created: 1473576318 })
 
       expect(subscription.created).to eq(1473576318)
@@ -569,7 +580,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it 'when adds coupon', live: true do
-      plan = stripe_helper.create_plan(id: 'plan_with_coupon2', name: 'One More Test Plan', amount: 777)
+      plan = stripe_helper.create_plan(id: 'plan_with_coupon2', product: { name: 'One More Test Plan' },
+                                       amount: 777)
       coupon = stripe_helper.create_coupon
       customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
       subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
@@ -583,7 +595,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it 'when add not exist coupon' do
-      plan = stripe_helper.create_plan(id: 'plan_with_coupon3', name: 'One More Test Plan', amount: 777)
+      plan = stripe_helper.create_plan(id: 'plan_with_coupon3', product: { name: 'One More Test Plan' },
+                                       amount: 777)
       customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
       subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
 
@@ -598,7 +611,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it 'when coupon is removed' do
-      plan = stripe_helper.create_plan(id: 'plan_with_coupon3', name: 'One More Test Plan', amount: 777)
+      plan = stripe_helper.create_plan(id: 'plan_with_coupon3', product: { name: 'One More Test Plan' },
+                                       amount: 777)
       customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
       coupon = stripe_helper.create_coupon
       subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
@@ -962,10 +976,13 @@ shared_examples 'Customer Subscriptions' do
 
     it "creates a stripe customer and subscribes them to a plan with meta data", :live => true do
 
-      stripe_helper.create_plan(
+      stripe_helper.
+        create_plan(
         :amount => 500,
         :interval => 'month',
-        :name => 'Sample Plan',
+        :product => {
+          :name => 'Sample Plan'
+        },
         :currency => 'usd',
         :id => 'Sample5'
       )
