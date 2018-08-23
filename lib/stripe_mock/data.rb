@@ -243,7 +243,8 @@ module StripeMock
         cvc_check: nil,
         address_line1_check: nil,
         address_zip_check: nil,
-        tokenization_method: nil
+        tokenization_method: nil,
+        metadata: {}
       }, params)
     end
 
@@ -261,7 +262,8 @@ module StripeMock
         status: 'new',
         account_holder_name: 'John Doe',
         account_holder_type: 'individual',
-        fingerprint: "aBcFinGerPrINt123"
+        fingerprint: "aBcFinGerPrINt123",
+        metadata: {}
       }.merge(params)
     end
 
