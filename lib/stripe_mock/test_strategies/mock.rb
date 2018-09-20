@@ -10,6 +10,14 @@ module StripeMock
         Stripe::Plan.create create_plan_params(params)
       end
 
+      def delete_product(product_id)
+        if StripeMock.state == 'remote'
+          StripeMock.client.destroy_resource('products', product_id)
+        elsif StripeMock.state == 'local'
+          StripeMock.instance.products.delete(product_id)
+        end
+      end
+
       def delete_plan(plan_id)
         if StripeMock.state == 'remote'
           StripeMock.client.destroy_resource('plans', plan_id)
