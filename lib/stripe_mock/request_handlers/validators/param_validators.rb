@@ -24,8 +24,18 @@ module StripeMock
         end
       end
 
-      #def validate_create_product_params(params)
-      #end
+      def validate_create_product_params(params)
+        params[:id] = params[:id].to_s
+
+        #@base_strategy.create_plan_params.keys.each do |k|
+        #  message = "Missing required param: #{k}."
+        #  raise Stripe::InvalidRequestError.new(message, k) if params[k].nil?
+        #end
+
+        if products[ params[:id] ]
+          raise Stripe::InvalidRequestError.new("Product already exists.", :id)
+        end
+      end
 
     end
   end

@@ -12,7 +12,7 @@ module StripeMock
 
       def new_product(route, method_url, params, headers)
         params[:id] ||= new_id('product')
-        #validate_create_product_params(params)
+        validate_create_product_params(params)
         products[ params[:id] ] = Data.mock_product(params)
       end
 

@@ -18,7 +18,6 @@ shared_examples "Product API" do
     expect(product.unit_label).to eq("my_unit")
   end
 
-
   it "creates a stripe product without specifying ID" do
     expect(idless_attributes[:id]).to be_nil
 
@@ -39,7 +38,6 @@ shared_examples "Product API" do
     expect(data[product2.id][:name]).to eq("My Other Product")
   end
 
-
   it "retrieves a stripe product" do
     original = stripe_helper.create_product(idless_attributes)
     product = Stripe::Product.retrieve(original.id)
@@ -47,7 +45,6 @@ shared_examples "Product API" do
     expect(product.id).to eq(original.id)
     expect(product.name).to eq(original.name)
   end
-
 
   it "updates a stripe product" do
     stripe_helper.create_product(id: "prod_XYZ", name: "Future Product")
@@ -60,7 +57,6 @@ shared_examples "Product API" do
     product = Stripe::Product.retrieve("prod_XYZ")
     expect(product.name).to eq("Updated Product")
   end
-
 
   it "cannot retrieve a stripe product that doesn't exist" do
     expect { Stripe::Product.retrieve('nope') }.to raise_error {|e|
@@ -139,7 +135,6 @@ shared_examples "Product API" do
     #end
 
     describe "Uniqueness" do
-
       it "validates for uniqueness" do
         stripe_helper.delete_product(params[:id])
 
