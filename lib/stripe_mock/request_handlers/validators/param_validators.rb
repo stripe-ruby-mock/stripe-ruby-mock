@@ -24,6 +24,9 @@ module StripeMock
         end
       end
 
+      #def validate_create_product_params(params)
+      #end
+
     end
   end
 end

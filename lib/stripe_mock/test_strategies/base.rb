@@ -3,7 +3,6 @@ module StripeMock
     class Base
 
       def create_product_params(params={})
-        currency = params[:currency] || StripeMock.default_currency
         {
           :id => 'stripe_mock_default_product_id',
           :name => 'Default Product',

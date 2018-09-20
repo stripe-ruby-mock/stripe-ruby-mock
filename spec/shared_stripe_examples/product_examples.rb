@@ -8,22 +8,22 @@ shared_examples "Product API" do
     type: "service",
     unit_label: "my_unit"
   } }
+  let(:idless_attributes){ product_attributes.merge({id: nil}) }
 
   it "creates a stripe product" do
     product = Stripe::Product.create(product_attributes)
     expect(product.id).to eq("prod_123")
     expect(product.name).to eq("My Mock Product")
     expect(product.type).to eq("service")
-    expect(product.type).to eq("my_unit")
+    expect(product.unit_label).to eq("my_unit")
   end
 
 
   it "creates a stripe product without specifying ID" do
-    idless_attributes = product_attributes.except!(:id)
     expect(idless_attributes[:id]).to be_nil
 
     product = Stripe::Product.create(idless_attributes)
-    expect(product.id).to match(/^prod_123/)
+    expect(product.id).to match(/^test_product_1/)
   end
 
   it "stores a created stripe product in memory" do
@@ -41,7 +41,7 @@ shared_examples "Product API" do
 
 
   it "retrieves a stripe product" do
-    original = stripe_helper.create_product(product_attributes.except!(:id))
+    original = stripe_helper.create_product(idless_attributes)
     product = Stripe::Product.retrieve(original.id)
 
     expect(product.id).to eq(original.id)
