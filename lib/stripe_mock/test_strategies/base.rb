@@ -2,6 +2,20 @@ module StripeMock
   module TestStrategies
     class Base
 
+      def create_product_params(params={})
+        currency = params[:currency] || StripeMock.default_currency
+        {
+          :id => 'stripe_mock_default_product_id',
+          :name => 'Default Product',
+          :type => 'service',
+          :unit_label => 'my_unit'
+        }.merge(params)
+      end
+
+      def create_product(params = {})
+        Stripe::Product.create create_product_params(params)
+      end
+
       def create_plan_params(params={})
         currency = params[:currency] || StripeMock.default_currency
         {
