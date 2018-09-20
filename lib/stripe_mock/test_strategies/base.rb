@@ -12,10 +12,6 @@ module StripeMock
         }.merge(params)
       end
 
-      def create_product(params = {})
-        Stripe::Product.create create_product_params(params)
-      end
-
       def create_plan_params(params={})
         currency = params[:currency] || StripeMock.default_currency
         {

@@ -5,7 +5,11 @@ module StripeMock
     def initialize(port)
       @port = port
 
-      DRb.start_service
+      begin
+        DRb.start_service
+      rescue => e
+        binding.pry
+      end
       @pipe = DRbObject.new_with_uri "druby://localhost:#{port}"
 
       # Ensure client can connect to server

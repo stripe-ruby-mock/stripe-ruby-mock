@@ -2,6 +2,10 @@ module StripeMock
   module TestStrategies
     class Mock < Base
 
+      def create_product(params = {})
+        Stripe::Product.create create_product_params(params)
+      end
+
       def create_plan(params={})
         Stripe::Plan.create create_plan_params(params)
       end
