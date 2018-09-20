@@ -7,8 +7,8 @@ module StripeMock
 
       begin
         DRb.start_service
-      rescue => e
-        binding.pry
+      #rescue => e
+      #  binding.pry
       end
       @pipe = DRbObject.new_with_uri "druby://localhost:#{port}"
 
