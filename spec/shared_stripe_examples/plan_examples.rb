@@ -2,19 +2,22 @@ require 'spec_helper'
 
 shared_examples 'Plan API' do
 
+  let(:plan_attributes) { {
+    :id => 'pid_1',
+    :product => 'prod_abc123',
+    :name => 'The Mock Plan',
+    :amount => 9900,
+    :currency => 'USD',
+    :interval => 1,
+    :metadata => {
+      :description => "desc text",
+      :info => "info text"
+    },
+    :trial_period_days => 30
+  } }
+
   it "creates a stripe plan" do
-    plan = Stripe::Plan.create(
-      :id => 'pid_1',
-      :name => 'The Mock Plan',
-      :amount => 9900,
-      :currency => 'USD',
-      :interval => 1,
-      :metadata => {
-        :description => "desc text",
-        :info => "info text"
-      },
-      :trial_period_days => 30
-    )
+    plan = Stripe::Plan.create(plan_attributes)
 
     expect(plan.id).to eq('pid_1')
     expect(plan.name).to eq('The Mock Plan')
@@ -31,27 +34,26 @@ shared_examples 'Plan API' do
 
 
   it "creates a stripe plan without specifying ID" do
-    plan = Stripe::Plan.create(
-      :name => 'The Mock Plan',
-      :amount => 9900,
-      :currency => 'USD',
-      :interval => 1,
-    )
+    idless_attributes = plan_attributes.merge({id: nil})
+    expect(idless_attributes[:id]).to be_nil
 
-    expect(plan.id).to match(/^test_plan/)
+    plan = Stripe::Plan.create(idless_attributes)
+    expect(plan.id).to match(/^test_plan_1/)
   end
 
   it "stores a created stripe plan in memory" do
     plan = Stripe::Plan.create(
       :id => 'pid_2',
-      :name => 'The Memory Plan',
+      :product => 'prod_222',
+      :name => 'The Second Plan',
       :amount => 1100,
       :currency => 'USD',
       :interval => 1
     )
     plan2 = Stripe::Plan.create(
       :id => 'pid_3',
-      :name => 'The Bonk Plan',
+      :product => 'prod_333',
+      :name => 'The Third Plan',
       :amount => 7777,
       :currency => 'USD',
       :interval => 1
@@ -131,13 +133,7 @@ shared_examples 'Plan API' do
 
   it 'validates the amount' do
     expect {
-      Stripe::Plan.create(
-        :id => 'pid_1',
-        :name => 'The Mock Plan',
-        :amount => 99.99,
-        :currency => 'USD',
-        :interval => 'month'
-      )
+      Stripe::Plan.create(plan_attributes.merge({amount: 99.99}))
     }.to raise_error(Stripe::InvalidRequestError, "Invalid integer: 99.99")
   end
 
@@ -157,7 +153,7 @@ shared_examples 'Plan API' do
         expect { subject }.to raise_error(Stripe::InvalidRequestError, message)
       end
 
-      it("requires a name") { @name = :name }
+      #it("requires a name") { @name = :name } # @deprecated
       it("requires an amount") { @name = :amount }
       it("requires a currency") { @name = :currency }
       it("requires an interval") { @name = :interval }
