@@ -32,18 +32,18 @@ shared_examples 'Customer Subscriptions' do
       expect(subscription.metadata.foo).to eq("bar")
       expect(subscription.metadata.example).to eq("yes")
 
-      #customer = Stripe::Customer.retrieve(customer.id)
-      #expect(customer.subscriptions.data).to_not be_empty
-      #expect(customer.subscriptions.count).to eq(1)
-      #expect(customer.subscriptions.data.length).to eq(1)
-      #expect(customer.charges.data.length).to eq(1)
-      #expect(customer.currency).to eq( "usd" )
-#
-      #expect(customer.subscriptions.data.first.id).to eq(subscription.id)
-      #expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
-      #expect(customer.subscriptions.data.first.customer).to eq(customer.id)
-      #expect(customer.subscriptions.data.first.metadata.foo).to eq( "bar" )
-      #expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
+      customer = Stripe::Customer.retrieve(customer.id)
+      expect(customer.subscriptions.data).to_not be_empty
+      expect(customer.subscriptions.count).to eq(1)
+      expect(customer.subscriptions.data.length).to eq(1)
+      expect(customer.charges.data.length).to eq(1)
+      expect(customer.currency).to eq("usd")
+
+      expect(customer.subscriptions.data.first.id).to eq(subscription.id)
+      expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
+      expect(customer.subscriptions.data.first.customer).to eq(customer.id)
+      expect(customer.subscriptions.data.first.metadata.foo).to eq( "bar" )
+      expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
     end
 
     it "adds a new subscription to customer with none", :live => true do
