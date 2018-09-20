@@ -33,6 +33,7 @@ module StripeMock
       end
 
       def create_customer_subscription(route, method_url, params, headers)
+        puts "CREATE CUSTOMER SUBSCRIPTION"
         route =~ method_url
 
         subscription_plans = get_subscription_plans_from_params(params)
@@ -73,6 +74,7 @@ module StripeMock
       end
 
       def create_subscription(route, method_url, params, headers)
+        puts "CREATE SUBSCRIPTION"
         route =~ method_url
 
         subscription_plans = get_subscription_plans_from_params(params)
@@ -144,6 +146,7 @@ module StripeMock
       end
 
       def update_subscription(route, method_url, params, headers)
+        puts "UPDATE SUBSCRIPTION"
         route =~ method_url
 
         subscription_id = $2 ? $2 : $1
