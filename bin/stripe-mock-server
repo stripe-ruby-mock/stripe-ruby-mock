@@ -13,7 +13,7 @@ opts = Trollop::options do
   opt :pid_path, "Location to put server pid file", :type => :string, :default => './stripe-mock-server.pid'
 end
 
-puts opts
+puts opts if ENV['LOG_STRIPE_MOCK_SERVER'] == 'true'
 
 require 'stripe_mock'
 require 'stripe_mock/server'
