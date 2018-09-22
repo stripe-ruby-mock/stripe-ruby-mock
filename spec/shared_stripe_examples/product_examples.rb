@@ -6,7 +6,6 @@ shared_examples "Product API" do
     id: "prod_123",
     name: "My Mock Product",
     type: "service",
-    unit_label: "my_unit"
   } }
   let(:idless_attributes){ product_attributes.merge({id: nil}) }
 
@@ -100,42 +99,31 @@ shared_examples "Product API" do
     expect(all.count).to eq(100)
   end
 
-  #it 'validates the amount' do
-  #  expect {
-  #    Stripe::Product.create(
-  #      :id => 'pid_1',
-  #      :name => 'The Mock Plan',
-  #      :amount => 99.99,
-  #      :currency => 'USD',
-  #      :interval => 'month'
-  #    )
-  #  }.to raise_error(Stripe::InvalidRequestError, "Invalid integer: 99.99")
-  #end
-
   describe "Validation", :live => true do
     let(:params) { stripe_helper.create_product_params }
     let(:subject) { Stripe::Product.create(params) }
 
-    #describe "Required Parameters" do
-    #  after do
-    #    params.delete(@name)
-    #    message =
-    #      if @name == :amount
-    #        "Plans require an `#{@name}` parameter to be set."
-    #      else
-    #        "Missing required param: #{@name}."
-    #      end
-    #    expect { subject }.to raise_error(Stripe::InvalidRequestError, message)
+    describe "Required Parameters" do
+      after do
+        params.delete(@attribute_name)
+        message = "Missing required param: #{@attribute_name}."
+        expect { subject }.to raise_error(Stripe::InvalidRequestError, message)
+      end
+
+      it("requires a name") { @attribute_name = :name }
+      it("requires a type") { @attribute_name = :type }
+    end
+
+    #describe "Inclusion" do
+    #  it "validates inclusion of type in 'good' or 'service'" do
+    #    expect {
+    #      Stripe::Product.create(params.merge({type: "OOPS"}))
+    #    }.to raise_error(Stripe::InvalidRequestError, "Invalid type: must be one of good or service")
     #  end
-#
-    #  it("requires a name") { @name = :name }
-    #  it("requires an amount") { @name = :amount }
-    #  it("requires a currency") { @name = :currency }
-    #  it("requires an interval") { @name = :interval }
     #end
 
     describe "Uniqueness" do
-      it "validates for uniqueness" do
+      it "validates uniqueness of identifier" do
         stripe_helper.delete_product(params[:id])
 
         Stripe::Product.create(params)
