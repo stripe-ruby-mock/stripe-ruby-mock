@@ -36,7 +36,7 @@ module StripeMock
 
       def get_card_or_bank_by_token(token)
         token_id = token['id'] || token
-         @card_tokens[token_id] || @bank_tokens[token_id] || raise(Stripe::InvalidRequestError.new("Invalid token id: #{token_id}", 'tok', http_status: 404))
+        @card_tokens[token_id] || @bank_tokens[token_id] || raise(Stripe::InvalidRequestError.new("Invalid token id: #{token_id}", 'tok', http_status: 404))
       end
 
     end
