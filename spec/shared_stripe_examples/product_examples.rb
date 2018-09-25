@@ -1,16 +1,11 @@
 require "spec_helper"
 
 shared_examples "Product API" do
-
-  let(:product_attributes){ {
-    id: "prod_123",
-    name: "My Mock Product",
-    type: "service",
-  } }
-  let(:idless_attributes){ product_attributes.merge({id: nil}) }
+  let(:product_attributes) { {id: "prod_123", name: "My Mock Product", type: "service"} }
+  let(:idless_attributes) { product_attributes.merge({id: nil}) }
+  let(:product) { Stripe::Product.create(product_attributes) }
 
   it "creates a stripe product" do
-    product = Stripe::Product.create(product_attributes)
     expect(product.id).to eq("prod_123")
     expect(product.name).to eq("My Mock Product")
     expect(product.type).to eq("service")

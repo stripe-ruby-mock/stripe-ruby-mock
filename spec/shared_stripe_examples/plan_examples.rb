@@ -1,11 +1,12 @@
 require 'spec_helper'
 
 shared_examples 'Plan API' do
-
+  let(:product_attributes){ {id: "prod_abc123", name: "My Mock Product", type: "service"} }
+  let(:product) { Stripe::Product.create(product_attributes) }
   let(:plan_attributes) { {
-    :id => 'pid_1',
-    :product => 'prod_abc123',
-    :name => 'The Mock Plan',
+    :id => 'prod_abc123',
+    :product => product_attributes[:id],
+    :name => 'My Mock Plan',
     :amount => 9900,
     :currency => 'USD',
     :interval => 1,
@@ -15,12 +16,16 @@ shared_examples 'Plan API' do
     },
     :trial_period_days => 30
   } }
+  let(:idless_attributes){ plan_attributes.merge({id: nil}) }
+  let(:plan) { Stripe::Plan.create(plan_attributes) }
+
+  #before(:each) do
+  #  product
+  #end
 
   it "creates a stripe plan" do
-    plan = Stripe::Plan.create(plan_attributes)
-
-    expect(plan.id).to eq('pid_1')
-    expect(plan.name).to eq('The Mock Plan')
+    expect(plan.id).to eq('prod_abc123')
+    expect(plan.name).to eq('My Mock Plan')
     expect(plan.amount).to eq(9900)
 
     expect(plan.currency).to eq('USD')
@@ -31,7 +36,6 @@ shared_examples 'Plan API' do
 
     expect(plan.trial_period_days).to eq(30)
   end
-
 
   it "creates a stripe plan without specifying ID" do
     idless_attributes = plan_attributes.merge({id: nil})
@@ -66,7 +70,6 @@ shared_examples 'Plan API' do
     expect(data[plan2.id][:amount]).to eq(7777)
   end
 
-
   it "retrieves a stripe plan" do
     original = stripe_helper.create_plan(amount: 1331)
     plan = Stripe::Plan.retrieve(original.id)
@@ -74,7 +77,6 @@ shared_examples 'Plan API' do
     expect(plan.id).to eq(original.id)
     expect(plan.amount).to eq(original.amount)
   end
-
 
   it "updates a stripe plan" do
     stripe_helper.create_plan(id: 'super_member', amount: 111)
@@ -87,7 +89,6 @@ shared_examples 'Plan API' do
     plan = Stripe::Plan.retrieve('super_member')
     expect(plan.amount).to eq(789)
   end
-
 
   it "cannot retrieve a stripe plan that doesn't exist" do
     expect { Stripe::Plan.retrieve('nope') }.to raise_error {|e|
@@ -131,12 +132,6 @@ shared_examples 'Plan API' do
     expect(all.count).to eq(100)
   end
 
-  it 'validates the amount' do
-    expect {
-      Stripe::Plan.create(plan_attributes.merge({amount: 99.99}))
-    }.to raise_error(Stripe::InvalidRequestError, "Invalid integer: 99.99")
-  end
-
   describe "Validation", :live => true do
     let(:params) { stripe_helper.create_plan_params }
     let(:subject) { Stripe::Plan.create(params) }
@@ -153,14 +148,45 @@ shared_examples 'Plan API' do
         expect { subject }.to raise_error(Stripe::InvalidRequestError, message)
       end
 
-      #it("requires a name") { @name = :name } # @deprecated
-      it("requires an amount") { @name = :amount }
-      it("requires a currency") { @name = :currency }
-      it("requires an interval") { @name = :interval }
+      it("validates presence of interval") { @name = :interval }
+      it("validates presence of currency") { @name = :currency }
+      it("validates presence of product") { @name = :product }
+      it("validates presence of amount") { @name = :amount }
+    end
+
+    describe "Inclusion" do
+      let(:invalid_currency_message) {
+        ""
+      }
+
+      it "validates inclusion of interval in a supported list'" do
+        expect {
+          Stripe::Product.create(params.merge({interval: "OOPS"}))
+        }.to raise_error(Stripe::InvalidRequestError, "Invalid interval: must be one of month, year, week, or day")
+      end
+
+      it "validates inclusion of currency in a supported list" do
+        expect {
+          Stripe::Product.create(params.merge({currency: "OOPS"}))
+        }.to raise_error(Stripe::InvalidRequestError, invalid_currency_message)
+      end
+    end
+
+    describe "Integer" do
+      it 'validates amount is an integer' do
+        expect {
+          Stripe::Plan.create(plan_attributes.merge({amount: 99.99}))
+        }.to raise_error(Stripe::InvalidRequestError, "Invalid integer: 99.99")
+      end
+    end
+
+    describe "Associations" do
+      it "validates associated product" do
+        expect { plan }.to raise_error(Stripe::InvalidRequestError, "Invalid integer: 99.99")
+      end
     end
 
     describe "Uniqueness" do
-
       it "validates for uniqueness" do
         stripe_helper.delete_plan(params[:id])
 
@@ -170,6 +196,7 @@ shared_examples 'Plan API' do
         }.to raise_error(Stripe::InvalidRequestError, "Plan already exists.")
       end
     end
+
   end
 
 end
