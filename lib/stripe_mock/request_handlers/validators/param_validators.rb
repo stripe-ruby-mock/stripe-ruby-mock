@@ -32,11 +32,9 @@ module StripeMock
           raise Stripe::InvalidRequestError.new(message, k) if params[k].nil?
         end
 
-        #if !["good", "service"].include?(params[:type])
-        #  puts "RAISING"
-        #  Stripe::InvalidRequestError.new("Invalid type: must be one of good or service", "type")
-        #  puts "RAISED"
-        #end
+        if !["good", "service"].include?(params[:type])
+          raise Stripe::InvalidRequestError.new("Invalid type: must be one of good or service", :type)
+        end
 
         if products[ params[:id] ]
           raise Stripe::InvalidRequestError.new("Product already exists.", :id)
