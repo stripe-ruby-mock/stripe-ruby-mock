@@ -24,5 +24,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec', '~> 3.1.0'
   gem.add_development_dependency 'rubygems-tasks', '~> 0.2'
   gem.add_development_dependency 'thin', '~> 1.6.4'
-  gem.add_development_dependency 'pry', '~> 0.11'
+  gem.add_dependency 'pry', '~> 0.11'
 end

@@ -1,16 +1,11 @@
 require "spec_helper"
 
 shared_examples "Product API" do
-
-  let(:product_attributes){ {
-    id: "prod_123",
-    name: "My Mock Product",
-    type: "service",
-  } }
-  let(:idless_attributes){ product_attributes.merge({id: nil}) }
+  let(:product_attributes) { {id: "prod_123", name: "My Mock Product", type: "service"} }
+  let(:idless_attributes) { product_attributes.merge({id: nil}) }
+  let(:product) { Stripe::Product.create(product_attributes) }
 
   it "creates a stripe product" do
-    product = Stripe::Product.create(product_attributes)
     expect(product.id).to eq("prod_123")
     expect(product.name).to eq("My Mock Product")
     expect(product.type).to eq("service")
@@ -100,13 +95,14 @@ shared_examples "Product API" do
   end
 
   describe "Validation", :live => true do
+    include_context "stripe validator"
     let(:params) { stripe_helper.create_product_params }
     let(:subject) { Stripe::Product.create(params) }
 
     describe "Required Parameters" do
       after do
         params.delete(@attribute_name)
-        message = "Missing required param: #{@attribute_name}."
+        message = stripe_validator.missing_param_message(@attribute_name)
         expect { subject }.to raise_error(Stripe::InvalidRequestError, message)
       end
 
@@ -118,19 +114,50 @@ shared_examples "Product API" do
       it "validates inclusion of type in 'good' or 'service'" do
         expect {
           Stripe::Product.create(params.merge({type: "OOPS"}))
-        }.to raise_error(Stripe::InvalidRequestError, "Invalid type: must be one of good or service")
+        }.to raise_error(Stripe::InvalidRequestError, stripe_validator.invalid_product_type_message)
       end
     end
 
     describe "Uniqueness" do
+      let(:already_exists_message){ stripe_validator.already_exists_message(Stripe::Product) }
+
       it "validates uniqueness of identifier" do
         stripe_helper.delete_product(params[:id])
 
         Stripe::Product.create(params)
         expect {
           Stripe::Product.create(params)
-        }.to raise_error(Stripe::InvalidRequestError, "Product already exists.")
+        }.to raise_error(Stripe::InvalidRequestError, already_exists_message)
       end
+    end
+  end
+
+ describe "Mock Data" do
+    let(:mock_object) { StripeMock::Data.mock_product }
+    let(:known_attributes) { [
+      :id,
+      :object,
+      :active,
+      :attributes,
+      :caption,
+      :created,
+      :deactivate_on,
+      :description,
+      :images,
+      :livemode,
+      :metadata,
+      :name,
+      :package_dimensions,
+      :shippable,
+      :statement_descriptor,
+      :type,
+      :unit_label,
+      :updated,
+      :url
+    ] }
+
+    it "includes all retreived attributes" do
+      expect(mock_object.keys).to eql(known_attributes)
     end
   end
 
