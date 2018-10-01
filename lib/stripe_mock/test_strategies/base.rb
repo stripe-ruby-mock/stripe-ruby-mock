@@ -16,7 +16,7 @@ module StripeMock
       end
 
       def generate_card_token(card_params={})
-        card_data = { :number => "4242424242424242", :exp_month => 9, :exp_year => 1.year.from_now, :cvc => "999", :tokenization_method => nil }
+        card_data = { :number => "4242424242424242", :exp_month => 9, :exp_year => 1.year.from_now.year, :cvc => "999", :tokenization_method => nil }
         card = StripeMock::Util.card_merge(card_data, card_params)
         card[:fingerprint] = StripeMock::Util.fingerprint(card[:number]) if StripeMock.state == 'local'
 
