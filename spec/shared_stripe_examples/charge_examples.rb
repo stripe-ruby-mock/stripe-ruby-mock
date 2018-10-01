@@ -12,6 +12,12 @@ shared_examples 'Charge API' do
     }.to raise_error(Stripe::InvalidRequestError, /token/i)
   end
 
+  it "accepts a supported test card token", :live => true do
+    charge_attrs = {amount: 1995, currency: "usd", source: "tok_amex"}
+    charge = Stripe::Charge.create(charge_attrs)
+    expect(charge.source).to be_kind_of(Stripe::Card)
+  end
+
   it "requires a valid customer or source", :live => true do
     expect {
       charge = Stripe::Charge.create(
