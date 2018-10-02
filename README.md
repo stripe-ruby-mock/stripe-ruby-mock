@@ -12,7 +12,7 @@ This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 2.5.4', :require => 'stripe_mock'
+    gem 'stripe-ruby-mock', '~> 2.5.5', :require => 'stripe_mock'
 
 ## Features
 
