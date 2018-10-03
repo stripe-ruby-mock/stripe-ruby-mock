@@ -52,4 +52,49 @@ describe StripeMock::Instance do
     StripeMock.set_conversion_rate(1.25)
     expect(StripeMock.instance.conversion_rate).to eq(1.25)
   end
+
+  it "allows non-usd default currency" do
+    old_default_currency = StripeMock.default_currency
+    customer = begin
+      StripeMock.default_currency = "jpy"
+      Stripe::Customer.create({
+        email: 'johnny@appleseed.com',
+        source: stripe_helper.generate_card_token
+      })
+    ensure
+      StripeMock.default_currency = old_default_currency
+    end
+    expect(customer.currency).to eq("jpy")
+  end
+
+  context 'when creating sources with metadata' do
+    let(:customer) { Stripe::Customer.create(email: 'test@email.com') }
+    let(:metadata) { { test_key: 'test_value' } }
+
+    context 'for credit card' do
+      let(:credit_card) do
+        customer.sources.create(
+          source: stripe_helper.generate_card_token,
+          metadata: metadata
+        )
+      end
+
+      it('should save metadata') do
+        expect(credit_card.metadata.test_key).to eq metadata[:test_key]
+      end
+    end
+
+    context 'for bank account' do
+      let(:bank_account) do
+        customer.sources.create(
+          source: stripe_helper.generate_bank_token,
+          metadata: metadata
+        )
+      end
+
+      it('should save metadata') do
+        expect(bank_account.metadata.test_key).to eq metadata[:test_key]
+      end
+    end
+  end
 end

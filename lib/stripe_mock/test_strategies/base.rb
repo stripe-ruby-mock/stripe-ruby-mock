@@ -3,10 +3,12 @@ module StripeMock
     class Base
 
       def create_plan_params(params={})
-        currency = params[:currency] || 'usd'
+        currency = params[:currency] || StripeMock.default_currency
         {
           :id => 'stripe_mock_default_plan_id',
-          :name => 'StripeMock Default Plan ID',
+          :product => {
+            :name => 'StripeMock Default Plan ID'
+          },
           :amount => 1337,
           :currency => currency,
           :interval => 'month'
@@ -14,7 +16,7 @@ module StripeMock
       end
 
       def generate_card_token(card_params={})
-        card_data = { :number => "4242424242424242", :exp_month => 9, :exp_year => 2018, :cvc => "999", :tokenization_method => nil }
+        card_data = { :number => "4242424242424242", :exp_month => 9, :exp_year => (Time.now.year + 5), :cvc => "999", :tokenization_method => nil }
         card = StripeMock::Util.card_merge(card_data, card_params)
         card[:fingerprint] = StripeMock::Util.fingerprint(card[:number]) if StripeMock.state == 'local'
 
@@ -23,7 +25,7 @@ module StripeMock
       end
 
       def generate_bank_token(bank_account_params={})
-        currency = bank_account_params[:currency] || 'usd'
+        currency = bank_account_params[:currency] || StripeMock.default_currency
         bank_account = {
           :country => "US",
           :currency => currency,
@@ -39,7 +41,7 @@ module StripeMock
       end
 
       def create_coupon_params(params = {})
-        currency = params[:currency] || 'usd'
+        currency = params[:currency] || StripeMock.default_currency
         {
           id: '10BUCKS',
           amount_off: 1000,

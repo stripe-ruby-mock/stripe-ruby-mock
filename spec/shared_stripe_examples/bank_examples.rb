@@ -40,7 +40,7 @@ shared_examples 'Bank API' do
     expect(bank.last4).to eq("6789")
   end
 
-  it "creates a single bank with a generated bank token", :live => true do
+  it "creates a single bank with a generated bank token" do
     customer = Stripe::Customer.create
     expect(customer.sources.count).to eq 0
 
@@ -199,4 +199,31 @@ shared_examples 'Bank API' do
     end
   end
 
+  describe 'Stripe::Token creation from bank account' do
+    it 'generates token from bank account informations' do
+      token = Stripe::Token.create({
+        bank_account: {
+          account_number: "4222222222222222",
+          routing_number: "123456",
+          bank_name: "Fake bank"
+        }
+      })
+
+      cus = Stripe::Customer.create(source: token.id)
+      bank_account = cus.sources.data.first
+      expect(bank_account.bank_name).to eq('Fake bank')
+    end
+
+    it 'generates token from existing bank account token' do
+      bank_token = StripeMock.generate_bank_token(bank_name: 'Fake bank')
+      cus = Stripe::Customer.create(source: bank_token)
+      token = Stripe::Token.create({ customer: cus.id, bank_account: cus.sources.first.id })
+      cus.sources.create(source: token.id)
+      cus = Stripe::Customer.retrieve(cus.id)
+      expect(cus.sources.data.count).to eq 2
+      cus.sources.data.each do |source|
+        expect(source.bank_name).to eq('Fake bank')
+      end
+    end
+  end
 end
