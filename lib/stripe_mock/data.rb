@@ -1,6 +1,5 @@
 module StripeMock
   module Data
-
     def self.mock_account(params = {})
       id = params[:id] || 'acct_103ED82ePvKYlo2C'
       currency = params[:currency] || StripeMock.default_currency
@@ -1003,6 +1002,8 @@ module StripeMock
     end
 
     def self.mock_subscription_item(params = {})
+      item_options = params[:item_options]
+
       iid = params[:id] || 'test_txn_default'
       {
         id: iid,
@@ -1024,7 +1025,8 @@ module StripeMock
           statement_descriptor: nil,
           trial_period_days: nil
         },
-        quantity: 2
+        quantity: (item_options[:quantity] || 1),
+        deleted: (item_options[:deleted] || false)
       }.merge(params)
     end
 
