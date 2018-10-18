@@ -291,6 +291,7 @@ module StripeMock
         current_period_start: 1308595038,
         current_period_end: 1308681468,
         status: 'trialing',
+        trial_from_plan: false,
         plan: {
           interval: 'month',
           amount: 7500,
