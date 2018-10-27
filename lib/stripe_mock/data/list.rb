@@ -8,13 +8,7 @@ module StripeMock
         @limit = [[options[:limit] || 10, 100].min, 1].max # restrict @limit to 1..100
         @starting_after = options[:starting_after]
         @ending_before  = options[:ending_before]
-        if @data.first.is_a?(Hash) && @data.first[:created]
-          @data.sort_by! { |x| x[:created] }
-          @data.reverse!
-        elsif @data.first.respond_to?(:created)
-          @data.sort_by { |x| x.created }
-          @data.reverse!
-        end
+        filter(options)
       end
 
       def url
@@ -45,6 +39,22 @@ module StripeMock
       end
 
       private
+
+      def filter(options)
+        return if @data.empty?
+        return unless options.include?(:created)
+        return unless %i(gt gte lt lte).any? { |k| options[:created].key? k } # verify proper filter was supplied
+        filter_by(options[:created])
+        @data.reverse!
+      end
+
+      def filter_by
+        if @data.first.is_a?(Hash)
+          @data.sort_by! { |x| x[:created] }
+        elsif @data.first.respond_to?(:created)
+          @data.sort_by { |x| x.created }
+        end
+      end
 
       def offset
         case
