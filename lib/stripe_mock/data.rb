@@ -1047,5 +1047,36 @@ module StripeMock
         secret: "ek_test_default"
       }
     end
+
+    def self.mock_file(params={})
+      id = params[:id] || 'file_1D2bNMG2b8EWj803MhNWqPw4'
+      {
+        id: id,
+        object: "file",
+        created: 1535102080,
+        filename: id,
+        links:
+        { object: "list",
+         data:
+          [{id: "link_1DLz0SG2b8EWj803yQ9arYOA",
+            object: "file_link",
+            created: 1539721148,
+            expired: false,
+            expires_at: nil,
+            file: id,
+            livemode: false,
+            metadata: {},
+            url: "https://files.stripe.com/links/fl_test_J5swDccota4TyeNpoGm9l5Nt"
+          }],
+         has_more: false,
+         url: "/v1/file_links?file=#{id}"
+        },
+        purpose: "dispute_evidence",
+        size: 9863,
+        title: nil,
+        type: "png",
+        url: "https://files.stripe.com/v1/files/#{id}/contents"
+      }
+    end
   end
 end
