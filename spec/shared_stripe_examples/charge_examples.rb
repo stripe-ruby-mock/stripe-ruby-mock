@@ -163,15 +163,19 @@ shared_examples 'Charge API' do
   end
 
   it "creates a balance transaction" do
+    amount = 300
+    fee = 10
     charge = Stripe::Charge.create({
-      amount: 300,
+      amount: amount,
       currency: 'USD',
-      source: stripe_helper.generate_card_token
+      source: stripe_helper.generate_card_token,
+      application_fee: fee,
     })
     bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
-    expect(bal_trans.amount).to eq(charge.amount)
-    expect(bal_trans.fee).to eq(39)
+    expect(bal_trans.amount).to eq(amount)
+    expect(bal_trans.fee).to eq(39 + fee)
     expect(bal_trans.source).to eq(charge.id)
+    expect(bal_trans.net).to eq(amount - bal_trans.fee)
   end
 
   context 'when conversion rate is set' do
