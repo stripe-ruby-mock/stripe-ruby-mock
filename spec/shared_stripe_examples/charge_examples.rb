@@ -178,6 +178,28 @@ shared_examples 'Charge API' do
     expect(bal_trans.net).to eq(amount - bal_trans.fee)
   end
 
+  it "creates a balance transaction with destination charges" do
+    amount = 300
+    fee = 10
+    stripe_fee = 39
+    charge = Stripe::Charge.create({
+      amount: amount,
+      currency: 'USD',
+      source: stripe_helper.generate_card_token,
+      application_fee: fee,
+      destination: {
+        account: 'some account',
+        amount: 200
+      }
+    })
+    bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
+    expect(bal_trans.amount).to eq(amount)
+    expect(bal_trans.fee).to eq(stripe_fee)
+    expect(bal_trans.source).to eq(charge.id)
+    expect(bal_trans.net).to eq(amount - stripe_fee)
+    expect(bal_trans.sourced_transfers.data[0].amount).to eq(200)
+  end
+
   context 'when conversion rate is set' do
     it "balance transaction stores amount converted from charge currency to USD" do
       StripeMock.set_conversion_rate(1.2)

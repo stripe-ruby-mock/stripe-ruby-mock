@@ -42,7 +42,12 @@ module StripeMock
 
         ensure_required_params(params)
 
-        def_bal_trans_params = { amount: params[:amount], source: params[:id], application_fee: params[:application_fee] }
+        def_bal_trans_params = {
+          amount: params[:amount],
+          source: params[:id],
+          application_fee: params[:application_fee],
+          destination_amount: params.dig(:destination, :amount)
+        }
         bal_trans_params = params.delete(:balance_transaction) || def_bal_trans_params
         params[:balance_transaction] = new_balance_transaction('txn', bal_trans_params)
         charges[params[:id]] = Data.mock_charge(params)

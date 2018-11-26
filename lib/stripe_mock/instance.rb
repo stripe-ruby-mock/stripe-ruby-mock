@@ -195,7 +195,7 @@ module StripeMock
     end
 
     def calculate_fees(params)
-      application_fee = params[:application_fee] || 0
+      application_fee = !params[:destination_amount] && params[:application_fee] || 0
       params[:fee] = processing_fee(params[:amount]) + application_fee
       params[:fee_details] = [
         {
@@ -212,6 +212,18 @@ module StripeMock
           currency: params[:currency] || StripeMock.default_currency,
           description: "Application fee",
           type: "application_fee"
+        }
+      end
+      if params[:destination_amount]
+        params[:sourced_transfers] = {
+          object: "list",
+          data: [{
+            amount: params[:destination_amount],
+            amount_reversed: 0,
+            application_fee: nil
+          }],
+          has_more: false,
+          total_count: 1,
         }
       end
     end
