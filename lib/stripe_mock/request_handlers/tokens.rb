@@ -46,12 +46,12 @@ module StripeMock
         end
 
         if bank_account
-          token_id = generate_bank_token(bank_account)
+          token_id = generate_bank_token(bank_account.dup)
           bank_account = @bank_tokens[token_id]
 
           Data.mock_bank_account_token(params.merge :id => token_id, :bank_account => bank_account)
         else
-          token_id = generate_card_token(customer_card)
+          token_id = generate_card_token(customer_card.dup)
           card = @card_tokens[token_id]
 
           Data.mock_card_token(params.merge :id => token_id, :card => card)
