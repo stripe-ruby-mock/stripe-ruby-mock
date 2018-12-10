@@ -183,7 +183,10 @@ module StripeMock
         end
         verify_card_present(customer, subscription_plans.first, subscription)
 
-        if subscription[:cancel_at_period_end]
+        if params[:cancel_at_period_end]
+          subscription[:cancel_at_period_end] = true
+          subscription[:canceled_at] = Time.now.utc.to_i
+        elsif params.has_key?(:cancel_at_period_end)
           subscription[:cancel_at_period_end] = false
           subscription[:canceled_at] = nil
         end

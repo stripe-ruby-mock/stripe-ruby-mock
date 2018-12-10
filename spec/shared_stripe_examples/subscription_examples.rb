@@ -501,6 +501,29 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.cancel_at_period_end).to be_falsey
     end
 
+    it "updates a subscription's cancel_at_period_end" do
+      silver = stripe_helper.create_plan(id: 'silver')
+      customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
+
+      sub = Stripe::Subscription.create({ items: [ { plan: 'silver' } ], customer: customer.id })
+
+      expect(sub.cancel_at_period_end).to be_falsey
+
+      sub.cancel_at_period_end = true
+      sub.save
+
+      expect(sub.save).to be_truthy
+      expect(sub.cancel_at_period_end).to be_truthy
+      expect(sub.canceled_at).to be_truthy
+
+      sub.cancel_at_period_end = false
+      sub.save
+
+      expect(sub.save).to be_truthy
+      expect(sub.cancel_at_period_end).to be_falsey
+      expect(sub.canceled_at).to be_falsey
+    end
+
     it "updates a stripe customer's existing subscription when plan inside of items" do
       silver = stripe_helper.create_plan(id: 'silver')
       gold = stripe_helper.create_plan(id: 'gold')
