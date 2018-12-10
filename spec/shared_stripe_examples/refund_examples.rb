@@ -337,26 +337,32 @@ shared_examples 'Refund API' do
           capture: true
         )
       end
-      let(:idempotent_refund_params) {{
-        charge: charge.id,
+      let(:refund_params) {{
+        charge: charge.id
+      }}
+
+      let(:refund_headers) {{
         idempotency_key: 'onceisenough'
       }}
 
       it "returns the original refund if the same idempotency_key is passed in" do
-        refund1 = Stripe::Refund.create(idempotent_refund_params)
-        refund2 = Stripe::Refund.create(idempotent_refund_params)
+        refund1 = Stripe::Refund.create(refund_params, refund_headers)
+        refund2 = Stripe::Refund.create(refund_params, refund_headers)
 
         expect(refund1).to eq(refund2)
       end
 
-      it "returns different charges if different idempotency_keys are used for each charge" do
-        idempotent_refund_params2 = idempotent_refund_params.clone
-        idempotent_refund_params2[:idempotency_key] = 'thisoneisdifferent'
+      context 'different key' do
+        let(:different_refund_headers) {{
+          idempotency_key: 'thisoneisdifferent'
+        }}
 
-        refund1 = Stripe::Refund.create(idempotent_refund_params)
-        refund2 = Stripe::Refund.create(idempotent_refund_params2)
+        it "returns different charges if different idempotency_keys are used for each charge" do
+          refund1 = Stripe::Refund.create(refund_params, refund_headers)
+          refund2 = Stripe::Refund.create(refund_params, different_refund_headers)
 
-        expect(refund1).not_to eq(refund2)
+          expect(refund1).not_to eq(refund2)
+        end
       end
     end
   end

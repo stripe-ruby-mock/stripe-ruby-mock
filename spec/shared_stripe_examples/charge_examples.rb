@@ -476,29 +476,34 @@ shared_examples 'Charge API' do
 
   describe "idempotency" do
     let(:customer) { Stripe::Customer.create(email: 'johnny@appleseed.com') }
-    let(:idempotent_charge_params) {{
+    let(:charge_params) {{
       amount: 777,
       currency: 'USD',
       customer: customer.id,
-      capture: true,
+      capture: true
+    }}
+    let(:charge_headers) {{
       idempotency_key: 'onceisenough'
     }}
 
     it "returns the original charge if the same idempotency_key is passed in" do
-      charge1 = Stripe::Charge.create(idempotent_charge_params)
-      charge2 = Stripe::Charge.create(idempotent_charge_params)
+      charge1 = Stripe::Charge.create(charge_params, charge_headers)
+      charge2 = Stripe::Charge.create(charge_params, charge_headers)
 
       expect(charge1).to eq(charge2)
     end
 
-    it "returns different charges if different idempotency_keys are used for each charge" do
-      idempotent_charge_params2 = idempotent_charge_params.clone
-      idempotent_charge_params2[:idempotency_key] = 'thisoneisdifferent'
+    context 'different key' do
+      let(:different_charge_headers) {{
+        idempotency_key: 'thisoneisdifferent'
+      }}
 
-      charge1 = Stripe::Charge.create(idempotent_charge_params)
-      charge2 = Stripe::Charge.create(idempotent_charge_params2)
+      it "returns different charges if different idempotency_keys are used for each charge" do
+        charge1 = Stripe::Charge.create(charge_params, charge_headers)
+        charge2 = Stripe::Charge.create(charge_params, different_charge_headers)
 
-      expect(charge1).not_to eq(charge2)
+        expect(charge1).not_to eq(charge2)
+      end
     end
   end
 
