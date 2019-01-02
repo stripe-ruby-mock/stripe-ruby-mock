@@ -910,7 +910,9 @@ shared_examples 'Customer Subscriptions' do
     plan = stripe_helper.create_plan(
       :amount => 2000,
       :interval => 'month',
-      :name => 'Amazing Gold Plan',
+      :product => {
+        :name => 'Amazing Gold Plan'
+      },
       :currency => 'usd',
       :id => 'gold'
     )
