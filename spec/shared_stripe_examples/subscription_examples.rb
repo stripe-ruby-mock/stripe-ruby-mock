@@ -163,6 +163,7 @@ shared_examples 'Customer Subscriptions' do
         :product => {
           :name => 'Test plan'
         },
+        :name => 'Test Plan',
         :currency => 'usd',
         :id => 'silver',
         :statement_description => "testPlan"
