@@ -243,7 +243,8 @@ module StripeMock
         cvc_check: nil,
         address_line1_check: nil,
         address_zip_check: nil,
-        tokenization_method: nil
+        tokenization_method: nil,
+        metadata: {}
       }, params)
     end
 
@@ -261,7 +262,8 @@ module StripeMock
         status: 'new',
         account_holder_name: 'John Doe',
         account_holder_type: 'individual',
-        fingerprint: "aBcFinGerPrINt123"
+        fingerprint: "aBcFinGerPrINt123",
+        metadata: {}
       }.merge(params)
     end
 
@@ -289,6 +291,7 @@ module StripeMock
         current_period_start: 1308595038,
         current_period_end: 1308681468,
         status: 'trialing',
+        trial_from_plan: false,
         plan: {
           interval: 'month',
           amount: 7500,

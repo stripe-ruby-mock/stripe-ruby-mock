@@ -97,6 +97,7 @@ module StripeMock
               get_bank_by_token(params[:source])
             end
           end
+        source[:metadata].merge!(params[:metadata]) if params[:metadata]
         add_source_to_object(type, source, resource)
       end
 

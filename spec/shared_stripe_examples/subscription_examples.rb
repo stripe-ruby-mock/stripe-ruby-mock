@@ -447,6 +447,8 @@ shared_examples 'Customer Subscriptions' do
       expect(subscription.plan).to eq nil
       expect(subscription.items.data[0].plan.id).to eq plan.id
       expect(subscription.items.data[1].plan.id).to eq plan2.id
+      expect(subscription.items.data[0].quantity).to eq 1
+      expect(subscription.items.data[1].quantity).to eq 2
     end
 
     it 'when plan defined inside items for trials with no card', live: true do
