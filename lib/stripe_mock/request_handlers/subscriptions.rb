@@ -189,6 +189,7 @@ module StripeMock
         end
 
         params[:current_period_start] = subscription[:current_period_start]
+        params[:trial_end] = params[:trial_end] || subscription[:trial_end]
         subscription = resolve_subscription_changes(subscription, subscription_plans, customer, params)
 
         # delete the old subscription, replace with the new subscription
