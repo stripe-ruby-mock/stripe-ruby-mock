@@ -68,7 +68,7 @@ module StripeMock
 
         assert_existence :card, card_id, get_card(resource, card_id)
 
-        card = { id: card_id, deleted: true }
+        card = { id: card_id, object: 'card', deleted: true }
         cards_or_sources = resource[:cards] || resource[:sources] || resource[:external_accounts]
         cards_or_sources[:data].reject!{|cc|
           cc[:id] == card[:id]
