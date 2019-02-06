@@ -1,6 +1,5 @@
 module StripeMock
   module Data
-
     def self.mock_account(params = {})
       id = params[:id] || 'acct_103ED82ePvKYlo2C'
       currency = params[:currency] || StripeMock.default_currency
@@ -104,13 +103,13 @@ module StripeMock
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
       currency = params[:currency] || StripeMock.default_currency
-      sources.each {|source| source[:customer] = cus_id}
+      sources.each { |source| source[:customer] = cus_id }
       {
         email: 'stripe_mock@example.com',
         description: 'an auto-generated stripe customer data mock',
         object: "customer",
         created: 1372126710,
-        id: cus_id,
+        id: StripeMock::Util.card_id,
         livemode: false,
         delinquent: false,
         discount: nil,
@@ -153,6 +152,7 @@ module StripeMock
         statement_descriptor: "Charge #{charge_id}",
         status: 'succeeded',
         source: {
+          id: StripeMock::Util.card_id,
           object: "card",
           last4: "4242",
           type: "Visa",
@@ -222,7 +222,7 @@ module StripeMock
 
     def self.mock_card(params={})
       StripeMock::Util.card_merge({
-        id: "test_cc_default",
+        id: StripeMock::Util.card_id,
         object: "card",
         last4: "4242",
         type: "Visa",

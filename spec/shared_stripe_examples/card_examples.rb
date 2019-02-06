@@ -7,6 +7,7 @@ shared_examples 'Card API' do
     card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
     card = customer.sources.create(source: card_token)
 
+    expect(card.id).to match(/src_\h+/)
     expect(card.customer).to eq('test_customer_sub')
     expect(card.last4).to eq("1123")
     expect(card.exp_month).to eq(11)
@@ -15,6 +16,8 @@ shared_examples 'Card API' do
     customer = Stripe::Customer.retrieve('test_customer_sub')
     expect(customer.sources.count).to eq(1)
     card = customer.sources.data.first
+
+    expect(card.id).to match(/src_\h+/)
     expect(card.customer).to eq('test_customer_sub')
     expect(card.last4).to eq("1123")
     expect(card.exp_month).to eq(11)
@@ -32,6 +35,7 @@ shared_examples 'Card API' do
     card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
     card = recipient.cards.create(card: card_token)
 
+    expect(card.id).to match(/src_\h+/)
     expect(card.recipient).to eq('test_recipient_sub')
     expect(card.last4).to eq("1123")
     expect(card.exp_month).to eq(11)
@@ -40,6 +44,8 @@ shared_examples 'Card API' do
     recipient = Stripe::Recipient.retrieve('test_recipient_sub')
     expect(recipient.cards.count).to eq(1)
     card = recipient.cards.data.first
+
+    expect(card.id).to match(/src_\h+/)
     expect(card.recipient).to eq('test_recipient_sub')
     expect(card.last4).to eq("1123")
     expect(card.exp_month).to eq(11)
@@ -55,6 +61,7 @@ shared_examples 'Card API' do
       cvc: '123'
     })
 
+    expect(card.id).to match(/src_\h+/)
     expect(card.customer).to eq('test_customer_sub')
     expect(card.last4).to eq("4242")
     expect(card.exp_month).to eq(11)
@@ -63,6 +70,7 @@ shared_examples 'Card API' do
     customer = Stripe::Customer.retrieve('test_customer_sub')
     expect(customer.sources.count).to eq(1)
     card = customer.sources.data.first
+
     expect(card.customer).to eq('test_customer_sub')
     expect(card.last4).to eq("4242")
     expect(card.exp_month).to eq(11)
@@ -83,6 +91,7 @@ shared_examples 'Card API' do
       cvc: '123'
     })
 
+    expect(card.id).to match(/src_\h+/)
     expect(card.recipient).to eq('test_recipient_sub')
     expect(card.last4).to eq("5556")
     expect(card.exp_month).to eq(11)
@@ -91,6 +100,8 @@ shared_examples 'Card API' do
     recipient = Stripe::Recipient.retrieve('test_recipient_sub')
     expect(recipient.cards.count).to eq(1)
     card = recipient.cards.data.first
+
+    expect(card.id).to match(/src_\h+/)
     expect(card.recipient).to eq('test_recipient_sub')
     expect(card.last4).to eq("5556")
     expect(card.exp_month).to eq(11)
@@ -113,7 +124,7 @@ shared_examples 'Card API' do
   it 'create does not change the customers default card if already set' do
     customer = Stripe::Customer.create(id: 'test_customer_sub', default_source: "test_cc_original")
     card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
-    card = customer.sources.create(source: card_token)
+    customer.sources.create(source: card_token)
 
     customer = Stripe::Customer.retrieve('test_customer_sub')
     expect(customer.default_source).to eq("test_cc_original")
@@ -122,7 +133,7 @@ shared_examples 'Card API' do
   it 'create updates the customers default card if not set' do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     card_token = stripe_helper.generate_card_token(last4: "1123", exp_month: 11, exp_year: 2099)
-    card = customer.sources.create(source: card_token)
+    customer.sources.create(source: card_token)
 
     customer = Stripe::Customer.retrieve('test_customer_sub')
     expect(customer.default_source).to_not be_nil
@@ -262,13 +273,13 @@ shared_examples 'Card API' do
 
       retrieved = customer.sources.retrieve(card.id)
 
+      expect(retrieved.id).to match(/src_\h+/)
       expect(retrieved.exp_month).to eq(exp_month)
       expect(retrieved.exp_year).to eq(exp_year)
     end
   end
 
   context "retrieve multiple cards" do
-
     it "retrieves a list of multiple cards" do
       customer = Stripe::Customer.create(id: 'test_customer_card')
 
@@ -303,5 +314,4 @@ shared_examples 'Card API' do
       expect(list.data.length).to eq(0)
     end
   end
-
 end

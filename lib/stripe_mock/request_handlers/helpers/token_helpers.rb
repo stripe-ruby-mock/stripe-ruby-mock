@@ -11,7 +11,7 @@ module StripeMock
 
       def generate_card_token(card_params = {})
         token = new_id 'tok'
-        card_params[:id] = new_id 'cc'
+        card_params[:id] = StripeMock::Util.card_id
         @card_tokens[token] = Data.mock_card symbolize_names(card_params)
         token
       end
