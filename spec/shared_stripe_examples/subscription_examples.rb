@@ -472,6 +472,28 @@ shared_examples 'Customer Subscriptions' do
       expect(subscription.items.data[0].plan.id).to eq plan.id
       expect(subscription.items.data[1].plan.id).to eq plan2.id
     end
+
+    it 'add a new subscription to bill via an invoice' do
+      plan = stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' },
+                                       amount: 4999, currency: 'usd')
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      expect(customer.subscriptions.data).to be_empty
+      expect(customer.subscriptions.count).to eq(0)
+
+      sub = Stripe::Subscription.create({
+        plan: 'silver',
+        customer: customer.id,
+        metadata: { foo: 'bar', example: 'yes' },
+        billing: 'send_invoice',
+        days_until_due: 30,
+      })
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
+      expect(sub.billing).to eq 'send_invoice'
+      expect(sub.days_until_due).to eq 30
+    end
   end
 
   context "updating a subscription" do
