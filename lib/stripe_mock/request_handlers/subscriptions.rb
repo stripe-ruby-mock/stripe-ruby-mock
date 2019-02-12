@@ -244,26 +244,33 @@ module StripeMock
         plan_ids.map { |plan_id| plans[plan_id] }
       end
 
+      # Ensure customer has card to charge unless one of the following criterias is met:
+      # 1) is in trial
+      # 2) is free
+      # 3) has billing set to send invoice
       def verify_card_present(customer, plan, subscription, params={})
-        if customer[:default_source].nil? && customer[:trial_end].nil? &&
-          (plan.nil? ||
-            ((plan[:trial_period_days] || 0) == 0 &&
-              plan[:amount] != 0 &&
-              plan[:trial_end].nil?)) &&
-          params[:trial_end].nil? &&
-          (subscription.nil? || subscription[:trial_end].nil? || subscription[:trial_end] == 'now')
+        return if customer[:default_source]
+        return if customer[:trial_end]
+        return if params[:trial_end]
 
-          if subscription[:items]
-            trial = subscription[:items][:data].none? do |item|
-              plan = item[:plan]
-              (plan[:trial_period_days].nil? || plan[:trial_period_days] == 0) &&
-                (plan[:trial_end].nil? || plan[:trial_end] == 'now')
-            end
-            return if trial
+        plan_trial_period_days = plan[:trial_period_days] || 0
+        plan_has_trial = plan_trial_period_days != 0 || plan[:amount] == 0 || plan[:trial_end]
+        return if plan && plan_has_trial
+
+        return if subscription && subscription[:trial_end] && subscription[:trial_end] != 'now'
+
+        if subscription[:items]
+          trial = subscription[:items][:data].none? do |item|
+            plan = item[:plan]
+            (plan[:trial_period_days].nil? || plan[:trial_period_days] == 0) &&
+              (plan[:trial_end].nil? || plan[:trial_end] == 'now')
           end
-
-          raise Stripe::InvalidRequestError.new('You must supply a valid card xoxo', nil, http_status: 400)
+          return if trial
         end
+
+        return if params[:billing] == 'send_invoice'
+
+        raise Stripe::InvalidRequestError.new('You must supply a valid card xoxo', nil, http_status: 400)
       end
 
       def verify_active_status(subscription)

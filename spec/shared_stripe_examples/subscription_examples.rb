@@ -476,7 +476,7 @@ shared_examples 'Customer Subscriptions' do
     it 'add a new subscription to bill via an invoice' do
       plan = stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' },
                                        amount: 4999, currency: 'usd')
-      customer = Stripe::Customer.create(source: gen_card_tk)
+      customer = Stripe::Customer.create(id: 'cardless')
 
       expect(customer.subscriptions.data).to be_empty
       expect(customer.subscriptions.count).to eq(0)
