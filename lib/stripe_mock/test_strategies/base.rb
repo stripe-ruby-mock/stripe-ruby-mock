@@ -2,18 +2,72 @@ module StripeMock
   module TestStrategies
     class Base
 
-      def create_plan_params(params={})
-        currency = params[:currency] || StripeMock.default_currency
+      #
+      # PRODUCT
+      #
+
+      def list_products(limit)
+        Stripe::Product.list(limit: limit)
+      end
+
+      def create_product(params = {})
+        Stripe::Product.create create_product_params(params)
+      end
+
+      def create_product_params(params={})
         {
-          :id => 'stripe_mock_default_plan_id',
-          :product => {
-            :name => 'StripeMock Default Plan ID'
-          },
-          :amount => 1337,
-          :currency => currency,
-          :interval => 'month'
+          :id => 'stripe_mock_default_product_id',
+          :name => 'Default Product',
+          :type => 'service'
         }.merge(params)
       end
+
+      def find_or_create_product(params)
+        product_id = params[:id]
+        begin
+          retrieve_product(product_id)
+        rescue Stripe::InvalidRequestError => e
+          create_product(params) if e.message == "No such product: #{product_id}"
+        end
+      end
+
+      def retrieve_product(product_id)
+        Stripe::Product.retrieve(product_id)
+      end
+
+      #
+      # PLAN
+      #
+
+      def list_plans(limit)
+        Stripe::Plan.list(limit: limit)
+      end
+
+      def create_plan(params={})
+        Stripe::Plan.create create_plan_params(params)
+      end
+
+      def create_plan_params(params={})
+        {
+          :id => 'stripe_mock_default_plan_id',
+          :interval => 'month',
+          :currency => StripeMock.default_currency,
+          :product => nil, # need to override yourself to pass validations
+          :amount => 1337
+        }.merge(params)
+      end
+
+      #
+      # SUBSCRIPTION
+      #
+
+      def list_subscriptions(limit)
+        Stripe::Subscription.list(limit: limit)
+      end
+
+      #
+      # CARD TOKEN
+      #
 
       def generate_card_token(card_params={})
         card_data = { :number => "4242424242424242", :exp_month => 9, :exp_year => (Time.now.year + 5), :cvc => "999", :tokenization_method => nil }
@@ -39,6 +93,10 @@ module StripeMock
         stripe_token = Stripe::Token.create(:bank_account => bank_account)
         stripe_token.id
       end
+
+      #
+      # COUPON
+      #
 
       def create_coupon_params(params = {})
         currency = params[:currency] || StripeMock.default_currency
@@ -76,6 +134,7 @@ module StripeMock
       def prepare_card_error
         StripeMock.prepare_card_error(:card_error, :new_customer) if StripeMock.state == 'local'
       end
+
     end
   end
 end

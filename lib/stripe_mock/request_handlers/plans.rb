@@ -12,6 +12,7 @@ module StripeMock
 
       def new_plan(route, method_url, params, headers)
         params[:id] ||= new_id('plan')
+        params[:id] = params[:id].to_s # satisfy people's desire to use symbol identifiers
         validate_create_plan_params(params)
         plans[ params[:id] ] = Data.mock_plan(params)
       end

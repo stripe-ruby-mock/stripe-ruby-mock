@@ -7,6 +7,7 @@ rvm:
   - 2.1.10
   - 2.2.7
   - 2.3.4
+  - 2.5.0
 before_install:
   - rvm 2.1.10 do gem install mime-types -v 2.6.2
   - gem install bundler
@@ -17,7 +18,7 @@ script: "bundle exec rspec && bundle exec rspec -t live"
 
 env:
   global:
-    - IS_TRAVIS=true STRIPE_TEST_SECRET_KEY_A=sk_test_Ut2MSlZANdT3iDALdGhyLymy STRIPE_TEST_SECRET_KEY_B=sk_test_JXtzss9tHOG1ofIyEZgoUP4Q STRIPE_TEST_SECRET_KEY_C=sk_test_ZR5nVz9p3ivsqVa7mYB0sFep STRIPE_TEST_SECRET_KEY_D=sk_test_ZR5nVz9p3ivsqVa7mYB0sFep
+    - IS_TRAVIS=true STRIPE_TEST_SECRET_KEY_A=sk_test_Ut2MSlZANdT3iDALdGhyLymy STRIPE_TEST_SECRET_KEY_B=sk_test_JXtzss9tHOG1ofIyEZgoUP4Q STRIPE_TEST_SECRET_KEY_C=sk_test_ZR5nVz9p3ivsqVa7mYB0sFep STRIPE_TEST_SECRET_KEY_D=sk_test_ZR5nVz9p3ivsqVa7mYB0sFep LOG_STRIPE_MOCK_SERVER=true
 
 notifications:
   webhooks:

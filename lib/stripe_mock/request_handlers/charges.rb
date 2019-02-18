@@ -12,6 +12,20 @@ module StripeMock
         klass.add_handler 'post /v1/charges/(.*)',          :update_charge
       end
 
+      # @see https://stripe.com/docs/testing#cards
+      SUPPORTED_TEST_TOKENS = [
+        "tok_visa",
+        "tok_visa_debit",
+        "tok_mastercard",
+        "tok_mastercard_debit",
+        "tok_mastercard_prepaid",
+        "tok_amex",
+        "tok_discover",
+        "tok_diners",
+        "tok_jcb",
+        "tok_unionpay"
+      ]
+
       def new_charge(route, method_url, params, headers)
         if headers && headers[:idempotency_key]
           params[:idempotency_key] = headers[:idempotency_key]
@@ -31,6 +45,10 @@ module StripeMock
             if params[:customer]
               params[:source] = get_card(customers[params[:customer]], params[:source])
             else
+              if SUPPORTED_TEST_TOKENS.include?(params[:source])
+                # bypass invalid token error for supported test card tokens
+                @card_tokens[params[:source]] = Data.mock_card
+              end
               params[:source] = get_card_or_bank_by_token(params[:source])
             end
           elsif params[:source][:id]

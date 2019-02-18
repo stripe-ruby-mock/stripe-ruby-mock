@@ -13,13 +13,13 @@ describe StripeMock::Instance do
   after { StripeMock.stop }
 
   it "handles both string and symbol hash keys" do
-    string_params = stripe_helper.create_plan_params(
-      "id" => "str_abcde",
-      :name => "String Plan"
+    symbol_params = stripe_helper.create_product_params(
+      :name => "Symbol Product",
+      "type" => "service"
     )
-    res, api_key = StripeMock.instance.mock_request('post', '/v1/plans', api_key: 'api_key', params: string_params)
-    expect(res.data[:id]).to eq('str_abcde')
-    expect(res.data[:name]).to eq('String Plan')
+    res, api_key = StripeMock.instance.mock_request('post', '/v1/products', api_key: 'api_key', params: symbol_params)
+    expect(res.data[:name]).to eq('Symbol Product')
+    expect(res.data[:type]).to eq('service')
   end
 
   it "exits gracefully on an unrecognized handler url" do

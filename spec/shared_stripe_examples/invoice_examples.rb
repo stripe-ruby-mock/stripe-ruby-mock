@@ -110,7 +110,8 @@ shared_examples 'Invoice API' do
     let(:customer)      { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
     let(:coupon_amtoff) { stripe_helper.create_coupon(id: '100OFF', currency: 'usd', amount_off: 100_00, duration: 'repeating', duration_in_months: 6) }
     let(:coupon_pctoff) { stripe_helper.create_coupon(id: '50%OFF', currency: 'usd', percent_off: 50, amount_off: nil, duration: 'repeating', duration_in_months: 6) }
-    let(:plan)          { stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
+    let(:product)       { stripe_helper.find_or_create_product(id: "prod_123") }
+    let(:plan)          { stripe_helper.create_plan(id: '50m', product: product.id, amount: 50_00, interval: 'month', nickname: '50m', currency: 'usd') }
     let(:quantity)      { 3 }
     let(:subscription)  { Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: quantity) }
 
@@ -248,9 +249,9 @@ shared_examples 'Invoice API' do
 
       [false, true].each do |with_trial|
         describe "prorating a subscription with a new plan, with_trial: #{with_trial}" do
-          let(:new_monthly_plan) { stripe_helper.create_plan(id: '100m', amount: 100_00, interval: 'month', name: '100m', currency: 'usd') }
-          let(:new_yearly_plan) { stripe_helper.create_plan(id: '100y', amount: 100_00, interval: 'year', name: '100y', currency: 'usd') }
-          let(:plan) { stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
+          let(:new_monthly_plan) { stripe_helper.create_plan(id: '100m', product: product.id, amount: 100_00, interval: 'month', nickname: '100m', currency: 'usd') }
+          let(:new_yearly_plan) { stripe_helper.create_plan(id: '100y', product: product.id, amount: 100_00, interval: 'year', nickname: '100y', currency: 'usd') }
+          let(:plan) { stripe_helper.create_plan(id: '50m', product: product.id, amount: 50_00, interval: 'month', nickname: '50m', currency: 'usd') }
 
           it 'prorates while maintaining billing interval', live: true do
             # Given
@@ -393,7 +394,7 @@ shared_examples 'Invoice API' do
     end
 
     it 'sets the start and end of billing periods correctly when plan has an interval_count' do
-      @oddplan = stripe_helper.create_plan(interval: "week", interval_count: 11)
+      @oddplan = stripe_helper.create_plan(product: product.id, interval: "week", interval_count: 11)
       @subscription = Stripe::Subscription.create(plan: @oddplan.id, customer: customer.id)
       @upcoming = Stripe::Invoice.upcoming(customer: customer.id)
 
@@ -404,9 +405,9 @@ shared_examples 'Invoice API' do
     end
 
     it 'chooses the most recent of multiple subscriptions' do
-      @shortplan = stripe_helper.create_plan(id: 'a', interval: "week") # 1 week sub
-      @plainplan = stripe_helper.create_plan(id: 'b')                 # 1 month sub
-      @longplan  = stripe_helper.create_plan(id: 'c', interval: "year") # 1 year sub
+      @shortplan = stripe_helper.create_plan(id: 'a', product: product.id, interval: "week") # 1 week sub
+      @plainplan = stripe_helper.create_plan(id: 'b', product: product.id, interval: "month") # 1 month sub
+      @longplan  = stripe_helper.create_plan(id: 'c', product: product.id, interval: "year") # 1 year sub
 
       @plainsub = Stripe::Subscription.create(plan: @plainplan.id, customer: customer.id)
       @shortsub = Stripe::Subscription.create(plan: @shortplan.id, customer: customer.id)
@@ -438,7 +439,7 @@ shared_examples 'Invoice API' do
       end
 
       it 'returns all line items for upcoming invoice' do
-        plan = stripe_helper.create_plan()
+        plan = stripe_helper.create_plan(product: product.id)
         subscription = Stripe::Subscription.create(plan: plan.id, customer: customer.id)
         upcoming = Stripe::Invoice.upcoming(customer: customer.id)
         line_items = upcoming.lines
@@ -454,7 +455,7 @@ shared_examples 'Invoice API' do
     context 'calculates month and year offsets correctly' do
 
       it 'for one month plan on the 1st' do
-        @plan = stripe_helper.create_plan()
+        @plan = stripe_helper.create_plan(product: product.id)
         @sub = Stripe::Subscription.create(plan: @plan.id, customer: customer.id, current_period_start: Time.utc(2014,1,1,12).to_i)
         @upcoming = Stripe::Invoice.upcoming(customer: customer.id)
 
@@ -465,7 +466,7 @@ shared_examples 'Invoice API' do
       end
 
       it 'for one year plan on the 1st' do
-        @plan = stripe_helper.create_plan(interval: "year")
+        @plan = stripe_helper.create_plan(interval: "year", product: product.id)
         @sub = Stripe::Subscription.create(plan: @plan.id, customer: customer.id, current_period_start: Time.utc(2012,1,1,12).to_i)
         @upcoming = Stripe::Invoice.upcoming(customer: customer.id)
 
@@ -476,7 +477,7 @@ shared_examples 'Invoice API' do
       end
 
       it 'for one month plan on the 31st' do
-        @plan = stripe_helper.create_plan()
+        @plan = stripe_helper.create_plan(product: product.id)
         @sub = Stripe::Subscription.create(plan: @plan.id, customer: customer.id, current_period_start: Time.utc(2014,1,31,12).to_i)
         @upcoming = Stripe::Invoice.upcoming(customer: customer.id)
 
@@ -487,7 +488,7 @@ shared_examples 'Invoice API' do
       end
 
       it 'for one year plan on feb. 29th' do
-        @plan = stripe_helper.create_plan(interval: "year")
+        @plan = stripe_helper.create_plan(product: product.id, interval: "year")
         @sub = Stripe::Subscription.create(plan: @plan.id, customer: customer.id, current_period_start: Time.utc(2012,2,29,12).to_i)
         @upcoming = Stripe::Invoice.upcoming(customer: customer.id)
 
@@ -498,7 +499,7 @@ shared_examples 'Invoice API' do
       end
 
       it 'for two month plan on dec. 31st' do
-        @plan = stripe_helper.create_plan(interval_count: 2)
+        @plan = stripe_helper.create_plan(product: product.id, interval_count: 2)
         @sub = Stripe::Subscription.create(plan: @plan.id, customer: customer.id, current_period_start: Time.utc(2013,12,31,12).to_i)
         @upcoming = Stripe::Invoice.upcoming(customer: customer.id)
 
@@ -509,7 +510,7 @@ shared_examples 'Invoice API' do
       end
 
       it 'for three month plan on nov. 30th' do
-        @plan = stripe_helper.create_plan(interval_count: 3)
+        @plan = stripe_helper.create_plan(product: product.id, interval_count: 3)
         @sub = Stripe::Subscription.create(plan: @plan.id, customer: customer.id, current_period_start: Time.utc(2013,11,30,12).to_i)
         @upcoming = Stripe::Invoice.upcoming(customer: customer.id)
 

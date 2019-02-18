@@ -495,18 +495,49 @@ module StripeMock
     def self.mock_plan(params={})
       currency = params[:currency] || StripeMock.default_currency
       {
-        id: "2",
+        id: "mock_plan_123",
         object: "plan",
+        active: true,
+        aggregate_usage: nil,
         amount: 2300,
+        billing_scheme: "per_unit",
         created: 1466698898,
         currency: currency,
         interval: "month",
         interval_count: 1,
         livemode: false,
         metadata: {},
-        name: "The Basic Plan",
+        nickname: "My Mock Plan",
+        product: "mock_prod_NONEXIST", # override this with your own existing product id
+        tiers: nil,
+        tiers_mode: nil,
+        transform_usage: nil,
+        trial_period_days: nil,
+        usage_type: "licensed"
+      }.merge(params)
+    end
+
+    def self.mock_product(params={})
+      {
+        id: "mock_prod_abc123",
+        object: "product",
+        active: true,
+        attributes:[],
+        caption: nil,
+        created: 1466698000,
+        deactivate_on: [],
+        description: nil,
+        images: [],
+        livemode: false,
+        metadata: {},
+        name: "The Mock Product",
+        package_dimensions: nil,
+        shippable: nil,
         statement_descriptor: nil,
-        trial_period_days: nil
+        type: "service",
+        unit_label: "my_unit",
+        updated: 1537939442,
+        url: nil
       }.merge(params)
     end
 
