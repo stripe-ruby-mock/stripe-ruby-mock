@@ -75,10 +75,10 @@ module StripeMock
         'plan.deleted',
         'coupon.created',
         'coupon.deleted',
-        'transfer.created',
-        'transfer.paid',
-        'transfer.updated',
-        'transfer.failed'
+        'payout.created',
+        'payout.paid',
+        'payout.updated',
+        'payout.failed'
       ]
     end
   end

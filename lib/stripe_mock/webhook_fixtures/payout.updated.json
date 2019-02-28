@@ -2,7 +2,7 @@
   "created": 1326853478,
   "livemode": false,
   "id": "evt_00000000000000",
-  "type": "transfer.paid",
+  "type": "payout.updated",
   "object": "event",
   "data": {
     "object": {
@@ -12,7 +12,7 @@
       "livemode": false,
       "amount": 67,
       "currency": "usd",
-      "status": "paid",
+      "status": "pending",
       "balance_transaction": "txn_00000000000000",
       "summary": {
         "charge_gross": 100,
@@ -84,6 +84,9 @@
       },
       "statement_descriptor": null,
       "recipient": null
+    },
+    "previous_attributes": {
+      "amount": 123
     }
   }
 }

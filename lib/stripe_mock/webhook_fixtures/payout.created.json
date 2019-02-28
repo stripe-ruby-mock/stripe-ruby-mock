@@ -2,7 +2,7 @@
   "created": 1326853478,
   "livemode": false,
   "id": "evt_00000000000000",
-  "type": "transfer.updated",
+  "type": "payout.created",
   "object": "event",
   "data": {
     "object": {
@@ -84,9 +84,6 @@
       },
       "statement_descriptor": null,
       "recipient": null
-    },
-    "previous_attributes": {
-      "amount": 123
     }
   }
 }

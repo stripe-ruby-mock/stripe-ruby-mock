@@ -2,7 +2,7 @@
   "created": 1326853478,
   "livemode": false,
   "id": "evt_00000000000000",
-  "type": "transfer.failed",
+  "type": "payout.paid",
   "object": "event",
   "data": {
     "object": {
@@ -12,7 +12,7 @@
       "livemode": false,
       "amount": 67,
       "currency": "usd",
-      "status": "failed",
+      "status": "paid",
       "balance_transaction": "txn_00000000000000",
       "summary": {
         "charge_gross": 100,
