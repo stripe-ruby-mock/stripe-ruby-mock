@@ -10,6 +10,7 @@ module StripeMock
         subscription.merge!(custom_subscription_params(plans, customer, options))
         subscription[:items][:data] = plans.map do |plan|
           if options[:items] && options[:items].size == plans.size
+            options[:items] = options[:items].values if options[:items].respond_to?(:values)
             quantity = options[:items] &&
               options[:items].detect { |item| item[:plan] == plan[:id] }[:quantity] || 1
             Data.mock_subscription_item({ plan: plan, quantity: quantity })
