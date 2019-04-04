@@ -335,7 +335,7 @@ module StripeMock
       lines << Data.mock_line_item() if lines.empty?
       invoice = {
         id: 'in_test_invoice',
-        date: 1349738950,
+        created: 1349738950,
         period_end: 1349738950,
         period_start: 1349738950,
         lines: {
@@ -409,7 +409,7 @@ module StripeMock
       {
         id: "test_ii",
         object: "invoiceitem",
-        date: 1349738920,
+        created: 1349738920,
         amount: 1099,
         livemode: false,
         proration: false,
