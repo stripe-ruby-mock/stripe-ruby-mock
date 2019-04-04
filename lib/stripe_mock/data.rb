@@ -370,7 +370,6 @@ module StripeMock
         status: 'open',
         invoice_pdf: 'pdf_url',
         hosted_invoice_url: 'hosted_invoice_url',
-        date: 1349738950,
         created: 1349738950,
         period_end: 1349738950,
         period_start: 1349738950,

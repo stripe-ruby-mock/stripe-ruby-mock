@@ -353,7 +353,7 @@ shared_examples 'Invoice API' do
         it 'generates a preview without performing an actual proration', live: true do
           expect(preview.subtotal).to eq 150_00
           # this is a future invoice (generted at the end of the current subscription cycle), rather than a proration invoice
-          expect(preview.due_date).to be_nil
+          expect(preview.created).to be_within(1).of subscription.current_period_end
           expect(preview.period_start).to eq subscription.current_period_start
           expect(preview.period_end).to eq subscription.current_period_end
           expect(preview.lines.count).to eq 1
