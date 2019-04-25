@@ -32,6 +32,13 @@ module StripeMock
         params.merge!({ :plan => (plans.size == 1 ? plans.first : nil) })
         keys_to_merge = /application_fee_percent|quantity|metadata|tax_percent|billing|days_until_due/
         params.merge! options.select {|k,v| k =~ keys_to_merge}
+
+        if options[:cancel_at_period_end] == true
+          params.merge!(cancel_at_period_end: true, canceled_at: now)
+        elsif options[:cancel_at_period_end] == false
+          params.merge!(cancel_at_period_end: false, canceled_at: nil)
+        end
+
         # TODO: Implement coupon logic
 
         if (((plan && plan[:trial_period_days]) || 0) == 0 && options[:trial_end].nil?) || options[:trial_end] == "now"
