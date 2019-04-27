@@ -9,11 +9,25 @@ module StripeMock
         klass.add_handler 'get /v1/customers/(.*)/sources/(.*)', :retrieve_source
         klass.add_handler 'delete /v1/customers/(.*)/sources/(.*)', :delete_source
         klass.add_handler 'post /v1/customers/(.*)/sources/(.*)', :update_source
+        klass.add_handler 'post /v1/sources', :create_platform_source
       end
 
       def create_source(route, method_url, params, headers)
         route =~ method_url
         add_source_to(:customer, $1, params, customers)
+      end
+
+      def create_platform_source(_route, _method_url, params, _headers)
+        if params[:card]
+          card_from_params(params[:card]).tap do |card|
+            @card_tokens[card[:id]] = card
+          end
+        else
+          card = get_card_by_token(params[:token])
+          @card_tokens[card[:id]] = card
+
+          card[:id]
+        end
       end
 
       def retrieve_sources(route, method_url, params, headers)
