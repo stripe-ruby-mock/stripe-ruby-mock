@@ -73,6 +73,13 @@ module StripeMock
       end
 
       def create_subscription(route, method_url, params, headers)
+        if headers && headers[:idempotency_key]
+          if subscriptions.any?
+            original_subscription = subscriptions.values.find { |c| c[:idempotency_key] == headers[:idempotency_key]}
+            puts original_subscription
+            return subscriptions[original_subscription[:id]] if original_subscription
+          end
+        end
         route =~ method_url
 
         subscription_plans = get_subscription_plans_from_params(params)
@@ -95,7 +102,7 @@ module StripeMock
           customer[:default_source] = new_card[:id]
         end
 
-        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate billing_cycle_anchor billing days_until_due)
+        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate billing_cycle_anchor billing days_until_due idempotency_key)
         unknown_params = params.keys - allowed_params.map(&:to_sym)
         if unknown_params.length > 0
           raise Stripe::InvalidRequestError.new("Received unknown parameter: #{unknown_params.join}", unknown_params.first.to_s, http_status: 400)
@@ -103,6 +110,9 @@ module StripeMock
 
         subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')) })
         subscription = resolve_subscription_changes(subscription, subscription_plans, customer, params)
+        if headers[:idempotency_key]
+          subscription[:idempotency_key] = headers[:idempotency_key]
+        end
 
         # Ensure customer has card to charge if plan has no trial and is not free
         # Note: needs updating for subscriptions with multiple plans
