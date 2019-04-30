@@ -8,6 +8,7 @@
     "object": {
       "id": "ch_00000000000000",
       "object": "charge",
+      "status": "failed",
       "created": 1380933505,
       "livemode": false,
       "paid": false,
