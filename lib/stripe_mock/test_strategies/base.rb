@@ -2,10 +2,6 @@ module StripeMock
   module TestStrategies
     class Base
 
-      #
-      # PRODUCT
-      #
-
       def list_products(limit)
         Stripe::Product.list(limit: limit)
       end
@@ -22,22 +18,10 @@ module StripeMock
         }.merge(params)
       end
 
-      def find_or_create_product(params)
-        product_id = params[:id]
-        begin
-          retrieve_product(product_id)
-        rescue Stripe::InvalidRequestError => e
-          create_product(params) if e.message == "No such product: #{product_id}"
-        end
-      end
-
       def retrieve_product(product_id)
         Stripe::Product.retrieve(product_id)
       end
 
-      #
-      # PLAN
-      #
 
       def list_plans(limit)
         Stripe::Plan.list(limit: limit)
@@ -57,17 +41,11 @@ module StripeMock
         }.merge(params)
       end
 
-      #
-      # SUBSCRIPTION
-      #
 
       def list_subscriptions(limit)
         Stripe::Subscription.list(limit: limit)
       end
 
-      #
-      # CARD TOKEN
-      #
 
       def generate_card_token(card_params={})
         card_data = { :number => "4242424242424242", :exp_month => 9, :exp_year => (Time.now.year + 5), :cvc => "999", :tokenization_method => nil }
@@ -94,9 +72,6 @@ module StripeMock
         stripe_token.id
       end
 
-      #
-      # COUPON
-      #
 
       def create_coupon_params(params = {})
         currency = params[:currency] || StripeMock.default_currency

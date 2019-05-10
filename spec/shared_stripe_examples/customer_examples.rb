@@ -2,7 +2,7 @@ require 'spec_helper'
 
 shared_examples 'Customer API' do
   let(:product_params) { {id: "prod_CCC", name: "My Product", type: "service"} }
-  let(:product) { stripe_helper.find_or_create_product(product_params) }
+  let(:product) { stripe_helper.create_product(product_params) }
 
   def gen_card_tk
     stripe_helper.generate_card_token
@@ -234,7 +234,7 @@ shared_examples 'Customer API' do
       discount = Stripe::Customer.retrieve(customer.id).discount
       expect(discount).to_not be_nil
       expect(discount.coupon).to_not be_nil
-      expect(discount.end).to be_within(1).of (Time.now + 365 * 24 * 3600).to_i
+      expect(discount.end).to be_within(10).of (DateTime.now >> 12).to_time.to_i
     end
     after { Stripe::Coupon.retrieve(coupon.id).delete }
     after { Stripe::Customer.retrieve(customer.id).delete }

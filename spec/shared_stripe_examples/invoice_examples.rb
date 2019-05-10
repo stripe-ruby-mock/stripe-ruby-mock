@@ -109,8 +109,8 @@ shared_examples 'Invoice API' do
   context "retrieving upcoming invoice" do
     let(:customer)      { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
     let(:coupon_amtoff) { stripe_helper.create_coupon(id: '100OFF', currency: 'usd', amount_off: 100_00, duration: 'repeating', duration_in_months: 6) }
-    let(:coupon_pctoff) { stripe_helper.create_coupon(id: '50%OFF', currency: 'usd', percent_off: 50, amount_off: nil, duration: 'repeating', duration_in_months: 6) }
-    let(:product)       { stripe_helper.find_or_create_product(id: "prod_123") }
+    let(:coupon_pctoff) { stripe_helper.create_coupon(id: '50OFF', currency: 'usd', percent_off: 50, amount_off: nil, duration: 'repeating', duration_in_months: 6) }
+    let(:product)       { stripe_helper.create_product(id: "prod_123") }
     let(:plan)          { stripe_helper.create_plan(id: '50m', product: product.id, amount: 50_00, interval: 'month', nickname: '50m', currency: 'usd') }
     let(:quantity)      { 3 }
     let(:subscription)  { Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: quantity) }
@@ -199,8 +199,8 @@ shared_examples 'Invoice API' do
         expect(upcoming.discount).not_to be_nil
         expect(upcoming.discount.coupon.id).to eq '100OFF'
         expect(upcoming.discount.customer).to eq customer.id
-        expect(upcoming.discount.start).to be_within(5).of Time.now.to_i
-        expect(upcoming.discount.end).to be_within(5).of (Time.now.to_datetime >> 6).to_time.to_i
+        expect(upcoming.discount.start).to be_within(60).of Time.now.to_i
+        expect(upcoming.discount.end).to be_within(60).of (Time.now.to_datetime >> 6).to_time.to_i
         expect(upcoming.amount_due).to eq plan.amount * quantity - 100_00
         expect(upcoming.subtotal).to eq(upcoming.lines.data[0].amount)
         expect(upcoming.total).to eq upcoming.subtotal - 100_00
@@ -212,10 +212,10 @@ shared_examples 'Invoice API' do
 
         # Then
         expect(upcoming.discount).not_to be_nil
-        expect(upcoming.discount.coupon.id).to eq '50%OFF'
+        expect(upcoming.discount.coupon.id).to eq '50OFF'
         expect(upcoming.discount.customer).to eq customer.id
-        expect(upcoming.discount.start).to be_within(5).of Time.now.to_i
-        expect(upcoming.discount.end).to be_within(5).of (Time.now.to_datetime >> 6).to_time.to_i
+        expect(upcoming.discount.start).to be_within(60).of Time.now.to_i
+        expect(upcoming.discount.end).to be_within(60).of (Time.now.to_datetime >> 6).to_time.to_i
         expect(upcoming.amount_due).to eq (plan.amount * quantity) * 0.5
         expect(upcoming.subtotal).to eq(upcoming.lines.data[0].amount)
         expect(upcoming.total).to eq upcoming.subtotal * 0.5
@@ -224,7 +224,7 @@ shared_examples 'Invoice API' do
 
     describe 'proration' do
       shared_examples 'failing when proration date is outside of the subscription current period' do
-        it 'fails', live: true do
+        it 'fails', live: true, skip: 'Stripe does not raise error anymore' do
           expect { Stripe::Invoice.upcoming(
               customer: customer.id,
               subscription: subscription.id,
@@ -272,19 +272,17 @@ shared_examples 'Invoice API' do
             # Then
             expect(upcoming).to be_a Stripe::Invoice
             expect(upcoming.customer).to eq(customer.id)
-            if with_trial
-              expect(upcoming.amount_due).to be_within(1).of 0
-            else
-              expect(upcoming.amount_due).to be_within(1).of prorated_amount_due - credit_balance
-            end
             expect(upcoming.starting_balance).to eq -credit_balance
-            expect(upcoming.ending_balance).to be_nil
             expect(upcoming.subscription).to eq(subscription.id)
 
             if with_trial
+              expect(upcoming.amount_due).to be_within(1).of 0
               expect(upcoming.lines.data.length).to eq(2)
+              expect(upcoming.ending_balance).to eq -13581
             else
+              expect(upcoming.amount_due).to be_within(1).of prorated_amount_due - credit_balance
               expect(upcoming.lines.data.length).to eq(3)
+              expect(upcoming.ending_balance).to eq 0
             end
 
             expect(upcoming.lines.data[0].proration).to be_truthy
@@ -309,7 +307,7 @@ shared_examples 'Invoice API' do
             # Given
             proration_date = Time.now + 5 * 24 * 3600 # 5 days later
             new_quantity = 2
-            unused_amount = plan.amount * quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)
+            unused_amount = (plan.amount.to_f * quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)).round
             prorated_amount_due = new_yearly_plan.amount * new_quantity - unused_amount
             credit_balance = 1000
             customer.account_balance = -credit_balance
@@ -324,17 +322,18 @@ shared_examples 'Invoice API' do
             expect(upcoming).to be_a Stripe::Invoice
             expect(upcoming.customer).to eq(customer.id)
             if with_trial
+              expect(upcoming.ending_balance).to eq -13581
               expect(upcoming.amount_due).to eq 0
             else
-              expect(upcoming.amount_due).to be_within(1).of prorated_amount_due - credit_balance
+              expect(upcoming.ending_balance).to eq 0
+              expect(upcoming.amount_due).to eq prorated_amount_due - credit_balance
             end
             expect(upcoming.starting_balance).to eq -credit_balance
-            expect(upcoming.ending_balance).to be_nil
             expect(upcoming.subscription).to eq(subscription.id)
 
             expect(upcoming.lines.data[0].proration).to be_truthy
             expect(upcoming.lines.data[0].plan.id).to eq '50m'
-            expect(upcoming.lines.data[0].amount).to be_within(1).of -unused_amount
+            expect(upcoming.lines.data[0].amount).to eq -unused_amount
             expect(upcoming.lines.data[0].quantity).to eq quantity
 
             expect(upcoming.lines.data[1].proration).to be_falsey
@@ -352,7 +351,7 @@ shared_examples 'Invoice API' do
         it 'generates a preview without performing an actual proration', live: true do
           expect(preview.subtotal).to eq 150_00
           # this is a future invoice (generted at the end of the current subscription cycle), rather than a proration invoice
-          expect(preview.date).to be_within(1).of subscription.current_period_end
+          expect(preview.due_date).to be_nil
           expect(preview.period_start).to eq subscription.current_period_start
           expect(preview.period_end).to eq subscription.current_period_end
           expect(preview.lines.count).to eq 1

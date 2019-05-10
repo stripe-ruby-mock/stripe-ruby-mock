@@ -2,6 +2,20 @@ module StripeMock
   module TestStrategies
     class Live < Base
 
+      def create_product(params={})
+        params = create_product_params(params)
+        raise "create_product requires an :id" if params[:id].nil?
+        delete_product(params[:id])
+        Stripe::Product.create params
+      end
+
+      def delete_product(product_id)
+        product = Stripe::Product.retrieve(product_id)
+        Stripe::Plan.all(product: product_id).each(&:delete) if product.type == 'service'
+        product.delete
+      rescue Stripe::StripeError => e
+      end
+
       def create_plan(params={})
         raise "create_plan requires an :id" if params[:id].nil?
         delete_plan(params[:id])

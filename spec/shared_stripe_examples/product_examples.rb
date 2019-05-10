@@ -2,7 +2,6 @@ require "spec_helper"
 
 shared_examples "Product API" do
   let(:product_attributes) { {id: "prod_123", name: "My Mock Product", type: "service"} }
-  let(:idless_attributes) { product_attributes.merge({id: nil}) }
   let(:product) { Stripe::Product.create(product_attributes) }
 
   it "creates a stripe product" do
@@ -10,13 +9,6 @@ shared_examples "Product API" do
     expect(product.name).to eq("My Mock Product")
     expect(product.type).to eq("service")
     expect(product.unit_label).to eq("my_unit")
-  end
-
-  it "creates a stripe product without specifying ID" do
-    expect(idless_attributes[:id]).to be_nil
-
-    product = Stripe::Product.create(idless_attributes)
-    expect(product.id).to match(/^test_product_1/)
   end
 
   it "stores a created stripe product in memory" do
@@ -33,7 +25,7 @@ shared_examples "Product API" do
   end
 
   it "retrieves a stripe product" do
-    original = stripe_helper.create_product(idless_attributes)
+    original = stripe_helper.create_product(product_attributes)
     product = Stripe::Product.retrieve(original.id)
 
     expect(product.id).to eq(original.id)
@@ -98,6 +90,7 @@ shared_examples "Product API" do
     include_context "stripe validator"
     let(:params) { stripe_helper.create_product_params }
     let(:subject) { Stripe::Product.create(params) }
+    before { stripe_helper.delete_product(params[:id]) }
 
     describe "Required Parameters" do
       after do
@@ -114,7 +107,7 @@ shared_examples "Product API" do
       it "validates inclusion of type in 'good' or 'service'" do
         expect {
           Stripe::Product.create(params.merge({type: "OOPS"}))
-        }.to raise_error(Stripe::InvalidRequestError, stripe_validator.invalid_product_type_message)
+        }.to raise_error(Stripe::InvalidRequestError, "Invalid type: must be one of good or service")
       end
     end
 

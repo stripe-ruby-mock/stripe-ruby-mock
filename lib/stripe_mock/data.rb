@@ -338,6 +338,7 @@ module StripeMock
         date: 1349738950,
         period_end: 1349738950,
         period_start: 1349738950,
+        due_date: nil,
         lines: {
           object: "list",
           total_count: lines.count,
@@ -364,7 +365,7 @@ module StripeMock
         amount_due: nil,
         currency: currency,
         starting_balance: 0,
-        ending_balance: nil,
+        ending_balance: 0,
         next_payment_attempt: 1349825350,
         charge: nil,
         discount: nil,
@@ -378,6 +379,7 @@ module StripeMock
       end
       due = invoice[:total] + invoice[:starting_balance]
       invoice[:amount_due] = due < 0 ? 0 : due
+      invoice[:ending_balance] = invoice[:starting_balance] + invoice[:total] if invoice[:amount_due] == 0
       invoice
     end
 

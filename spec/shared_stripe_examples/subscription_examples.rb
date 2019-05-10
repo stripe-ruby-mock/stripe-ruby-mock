@@ -114,12 +114,6 @@ shared_examples 'Customer Subscriptions' do
       customer = Stripe::Customer.retrieve(customer.id)
       expect(sub.plan.to_hash).to eq(plan.to_hash)
       expect(customer.subscriptions.count).to eq(1)
-
-      plan_with_sym_id = stripe_helper.create_plan(id: :gold, product: product.id, amount: 14999, currency: 'usd')
-      sub = Stripe::Subscription.create({ plan: plan_with_sym_id.id, customer: customer.id })
-      customer = Stripe::Customer.retrieve(customer.id)
-      expect(sub.plan.to_hash).to eq(plan_with_sym_id.to_hash)
-      expect(customer.subscriptions.count).to eq(2)
     end
 
     it 'creates a charge for the customer', live: true do
@@ -457,7 +451,8 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it 'add a new subscription to bill via an invoice' do
-      plan = stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' },
+      product = stripe_helper.create_product(id: 'invoice_billing')
+      plan = stripe_helper.create_plan(id: 'silver', product: product.id,
                                        amount: 4999, currency: 'usd')
       customer = Stripe::Customer.create(id: 'cardless')
 
@@ -591,7 +586,7 @@ shared_examples 'Customer Subscriptions' do
       subscription.save
 
       expect(subscription.discount).not_to be_nil
-      expect(subscription.discount).to be_an_instance_of(Stripe::StripeObject)
+      expect(subscription.discount).to be_an_instance_of(Stripe::Discount)
       expect(subscription.discount.coupon.id).to eq(coupon.id)
     end
 
@@ -650,7 +645,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     [nil, 0].each do |trial_period_days|
-      it "throws an error when updating a customer with no card, and plan trail_period_days = #{trial_period_days}", live: true do
+      it "updates a subscription with status: past_due when updating a customer with no card, and plan trial_period_days = #{trial_period_days}", live: true do
         begin
           free_plan
           paid_plan = stripe_helper.create_plan(id: 'enterprise', product: product.id, amount: 499, trial_period_days: trial_period_days)
@@ -659,16 +654,13 @@ shared_examples 'Customer Subscriptions' do
           sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
           sub.plan = paid_plan.id
 
-          expect { sub.save }.to raise_error {|e|
-            expect(e).to be_a Stripe::InvalidRequestError
-            expect(e.http_status).to eq(400)
-            expect(e.message).to_not be_nil
-          }
+          sub.save
 
           customer = Stripe::Customer.retrieve(customer.id)
           expect(customer.subscriptions.count).to eq(1)
           expect(customer.subscriptions.data.length).to eq(1)
-          expect(customer.subscriptions.data.first.plan.to_hash).to eq(free_plan.to_hash)
+          expect(customer.subscriptions.data.first.plan.to_hash).to eq(paid_plan.to_hash)
+          expect(customer.subscriptions.data.first.status).to eq('past_due')
         ensure
           customer.delete if customer
           paid_plan.delete if paid_plan
@@ -759,7 +751,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     it "returns without a trial when trial_end is set to 'now'" do
-      customer = Stripe::Customer.create(id: 'test_trial_end', plan: plan_with_trial.id)
+      customer = Stripe::Customer.create(id: 'test_trial_end', plan: plan_with_trial.id, default_source: 'tok_visa')
 
       sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
 
@@ -882,7 +874,6 @@ shared_examples 'Customer Subscriptions' do
       :amount => 2000,
       :product => product.id,
       :interval => 'month',
-      :name => 'Amazing Gold Plan',
       :currency => 'usd',
       :id => 'gold'
     )

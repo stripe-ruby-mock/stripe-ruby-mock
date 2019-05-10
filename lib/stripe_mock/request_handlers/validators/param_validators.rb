@@ -22,11 +22,6 @@ module StripeMock
       # ProductValidator
       #
 
-      SUPPORTED_PRODUCT_TYPES = ["good", "service"]
-
-      def invalid_product_type_message
-        "Invalid type: must be one of good or service"
-      end
 
       def validate_create_product_params(params)
         params[:id] = params[:id].to_s
@@ -35,8 +30,8 @@ module StripeMock
           raise Stripe::InvalidRequestError.new(missing_param_message(k), k) if params[k].nil?
         end
 
-        if !SUPPORTED_PRODUCT_TYPES.include?(params[:type])
-          raise Stripe::InvalidRequestError.new(invalid_product_type_message, :type)
+        if !%w[good service].include?(params[:type])
+          raise Stripe::InvalidRequestError.new("Invalid type: must be one of good or service", :type)
         end
 
         if products[ params[:id] ]
@@ -66,9 +61,9 @@ module StripeMock
         "kgs", "khr", "kmf", "krw", "kyd", "kzt", "lak", "lbp", "lkr", "lrd", "lsl", "mad", "mdl", "mga", "mkd",
         "mmk", "mnt", "mop", "mro", "mur", "mvr", "mwk", "mxn", "myr", "mzn", "nad", "ngn", "nio", "nok", "npr",
         "nzd", "pab", "pen", "pgk", "php", "pkr", "pln", "pyg", "qar", "ron", "rsd", "rub", "rwf", "sar", "sbd",
-        "scr", "sek", "sgd", "shp", "sll", "sos", "srd", "std", "svc", "szl", "thb", "tjs", "top", "try", "ttd",
-        "twd", "tzs", "uah", "ugx", "uyu", "uzs", "vnd", "vuv", "wst", "xaf", "xcd", "xof", "xpf", "yer", "zar",
-        "zmw", "eek", "lvl", "vef"
+        "scr", "sek", "sgd", "shp", "sll", "sos", "srd", "std", "szl", "thb", "tjs", "top", "try", "ttd", "twd",
+        "tzs", "uah", "ugx", "uyu", "uzs", "vnd", "vuv", "wst", "xaf", "xcd", "xof", "xpf", "yer", "zar", "zmw",
+        "eek", "lvl", "svc", "vef"
       ]
 
       def invalid_currency_message(my_val)

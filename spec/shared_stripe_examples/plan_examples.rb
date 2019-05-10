@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 shared_examples 'Plan API' do
-  let(:product_id) { "prod_abc123" }
-  let(:product_attributes){ {id: product_id, name: "My Mock Product", type: "service"} }
-  let(:product) { Stripe::Product.create(product_attributes) }
+  let(:product) { stripe_helper.create_product }
+  let(:product_id) { product.id }
 
   let(:plan_attributes) { {
     :id => "plan_abc123",

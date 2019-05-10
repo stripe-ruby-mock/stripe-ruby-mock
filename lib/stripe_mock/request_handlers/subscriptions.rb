@@ -174,14 +174,13 @@ module StripeMock
 
           coupon = coupons[coupon_id]
           if coupon
-            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon, object: "discount" }, {})
           elsif coupon_id == ""
             subscription[:discount] = Stripe::Util.convert_to_stripe_object(nil, {})
           else
             raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
           end
         end
-        verify_card_present(customer, subscription_plans.first, subscription)
 
         if subscription[:cancel_at_period_end]
           subscription[:cancel_at_period_end] = false

@@ -36,7 +36,12 @@ module StripeMock
 
         if (((plan && plan[:trial_period_days]) || 0) == 0 && options[:trial_end].nil?) || options[:trial_end] == "now"
           end_time = options[:billing_cycle_anchor] || get_ending_time(start_time, plan)
-          params.merge!({status: 'active', current_period_end: end_time, trial_start: nil, trial_end: nil, billing_cycle_anchor: options[:billing_cycle_anchor]})
+          status = if payment_will_fail?(cus)
+            created_time == now ? 'past_due' : 'incomplete'
+          else
+            'active'
+          end
+          params.merge!({status: status, current_period_end: end_time, trial_start: nil, trial_end: nil, billing_cycle_anchor: options[:billing_cycle_anchor]})
         else
           end_time = options[:trial_end] || (Time.now.utc.to_i + plan[:trial_period_days]*86400)
           params.merge!({status: 'trialing', current_period_end: end_time, trial_start: start_time, trial_end: end_time, billing_cycle_anchor: nil})
@@ -104,6 +109,10 @@ module StripeMock
         total = 0
         items.each { |i| total += (i[:quantity] || 1) * i[:plan][:amount] }
         total
+      end
+
+      def payment_will_fail?(customer)
+        !customer[:default_source]
       end
     end
   end
