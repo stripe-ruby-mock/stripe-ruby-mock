@@ -362,6 +362,30 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.trial_end).to eq(trial_end)
     end
 
+    it "does not override trial end when trial end is not set" do
+      plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
+      customer = Stripe::Customer.create(id: 'short_trial')
+      trial_end = Time.now.utc.to_i + 3600
+      metadata = {description: 'original description'}
+
+      sub = Stripe::Subscription.create({ plan: 'trial', customer: customer.id, trial_end: trial_end, metadata: metadata })
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
+      expect(sub.current_period_end).to eq(trial_end)
+      expect(sub.trial_end).to eq(trial_end)
+      expect(sub.metadata.description).to eq(metadata[:description])
+
+      metadata = {description: 'updated description'}
+      sub = Stripe::Subscription.update(sub.id, { metadata: metadata })
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
+      expect(sub.current_period_end).to eq(trial_end)
+      expect(sub.trial_end).to eq(trial_end) # check that the trial_end has NOT changed
+      expect(sub.metadata.description).to eq(metadata[:description]) # check that the description has changed
+    end
+
     it "returns without a trial when trial_end is set to 'now'" do
       plan = stripe_helper.create_plan(id: 'trial', amount: 999, trial_period_days: 14)
       customer = Stripe::Customer.create(id: 'no_trial', source: gen_card_tk)
