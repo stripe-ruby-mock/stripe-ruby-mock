@@ -155,7 +155,7 @@ shared_examples 'Product API' do
       end
 
       it("requires a name") { @name = :name }
-      it("requires an type") { @name = :type }
+      it("requires a type") { @name = :type }
     end
 
     describe "Uniqueness" do
