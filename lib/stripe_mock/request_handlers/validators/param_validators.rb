@@ -50,7 +50,7 @@ module StripeMock
         end
 
         unless %w(finite bucket infinite).include? params[:inventory][:type]
-          raise Stripe::InvalidRequestError.new("Invalid type: must be one of finite, infinite, or bucket", :type)
+          raise Stripe::InvalidRequestError.new("Invalid inventory type: must be one of finite, infinite, or bucket", :type)
         end
       end
     end

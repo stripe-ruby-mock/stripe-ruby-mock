@@ -72,6 +72,7 @@ module StripeMock
       @refunds = {}
       @transfers = {}
       @payouts = {}
+      @skus = {}
       @subscriptions = {}
       @subscriptions_items = []
       @country_spec = {}
