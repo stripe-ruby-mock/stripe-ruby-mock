@@ -23,6 +23,17 @@ module StripeMock
         }.merge(params)
       end
 
+      # See https://stripe.com/docs/api/skus/create
+      def create_sku_params(params={})
+        {
+          :id => 'stripe_mock_default_sku_id',
+          :currency => 'usd',
+          :inventory => {type: 'infinite'},
+          :price => 1337,
+          :product => 'stripe_mock_default_product_id'
+        }.merge(params)
+      end
+
       def generate_card_token(card_params={})
         card_data = { :number => "4242424242424242", :exp_month => 9, :exp_year => (Time.now.year + 5), :cvc => "999", :tokenization_method => nil }
         card = StripeMock::Util.card_merge(card_data, card_params)

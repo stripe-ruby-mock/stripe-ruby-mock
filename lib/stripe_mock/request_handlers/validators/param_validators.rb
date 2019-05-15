@@ -38,6 +38,21 @@ module StripeMock
           raise Stripe::InvalidRequestError.new("Invalid type: must be one of good or service", :type)
         end
       end
+
+      def validate_create_sku_params(params)
+        @base_strategy.create_sku_params.keys.each do |name|
+          message = "Missing required param: #{name}."
+          raise Stripe::InvalidRequestError.new(message, name) if params[name].nil?
+        end
+
+        if skus[ params[:id] ]
+          raise Stripe::InvalidRequestError.new("SKU already exists.", :id)
+        end
+
+        unless %w(finite bucket infinite).include? params[:inventory][:type]
+          raise Stripe::InvalidRequestError.new("Invalid type: must be one of finite, infinite, or bucket", :type)
+        end
+      end
     end
   end
 end
