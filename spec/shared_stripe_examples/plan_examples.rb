@@ -157,7 +157,7 @@ shared_examples 'Plan API' do
         expect { subject }.to raise_error(Stripe::InvalidRequestError, message)
       end
 
-      it("requires a name") { @name = :name }
+      it("requires a product") { @name = :product }
       it("requires an amount") { @name = :amount }
       it("requires a currency") { @name = :currency }
       it("requires an interval") { @name = :interval }
