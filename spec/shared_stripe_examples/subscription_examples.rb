@@ -487,12 +487,14 @@ shared_examples 'Customer Subscriptions' do
         metadata: { foo: 'bar', example: 'yes' },
         billing: 'send_invoice',
         days_until_due: 30,
+        enable_incomplete_payments: false,
       })
 
       expect(sub.object).to eq('subscription')
       expect(sub.plan.to_hash).to eq(plan.to_hash)
       expect(sub.billing).to eq 'send_invoice'
       expect(sub.days_until_due).to eq 30
+      expect(sub.enable_incomplete_payments).to eq false
     end
   end
 
