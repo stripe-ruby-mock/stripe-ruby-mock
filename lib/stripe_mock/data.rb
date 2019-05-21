@@ -342,7 +342,8 @@ module StripeMock
         quantity: 1,
         tax_percent: nil,
         discount: nil,
-        metadata: {}
+        metadata: {},
+        default_tax_rates: nil
       }, params)
     end
 
