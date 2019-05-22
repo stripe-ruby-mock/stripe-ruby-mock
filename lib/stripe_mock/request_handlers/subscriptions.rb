@@ -60,7 +60,7 @@ module StripeMock
           coupon = coupons[coupon_id]
 
           if coupon
-            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+            add_coupon_to_object(subscription, coupon)
           else
             raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
           end
@@ -117,7 +117,7 @@ module StripeMock
           coupon = coupons[coupon_id]
 
           if coupon
-            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+            add_coupon_to_object(subscription, coupon)
           else
             raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
           end
@@ -174,9 +174,9 @@ module StripeMock
 
           coupon = coupons[coupon_id]
           if coupon
-            subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
+            add_coupon_to_object(subscription, coupon)
           elsif coupon_id == ""
-            subscription[:discount] = Stripe::Util.convert_to_stripe_object(nil, {})
+            subscription[:discount] = nil
           else
             raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
           end

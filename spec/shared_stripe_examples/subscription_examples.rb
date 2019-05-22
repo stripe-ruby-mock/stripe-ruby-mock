@@ -140,7 +140,7 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data).to be_a(Array)
       expect(customer.subscriptions.data.count).to eq(1)
       expect(customer.subscriptions.data.first.discount).not_to be_nil
-      expect(customer.subscriptions.data.first.discount).to be_a(Stripe::StripeObject)
+      expect(customer.subscriptions.data.first.discount).to be_a(Stripe::Discount)
       expect(customer.subscriptions.data.first.discount.coupon.id).to eq(coupon.id)
     end
 
@@ -614,7 +614,7 @@ shared_examples 'Customer Subscriptions' do
       subscription.save
 
       expect(subscription.discount).not_to be_nil
-      expect(subscription.discount).to be_an_instance_of(Stripe::StripeObject)
+      expect(subscription.discount).to be_a(Stripe::Discount)
       expect(subscription.discount.coupon.id).to eq(coupon.id)
     end
 
