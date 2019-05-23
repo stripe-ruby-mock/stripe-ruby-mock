@@ -510,6 +510,21 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_product(params = {})
+      {
+        id: "default_test_prod",
+        object: "product",
+        active: true,
+        created: 1556896214,
+        livemode: false,
+        metadata: {},
+        name: "Default Test Product",
+        statement_descriptor: "PRODUCT",
+        type: "service",
+        updated: 1556918200,
+      }.merge(params)
+    end
+
     def self.mock_recipient(cards, params={})
       rp_id = params[:id] || "test_rp_default"
       cards.each {|card| card[:recipient] = rp_id}
