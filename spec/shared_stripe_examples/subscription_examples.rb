@@ -971,6 +971,52 @@ shared_examples 'Customer Subscriptions' do
     end
   end
 
+  it "supports 'cancelling' by updating cancel_at_period_end" do
+    truth = stripe_helper.create_plan(id: 'the_truth')
+    customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: "the_truth")
+
+    sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+    result = Stripe::Subscription.update(sub.id, cancel_at_period_end: true)
+
+    expect(result.status).to eq('active')
+    expect(result.cancel_at_period_end).to eq(true)
+    expect(result.id).to eq(sub.id)
+
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+    expect(customer.subscriptions.data).to_not be_empty
+    expect(customer.subscriptions.count).to eq(1)
+    expect(customer.subscriptions.data.length).to eq(1)
+
+    expect(customer.subscriptions.data.first.status).to eq('active')
+    expect(customer.subscriptions.data.first.cancel_at_period_end).to eq(true)
+    expect(customer.subscriptions.data.first.ended_at).to be_nil
+    expect(customer.subscriptions.data.first.canceled_at).to_not be_nil
+  end
+
+  it "resumes a subscription cancelled by updating cancel_at_period_end" do
+    truth = stripe_helper.create_plan(id: 'the_truth')
+    customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: "the_truth")
+
+    sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+    Stripe::Subscription.update(sub.id, cancel_at_period_end: true)
+
+    result = Stripe::Subscription.update(sub.id, cancel_at_period_end: false)
+
+    expect(result.status).to eq('active')
+    expect(result.cancel_at_period_end).to eq(false)
+    expect(result.id).to eq(sub.id)
+
+    customer = Stripe::Customer.retrieve('test_customer_sub')
+    expect(customer.subscriptions.data).to_not be_empty
+    expect(customer.subscriptions.count).to eq(1)
+    expect(customer.subscriptions.data.length).to eq(1)
+
+    expect(customer.subscriptions.data.first.status).to eq('active')
+    expect(customer.subscriptions.data.first.cancel_at_period_end).to eq(false)
+    expect(customer.subscriptions.data.first.ended_at).to be_nil
+    expect(customer.subscriptions.data.first.canceled_at).to be_nil
+  end
+
   it "doesn't change status of subscription when cancelling at period end" do
     trial = stripe_helper.create_plan(id: 'trial', trial_period_days: 14)
     customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: "trial")
