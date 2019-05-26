@@ -6,7 +6,7 @@
   "object": "event",
   "data": {
     "object": {
-      "date": 1380674206,
+      "created": 1380674206,
       "id": "in_00000000000000",
       "period_start": 1378082075,
       "period_end": 1380674075,
