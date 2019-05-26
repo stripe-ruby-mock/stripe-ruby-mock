@@ -226,7 +226,7 @@ shared_examples 'Customer API' do
       discount = Stripe::Customer.retrieve(customer.id).discount
       expect(discount).to_not be_nil
       expect(discount.coupon).to_not be_nil
-      expect(discount.end).to be_within(1).of (Time.now + 365 * 24 * 3600).to_i
+      expect(discount.end).to be_within(1).of (Time.now.to_datetime >> 12).to_time.to_i
     end
     after { Stripe::Coupon.retrieve(coupon.id).delete }
     after { Stripe::Customer.retrieve(customer.id).delete }

@@ -51,7 +51,7 @@ module StripeMock
           coupon = coupons[ params[:coupon] ]
           assert_existence :coupon, params[:coupon], coupon
 
-          add_coupon_to_customer(customers[params[:id]], coupon)
+          add_coupon_to_object(customers[params[:id]], coupon)
         end
 
         customers[ params[:id] ]
@@ -90,7 +90,7 @@ module StripeMock
           coupon = coupons[ params[:coupon] ]
           assert_existence :coupon, params[:coupon], coupon
 
-          add_coupon_to_customer(cus, coupon)
+          add_coupon_to_object(cus, coupon)
         end
 
         cus
