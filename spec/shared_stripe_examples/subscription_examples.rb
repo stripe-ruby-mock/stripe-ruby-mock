@@ -518,6 +518,40 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.billing).to eq 'send_invoice'
       expect(sub.days_until_due).to eq 30
     end
+
+    let(:subscription_header) {{
+      :idempotency_key => 'a_idempotency_key'
+    }}
+
+    it "adds a new subscription to customer with identical idempotency key" do
+      plan = stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' },
+                                       amount: 4999, currency: 'usd')
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      expect(customer.subscriptions.data).to be_empty
+      expect(customer.subscriptions.count).to eq(0)
+
+      sub1 = Stripe::Subscription.create({ items: [{ plan: 'silver' }], customer: customer.id }, subscription_header)
+      sub2 = Stripe::Subscription.create({ items: [{ plan: 'silver' }], customer: customer.id }, subscription_header)
+      expect(sub1).to eq(sub2)
+    end
+
+    it "adds a new subscription to customer with different idempotency key", :live => true do
+      plan = stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' },
+                                       amount: 4999, currency: 'usd')
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      expect(customer.subscriptions.data).to be_empty
+      expect(customer.subscriptions.count).to eq(0)
+
+      another_subscription_header = {
+        :idempotency_key => 'another_idempotency_key'
+      }
+
+      sub1 = Stripe::Subscription.create({ items: [{ plan: 'silver' }], customer: customer.id }, subscription_header)
+      sub2 = Stripe::Subscription.create({ items: [{ plan: 'silver' }], customer: customer.id }, another_subscription_header)
+      expect(sub1).not_to eq(sub2)
+    end
   end
 
   context "updating a subscription" do
