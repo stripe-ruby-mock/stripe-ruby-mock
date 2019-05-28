@@ -101,6 +101,22 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_tax_rate(params)
+      {
+        id: 'test_cus_default',
+        object: 'tax_rate',
+        active: true,
+        created: 1559079603,
+        description: nil,
+        display_name: 'VAT',
+        inclusive: false,
+        jurisdiction: 'EU',
+        livemode: false,
+        metadata: {},
+        percentage: 21.0
+      }.merge(params)
+    end
+
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
       currency = params[:currency] || StripeMock.default_currency
