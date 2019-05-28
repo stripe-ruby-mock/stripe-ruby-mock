@@ -78,6 +78,15 @@ shared_examples 'Customer API' do
     expect(customer.sources.data.first.exp_year).to eq 2024
   end
 
+  it 'creates a customer with name' do
+    customer = Stripe::Customer.create(
+      source: gen_card_tk,
+      name: 'John Appleseed'
+    )
+    expect(customer.id).to match(/^test_cus/)
+    expect(customer.name).to eq('John Appleseed')
+  end
+
   it 'creates a customer with a plan' do
     plan = stripe_helper.create_plan(id: 'silver')
     customer = Stripe::Customer.create(id: 'test_cus_plan', source: gen_card_tk, :plan => 'silver')
@@ -267,6 +276,7 @@ shared_examples 'Customer API' do
 
     expect(customer.id).to eq(original.id)
     expect(customer.email).to eq(original.email)
+    expect(customer.name).to eq(nil)
     expect(customer.default_source).to eq(original.default_source)
     expect(customer.default_source).not_to be_a(Stripe::Card)
     expect(customer.subscriptions.count).to eq(0)

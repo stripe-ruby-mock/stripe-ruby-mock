@@ -111,6 +111,7 @@ module StripeMock
         object: "customer",
         created: 1372126710,
         id: cus_id,
+        name: nil,
         livemode: false,
         delinquent: false,
         discount: nil,
