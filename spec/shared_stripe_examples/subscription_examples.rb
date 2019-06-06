@@ -487,6 +487,7 @@ shared_examples 'Customer Subscriptions' do
         metadata: { foo: 'bar', example: 'yes' },
         billing: 'send_invoice',
         days_until_due: 30,
+        prorate: false,
         enable_incomplete_payments: false,
       })
 
@@ -495,6 +496,7 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.billing).to eq 'send_invoice'
       expect(sub.days_until_due).to eq 30
       expect(sub.enable_incomplete_payments).to eq false
+      expect(sub.prorate).to eq false
     end
   end
 
