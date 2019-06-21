@@ -79,7 +79,7 @@ shared_examples 'Invoice API' do
     end
 
     it 'updates attempted and paid flags' do
-      @invoice.pay
+      @invoice = @invoice.pay
       expect(@invoice.attempted).to eq(true)
       expect(@invoice.paid).to eq(true)
     end
@@ -89,7 +89,7 @@ shared_examples 'Invoice API' do
     end
 
     it 'sets the charge attribute' do
-      @invoice.pay
+      @invoice = @invoice.pay
       expect(@invoice.charge).to be_a String
       expect(@invoice.charge.length).to be > 0
     end
