@@ -52,7 +52,7 @@ shared_examples 'Invoice API' do
     end
 
     it "stores all invoices in memory" do
-      expect(Stripe::Invoice.all.map(&:id)).to eq([@invoice.id, @invoice2.id])
+      expect(Stripe::Invoice.all.map(&:id).sort).to eq([@invoice.id, @invoice2.id].sort)
     end
 
     it "defaults count to 10 invoices" do
