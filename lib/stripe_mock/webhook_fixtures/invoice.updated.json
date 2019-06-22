@@ -3,6 +3,7 @@
   "livemode": false,
   "id": "evt_00000000000000",
   "type": "invoice.updated",
+  "status": "paid",
   "object": "event",
   "data": {
     "object": {
