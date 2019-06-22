@@ -417,6 +417,11 @@ module StripeMock
           start: 1349738920,
           end: 1349738920
         },
+        tax_amounts: [
+          {
+            amount: 10
+          }
+        ]
         quantity: nil,
         subscription: nil,
         plan: nil,
