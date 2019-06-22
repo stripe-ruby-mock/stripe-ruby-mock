@@ -421,7 +421,7 @@ module StripeMock
           {
             amount: 10
           }
-        ]
+        ],
         quantity: nil,
         subscription: nil,
         plan: nil,
