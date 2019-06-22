@@ -353,6 +353,7 @@ module StripeMock
       invoice = {
         id: 'in_test_invoice',
         status: 'open',
+        invoice_pdf: 'pdf_url',
         created: 1349738950,
         period_end: 1349738950,
         period_start: 1349738950,
