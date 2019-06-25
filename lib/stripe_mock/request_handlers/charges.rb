@@ -158,10 +158,6 @@ module StripeMock
         params[:amount] && params[:amount] < 1
       end
 
-      def require_param(param)
-        raise Stripe::InvalidRequestError.new("Missing required param: #{param}", param.to_s, http_status: 400)
-      end
-
       def allowed_params(params)
         allowed = [:description, :metadata, :receipt_email, :fraud_details, :shipping, :destination]
 

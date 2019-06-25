@@ -75,7 +75,7 @@ module StripeMock
       @transfers = {}
       @payouts = {}
       @subscriptions = {}
-      @subscriptions_items = []
+      @subscriptions_items = {}
       @country_spec = {}
       @tax_rates = {}
 
