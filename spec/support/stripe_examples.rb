@@ -27,6 +27,7 @@ def it_behaves_like_stripe(&block)
   it_behaves_like 'Payout API', &block
   it_behaves_like 'Stripe Error Mocking', &block
   it_behaves_like 'Customer Subscriptions', &block
+  it_behaves_like 'Subscription Items API', &block
   it_behaves_like 'Webhook Events API', &block
   it_behaves_like 'Country Spec API', &block
   it_behaves_like 'EphemeralKey API', &block
