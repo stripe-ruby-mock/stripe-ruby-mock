@@ -50,6 +50,8 @@ module StripeMock
         'charge.dispute.created',
         'charge.dispute.updated',
         'charge.dispute.closed',
+        'charge.dispute.funds_reinstated',
+        'charge.dispute.funds_withdrawn',
         'customer.source.created',
         'customer.source.deleted',
         'customer.source.updated',
