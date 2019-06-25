@@ -101,6 +101,22 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_tax_rate(params)
+      {
+        id: 'test_cus_default',
+        object: 'tax_rate',
+        active: true,
+        created: 1559079603,
+        description: nil,
+        display_name: 'VAT',
+        inclusive: false,
+        jurisdiction: 'EU',
+        livemode: false,
+        metadata: {},
+        percentage: 21.0
+      }.merge(params)
+    end
+
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
       currency = params[:currency] || StripeMock.default_currency
@@ -336,6 +352,9 @@ module StripeMock
       lines << Data.mock_line_item() if lines.empty?
       invoice = {
         id: 'in_test_invoice',
+        status: 'open',
+        invoice_pdf: 'pdf_url',
+        hosted_invoice_url: 'hosted_invoice_url',
         created: 1349738950,
         period_end: 1349738950,
         period_start: 1349738950,
@@ -357,12 +376,13 @@ module StripeMock
         paid: false,
         receipt_number: nil,
         statement_descriptor: nil,
-        tax: nil,
+        tax: 10,
         tax_percent: nil,
         webhooks_delivered_at: 1349825350,
         livemode: false,
         attempt_count: 0,
-        amount_due: nil,
+        amount_due: 100,
+        amount_paid: 0,
         currency: currency,
         starting_balance: 0,
         ending_balance: nil,
@@ -397,6 +417,11 @@ module StripeMock
           start: 1349738920,
           end: 1349738920
         },
+        tax_amounts: [
+          {
+            amount: 10
+          }
+        ],
         quantity: nil,
         subscription: nil,
         plan: nil,
