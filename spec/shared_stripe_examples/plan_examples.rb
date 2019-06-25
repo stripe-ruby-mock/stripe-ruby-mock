@@ -9,6 +9,9 @@ shared_examples 'Plan API' do
       :amount => 9900,
       :currency => 'USD',
       :interval => 1,
+      :product => {
+        :name => 'A product'
+      },
       :metadata => {
         :description => "desc text",
         :info => "info text"
@@ -36,6 +39,9 @@ shared_examples 'Plan API' do
       :amount => 9900,
       :currency => 'USD',
       :interval => 1,
+      :product => {
+        :name => 'A product'
+      }
     )
 
     expect(plan.id).to match(/^test_plan/)
@@ -47,14 +53,20 @@ shared_examples 'Plan API' do
       :name => 'The Memory Plan',
       :amount => 1100,
       :currency => 'USD',
-      :interval => 1
+      :interval => 1,
+      :product => {
+        :name => 'A product'
+      }
     )
     plan2 = Stripe::Plan.create(
       :id => 'pid_3',
       :name => 'The Bonk Plan',
       :amount => 7777,
       :currency => 'USD',
-      :interval => 1
+      :interval => 1,
+      :product => {
+        :name => 'A product'
+      }
     )
     data = test_data_source(:plans)
     expect(data[plan.id]).to_not be_nil
@@ -136,7 +148,10 @@ shared_examples 'Plan API' do
         :name => 'The Mock Plan',
         :amount => 99.99,
         :currency => 'USD',
-        :interval => 'month'
+        :interval => 'month',
+        :product => {
+          :name => 'A product'
+        }
       )
     }.to raise_error(Stripe::InvalidRequestError, "Invalid integer: 99.99")
   end
