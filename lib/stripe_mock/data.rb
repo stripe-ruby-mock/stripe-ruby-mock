@@ -1088,5 +1088,100 @@ module StripeMock
         secret: "ek_test_default"
       }
     end
+
+    def self.mock_payment_intent(params = {})
+      payment_intent_id = params[:id] || "pi_1EwXFB2eZvKYlo2CggNnFBo8"
+      currency = params[:currency] || StripeMock.default_currency
+      {
+        id: payment_intent_id,
+        object: "payment_intent",
+        amount: 49900,
+        amount_capturable: 0,
+        amount_received: 0,
+        application: nil,
+        application_fee_amount: nil,
+        canceled_at: nil,
+        cancellation_reason: nil,
+        capture_method: "automatic",
+        charges: {
+          object: "list",
+          data: [],
+          has_more: false,
+          total_count: 0,
+          url: "/v1/charges?payment_intent=pi_1EwXFB2eZvKYlo2CggNnFBo8"
+        },
+        client_secret: "pi_1EwXFB2eZvKYlo2CggNnFBo8_secret_vOMkpqZu8ca7hxhfiO80tpT3v",
+        confirmation_method: "manual",
+        created: 1563208901,
+        currency: "gbp",
+        customer: nil,
+        description: nil,
+        invoice: nil,
+        last_payment_error: {
+          code: "payment_intent_authentication_failure",
+          doc_url: "https://stripe.com/docs/error-codes/payment-intent-authentication-failure",
+          message: "The provided PaymentMethod has failed authentication. You can provide payment_method_data or a new PaymentMethod to attempt to fulfill this PaymentIntent again.",
+          payment_method: {
+            id: "pm_1EwXFA2eZvKYlo2C0tlY091l",
+            object: "payment_method",
+            billing_details: {
+              address: {
+                city: nil,
+                country: nil,
+                line1: nil,
+                line2: nil,
+                postal_code: nil,
+                state: nil
+              },
+              email: nil,
+              name: "seller_08072019090000",
+              phone: nil
+            },
+            card: {
+              brand: "visa",
+              checks: {
+                address_line1_check: nil,
+                address_postal_code_check: nil,
+                cvc_check: "unchecked"
+              },
+              country: "US",
+              exp_month: 12,
+              exp_year: 2021,
+              fingerprint: "LQBhEmJnItuj3mxf",
+              funding: "credit",
+              generated_from: nil,
+              last4: "1629",
+              three_d_secure_usage: {
+                supported: true
+              },
+              wallet: nil
+            },
+            created: 1563208900,
+            customer: nil,
+            livemode: false,
+            metadata: {},
+            type: "card"
+          },
+          type: "invalid_request_error"
+        },
+        livemode: false,
+        metadata: {},
+        next_action: nil,
+        on_behalf_of: nil,
+        payment_method: nil,
+        payment_method_types: [
+          "card"
+        ],
+        receipt_email: nil,
+        review: nil,
+        setup_future_usage: nil,
+        shipping: nil,
+        source: nil,
+        statement_descriptor: nil,
+        status: "requires_action",
+        transfer_data: nil,
+        transfer_group: nil
+      }.merge(params)
+    end
   end
 end
