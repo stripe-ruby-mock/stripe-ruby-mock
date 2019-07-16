@@ -1117,53 +1117,7 @@ module StripeMock
         customer: nil,
         description: nil,
         invoice: nil,
-        last_payment_error: {
-          code: "payment_intent_authentication_failure",
-          doc_url: "https://stripe.com/docs/error-codes/payment-intent-authentication-failure",
-          message: "The provided PaymentMethod has failed authentication. You can provide payment_method_data or a new PaymentMethod to attempt to fulfill this PaymentIntent again.",
-          payment_method: {
-            id: "pm_1EwXFA2eZvKYlo2C0tlY091l",
-            object: "payment_method",
-            billing_details: {
-              address: {
-                city: nil,
-                country: nil,
-                line1: nil,
-                line2: nil,
-                postal_code: nil,
-                state: nil
-              },
-              email: nil,
-              name: "seller_08072019090000",
-              phone: nil
-            },
-            card: {
-              brand: "visa",
-              checks: {
-                address_line1_check: nil,
-                address_postal_code_check: nil,
-                cvc_check: "unchecked"
-              },
-              country: "US",
-              exp_month: 12,
-              exp_year: 2021,
-              fingerprint: "LQBhEmJnItuj3mxf",
-              funding: "credit",
-              generated_from: nil,
-              last4: "1629",
-              three_d_secure_usage: {
-                supported: true
-              },
-              wallet: nil
-            },
-            created: 1563208900,
-            customer: nil,
-            livemode: false,
-            metadata: {},
-            type: "card"
-          },
-          type: "invalid_request_error"
-        },
+        last_payment_error: nil,
         livemode: false,
         metadata: {},
         next_action: nil,

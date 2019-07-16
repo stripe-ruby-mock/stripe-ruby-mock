@@ -17,10 +17,18 @@ module StripeMock
         id = new_id('pi')
 
         ensure_payment_intent_required_params(params)
+        status = case params[:amount]
+        when 3184 then 'requires_action'
+        when 3178 then 'requires_payment_method'
+        else
+          'succeeded'
+        end
+        last_payment_error = params[:amount] == 3178 ? last_payment_error_generator(code: 'card_declined', decline_code: 'insufficient_funds', message: 'Not enough funds.') : nil
         payment_intents[id] = Data.mock_payment_intent(
           params.merge(
             id: id,
-            status: params[:amount] == 3184 ? 'requires_action' : 'succeeded'
+            status: status,
+            last_payment_error: last_payment_error
           )
         )
 
@@ -101,6 +109,57 @@ module StripeMock
 
       def non_positive_charge_amount?(params)
         params[:amount] && params[:amount] < 1
+      end
+
+      def last_payment_error_generator(code:, message:, decline_code:)
+        {
+          code: code,
+          doc_url: "https://stripe.com/docs/error-codes/payment-intent-authentication-failure",
+          message: message,
+          decline_code: decline_code,
+          payment_method: {
+            id: "pm_1EwXFA2eZvKYlo2C0tlY091l",
+            object: "payment_method",
+            billing_details: {
+              address: {
+                city: nil,
+                country: nil,
+                line1: nil,
+                line2: nil,
+                postal_code: nil,
+                state: nil
+              },
+              email: nil,
+              name: "seller_08072019090000",
+              phone: nil
+            },
+            card: {
+              brand: "visa",
+              checks: {
+                address_line1_check: nil,
+                address_postal_code_check: nil,
+                cvc_check: "unchecked"
+              },
+              country: "US",
+              exp_month: 12,
+              exp_year: 2021,
+              fingerprint: "LQBhEmJnItuj3mxf",
+              funding: "credit",
+              generated_from: nil,
+              last4: "1629",
+              three_d_secure_usage: {
+                supported: true
+              },
+              wallet: nil
+            },
+            created: 1563208900,
+            customer: nil,
+            livemode: false,
+            metadata: {},
+            type: "card"
+          },
+          type: "invalid_request_error"
+        }
       end
     end
   end
