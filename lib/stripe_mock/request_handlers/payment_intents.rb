@@ -32,6 +32,10 @@ module StripeMock
           )
         )
 
+        bal_trans_params = { amount: params[:amount], source: id, application_fee: params[:application_fee] }
+        balance_transaction_id = new_balance_transaction('txn', bal_trans_params)
+        payment_intents[id][:charges][:data][0][:balance_transaction] = balance_transaction_id
+
         payment_intents[id].clone
       end
 
