@@ -1,6 +1,10 @@
 module StripeMock
   module RequestHandlers
     module PaymentIntents
+      FAILED_TRANSACTION_AMOUNT = 3178
+      REQUIRES_ACTION_AMOUNT = 3184
+      REQUIRES_CAPTURE_AMOUNT = 3169
+
       ALLOWED_PARAMS = [:description, :metadata, :receipt_email, :shipping, :destination, :payment_method, :payment_method_types, :setup_future_usage, :transfer_data, :amount, :currency]
 
       def PaymentIntents.included(klass)
@@ -18,12 +22,13 @@ module StripeMock
 
         ensure_payment_intent_required_params(params)
         status = case params[:amount]
-        when 3184 then 'requires_action'
-        when 3178 then 'requires_payment_method'
+        when REQUIRES_ACTION_AMOUNT then 'requires_action'
+        when FAILED_TRANSACTION_AMOUNT then 'requires_payment_method'
+        when REQUIRES_CAPTURE_AMOUNT then 'requires_capture'
         else
           'succeeded'
         end
-        last_payment_error = params[:amount] == 3178 ? last_payment_error_generator(code: 'card_declined', decline_code: 'insufficient_funds', message: 'Not enough funds.') : nil
+        last_payment_error = params[:amount] == FAILED_TRANSACTION_AMOUNT ? last_payment_error_generator(code: 'card_declined', decline_code: 'insufficient_funds', message: 'Not enough funds.') : nil
         payment_intents[id] = Data.mock_payment_intent(
           params.merge(
             id: id,
@@ -70,8 +75,8 @@ module StripeMock
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        payment_intent[:status] = payment_intent[:amount] == 3178 ? 'requires_payment_method' : 'succeeded'
-        payment_intent[:last_payment_error] = payment_intent[:status] == 'requires_payment_method' ? last_payment_error_generator(code: 'card_declined', decline_code: 'insufficient_funds', message: 'Not enough funds.') : nil
+        payment_intent[:status] = payment_intent[:amount] == FAILED_TRANSACTION_AMOUNT ? 'requires_payment_method' : 'succeeded'
+        payment_intent[:last_payment_error] = payment_intent[:status] == 'requires_payment_method' ? last_payment_error_generator(code: 'card_declined', decline_code: 'do_not_honor', message: 'Your card has been declined. Please contact your bank for more information.') : nil
         payment_intent
       end
 
