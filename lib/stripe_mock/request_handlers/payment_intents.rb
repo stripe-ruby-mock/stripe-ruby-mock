@@ -28,7 +28,8 @@ module StripeMock
           params.merge(
             id: id,
             status: status,
-            last_payment_error: last_payment_error
+            last_payment_error: last_payment_error,
+            charges: status == 'succeeded' ? charges_date : empty_charges
           )
         )
 
@@ -69,7 +70,8 @@ module StripeMock
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        payment_intent[:status] = 'succeeded'
+        payment_intent[:status] = payment_intent[:amount] == 3178 ? 'requires_payment_method' : 'succeeded'
+        payment_intent[:last_payment_error] = payment_intent[:status] == 'requires_payment_method' ? last_payment_error_generator(code: 'card_declined', decline_code: 'insufficient_funds', message: 'Not enough funds.') : nil
         payment_intent
       end
 
@@ -109,6 +111,29 @@ module StripeMock
 
       def non_positive_charge_amount?(params)
         params[:amount] && params[:amount] < 1
+      end
+
+      def charges_date()
+        payment_intent_charge_id = new_id('ch')
+        payment_intent_charge = Data.mock_charge(id: payment_intent_charge_id)
+        charges[payment_intent_charge_id] = payment_intent_charge
+        {
+          :data => [payment_intent_charge],
+          :object => 'list',
+          has_more: false,
+          total_count: 1,
+          url: "/v1/charges?payment_intent=pi_1EwXFB2eZvKYlo2CggNnFBo8"
+        }
+      end
+
+      def empty_charges()
+        {
+          object: "list",
+          data: [],
+          has_more: false,
+          total_count: 0,
+          url: "/v1/charges?payment_intent=pi_1EwXFB2eZvKYlo2CggNnFBo8"
+        }
       end
 
       def last_payment_error_generator(code:, message:, decline_code:)
