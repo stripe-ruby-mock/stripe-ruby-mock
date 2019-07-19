@@ -1137,5 +1137,50 @@ module StripeMock
         transfer_group: nil
       }.merge(params)
     end
+
+    def self.mock_payment_method(params = {})
+      payment_intent_id = params[:id] || 'pm_1EUpjA404Ss6rryzkHnUQDxY'
+      {
+        id: payment_intent_id,
+        object: 'payment_method',
+        billing_details: {
+          address: {
+            city: nil,
+            country: nil,
+            line1: nil,
+            line2: nil,
+            postal_code: nil,
+            state: nil
+          },
+          email: nil,
+          name: nil,
+          phone: nil
+        },
+        card: {
+          brand: 'visa',
+          checks: {
+            address_line1_check: nil,
+            address_postal_code_check: nil,
+            cvc_check: nil
+          },
+          country: 'US',
+          exp_month: 4,
+          exp_year: (Time.now.year + 5),
+          fingerprint: 'Gu7YC8IGmLZsZJ4q',
+          funding: 'credit',
+          generated_from: nil,
+          last4: 4242,
+          three_d_secure_usage: {
+            supported: true
+          },
+          wallet: nil
+        },
+        created: 1556606768,
+        customer: nil,
+        livemode: false,
+        metadata: {},
+        type: 'card'
+      }.merge(params)
+    end
   end
 end
