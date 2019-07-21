@@ -89,6 +89,7 @@ shared_examples 'PaymentIntent API' do
     payment_intent = Stripe::PaymentIntent.create(amount: 100, currency: "usd")
     confirmed_payment_intent = payment_intent.capture()
     expect(confirmed_payment_intent.status).to eq("succeeded")
+    expect(confirmed_payment_intent.charges).not_to be_nil
   end
 
   it "cancels a stripe payment_intent" do
