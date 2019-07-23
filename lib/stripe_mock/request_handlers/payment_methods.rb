@@ -42,13 +42,8 @@ module StripeMock
       def attach_payment_method(route, method_url, params, headers)
         route =~ method_url
         id = $1
-        payment_methods[id] = Data.mock_payment_method(
-            params.merge(
-                id: id
-            )
-        )
-
-        payment_methods[id]
+        payment_methods[id].merge!(params)
+        payment_methods[id].clone
       end
 
       def detach_payment_method(route, method_url, params, headers)
