@@ -3,13 +3,15 @@ require 'spec_helper'
 shared_examples 'PaymentMethod API' do
 
   it "attaches a stripe payment_method" do
-    id = 'pm_1234'
-    payment_method = Stripe::PaymentMethod.attach(id, { customer: "cust_123" })
-    expect(payment_method.id).to eq(id)
+    pm = Stripe::PaymentMethod.create
+    payment_method = Stripe::PaymentMethod.attach(pm.id, { customer: "cust_123" })
+    expect(payment_method.id).to eq(pm.id)
+    expect(payment_method.customer).to eq("cust_123")
   end
 
   it "retrieves a stripe payment_method" do
-    original = Stripe::PaymentMethod.attach('pm_1234', { customer: "cust_123" })
+    pm = Stripe::PaymentMethod.create
+    original = Stripe::PaymentMethod.attach(pm.id, { customer: "cust_123" })
     payment_method = Stripe::PaymentMethod.retrieve(original.id)
     expect(payment_method.id).to eq(original.id)
   end

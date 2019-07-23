@@ -1159,11 +1159,9 @@ module StripeMock
       payment_method_id = params[:id] || "pm_1ExEuFL2DI6wht39WNJgbybl"
       {
           id: payment_method_id,
-          type: "card"
           object: "payment_method",
+          type: "card",
           billing_details: {},
-          customer: params[:customer] || "cus_FRncA7TzYgyplJ",
-          metadata: {},
           card: {
               brand: "visa",
               checks: { address_line1_check: nil, address_postal_code_check: nil, cvc_check: "pass" },
@@ -1174,6 +1172,10 @@ module StripeMock
               funding: "credit",
               last4: "3155",
               three_d_secure_usage: { supported: true }
+          },
+          customer: params[:customer] || "cus_FRncA7TzYgyplJ",
+          metadata: {
+            "order_id": "123456789"
           }
       }.merge(params)
     end
