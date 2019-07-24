@@ -743,10 +743,10 @@ module StripeMock
 
     def self.mock_dispute_evidence_details
       {
-          :due_by => 1424303999,
-          :has_evidence => false,
-          :past_due => false,
-          :submission_count => 0
+        :due_by => 1424303999,
+        :has_evidence => false,
+        :past_due => false,
+        :submission_count => 0
       }
     end
 
@@ -804,8 +804,8 @@ module StripeMock
 
     def self.mock_delete_discount_response
       {
-          :deleted => true,
-          :id => "di_test_coupon"
+        :deleted => true,
+        :id => "di_test_coupon"
       }
     end
 
