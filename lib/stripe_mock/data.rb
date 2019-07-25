@@ -1137,7 +1137,7 @@ module StripeMock
           last_payment_error: nil,
           livemode: false,
           metadata: {},
-          next_action: nil,
+          next_action: { type: "use_stripe_sdk" },
           on_behalf_of: nil,
           payment_method: nil,
           payment_method_types: [

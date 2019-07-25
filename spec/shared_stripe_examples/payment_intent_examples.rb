@@ -20,6 +20,7 @@ shared_examples 'PaymentIntent API' do
     expect(payment_intent.currency).to eq('usd')
     expect(payment_intent.metadata.to_hash).to eq({})
     expect(payment_intent.status).to eq('requires_action')
+    expect(payment_intent.next_action.type).to eq('use_stripe_sdk')
   end
 
   it "creates a requires_payment_method stripe payment_intent when amount matches 3184" do
