@@ -310,7 +310,7 @@ module StripeMock
     def self.mock_subscription(params={})
       StripeMock::Util.rmerge({
         created: 1478204116,
-        billing: 'charge_automatically',
+        collection_method: 'charge_automatically',
         current_period_start: 1308595038,
         current_period_end: 1308681468,
         status: 'trialing',
