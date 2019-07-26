@@ -78,7 +78,7 @@ shared_examples 'Invoice API' do
       @invoice = Stripe::Invoice.create
     end
 
-    it 'updates attempted and paid flags' do
+    it 'updates attempted and paid flags and status' do
       @invoice = @invoice.pay
       expect(@invoice.attempted).to eq(true)
       expect(@invoice.paid).to eq(true)
