@@ -82,6 +82,7 @@ shared_examples 'Invoice API' do
       @invoice = @invoice.pay
       expect(@invoice.attempted).to eq(true)
       expect(@invoice.paid).to eq(true)
+      expect(@invoice.status).to eq("paid")
     end
 
     it 'creates a new charge object' do
