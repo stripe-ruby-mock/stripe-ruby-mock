@@ -128,6 +128,7 @@ module StripeMock
         created: 1372126710,
         id: cus_id,
         name: nil,
+        preferred_locales: [],
         livemode: false,
         delinquent: false,
         discount: nil,
