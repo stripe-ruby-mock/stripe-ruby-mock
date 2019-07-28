@@ -328,7 +328,8 @@ module StripeMock
               created: 1504035972,
               currency: StripeMock.default_currency
             },
-            quantity: 1
+            quantity: 1,
+            tax_rates: []
           }]
         },
         cancel_at_period_end: false,
@@ -342,6 +343,7 @@ module StripeMock
         quantity: 1,
         tax_percent: nil,
         discount: nil,
+        default_tax_rates: [],
         metadata: {}
       }, params)
     end
@@ -1066,7 +1068,8 @@ module StripeMock
           statement_descriptor: nil,
           trial_period_days: nil
         },
-        quantity: 2
+        quantity: 2,
+        tax_rates: [],
       }.merge(params)
     end
 
