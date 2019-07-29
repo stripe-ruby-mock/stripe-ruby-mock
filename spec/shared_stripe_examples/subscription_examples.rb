@@ -565,6 +565,29 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.cancel_at_period_end).to be_falsey
     end
 
+    context 'when the customer has a default payment method but no default source' do
+      let(:customer) do
+        customer = Stripe::Customer.create
+        customer.invoice_settings.default_payment_method = 'pm_1F1P5TK3a32nQrTmF8MR5z3s'
+        customer.save
+      end
+      let(:plan) do
+        stripe_helper.create_plan(
+          id: 'silver',
+          product: { name: 'Silver Plan' },
+          amount: 4999, currency: 'usd'
+        )
+      end
+
+      it 'creates a new subscription' do
+        expect(customer.default_source).to be_nil
+        expect(customer.invoice_settings.default_payment_method.length).to be > 0
+
+        expect { Stripe::Subscription.create(items: [{ plan: plan.id }], customer: customer.id) }
+          .to change { customer.refresh.subscriptions.count }
+          .from(0).to(1)
+      end
+    end
   end
 
   context "updating a subscription" do
