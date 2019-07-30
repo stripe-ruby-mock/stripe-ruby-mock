@@ -7,6 +7,7 @@ end
 
 group :test do
   gem 'rake'
+  gem 'pry'
 end
 
 gemspec

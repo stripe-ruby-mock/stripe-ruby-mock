@@ -60,7 +60,7 @@ module StripeMock
         route =~ method_url
         order = assert_existence :order, $1, orders[$1]
 
-        if params[:source].blank? && params[:customer].blank?
+        if params[:source].nil? && params[:customer].nil?
           raise Stripe::InvalidRequestError.new('You must supply a source or customer', nil, http_status: 400)
         end
 

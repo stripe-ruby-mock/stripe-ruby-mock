@@ -9,6 +9,7 @@ module StripeMock
         klass.add_handler 'get /v1/invoices/(.*)',           :get_invoice
         klass.add_handler 'get /v1/invoices',                :list_invoices
         klass.add_handler 'post /v1/invoices/(.*)/pay',      :pay_invoice
+        klass.add_handler 'post /v1/invoices/(.*)/finalize', :finalize_invoice
         klass.add_handler 'post /v1/invoices/(.*)',          :update_invoice
       end
 
@@ -16,6 +17,14 @@ module StripeMock
         id = new_id('in')
         invoice_item = Data.mock_line_item()
         invoices[id] = Data.mock_invoice([invoice_item], params.merge(:id => id))
+      end
+
+      def finalize_invoice(route, method_url, params, headers)
+        route =~ method_url
+        assert_existence :invoice, $1, invoices[$1]
+        # check status it should works only for draft
+        payment_intent = invoice_payment_intent(invoices[$1])
+        invoices[$1].merge!(payment_intent: payment_intent[:id])
       end
 
       def update_invoice(route, method_url, params, headers)
@@ -172,6 +181,9 @@ module StripeMock
         end
       end
 
+      def invoice_payment_intent(invoice)
+        new_payment_intent(nil, nil, { customer: invoice[:customer], amount: invoice[:amount_due], currency: StripeMock.default_currency }, nil)
+      end
     end
   end
 end
