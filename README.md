@@ -106,6 +106,7 @@ The [available helpers](lib/stripe_mock/test_strategies/) are:
 stripe_helper.create_plan(my_plan_params)
 stripe_helper.delete_plan(my_plan_params)
 stripe_helper.generate_card_token(my_card_params)
+stripe_helper.automatic_confirm_payment_intent(payment_intent_client_secret)
 ```
 
 For everything else, use Stripe as you normally would (i.e. use Stripe as if you were not using StripeMock).

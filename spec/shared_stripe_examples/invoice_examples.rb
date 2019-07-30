@@ -109,8 +109,8 @@ shared_examples 'Invoice API' do
   context "retrieving upcoming invoice" do
     let(:customer)      { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
     let(:coupon_amtoff) { stripe_helper.create_coupon(id: '100OFF', currency: 'usd', amount_off: 100_00, duration: 'repeating', duration_in_months: 6) }
-    let(:coupon_pctoff) { stripe_helper.create_coupon(id: '50%OFF', currency: 'usd', percent_off: 50, amount_off: nil, duration: 'repeating', duration_in_months: 6) }
-    let(:plan)          { stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
+    let(:coupon_pctoff) { stripe_helper.create_coupon(id: '50OFF', currency: 'usd', percent_off: 50, amount_off: nil, duration: 'repeating', duration_in_months: 6) }
+    let(:plan)          { stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', product: { name: '50m' }, currency: 'usd') }
     let(:quantity)      { 3 }
     let(:subscription)  { Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: quantity) }
 
@@ -198,8 +198,8 @@ shared_examples 'Invoice API' do
         expect(upcoming.discount).not_to be_nil
         expect(upcoming.discount.coupon.id).to eq '100OFF'
         expect(upcoming.discount.customer).to eq customer.id
-        expect(upcoming.discount.start).to be_within(5).of Time.now.to_i
-        expect(upcoming.discount.end).to be_within(5).of (Time.now.to_datetime >> 6).to_time.to_i
+        expect(upcoming.discount.start).to be_within(10).of Time.now.to_i
+        expect(upcoming.discount.end).to be_within(10).of (Time.now.to_datetime >> 6).to_time.to_i
         expect(upcoming.amount_due).to eq plan.amount * quantity - 100_00
         expect(upcoming.subtotal).to eq(upcoming.lines.data[0].amount)
         expect(upcoming.total).to eq upcoming.subtotal - 100_00
@@ -211,7 +211,7 @@ shared_examples 'Invoice API' do
 
         # Then
         expect(upcoming.discount).not_to be_nil
-        expect(upcoming.discount.coupon.id).to eq '50%OFF'
+        expect(upcoming.discount.coupon.id).to eq '50OFF'
         expect(upcoming.discount.customer).to eq customer.id
         expect(upcoming.discount.start).to be_within(5).of Time.now.to_i
         expect(upcoming.discount.end).to be_within(5).of (Time.now.to_datetime >> 6).to_time.to_i
@@ -248,9 +248,9 @@ shared_examples 'Invoice API' do
 
       [false, true].each do |with_trial|
         describe "prorating a subscription with a new plan, with_trial: #{with_trial}" do
-          let(:new_monthly_plan) { stripe_helper.create_plan(id: '100m', amount: 100_00, interval: 'month', name: '100m', currency: 'usd') }
-          let(:new_yearly_plan) { stripe_helper.create_plan(id: '100y', amount: 100_00, interval: 'year', name: '100y', currency: 'usd') }
-          let(:plan) { stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', name: '50m', currency: 'usd') }
+          let(:new_monthly_plan) { stripe_helper.create_plan(id: '100m', amount: 100_00, interval: 'month', product: { name: '100m' }, currency: 'usd') }
+          let(:new_yearly_plan) { stripe_helper.create_plan(id: '100y', amount: 100_00, interval: 'year', product: { name: '100y' }, currency: 'usd') }
+          let(:plan) { stripe_helper.create_plan(id: '50m', amount: 50_00, interval: 'month', product: { name: '50m' }, currency: 'usd') }
 
           it 'prorates while maintaining billing interval', live: true do
             # Given
@@ -276,8 +276,9 @@ shared_examples 'Invoice API' do
             else
               expect(upcoming.amount_due).to be_within(1).of prorated_amount_due - credit_balance
             end
+
             expect(upcoming.starting_balance).to eq -credit_balance
-            expect(upcoming.ending_balance).to be_nil
+            expect(upcoming.ending_balance).to eq with_trial ? customer.account_balance - unused_amount : 0
             expect(upcoming.subscription).to eq(subscription.id)
 
             if with_trial
@@ -328,7 +329,8 @@ shared_examples 'Invoice API' do
               expect(upcoming.amount_due).to be_within(1).of prorated_amount_due - credit_balance
             end
             expect(upcoming.starting_balance).to eq -credit_balance
-            expect(upcoming.ending_balance).to be_nil
+
+            expect(upcoming.ending_balance).to eq with_trial ? customer.account_balance - unused_amount : 0
             expect(upcoming.subscription).to eq(subscription.id)
 
             expect(upcoming.lines.data[0].proration).to be_truthy
