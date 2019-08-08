@@ -76,7 +76,6 @@ module StripeMock
         if headers && headers[:idempotency_key]
           if subscriptions.any?
             original_subscription = subscriptions.values.find { |c| c[:idempotency_key] == headers[:idempotency_key]}
-            puts original_subscription
             return subscriptions[original_subscription[:id]] if original_subscription
           end
         end

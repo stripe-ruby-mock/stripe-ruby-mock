@@ -1,6 +1,10 @@
 module StripeMock
   module RequestHandlers
     module PaymentIntents
+      FAILED_TRANSACTION_AMOUNT = 3178
+      REQUIRES_ACTION_AMOUNT = 3184
+      REQUIRES_CAPTURE_AMOUNT = 3169
+
       ALLOWED_PARAMS = [:description, :metadata, :receipt_email, :shipping, :destination, :payment_method, :payment_method_types, :setup_future_usage, :transfer_data, :amount, :currency]
 
       def PaymentIntents.included(klass)
@@ -18,17 +22,19 @@ module StripeMock
 
         ensure_payment_intent_required_params(params)
         status = case params[:amount]
-        when 3184 then 'requires_action'
-        when 3178 then 'requires_payment_method'
+        when REQUIRES_ACTION_AMOUNT then 'requires_action'
+        when FAILED_TRANSACTION_AMOUNT then 'requires_payment_method'
+        when REQUIRES_CAPTURE_AMOUNT then 'requires_capture'
         else
           'succeeded'
         end
-        last_payment_error = params[:amount] == 3178 ? last_payment_error_generator(code: 'card_declined', decline_code: 'insufficient_funds', message: 'Not enough funds.') : nil
+        last_payment_error = params[:amount] == FAILED_TRANSACTION_AMOUNT ? last_payment_error_generator(code: 'card_declined', decline_code: 'insufficient_funds', message: 'Not enough funds.') : nil
         payment_intents[id] = Data.mock_payment_intent(
           params.merge(
             id: id,
             status: status,
-            last_payment_error: last_payment_error
+            last_payment_error: last_payment_error,
+            charges: status == 'succeeded' ? charges_data : empty_charges
           )
         )
 
@@ -69,7 +75,8 @@ module StripeMock
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        payment_intent[:status] = 'succeeded'
+        payment_intent[:status] = payment_intent[:amount] == FAILED_TRANSACTION_AMOUNT ? 'requires_payment_method' : 'succeeded'
+        payment_intent[:last_payment_error] = payment_intent[:status] == 'requires_payment_method' ? last_payment_error_generator(code: 'card_declined', decline_code: 'do_not_honor', message: 'Your card has been declined. Please contact your bank for more information.') : nil
         payment_intent
       end
 
@@ -78,6 +85,7 @@ module StripeMock
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
         payment_intent[:status] = 'succeeded'
+        payment_intent[:charges] = charges_data
         payment_intent
       end
 
@@ -109,6 +117,29 @@ module StripeMock
 
       def non_positive_charge_amount?(params)
         params[:amount] && params[:amount] < 1
+      end
+
+      def charges_data()
+        payment_intent_charge_id = new_id('ch')
+        payment_intent_charge = Data.mock_charge(id: payment_intent_charge_id)
+        charges[payment_intent_charge_id] = payment_intent_charge
+        {
+          :data => [payment_intent_charge],
+          :object => 'list',
+          has_more: false,
+          total_count: 1,
+          url: "/v1/charges?payment_intent=pi_1EwXFB2eZvKYlo2CggNnFBo8"
+        }
+      end
+
+      def empty_charges()
+        {
+          object: "list",
+          data: [],
+          has_more: false,
+          total_count: 0,
+          url: "/v1/charges?payment_intent=pi_1EwXFB2eZvKYlo2CggNnFBo8"
+        }
       end
 
       def last_payment_error_generator(code:, message:, decline_code:)

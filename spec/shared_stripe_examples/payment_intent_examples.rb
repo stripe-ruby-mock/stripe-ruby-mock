@@ -22,7 +22,7 @@ shared_examples 'PaymentIntent API' do
     expect(payment_intent.status).to eq('requires_action')
   end
 
-  it "creates a requires_payment_method stripe payment_intent when amount matches 3184" do
+  it "creates a requires_payment_method stripe payment_intent when amount matches 3178" do
     payment_intent = Stripe::PaymentIntent.create(amount: 3178, currency: "usd")
 
     expect(payment_intent.id).to match(/^test_pi/)
@@ -33,6 +33,16 @@ shared_examples 'PaymentIntent API' do
     expect(payment_intent.last_payment_error.code).to eq('card_declined')
     expect(payment_intent.last_payment_error.decline_code).to eq('insufficient_funds')
     expect(payment_intent.last_payment_error.message).to eq('Not enough funds.')
+  end
+
+  it "creates a requires_capture stripe payment_intent when amount matches 3169" do
+    payment_intent = Stripe::PaymentIntent.create(amount: 3169, currency: "usd")
+
+    expect(payment_intent.id).to match(/^test_pi/)
+    expect(payment_intent.amount).to eq(3169)
+    expect(payment_intent.currency).to eq('usd')
+    expect(payment_intent.metadata.to_hash).to eq({})
+    expect(payment_intent.status).to eq('requires_capture')
   end
 
   describe "listing payment_intent" do
@@ -79,6 +89,7 @@ shared_examples 'PaymentIntent API' do
     payment_intent = Stripe::PaymentIntent.create(amount: 100, currency: "usd")
     confirmed_payment_intent = payment_intent.capture()
     expect(confirmed_payment_intent.status).to eq("succeeded")
+    expect(confirmed_payment_intent.charges).not_to be_nil
   end
 
   it "cancels a stripe payment_intent" do
