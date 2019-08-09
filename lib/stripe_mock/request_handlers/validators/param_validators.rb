@@ -4,11 +4,22 @@ module StripeMock
 
       def validate_create_plan_params(params)
         params[:id] = params[:id].to_s
+        required_product_fields =  @base_strategy.create_plan_params[:product].keys
+
+        message = "Missing required param: name."
+        raise Stripe::InvalidRequestError.new(message, :product) if params[:product].nil?
+
+        required_product_fields.each do |name|
+          message = "Missing required param: #{name}."
+          raise Stripe::InvalidRequestError.new(message, name) if params[:product][name].nil?
+        end
 
         @base_strategy.create_plan_params.keys.each do |name|
           message =
             if name == :amount
               "Plans require an `#{name}` parameter to be set."
+            elsif name == :product
+              "Missing required param: name."
             else
               "Missing required param: #{name}."
             end
