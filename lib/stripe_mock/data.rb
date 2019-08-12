@@ -1131,7 +1131,7 @@ module StripeMock
         client_secret: "pi_1EwXFB2eZvKYlo2CggNnFBo8_secret_vOMkpqZu8ca7hxhfiO80tpT3v",
         confirmation_method: "manual",
         created: 1563208901,
-        currency: "gbp",
+        currency: currency,
         customer: nil,
         description: nil,
         invoice: nil,
