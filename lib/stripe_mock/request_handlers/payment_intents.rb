@@ -31,6 +31,9 @@ module StripeMock
             last_payment_error: last_payment_error
           )
         )
+        if params[:confirm]
+          payment_intents[id] = succeeded_payment_intent(payment_intents[id])
+        end
 
         payment_intents[id].clone
       end
@@ -69,18 +72,14 @@ module StripeMock
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        payment_intent[:status] = 'succeeded'
-        payment_intent[:charges][:data] << Data.mock_charge
-        payment_intent
+        succeeded_payment_intent(payment_intent)
       end
 
       def confirm_payment_intent(route, method_url, params, headers)
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        payment_intent[:status] = 'succeeded'
-        payment_intent[:charges][:data] << Data.mock_charge
-        payment_intent
+        succeeded_payment_intent(payment_intent)
       end
 
       def cancel_payment_intent(route, method_url, params, headers)
@@ -162,6 +161,13 @@ module StripeMock
           },
           type: "invalid_request_error"
         }
+      end
+
+      def succeeded_payment_intent(payment_intent)
+        payment_intent[:status] = 'succeeded'
+        payment_intent[:charges][:data] << Data.mock_charge
+
+        payment_intent
       end
     end
   end

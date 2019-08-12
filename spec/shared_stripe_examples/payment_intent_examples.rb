@@ -69,6 +69,15 @@ shared_examples 'PaymentIntent API' do
     }
   end
 
+  it 'creates and confirms a stripe payment_intent with confirm flag to true' do
+    payment_intent = Stripe::PaymentIntent.create(
+      amount: 100, currency: 'usd', confirm: true
+    )
+    expect(payment_intent.status).to eq('succeeded')
+    expect(payment_intent.charges.data.size).to eq(1)
+    expect(payment_intent.charges.data.first.object).to eq('charge')
+  end
+
   it "confirms a stripe payment_intent" do
     payment_intent = Stripe::PaymentIntent.create(amount: 100, currency: "usd")
     confirmed_payment_intent = payment_intent.confirm()
