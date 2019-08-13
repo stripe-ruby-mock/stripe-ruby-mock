@@ -228,6 +228,17 @@ shared_examples 'Customer API' do
     expect(customer.discount.start).to be_within(1).of Time.now.to_i
   end
 
+  it 'creates a customer with default invoice settings', live: true do
+    Stripe::Customer.create(id: 'test_cus_invoice_settings')
+    customer = Stripe::Customer.retrieve('test_cus_invoice_settings')
+
+    expect(customer.invoice_prefix).to_not be_nil
+    expect(customer.invoice_settings).to_not be_nil
+    expect(customer.invoice_settings.custom_fields).to be_nil
+    expect(customer.invoice_settings.default_payment_method).to be_nil
+    expect(customer.invoice_settings.footer).to be_nil
+  end
+
   describe 'repeating coupon with duration limit', live: true do
     let!(:coupon) { stripe_helper.create_coupon(id: '10OFF', amount_off: 1000, currency: 'usd', duration: 'repeating', duration_in_months: 12) }
     let!(:customer) { Stripe::Customer.create(coupon: coupon.id) }

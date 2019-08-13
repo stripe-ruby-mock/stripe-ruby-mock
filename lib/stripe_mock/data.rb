@@ -120,6 +120,7 @@ module StripeMock
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
       currency = params[:currency] || StripeMock.default_currency
+      invoice_prefix = SecureRandom.hex(4).upcase
       sources.each {|source| source[:customer] = cus_id}
       {
         email: 'stripe_mock@example.com',
@@ -127,6 +128,12 @@ module StripeMock
         object: "customer",
         created: 1372126710,
         id: cus_id,
+        invoice_prefix: invoice_prefix,
+        invoice_settings: {
+          custom_fields: nil,
+          default_payment_method: nil,
+          footer: nil
+        },
         name: nil,
         livemode: false,
         delinquent: false,
