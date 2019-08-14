@@ -307,7 +307,7 @@ module StripeMock
         billing: 'charge_automatically',
         current_period_start: 1308595038,
         current_period_end: 1308681468,
-        status: 'trialing',
+        status: 'incomplete',
         trial_from_plan: false,
         plan: {
           interval: 'month',
@@ -342,7 +342,13 @@ module StripeMock
         quantity: 1,
         tax_percent: nil,
         discount: nil,
-        metadata: {}
+        metadata: {},
+        # latest_invoice: {
+        #   payment_intent: {
+        #     status: 'succeeded',
+        #     client_secret: "pi_1F4pCkHCzfVgCFOHLyr5ci0T_secret_vQlEhSBVaBVrSAC4BGnLDmTpm"
+        #   }
+        # }
       }, params)
     end
 
