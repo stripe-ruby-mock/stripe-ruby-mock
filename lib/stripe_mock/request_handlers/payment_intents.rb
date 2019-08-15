@@ -20,6 +20,7 @@ module StripeMock
         status = case params[:amount]
         when 3184 then 'requires_action'
         when 3178 then 'requires_payment_method'
+        when 3055 then 'requires_capture'
         else
           'succeeded'
         end

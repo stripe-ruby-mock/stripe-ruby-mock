@@ -36,6 +36,16 @@ shared_examples 'PaymentIntent API' do
     expect(payment_intent.last_payment_error.message).to eq('Not enough funds.')
   end
 
+  it "creates a requires_payment_method stripe payment_intent when amount matches 3055" do
+    payment_intent = Stripe::PaymentIntent.create(amount: 3055, currency: "usd")
+
+    expect(payment_intent.id).to match(/^test_pi/)
+    expect(payment_intent.amount).to eq(3055)
+    expect(payment_intent.currency).to eq('usd')
+    expect(payment_intent.metadata.to_hash).to eq({})
+    expect(payment_intent.status).to eq('requires_capture')
+  end
+
   describe "listing payment_intent" do
     before do
       3.times do
