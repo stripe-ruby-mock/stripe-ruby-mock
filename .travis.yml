@@ -17,7 +17,7 @@ script: "bundle exec rspec && bundle exec rspec -t live"
 
 env:
   global:
-    - IS_TRAVIS=true STRIPE_TEST_SECRET_KEY_A=sk_test_sXdhUWu3NhrB7r1tkK0zZfMW STRIPE_TEST_SECRET_KEY_B=sk_test_uPfIX9ziFNloXwtSdDPJTdnh STRIPE_TEST_SECRET_KEY_C=sk_test_waSy1TaP2RNEpoz9t2pFCysm STRIPE_TEST_SECRET_KEY_D=sk_test_Z1mQZNehRFmI3EN9mHnMafnq
+    - IS_TRAVIS=true STRIPE_TEST_SECRET_KEY_A=sk_test_Ut2MSlZANdT3iDALdGhyLymy STRIPE_TEST_SECRET_KEY_B=sk_test_JXtzss9tHOG1ofIyEZgoUP4Q STRIPE_TEST_SECRET_KEY_C=sk_test_ZR5nVz9p3ivsqVa7mYB0sFep STRIPE_TEST_SECRET_KEY_D=sk_test_ZR5nVz9p3ivsqVa7mYB0sFep
 
 notifications:
   webhooks:

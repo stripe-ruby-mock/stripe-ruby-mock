@@ -78,6 +78,15 @@ shared_examples 'Customer API' do
     expect(customer.sources.data.first.exp_year).to eq 2024
   end
 
+  it 'creates a customer with name' do
+    customer = Stripe::Customer.create(
+      source: gen_card_tk,
+      name: 'John Appleseed'
+    )
+    expect(customer.id).to match(/^test_cus/)
+    expect(customer.name).to eq('John Appleseed')
+  end
+
   it 'creates a customer with a plan' do
     plan = stripe_helper.create_plan(id: 'silver')
     customer = Stripe::Customer.create(id: 'test_cus_plan', source: gen_card_tk, :plan => 'silver')
@@ -226,7 +235,7 @@ shared_examples 'Customer API' do
       discount = Stripe::Customer.retrieve(customer.id).discount
       expect(discount).to_not be_nil
       expect(discount.coupon).to_not be_nil
-      expect(discount.end).to be_within(1).of (Time.now + 365 * 24 * 3600).to_i
+      expect(discount.end).to be_within(1).of (Time.now.to_datetime >> 12).to_time.to_i
     end
     after { Stripe::Coupon.retrieve(coupon.id).delete }
     after { Stripe::Customer.retrieve(customer.id).delete }
@@ -267,6 +276,7 @@ shared_examples 'Customer API' do
 
     expect(customer.id).to eq(original.id)
     expect(customer.email).to eq(original.email)
+    expect(customer.name).to eq(nil)
     expect(customer.default_source).to eq(original.default_source)
     expect(customer.default_source).not_to be_a(Stripe::Card)
     expect(customer.subscriptions.count).to eq(0)
