@@ -10,9 +10,12 @@ module StripeMock
       end
 
       def new_refund(route, method_url, params, headers)
-        if params[:idempotency_key] && refunds.any?
-          original_refund = refunds.values.find { |c| c[:idempotency_key] == params[:idempotency_key]}
-          return refunds[original_refund[:id]] if original_refund
+        if headers && headers[:idempotency_key]
+          params[:idempotency_key] = headers[:idempotency_key]
+          if refunds.any?
+            original_refund = refunds.values.find { |c| c[:idempotency_key] == headers[:idempotency_key]}
+            return refunds[original_refund[:id]] if original_refund
+          end
         end
 
         charge = assert_existence :charge, params[:charge], charges[params[:charge]]

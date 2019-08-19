@@ -66,4 +66,35 @@ describe StripeMock::Instance do
     end
     expect(customer.currency).to eq("jpy")
   end
+
+  context 'when creating sources with metadata' do
+    let(:customer) { Stripe::Customer.create(email: 'test@email.com') }
+    let(:metadata) { { test_key: 'test_value' } }
+
+    context 'for credit card' do
+      let(:credit_card) do
+        customer.sources.create(
+          source: stripe_helper.generate_card_token,
+          metadata: metadata
+        )
+      end
+
+      it('should save metadata') do
+        expect(credit_card.metadata.test_key).to eq metadata[:test_key]
+      end
+    end
+
+    context 'for bank account' do
+      let(:bank_account) do
+        customer.sources.create(
+          source: stripe_helper.generate_bank_token,
+          metadata: metadata
+        )
+      end
+
+      it('should save metadata') do
+        expect(bank_account.metadata.test_key).to eq metadata[:test_key]
+      end
+    end
+  end
 end

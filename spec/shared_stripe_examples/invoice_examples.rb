@@ -52,7 +52,7 @@ shared_examples 'Invoice API' do
     end
 
     it "stores all invoices in memory" do
-      expect(Stripe::Invoice.all.map(&:id)).to eq([@invoice.id, @invoice2.id])
+      expect(Stripe::Invoice.all.map(&:id).sort).to eq([@invoice.id, @invoice2.id].sort)
     end
 
     it "defaults count to 10 invoices" do
@@ -79,7 +79,7 @@ shared_examples 'Invoice API' do
     end
 
     it 'updates attempted and paid flags' do
-      @invoice.pay
+      @invoice = @invoice.pay
       expect(@invoice.attempted).to eq(true)
       expect(@invoice.paid).to eq(true)
     end
@@ -89,7 +89,7 @@ shared_examples 'Invoice API' do
     end
 
     it 'sets the charge attribute' do
-      @invoice.pay
+      @invoice = @invoice.pay
       expect(@invoice.charge).to be_a String
       expect(@invoice.charge.length).to be > 0
     end
@@ -351,7 +351,7 @@ shared_examples 'Invoice API' do
         it 'generates a preview without performing an actual proration', live: true do
           expect(preview.subtotal).to eq 150_00
           # this is a future invoice (generted at the end of the current subscription cycle), rather than a proration invoice
-          expect(preview.date).to be_within(1).of subscription.current_period_end
+          expect(preview.created).to be_within(1).of subscription.current_period_end
           expect(preview.period_start).to eq subscription.current_period_start
           expect(preview.period_end).to eq subscription.current_period_end
           expect(preview.lines.count).to eq 1
@@ -360,7 +360,7 @@ shared_examples 'Invoice API' do
           expect(line.amount).to eq 150_00
           # line period is for the NEXT subscription cycle
           expect(line.period.start).to be_within(1).of subscription.current_period_end
-          expect(line.period.end).to be_within(1).of (Time.at(subscription.current_period_end).to_datetime >> 1).to_time.to_i # +1 month
+          expect(Time.at(line.period.end).month).to be_within(1).of (Time.at(subscription.current_period_end).to_datetime >> 1).month # +1 month
         end
       end
 
