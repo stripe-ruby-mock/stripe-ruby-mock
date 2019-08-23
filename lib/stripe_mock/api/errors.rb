@@ -59,6 +59,12 @@ module StripeMock
 
       error_values.last.merge!(json_body: { error: json_hash }, http_body: { error: json_hash })
 
+      # In stripe-ruby > 5.0 Stripe::CardError.new third argument was moved
+      # to keyword argument `code`.
+      if Gem::Version.new(Stripe::VERSION) >= Gem::Version.new('5')
+        error_values.last.merge!(code: error_values.delete_at(2))
+      end
+
       error_values
     end
   end
