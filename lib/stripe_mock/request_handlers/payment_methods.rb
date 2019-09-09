@@ -1,7 +1,7 @@
 module StripeMock
   module RequestHandlers
     module PaymentMethods
-      ALLOWED_PARAMS = [:description, :metadata, :receipt_email, :shipping, :destination, :payment_method, :payment_method_types, :setup_future_usage, :transfer_data, :amount, :currency]
+      UPDATE_PARAMS = [:billing_details, :card, :metadata]
 
       def PaymentMethods.included(klass)
         klass.add_handler 'post /v1/payment_methods',             :new_payment_method
@@ -71,8 +71,7 @@ module StripeMock
           raise Stripe::InvalidRequestError.new('You must save this PaymentMethod to a customer before you can update it.', nil, http_status: 400)
         end
 
-        payment_method.merge!(params.slice(:billing_details, :card, :metadata))
-        payment_method
+        payment_methods[$1] = Util.rmerge(payment_method, params.select{ |k,v| UPDATE_PARAMS.include?(k)})
       end
 
       private
