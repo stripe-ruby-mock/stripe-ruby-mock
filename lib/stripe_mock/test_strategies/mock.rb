@@ -40,6 +40,10 @@ module StripeMock
             status: is_paid ? 'succeeded' : 'failed'
           })
 
+          if is_paid && !StripeMock.instance.payment_intents[pi_id][:invoice].nil?
+            StripeMock.instance.invoices[StripeMock.instance.payment_intents[pi_id][:invoice]][:paid] = is_paid
+          end
+
           StripeMock.instance.payment_intents[pi_id][:charges][:total_count] += 1
           StripeMock.instance.payment_intents[pi_id][:charges][:data] << charge
           StripeMock.instance.payment_intents[pi_id][:status] = is_paid ? 'succeeded' : 'requires_payment_method'

@@ -111,6 +111,7 @@ module StripeMock
             payment_intent[:charges][:total_count] += 1
             payment_intent[:charges][:data] << charge
             payment_intent[:status] = 'succeeded'
+            invoices[payment_intent[:invoice]].merge!(paid: true) if payment_intent[:invoice] && !invoices[payment_intent[:invoice]].nil?
           else
             payment_intent[:status] = 'requires_action' # check status for not enought founds
           end

@@ -24,7 +24,7 @@ module StripeMock
         assert_existence :invoice, $1, invoices[$1]
         # check status it should works only for draft
         payment_intent = invoice_payment_intent(invoices[$1])
-        invoices[$1].merge!(payment_intent: payment_intent[:id])
+        invoices[$1].merge!(paid: payment_intent[:status] == 'succeeded', payment_intent: payment_intent[:id])
       end
 
       def update_invoice(route, method_url, params, headers)
@@ -182,7 +182,7 @@ module StripeMock
       end
 
       def invoice_payment_intent(invoice)
-        new_payment_intent(nil, nil, { customer: invoice[:customer], amount: invoice[:amount_due], currency: StripeMock.default_currency }, nil)
+        new_payment_intent(nil, nil, { customer: invoice[:customer], amount: invoice[:amount_due], invoice: invoice[:id], currency: StripeMock.default_currency }, nil)
       end
     end
   end
