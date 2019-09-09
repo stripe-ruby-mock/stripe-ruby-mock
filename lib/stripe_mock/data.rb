@@ -393,7 +393,7 @@ module StripeMock
         amount_paid: 0,
         currency: currency,
         starting_balance: 0,
-        ending_balance: nil,
+        ending_balance: 0,
         next_payment_attempt: 1349825350,
         charge: nil,
         discount: nil,
@@ -407,6 +407,7 @@ module StripeMock
       end
       due = invoice[:total] + invoice[:starting_balance]
       invoice[:amount_due] = due < 0 ? 0 : due
+      invoice[:ending_balance] = [0, invoice[:starting_balance] + invoice[:total]].min
       invoice
     end
 
