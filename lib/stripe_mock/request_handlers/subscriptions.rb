@@ -142,7 +142,7 @@ module StripeMock
         invoices[invoice[:id]] = invoice
 
         # add payment intent
-        if params[:source].nil? && subscription_plans.first[:amount] > 0 # Check how free plan behave on stripe live
+        if params[:source].nil? && subscription_plans.first[:amount] > 0 && customer[:invoice_settings] && customer[:invoice_settings][:default_payment_method] # Check how free plan behave on stripe live
           payment_intent = subscription_payment_intent(invoice)
           invoice[:payment_intent] = payment_intent[:id]
           invoice[:paid] = payment_intent[:status] == 'succeeded'
