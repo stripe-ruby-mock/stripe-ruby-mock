@@ -12,7 +12,7 @@ This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 2.5.8', :require => 'stripe_mock'
+    gem 'stripe-ruby-mock', '~> 2.6.0', :require => 'stripe_mock'
 
 ## Features
 
@@ -23,12 +23,12 @@ In your gemfile:
 
 ### Requirements
 
-* ruby >= 2.0.0
-* stripe >= 2.0.3
+* ruby >= 2.3.0
+* stripe >= 4.22.0
 
 ### Specifications
 
-**STRIPE API TARGET VERSION:** 2017-06-05 (master)
+**STRIPE API TARGET VERSION:** 2019-05-16 (master)
 
 Older API version branches:
 
