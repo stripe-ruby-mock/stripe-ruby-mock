@@ -146,6 +146,7 @@ module StripeMock
           payment_intent = subscription_payment_intent(invoice)
           invoice[:payment_intent] = payment_intent[:id]
           invoice[:paid] = payment_intent[:status] == 'succeeded'
+          invoice[:status] = 'paid' if payment_intent[:status] == 'succeeded'
         end
         subscriptions[subscription[:id]]
       end
