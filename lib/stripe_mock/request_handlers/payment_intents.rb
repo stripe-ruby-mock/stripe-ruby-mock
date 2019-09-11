@@ -35,10 +35,13 @@ module StripeMock
 
       def update_payment_intent(route, method_url, params, headers)
         route =~ method_url
-        id = $1
+        payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        payment_intent = assert_existence :payment_intent, id, payment_intents[id]
-        payment_intents[id] = Util.rmerge(payment_intent, params.select{ |k,v| ALLOWED_PARAMS.include?(k)})
+        if params[:payment_method]
+          payment_intent[:payment_method] = params[:payment_method]
+          payment_intent[:status] = 'requires_confirmation'
+        end
+        payment_intents[$1] = Util.rmerge(payment_intent, params.select{ |k,v| ALLOWED_PARAMS.include?(k)})
       end
 
       def get_payment_intents(route, method_url, params, headers)
@@ -75,6 +78,10 @@ module StripeMock
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
+        if params[:payment_method]
+          payment_intent[:payment_method] = params[:payment_method]
+          payment_intent[:status] = 'requires_confirmation'
+        end
         confirm_intent(payment_intent)
       end
 
