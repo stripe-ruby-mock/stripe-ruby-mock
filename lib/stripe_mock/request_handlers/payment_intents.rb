@@ -27,16 +27,21 @@ module StripeMock
           )
         )
 
+        invoices[params[:invoice]][:payment_intent] = id if params[:invoice]
+
         confirm_intent(payment_intents[id]) if params[:confirm]
         payment_intents[id]
       end
 
       def update_payment_intent(route, method_url, params, headers)
         route =~ method_url
-        id = $1
+        payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        payment_intent = assert_existence :payment_intent, id, payment_intents[id]
-        payment_intents[id] = Util.rmerge(payment_intent, params.select{ |k,v| ALLOWED_PARAMS.include?(k)})
+        if params[:payment_method]
+          payment_intent[:payment_method] = params[:payment_method]
+          payment_intent[:status] = 'requires_confirmation'
+        end
+        payment_intents[$1] = Util.rmerge(payment_intent, params.select{ |k,v| ALLOWED_PARAMS.include?(k)})
       end
 
       def get_payment_intents(route, method_url, params, headers)
@@ -73,6 +78,10 @@ module StripeMock
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
+        if params[:payment_method]
+          payment_intent[:payment_method] = params[:payment_method]
+          payment_intent[:status] = 'requires_confirmation'
+        end
         confirm_intent(payment_intent)
       end
 
@@ -111,7 +120,7 @@ module StripeMock
             payment_intent[:charges][:total_count] += 1
             payment_intent[:charges][:data] << charge
             payment_intent[:status] = 'succeeded'
-            invoices[payment_intent[:invoice]].merge!(paid: true) if payment_intent[:invoice] && !invoices[payment_intent[:invoice]].nil?
+            invoices[payment_intent[:invoice]].merge!(paid: true, status: 'paid') if payment_intent[:invoice] && !invoices[payment_intent[:invoice]].nil?
           else
             payment_intent[:status] = 'requires_action' # check status for not enought founds
           end
