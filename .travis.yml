@@ -3,13 +3,12 @@ group: deprecated-2017Q2
 sudo: required
 language: ruby
 rvm:
-  - 2.0.0
-  - 2.1.10
-  - 2.2.7
-  - 2.3.4
+  - 2.3.8
+  - 2.4.6
+  - 2.5.5
+  - 2.6.3
 before_install:
-  - rvm 2.1.10 do gem install mime-types -v 2.6.2
-  - gem install -v 1.17.2 bundler
+  - gem install bundler
 before_script:
   - "sudo touch /var/log/stripe-mock-server.log"
   - "sudo chown travis /var/log/stripe-mock-server.log"
