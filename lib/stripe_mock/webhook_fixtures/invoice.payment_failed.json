@@ -99,7 +99,8 @@
       "application_fee": null,
       "subscription": "su_00000000000000",
       "metadata": {},
-      "description": null
+      "description": null,
+      "hosted_invoice_url": "https://pay.stripe.com/invoice/invst_IrblVzbkClg1um0YifDRPEDfvL"
     }
   }
 }

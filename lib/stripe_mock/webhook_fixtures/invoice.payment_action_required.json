@@ -21,6 +21,7 @@
       "discount": null,
       "ending_balance": 0,
       "forgiven": false,
+      "hosted_invoice_url": "https://pay.stripe.com/invoice/invst_IrblVzbkClg1um0YifDRPEDfvL",
       "lines": {
         "data": [{
           "id": "sub_00000000000000",
