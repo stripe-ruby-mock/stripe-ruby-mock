@@ -145,6 +145,11 @@ module StripeMock
           url: "/v1/customers/#{cus_id}/subscriptions",
           data: []
         },
+        invoice_settings: {
+          custom_fields: nil,
+          default_payment_method: nil,
+          footer: nil
+        },
         default_source: nil
       }.merge(params)
     end
@@ -207,6 +212,9 @@ module StripeMock
         invoice: nil,
         description: nil,
         dispute: nil,
+        payment_method: nil,
+        payment_method_details: nil,
+        payment_intent: nil,
         metadata: {
         }
       }.merge(params)
@@ -385,11 +393,12 @@ module StripeMock
         amount_paid: 0,
         currency: currency,
         starting_balance: 0,
-        ending_balance: nil,
+        ending_balance: 0,
         next_payment_attempt: 1349825350,
         charge: nil,
         discount: nil,
-        subscription: nil
+        subscription: nil,
+        payment_intent: nil
       }.merge(params)
       if invoice[:discount]
         invoice[:total] = [0, invoice[:subtotal] - invoice[:discount][:coupon][:amount_off]].max if invoice[:discount][:coupon][:amount_off]
@@ -399,6 +408,7 @@ module StripeMock
       end
       due = invoice[:total] + invoice[:starting_balance]
       invoice[:amount_due] = due < 0 ? 0 : due
+      invoice[:ending_balance] = [0, invoice[:starting_balance] + invoice[:total]].min
       invoice
     end
 
@@ -1135,6 +1145,51 @@ module StripeMock
         status: "requires_action",
         transfer_data: nil,
         transfer_group: nil
+      }.merge(params)
+    end
+
+    def self.mock_payment_method(params = {})
+      payment_method_id = params[:id] || 'pm_1EUpjA404Ss6rryzkHnUQDxY'
+      {
+        id: payment_method_id,
+        object: 'payment_method',
+        billing_details: {
+          address: {
+            city: nil,
+            country: nil,
+            line1: nil,
+            line2: nil,
+            postal_code: nil,
+            state: nil
+          },
+          email: nil,
+          name: nil,
+          phone: nil
+        },
+        card: {
+          brand: 'visa',
+          checks: {
+            address_line1_check: nil,
+            address_postal_code_check: nil,
+            cvc_check: nil
+          },
+          country: 'US',
+          exp_month: 8,
+          exp_year: 2020,
+          fingerprint: 'c43pb54tOJq4Twvj',
+          funding: 'credit',
+          generated_from: nil,
+          last4: 4242,
+          three_d_secure_usage: {
+            supported: true
+          },
+          wallet: nil
+        },
+        created: 123456789,
+        customer: nil,
+        livemode: false,
+        metadata: {},
+        type: 'card'
       }.merge(params)
     end
   end

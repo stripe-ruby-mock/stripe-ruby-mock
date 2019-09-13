@@ -520,7 +520,7 @@ shared_examples 'Customer Subscriptions' do
     end
 
     let(:subscription_header) {{
-      :idempotency_key => 'a_idempotency_key'
+      :idempotency_key => SecureRandom.hex
     }}
 
     it "adds a new subscription to customer with identical idempotency key" do
@@ -545,7 +545,7 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.count).to eq(0)
 
       another_subscription_header = {
-        :idempotency_key => 'another_idempotency_key'
+        :idempotency_key => SecureRandom.hex
       }
 
       sub1 = Stripe::Subscription.create({ items: [{ plan: 'silver' }], customer: customer.id }, subscription_header)
@@ -923,8 +923,8 @@ shared_examples 'Customer Subscriptions' do
   context "cancelling a subscription" do
 
     it "cancels a stripe customer's subscription", :live => true do
-      truth = stripe_helper.create_plan(id: 'the truth')
-      customer = Stripe::Customer.create(source: gen_card_tk, plan: "the truth")
+      stripe_helper.create_plan(id: 'the_truth')
+      customer = Stripe::Customer.create(source: gen_card_tk, plan: "the_truth")
 
       sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
       result = sub.delete
@@ -1046,11 +1046,11 @@ shared_examples 'Customer Subscriptions' do
 
   it "doesn't require a card when trial_end is present", :live => true do
     plan = stripe_helper.create_plan(
-      :amount => 2000,
-      :interval => 'month',
-      :name => 'Amazing Gold Plan',
-      :currency => 'usd',
-      :id => 'gold'
+      amount: 2000,
+      interval: 'month',
+      product: { name: 'Amazing Gold Plan' },
+      currency: 'usd',
+      id: 'gold'
     )
 
     stripe_customer = Stripe::Customer.create

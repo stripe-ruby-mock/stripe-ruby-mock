@@ -136,6 +136,18 @@ module StripeMock
         subscriptions[subscription[:id]] = subscription
         add_subscription_to_customer(customer, subscription)
 
+        # add invoice
+        invoice = Data.mock_invoice([Data.mock_line_item({ id: new_id('ii'), currency: subscription_plans.first[:currency], amount: subscription_plans.first[:amount], subscription: subscription[:id], plan: subscription_plans.first[:id] })], {id: new_id('in'), customer: params[:customer]})
+        subscription[:latest_invoice] = invoice[:id]
+        invoices[invoice[:id]] = invoice
+
+        # add payment intent
+        if params[:source].nil? && subscription_plans.first[:amount] > 0 && customer[:invoice_settings] && customer[:invoice_settings][:default_payment_method] # Check how free plan behave on stripe live
+          payment_intent = subscription_payment_intent(invoice)
+          invoice[:payment_intent] = payment_intent[:id]
+          invoice[:paid] = payment_intent[:status] == 'succeeded'
+          invoice[:status] = 'paid' if payment_intent[:status] == 'succeeded'
+        end
         subscriptions[subscription[:id]]
       end
 
@@ -260,6 +272,7 @@ module StripeMock
       # 2) is free
       # 3) has billing set to send invoice
       def verify_card_present(customer, plan, subscription, params={})
+        return if customer[:invoice_settings] && customer[:invoice_settings][:default_payment_method]
         return if customer[:default_source]
         return if customer[:trial_end]
         return if params[:trial_end]
@@ -291,6 +304,10 @@ module StripeMock
           message = "No such subscription: #{id}"
           raise Stripe::InvalidRequestError.new(message, 'subscription', http_status: 404)
         end
+      end
+
+      def subscription_payment_intent(invoice)
+        new_payment_intent(nil, nil, { payment_method: customers[invoice[:customer]][:invoice_settings][:default_payment_method], customer: invoice[:customer], amount: invoice[:amount_due], currency: invoice[:currency], invoice: invoice[:id], confirm: true }, nil)
       end
     end
   end
