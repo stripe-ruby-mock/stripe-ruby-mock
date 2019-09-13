@@ -26,7 +26,7 @@ module StripeMock
         pi_id = StripeMock.instance.payment_intents.find { |_k, v| v[:client_secret] == client_secret }[0]
 
         if StripeMock.instance.payment_intents[pi_id][:status] == 'requires_confirmation' || StripeMock.instance.payment_intents[pi_id][:status] == 'requires_action'
-          is_paid = StripeMock.instance.payment_methods[StripeMock.instance.payment_intents[pi_id][:payment_method]][:card][:last4] != 3178
+          is_paid = StripeMock.instance.payment_methods[StripeMock.instance.payment_intents[pi_id][:payment_method]][:card][:last4] != '3178'
 
           charge = Stripe::Charge.create({
             customer: StripeMock.instance.payment_intents[pi_id][:customer],
