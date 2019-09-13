@@ -16,7 +16,7 @@ module StripeMock
         id = new_id('pm')
 
         ensure_payment_method_required_params(params)
-        params[:card][:last4] = params[:card][:number][-4..-1].to_i if params[:card]
+        params[:card][:last4] = params[:card][:number][-4..-1] if params[:card]
         payment_methods[id] = Data.mock_payment_method(params.merge(id: id))
         payment_methods[id]
       end
