@@ -47,11 +47,12 @@ module StripeMock
     include StripeMock::RequestHandlers::Payouts
     include StripeMock::RequestHandlers::EphemeralKey
     include StripeMock::RequestHandlers::TaxRates
+    include StripeMock::RequestHandlers::Checkout
 
     attr_reader :accounts, :balance, :balance_transactions, :bank_tokens, :charges, :coupons, :customers,
                 :disputes, :events, :invoices, :invoice_items, :orders, :payment_intents, :plans, :recipients,
                 :refunds, :transfers, :payouts, :subscriptions, :country_spec, :subscriptions_items,
-                :products, :tax_rates
+                :products, :tax_rates, :checkout_sessions
 
     attr_accessor :error_queue, :debug, :conversion_rate, :account_balance
 
@@ -80,6 +81,7 @@ module StripeMock
       @subscriptions_items = {}
       @country_spec = {}
       @tax_rates = {}
+      @checkout_sessions = {}
 
       @debug = false
       @error_queue = ErrorQueue.new
