@@ -58,6 +58,10 @@ module StripeMock
           result.delete_if { |k,v| v[:customer] != params[:customer] }
         end
 
+        if params[:subscription]
+          result.delete_if { |k,v| v[:subscription] != params[:subscription] }
+        end
+
         Data.mock_list_object(result.values, params)
       end
 
