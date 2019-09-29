@@ -358,6 +358,7 @@ module StripeMock
         created: 1349738950,
         period_end: 1349738950,
         period_start: 1349738950,
+        due_date: nil,
         lines: {
           object: "list",
           total_count: lines.count,
@@ -385,7 +386,7 @@ module StripeMock
         amount_paid: 0,
         currency: currency,
         starting_balance: 0,
-        ending_balance: nil,
+        ending_balance: 0,
         next_payment_attempt: 1349825350,
         charge: nil,
         discount: nil,
@@ -399,6 +400,7 @@ module StripeMock
       end
       due = invoice[:total] + invoice[:starting_balance]
       invoice[:amount_due] = due < 0 ? 0 : due
+      invoice[:ending_balance] = invoice[:starting_balance] + invoice[:total] if invoice[:amount_due] == 0
       invoice
     end
 
@@ -521,33 +523,49 @@ module StripeMock
     def self.mock_plan(params={})
       currency = params[:currency] || StripeMock.default_currency
       {
-        id: "2",
+        id: "mock_plan_123",
         object: "plan",
+        active: true,
+        aggregate_usage: nil,
         amount: 2300,
+        billing_scheme: "per_unit",
         created: 1466698898,
         currency: currency,
         interval: "month",
         interval_count: 1,
         livemode: false,
         metadata: {},
-        name: "The Basic Plan",
-        statement_descriptor: nil,
-        trial_period_days: nil
+        nickname: "My Mock Plan",
+        product: "mock_prod_NONEXIST", # override this with your own existing product id
+        tiers: nil,
+        tiers_mode: nil,
+        transform_usage: nil,
+        trial_period_days: nil,
+        usage_type: "licensed"
       }.merge(params)
     end
 
-    def self.mock_product(params = {})
+    def self.mock_product(params={})
       {
-        id: "default_test_prod",
+        id: "mock_prod_abc123",
         object: "product",
         active: true,
-        created: 1556896214,
+        attributes:[],
+        caption: nil,
+        created: 1466698000,
+        deactivate_on: [],
+        description: nil,
+        images: [],
         livemode: false,
         metadata: {},
-        name: "Default Test Product",
-        statement_descriptor: "PRODUCT",
+        name: "The Mock Product",
+        package_dimensions: nil,
+        shippable: nil,
+        statement_descriptor: nil,
         type: "service",
-        updated: 1556918200,
+        unit_label: "my_unit",
+        updated: 1537939442,
+        url: nil
       }.merge(params)
     end
 
