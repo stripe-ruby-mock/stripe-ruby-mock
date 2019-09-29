@@ -519,10 +519,6 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.days_until_due).to eq 30
     end
 
-    let(:subscription_header) {{
-      :idempotency_key => 'a_idempotency_key'
-    }}
-
     it "adds a new subscription to customer with identical idempotency key" do
       plan = stripe_helper.create_plan(id: 'silver', product: { name: 'Silver Plan' },
                                        amount: 4999, currency: 'usd')
@@ -530,6 +526,10 @@ shared_examples 'Customer Subscriptions' do
 
       expect(customer.subscriptions.data).to be_empty
       expect(customer.subscriptions.count).to eq(0)
+
+      subscription_header = {
+        :idempotency_key => "uniq_idempotency_key_#{customer.id}"
+      }
 
       sub1 = Stripe::Subscription.create({ items: [{ plan: 'silver' }], customer: customer.id }, subscription_header)
       sub2 = Stripe::Subscription.create({ items: [{ plan: 'silver' }], customer: customer.id }, subscription_header)
@@ -544,8 +544,12 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.subscriptions.data).to be_empty
       expect(customer.subscriptions.count).to eq(0)
 
+      subscription_header = {
+        :idempotency_key => "uniq_idempotency_key_#{customer.id}"
+      }
+
       another_subscription_header = {
-        :idempotency_key => 'another_idempotency_key'
+        :idempotency_key => "another_uniq_idempotency_key_#{customer.id}"
       }
 
       sub1 = Stripe::Subscription.create({ items: [{ plan: 'silver' }], customer: customer.id }, subscription_header)
@@ -1046,11 +1050,13 @@ shared_examples 'Customer Subscriptions' do
 
   it "doesn't require a card when trial_end is present", :live => true do
     plan = stripe_helper.create_plan(
-      :amount => 2000,
-      :interval => 'month',
-      :name => 'Amazing Gold Plan',
-      :currency => 'usd',
-      :id => 'gold'
+      amount: 2000,
+      interval: 'month',
+      product: {
+        name: 'Amazing Gold Plan'
+      },
+      currency: 'usd',
+      id: 'gold'
     )
 
     stripe_customer = Stripe::Customer.create
