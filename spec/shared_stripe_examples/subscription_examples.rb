@@ -556,7 +556,7 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.cancel_at_period_end).to be_truthy
     end
 
-    it 'accepts default_tax_rates param', focus: true do
+    it 'accepts default_tax_rates param' do
       tax_rate = Stripe::TaxRate.create(
         display_name: 'VAT',
         description: 'VAT Germany',
