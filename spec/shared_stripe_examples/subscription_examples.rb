@@ -556,6 +556,28 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.cancel_at_period_end).to be_truthy
     end
 
+    it 'accepts default_tax_rates param', focus: true do
+      tax_rate = Stripe::TaxRate.create(
+        display_name: 'VAT',
+        description: 'VAT Germany',
+        jurisdiction: 'DE',
+        percentage: 19.0,
+        inclusive: false,
+      )
+      product = stripe_helper.create_product(name: 'Silver Product')
+      silver = stripe_helper.create_plan(id: 'silver', product: product.id)
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      subscription = Stripe::Subscription.create(
+        customer: customer.id,
+        items: [{ plan: silver.id }],
+        default_tax_rates: [ tax_rate ]
+      )
+
+      aggregate_failures do
+        expect(subscription.default_tax_rates.length).to eq(1)
+        expect(subscription.default_tax_rates.first.id).to eq(tax_rate.id)
+      end
+    end
   end
 
   context "updating a subscription" do
