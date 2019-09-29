@@ -111,7 +111,7 @@ module StripeMock
         params[:amount] && params[:amount] < 1
       end
 
-      def last_payment_error_generator(code:, message:, decline_code:)
+      def last_payment_error_generator(code: nil, message: nil, decline_code: nil)
         {
           code: code,
           doc_url: "https://stripe.com/docs/error-codes/payment-intent-authentication-failure",
