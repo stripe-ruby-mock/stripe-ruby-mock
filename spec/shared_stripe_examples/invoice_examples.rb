@@ -310,6 +310,7 @@ shared_examples 'Invoice API' do
             unused_amount = (plan.amount.to_f * quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)).round
             prorated_amount_due = new_yearly_plan.amount * new_quantity - unused_amount
             credit_balance = 1000
+            amount_due = prorated_amount_due - credit_balance
             customer.account_balance = -credit_balance
             customer.save
             query = { customer: customer.id, subscription: subscription.id, subscription_plan: new_yearly_plan.id, subscription_proration_date: proration_date.to_i, subscription_quantity: new_quantity }
@@ -326,7 +327,7 @@ shared_examples 'Invoice API' do
               expect(upcoming.amount_due).to eq 0
             else
               expect(upcoming.ending_balance).to eq 0
-              expect(upcoming.amount_due).to eq prorated_amount_due - credit_balance
+              expect(upcoming.amount_due).to eq amount_due
             end
             expect(upcoming.starting_balance).to eq -credit_balance
             expect(upcoming.subscription).to eq(subscription.id)
