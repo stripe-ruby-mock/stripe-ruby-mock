@@ -25,16 +25,6 @@ module StripeMock
 
       def validate_create_product_params(params)
         params[:id] = params[:id].to_s
-        required_product_fields =  @base_strategy.create_plan_params[:product].keys
-
-        message = "Missing required param: name."
-        raise Stripe::InvalidRequestError.new(message, :product) if params[:product].nil?
-
-        required_product_fields.each do |name|
-          message = "Missing required param: #{name}."
-          raise Stripe::InvalidRequestError.new(message, name) if params[:product][name].nil?
-        end
-
         @base_strategy.create_product_params.keys.reject{ |k,_| k == :id }.each do |k|
           raise Stripe::InvalidRequestError.new(missing_param_message(k), k) if params[k].nil?
         end
@@ -72,7 +62,7 @@ module StripeMock
         "nzd", "pab", "pen", "pgk", "php", "pkr", "pln", "pyg", "qar", "ron", "rsd", "rub", "rwf", "sar", "sbd",
         "scr", "sek", "sgd", "shp", "sll", "sos", "srd", "std", "szl", "thb", "tjs", "top", "try", "ttd", "twd",
         "tzs", "uah", "ugx", "uyu", "uzs", "vnd", "vuv", "wst", "xaf", "xcd", "xof", "xpf", "yer", "zar", "zmw",
-        "eek", "lvl", "svc", "vef"
+        "eek", "lvl", "svc", "vef", "ltl"
       ]
 
       def invalid_currency_message(my_val)
@@ -87,8 +77,6 @@ module StripeMock
           message =
             if attr_name == :amount
               "Plans require an `#{attr_name}` parameter to be set."
-            elsif attr_name == :product
-              "Missing required param: name."
             else
               "Missing required param: #{attr_name}."
             end
