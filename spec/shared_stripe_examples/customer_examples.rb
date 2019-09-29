@@ -17,6 +17,7 @@ shared_examples 'Customer API' do
     expect(customer.id).to match(/^test_cus/)
     expect(customer.email).to eq('johnny@appleseed.com')
     expect(customer.description).to eq('a description')
+    expect(customer.preferred_locales).to eq([])
 
     expect(customer.sources.count).to eq(1)
     expect(customer.sources.data.length).to eq(1)
@@ -325,8 +326,9 @@ shared_examples 'Customer API' do
     email = original.email
 
     coupon = Stripe::Coupon.create(id: "10PERCENT", duration: 'once')
-    original.description = 'new desc'
-    original.coupon      = coupon.id
+    original.description       = 'new desc'
+    original.preferred_locales = %w(fr en)
+    original.coupon            = coupon.id
     original.save
 
     expect(original.email).to eq(email)
@@ -336,6 +338,7 @@ shared_examples 'Customer API' do
     customer = Stripe::Customer.retrieve("test_customer_update")
     expect(customer.email).to eq(original.email)
     expect(customer.description).to eq('new desc')
+    expect(customer.preferred_locales).to eq(%w(fr en))
     expect(customer.discount.coupon).to be_a Stripe::Coupon
   end
 
