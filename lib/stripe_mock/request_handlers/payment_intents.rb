@@ -33,13 +33,6 @@ module StripeMock
           )
         )
 
-        bal_trans_params = { amount: params[:amount], source: id, application_fee: params[:application_fee] }
-        balance_transaction_id = new_balance_transaction('txn', bal_trans_params)
-
-        if payment_intents[id][:charges][:data].length > 0
-          payment_intents[id][:charges][:data][0][:balance_transaction] = balance_transaction_id
-        end
-
         payment_intents[id].clone
       end
 
@@ -170,9 +163,14 @@ module StripeMock
 
       def succeeded_payment_intent(payment_intent)
         payment_intent[:status] = 'succeeded'
-        payment_intent[:charges][:data] << Data.mock_charge
+
+        btxn = new_balance_transaction('txn', { amount: payment_intent[:amount], source: payment_intent[:id] })
+        payment_intent[:charges][:data] << Data.mock_charge({ balance_transaction_id: btxn })
+
+        #payment_intent[:charges][:data][0][:balance_transaction] = btxn
 
         payment_intent
+
       end
     end
   end

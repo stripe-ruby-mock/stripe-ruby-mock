@@ -200,7 +200,7 @@ module StripeMock
           data: []
         },
         transfer: nil,
-        balance_transaction: "txn_2dyYXXP90MN26R",
+        balance_transaction: params[:balance_transaction_id] || "txn_2dyYXXP90MN26R",
         failure_message: nil,
         failure_code: nil,
         amount_refunded: 0,
