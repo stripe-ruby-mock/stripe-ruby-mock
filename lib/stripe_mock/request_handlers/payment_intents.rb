@@ -168,6 +168,7 @@ module StripeMock
         btxn = new_balance_transaction('txn', { amount: payment_intent[:amount], source: payment_intent[:id] })
         payment_intent[:charges][:data][0][:balance_transaction] = btxn
 
+        puts payment_intent[:charges][:data][0][:balance_transaction]
         payment_intent
 
       end
