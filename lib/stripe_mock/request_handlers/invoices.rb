@@ -99,7 +99,12 @@ module StripeMock
         invoice_lines = []
 
         if prorating
-          unused_amount = subscription[:plan][:amount] * subscription[:quantity] * (subscription[:current_period_end] - subscription_proration_date.to_i) / (subscription[:current_period_end] - subscription[:current_period_start])
+          unused_amount = (
+            subscription[:plan][:amount].to_f *
+              subscription[:quantity] *
+              (subscription[:current_period_end] - subscription_proration_date.to_i) / (subscription[:current_period_end] - subscription[:current_period_start])
+            ).ceil
+
           invoice_lines << Data.mock_line_item(
                                    id: new_id('ii'),
                                    amount: -unused_amount,

@@ -31,6 +31,9 @@ module StripeMock
             last_payment_error: last_payment_error
           )
         )
+        if params[:confirm]
+          payment_intents[id] = succeeded_payment_intent(payment_intents[id])
+        end
 
         bal_trans_params = { amount: params[:amount], source: id, application_fee: params[:application_fee] }
         balance_transaction_id = new_balance_transaction('txn', bal_trans_params)
@@ -73,16 +76,14 @@ module StripeMock
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        payment_intent[:status] = 'succeeded'
-        payment_intent
+        succeeded_payment_intent(payment_intent)
       end
 
       def confirm_payment_intent(route, method_url, params, headers)
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        payment_intent[:status] = 'succeeded'
-        payment_intent
+        succeeded_payment_intent(payment_intent)
       end
 
       def cancel_payment_intent(route, method_url, params, headers)
@@ -115,7 +116,7 @@ module StripeMock
         params[:amount] && params[:amount] < 1
       end
 
-      def last_payment_error_generator(code:, message:, decline_code:)
+      def last_payment_error_generator(code: nil, message: nil, decline_code: nil)
         {
           code: code,
           doc_url: "https://stripe.com/docs/error-codes/payment-intent-authentication-failure",
@@ -164,6 +165,13 @@ module StripeMock
           },
           type: "invalid_request_error"
         }
+      end
+
+      def succeeded_payment_intent(payment_intent)
+        payment_intent[:status] = 'succeeded'
+        payment_intent[:charges][:data] << Data.mock_charge
+
+        payment_intent
       end
     end
   end
