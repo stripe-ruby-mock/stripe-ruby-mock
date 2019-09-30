@@ -1126,23 +1126,7 @@ module StripeMock
           capture_method: "automatic",
           charges: {
               object: "list",
-              data: [
-                  {
-                      id: "ch_1ExXjLL2DI6wht39e2fU80b4",
-                      paid: true,
-                      amount: 34500,
-                      object: "charge",
-                      status: "succeeded",
-                      captured: true,
-                      currency: "eur",
-                      customer: nil,
-                      refunded: false,
-                      payment_intent: payment_intent_id,
-                      payment_method: nil,
-                      amount_refunded: 0,
-                      balance_transaction: "txn_2dyYXXP90MN26R"
-                  }
-              ],
+              data: [],
               has_more: false,
               total_count: 1,
               url: "/v1/charges?payment_intent=pi_1EwXFB2eZvKYlo2CggNnFBo8"
@@ -1193,7 +1177,7 @@ module StripeMock
               last4: "3155",
               three_d_secure_usage: { supported: true }
           },
-          customer: params[:customer] || "cus_FRncA7TzYgyplJ",
+          customer: params[:customer] || nil,
           metadata: {
             "order_id": "123456789"
           }
