@@ -163,11 +163,10 @@ module StripeMock
 
       def succeeded_payment_intent(payment_intent)
         payment_intent[:status] = 'succeeded'
+        payment_intent[:charges][:data] << Data.mock_charge()
 
         btxn = new_balance_transaction('txn', { amount: payment_intent[:amount], source: payment_intent[:id] })
-        payment_intent[:charges][:data] << Data.mock_charge({ balance_transaction_id: btxn })
-
-        #payment_intent[:charges][:data][0][:balance_transaction] = btxn
+        payment_intent[:charges][:data][0][:balance_transaction] = btxn
 
         payment_intent
 
