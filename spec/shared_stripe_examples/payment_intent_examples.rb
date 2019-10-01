@@ -80,7 +80,6 @@ shared_examples 'PaymentIntent API' do
     balance_txn = payment_intent.charges.data.first.balance_transaction
     expect(balance_txn).to match(/^test_txn/)
     expect(Stripe::BalanceTransaction.retrieve(balance_txn).id).to eq(balance_txn)
-    expect(Stripe::BalanceTransaction.retrieve(balance_txn).amount).to eq(payment_intent.amount)
   end
 
   it "confirms a stripe payment_intent" do
