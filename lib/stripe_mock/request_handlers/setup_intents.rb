@@ -26,6 +26,18 @@ module StripeMock
       def new_setup_intent(route, method_url, params, headers)
         id = new_id('si')
 
+        if params.present?
+          if params[:payment_method_data].present? && params[:customer].present?
+            add_source_to(:customer, params[:customer], {source: params[:payment_method_data][:card][:token]}, @customers)
+            params[:status] = 'succeeded' # Defaults to succeeded for non-3d-secure cards. Add functionality to detect 3d-secure card and update the status to requires_action accordingly.
+          elsif params[:payment_method].present? && params[:customer].present? # When payment method being passed is a card_id
+            customer = assert_existence :customer, params[:customer], @customers[params[:customer]]
+            if has_card?(customer, params[:payment_method]).present?
+              params[:status] = 'succeeded'
+            end
+          end
+        end
+
         setup_intents[id] = Data.mock_setup_intent(
           params.merge(
             id: id

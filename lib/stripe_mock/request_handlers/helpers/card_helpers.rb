@@ -17,6 +17,12 @@ module StripeMock
         card
       end
 
+      def has_card?(object, card_id, class_name='Customer')
+        cards = object[:cards] || object[:sources] || object[:external_accounts]
+        card = cards[:data].find{|cc| cc[:id] == card_id }
+        card.present?
+      end
+
       def add_source_to_object(type, source, object, replace_current=false)
         source[type] = object[:id]
         sources = object[:sources]
