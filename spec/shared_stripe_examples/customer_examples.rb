@@ -27,6 +27,17 @@ shared_examples 'Customer API' do
     expect { customer.source }.to raise_error
   end
 
+  it "creates a stripe customer with a default payment method" do
+    customer = Stripe::Customer.create({
+      email: 'johnny@appleseed.com',
+      invoice_settings: {
+        default_payment_method: "pm_1ExEuFL2DI6wht39WNJgbybl"
+      },
+      description: "a description"
+    })
+    expect(customer.invoice_settings.default_payment_method).to eq("pm_1ExEuFL2DI6wht39WNJgbybl")
+  end
+
   it "creates a stripe customer with multiple cards and updates the default card" do
     card_a   = gen_card_tk
     card_b   = gen_card_tk
