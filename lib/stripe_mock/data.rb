@@ -134,6 +134,11 @@ module StripeMock
         discount: nil,
         account_balance: 0,
         currency: currency,
+        invoice_settings: {
+          default_payment_method: nil,
+          custom_fields: nil,
+          footer: nil
+        },
         sources: {
           object: "list",
           total_count: sources.size,
@@ -1184,7 +1189,7 @@ module StripeMock
 
       }.merge(params)
     end
-    
+
     def self.mock_setup_intent(params = {})
       setup_intent_id = params[:id] || "seti_1F96eK2aLAadsDqo0AVIyPmC"
       {
