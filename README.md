@@ -141,7 +141,7 @@ end
 ```
 
 ## Mocking Card Errors
-
+** Ensure you start StripeMock in a before filter `StripeMock.start`
 Tired of manually inputting fake credit card numbers to test against errors? Tire no more!
 
 ```ruby
@@ -176,7 +176,7 @@ StripeMock.prepare_card_error(:incorrect_zip)
 You can see the details of each error in [lib/stripe_mock/api/errors.rb](lib/stripe_mock/api/errors.rb)
 
 ### Specifying Card Errors
-
+** Ensure you start StripeMock in a before filter `StripeMock.start`
 By default, `prepare_card_error` only triggers for `:new_charge`, the event that happens when you run `Charge.create`. More explicitly, this is what happens by default:
 
 ```ruby
@@ -195,7 +195,7 @@ customer.cards.create
 `:new_charge` and `:create_card` are names of methods in the [StripeMock request handlers](lib/stripe_mock/request_handlers). You can also set `StripeMock.toggle_debug(true)` to see the event name for each Stripe request made in your tests.
 
 ### Custom Errors
-
+** Ensure you start StripeMock in a before filter `StripeMock.start`
 To raise an error on a specific type of request, take a look at the [request handlers folder](lib/stripe_mock/request_handlers/) and pass a method name to `StripeMock.prepare_error`.
 
 If you wanted to raise an error for creating a new customer, for instance, you would do the following:
