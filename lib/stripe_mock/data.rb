@@ -1184,7 +1184,7 @@ module StripeMock
           },
           customer: params[:customer] || nil,
           metadata: {
-            "order_id": "123456789"
+            order_id: "123456789"
           }
 
       }.merge(params)
@@ -1208,7 +1208,7 @@ module StripeMock
         :on_behalf_of => nil,
         :payment_method => nil,
         :payment_method_options => {
-          "card": {"request_three_d_secure":"automatic"}
+          card: {request_three_d_secure: "automatic"}
         },
         :payment_method_types => ["card"],
         :status => "requires_payment_method",
