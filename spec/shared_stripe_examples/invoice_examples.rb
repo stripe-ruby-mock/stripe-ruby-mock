@@ -48,7 +48,8 @@ shared_examples 'Invoice API' do
     end
 
     it "stores invoices for a customer in memory" do
-      expect(@customer.invoices.map(&:id)).to eq([@invoice.id])
+      invoices = Stripe::Invoice.list(customer: @customer.id)
+      expect(invoices.map(&:id)).to eq([@invoice.id])
     end
 
     it "stores all invoices in memory" do

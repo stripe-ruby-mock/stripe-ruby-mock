@@ -30,9 +30,7 @@ shared_examples 'Refund API' do
         description: 'card charge'
       )
 
-      Stripe::Refund.create(
-        charge: charge.id
-      )
+      Stripe::Refund.create(charge: charge.id)
 
       charge = Stripe::Charge.retrieve(charge.id)
 
@@ -378,7 +376,8 @@ shared_examples 'Refund API' do
         description: 'card charge'
       )
 
-      charge = Stripe::Refund.create(charge: charge.id, amount: 999)
+      Stripe::Refund.create(charge: charge.id, amount: 999)
+      charge.refresh
 
       expect(charge.refunded).to eq(true)
       expect(charge.refunds.data.first.amount).to eq(999)
@@ -395,7 +394,7 @@ shared_examples 'Refund API' do
       refund = Stripe::Refund.create(charge: charge.id)
 
       expect(charge.id).to match(/^(test_)?ch/)
-      expect(refund.id).to eq(charge.id)
+      expect(refund.charge).to eq(charge.id)
     end
 
     it "creates a stripe refund with a refund ID" do
@@ -405,10 +404,12 @@ shared_examples 'Refund API' do
         source: stripe_helper.generate_card_token,
         description: 'card charge'
       )
-      refund = Stripe::Refund.create(charge: charge.id)
 
-      expect(refund.refunds.data.count).to eq 1
-      expect(refund.refunds.data.first.id).to match(/^test_re/)
+      Stripe::Refund.create(charge: charge.id)
+      refunds = Stripe::Refund.list(charge: charge.id)
+
+      expect(refunds.data.count).to eq 1
+      expect(refunds.data.first.id).to match(/^test_re/)
     end
 
     it "creates a stripe refund with a status" do
@@ -418,10 +419,12 @@ shared_examples 'Refund API' do
         source: stripe_helper.generate_card_token,
         description: 'card charge'
       )
-      refund = Stripe::Refund.create(charge: charge.id)
 
-      expect(refund.refunds.data.count).to eq 1
-      expect(refund.refunds.data.first.status).to eq("succeeded")
+      Stripe::Refund.create(charge: charge.id)
+      refunds = Stripe::Refund.list(charge: charge.id)
+
+      expect(refunds.data.count).to eq 1
+      expect(refunds.data.first.status).to eq("succeeded")
     end
 
     it "creates a stripe refund with a different balance transaction than the charge" do
@@ -431,9 +434,10 @@ shared_examples 'Refund API' do
         source: stripe_helper.generate_card_token,
         description: 'card charge'
       )
-      refund = Stripe::Refund.create(charge: charge.id)
+      Stripe::Refund.create(charge: charge.id)
+      refunds = Stripe::Refund.list(charge: charge.id)
 
-      expect(charge.balance_transaction).not_to eq(refund.refunds.data.first.balance_transaction)
+      expect(charge.balance_transaction).not_to eq(refunds.data.first.balance_transaction)
     end
 
     it "creates a refund off a charge", :live => true do

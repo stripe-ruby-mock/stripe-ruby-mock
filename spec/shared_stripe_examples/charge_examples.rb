@@ -343,7 +343,8 @@ shared_examples 'Charge API' do
     end
 
     it "stores charges for a customer in memory" do
-      expect(@customer.charges.data.map(&:id)).to eq([@charge.id])
+      charges = Stripe::Charge.list(customer: @customer.id)
+      expect(charges.map(&:id)).to eq([@charge.id])
     end
 
     it "stores all charges in memory" do

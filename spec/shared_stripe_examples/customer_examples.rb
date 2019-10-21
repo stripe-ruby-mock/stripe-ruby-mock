@@ -439,14 +439,6 @@ shared_examples 'Customer API' do
     expect(customer.deleted).to eq(true)
   end
 
-  it 'works with the update_subscription method' do
-    stripe_helper.create_plan(id: 'silver', product: product.id)
-    cus   = Stripe::Customer.create(source: gen_card_tk)
-    expect {
-      cus.update_subscription(plan: 'silver')
-    }.not_to raise_error
-  end
-
   it "deletes a stripe customer discount" do
     original = Stripe::Customer.create(id: 'test_customer_update')
 
