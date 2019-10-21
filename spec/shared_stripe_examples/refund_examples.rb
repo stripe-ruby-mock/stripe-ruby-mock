@@ -378,7 +378,7 @@ shared_examples 'Refund API' do
         description: 'card charge'
       )
 
-      charge = charge.refund(amount: 999)
+      charge = Stripe::Refund.create(charge: charge.id, amount: 999)
 
       expect(charge.refunded).to eq(true)
       expect(charge.refunds.data.first.amount).to eq(999)
@@ -392,7 +392,7 @@ shared_examples 'Refund API' do
         source: stripe_helper.generate_card_token,
         description: 'card charge'
       )
-      refund = charge.refund
+      refund = Stripe::Refund.create(charge: charge.id)
 
       expect(charge.id).to match(/^(test_)?ch/)
       expect(refund.id).to eq(charge.id)
@@ -405,7 +405,7 @@ shared_examples 'Refund API' do
         source: stripe_helper.generate_card_token,
         description: 'card charge'
       )
-      refund = charge.refund
+      refund = Stripe::Refund.create(charge: charge.id)
 
       expect(refund.refunds.data.count).to eq 1
       expect(refund.refunds.data.first.id).to match(/^test_re/)
@@ -418,7 +418,7 @@ shared_examples 'Refund API' do
         source: stripe_helper.generate_card_token,
         description: 'card charge'
       )
-      refund = charge.refund
+      refund = Stripe::Refund.create(charge: charge.id)
 
       expect(refund.refunds.data.count).to eq 1
       expect(refund.refunds.data.first.status).to eq("succeeded")
@@ -431,7 +431,7 @@ shared_examples 'Refund API' do
         source: stripe_helper.generate_card_token,
         description: 'card charge'
       )
-      refund = charge.refund
+      refund = Stripe::Refund.create(charge: charge.id)
 
       expect(charge.balance_transaction).not_to eq(refund.refunds.data.first.balance_transaction)
     end
