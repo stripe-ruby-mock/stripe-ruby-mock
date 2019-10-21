@@ -1053,7 +1053,7 @@ shared_examples 'Customer Subscriptions' do
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: free_plan.id)
       Stripe::Subscription.create({ plan: 'paid', customer: customer.id })
 
-      subs = Stripe::Subscription.all({ customer: customer.id })
+      subs = Stripe::Subscription.list({ customer: customer.id })
 
       expect(subs.object).to eq("list")
       expect(subs.count).to eq(2)
@@ -1064,7 +1064,7 @@ shared_examples 'Customer Subscriptions' do
       Stripe::Customer.create(id: 'no_subs')
       customer = Stripe::Customer.retrieve('no_subs')
 
-      list = Stripe::Subscription.all({ customer: customer.id })
+      list = Stripe::Subscription.list({ customer: customer.id })
 
       expect(list.object).to eq("list")
       expect(list.count).to eq(0)

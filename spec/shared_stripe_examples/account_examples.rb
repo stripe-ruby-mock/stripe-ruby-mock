@@ -15,7 +15,7 @@ shared_examples 'Account API' do
       expect(account.id).to match /acct\_/
     end
     it 'retrieves all' do
-      accounts = Stripe::Account.all
+      accounts = Stripe::Account.list
 
       expect(accounts).to be_a Stripe::ListObject
       expect(accounts.data.count).to satisfy { |n| n >= 1 }

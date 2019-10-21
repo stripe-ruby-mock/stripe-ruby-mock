@@ -18,11 +18,11 @@ shared_examples 'SetupIntent API' do
     end
 
     it "without params retrieves all stripe setup_intent" do
-      expect(Stripe::SetupIntent.all.count).to eq(3)
+      expect(Stripe::SetupIntent.list.count).to eq(3)
     end
 
     it "accepts a limit param" do
-      expect(Stripe::SetupIntent.all(limit: 2).count).to eq(2)
+      expect(Stripe::SetupIntent.list(limit: 2).count).to eq(2)
     end
   end
 

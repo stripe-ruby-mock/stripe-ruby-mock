@@ -71,14 +71,14 @@ shared_examples 'Dispute API' do
   describe "listing disputes" do
 
     it "retrieves all disputes" do
-      disputes = Stripe::Dispute.all
+      disputes = Stripe::Dispute.list
 
       expect(disputes.count).to eq(10)
       expect(disputes.map &:id).to include('dp_05RsQX2eZvKYlo2C0FRTGSSA','dp_15RsQX2eZvKYlo2C0ERTYUIA', 'dp_25RsQX2eZvKYlo2C0ZXCVBNM', 'dp_35RsQX2eZvKYlo2C0QAZXSWE', 'dp_45RsQX2eZvKYlo2C0EDCVFRT', 'dp_55RsQX2eZvKYlo2C0OIKLJUY', 'dp_65RsQX2eZvKYlo2C0ASDFGHJ', 'dp_75RsQX2eZvKYlo2C0EDCXSWQ', 'dp_85RsQX2eZvKYlo2C0UJMCDET', 'dp_95RsQX2eZvKYlo2C0EDFRYUI')
     end
 
     it "retrieves disputes with a limit(3)" do
-      disputes = Stripe::Dispute.all(limit: 3)
+      disputes = Stripe::Dispute.list(limit: 3)
 
       expect(disputes.count).to eq(3)
       expected = ['dp_95RsQX2eZvKYlo2C0EDFRYUI','dp_85RsQX2eZvKYlo2C0UJMCDET', 'dp_75RsQX2eZvKYlo2C0EDCXSWQ']

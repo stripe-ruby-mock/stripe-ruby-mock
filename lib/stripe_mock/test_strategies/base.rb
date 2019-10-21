@@ -102,7 +102,7 @@ module StripeMock
       end
 
       def delete_all_coupons
-        coupons = Stripe::Coupon.all
+        coupons = Stripe::Coupon.list
         coupons.data.map(&:delete) if coupons.data.count > 0
       end
 

@@ -19,11 +19,11 @@ shared_examples 'Payout API' do
     end
 
     it "without params retrieves all tripe payouts" do
-      expect(Stripe::Payout.all.count).to eq(3)
+      expect(Stripe::Payout.list.count).to eq(3)
     end
 
     it "accepts a limit param" do
-      expect(Stripe::Payout.all(limit: 2).count).to eq(2)
+      expect(Stripe::Payout.list(limit: 2).count).to eq(2)
     end
   end
 
