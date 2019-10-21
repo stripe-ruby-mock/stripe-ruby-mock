@@ -278,20 +278,6 @@ shared_examples 'Charge API' do
     }.not_to raise_error
   end
 
-  it "marks a charge as safe" do
-    original = Stripe::Charge.create({
-      amount: 777,
-      currency: 'USD',
-      source: stripe_helper.generate_card_token
-    })
-    charge = Stripe::Charge.retrieve(original.id)
-
-    charge.mark_as_safe
-
-    updated = Stripe::Charge.retrieve(original.id)
-    expect(updated.fraud_details[:user_report]).to eq "safe"
-  end
-
   it "does not lose data when updating a charge" do
     original = Stripe::Charge.create({
       amount: 777,
