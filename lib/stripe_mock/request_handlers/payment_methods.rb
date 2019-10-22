@@ -51,7 +51,7 @@ module StripeMock
 
         Data.mock_list_object(clone.values, params)
       end
-      
+
       # post /v1/payment_methods/:id/attach
       def attach_payment_method(route, method_url, params, headers)
         allowed_params = [:customer]

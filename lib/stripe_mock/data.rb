@@ -1253,5 +1253,134 @@ module StripeMock
         success_url: 'https://example.com/success'
       }.merge(params)
     end
+
+    def self.mock_card_source(params)
+      source_id = params[:id] || 'src_1FTsaLG0atmGm5bMw35CVkqx'
+      client_secret = 'src_client_secret_Gn0DSPa7gyGxsgO0zy7t2HGR'
+
+      card_data = {
+          exp_month: 1,
+          exp_year: 2026,
+          last4: '4242',
+          country: 'US',
+          brand: 'Visa',
+          cvc_check: 'pass',
+          funding: 'credit',
+          fingerprint: 'K4ShpsDP7vAx47WF',
+          three_d_secure: 'optional',
+          name: nil,
+          address_line1_check: nil,
+          address_zip_check: nil,
+          tokenization_method: nil,
+          dynamic_last4: nil
+        }
+
+        if params[:card]
+          if params[:card][:number]
+            card_data[:last4] = params[:card][:number][-4..-1]
+            params[:card].delete(:number)
+          end
+
+          params[:card].delete(:cvc) if params[:card][:cvc]
+        end
+
+        Util.rmerge({
+          id: source_id,
+          object: 'source',
+          amount: nil,
+          card: card_data,
+          client_secret: client_secret,
+          created: 1_571_390_788,
+          currency: nil,
+          customer: nil,
+          flow: 'none',
+          livemode: false,
+          metadata: {},
+          owner: { address: nil,
+                   email: nil,
+                   name: nil,
+                   phone: nil,
+                   verified_address: nil,
+                   verified_email: nil,
+                   verified_name: nil,
+                   verified_phone: nil },
+          statement_descriptor: nil,
+          status: 'chargeable',
+          type: 'card',
+          usage: 'reusable'
+        },
+        params)
+    end
+
+    def self.mock_sepa_debit_source(params)
+      source_id = params[:id] || 'src_1FTsaLG0atmGm5bMw35CVkqx'
+      client_secret = 'src_client_secret_Gn0DSPa7gyGxsgO0zy7t2HGR'
+
+      sepa_debit_data = {
+          last4: '3000',
+          bank_code: '37040044',
+          fingerprint: '3QSJ9dz1Xejd1k8z',
+          country: 'DE',
+          mandate_reference: 'kv9TakBIOKmlgTV8',
+          mandate_url: "https://hooks.stripe.com/adapter/sepa_debit/file/#{source_id}/#{client_secret}",
+          branch_code: nil
+        }
+
+        if params.dig(:sepa_debit, :iban)
+          sepa_debit_data[:last4] = params[:sepa_debit][:iban][-4..-1]
+          sepa_debit_data[:country] = params[:sepa_debit][:iban][0..1]
+          params[:sepa_debit].delete(:iban)
+        end
+
+        Util.rmerge({
+          id: source_id,
+          object: 'source',
+          amount: nil,
+          client_secret: client_secret,
+          created: 1_571_140_374,
+          currency: 'eur',
+          customer: nil,
+          flow: 'none',
+          livemode: false,
+          mandate: {
+            acceptance: { date: nil,
+                          ip: nil,
+                          offline: nil,
+                          online: nil,
+                          status: 'pending',
+                          type: nil,
+                          user_agent: nil },
+            amount: nil,
+            currency: nil,
+            interval: 'variable',
+            notification_method: 'none',
+            reference: 'kv9TakBIOKmlgTV8',
+            url: "https://hooks.stripe.com/adapter/sepa_debit/file/#{source_id}/#{client_secret}"
+          },
+          metadata: {},
+          owner: { address: nil,
+                   email: nil,
+                   name: 'John Doe',
+                   phone: nil,
+                   verified_address: nil,
+                   verified_email: nil,
+                   verified_name: nil,
+                   verified_phone: nil },
+          sepa_debit: sepa_debit_data,
+          statement_descriptor: nil,
+          status: 'chargeable',
+          type: 'sepa_debit',
+          usage: 'reusable'
+        },
+        params)
+    end
+
+    def self.mock_source(params)
+      if params[:type] == 'card'
+        mock_card_source(params)
+      elsif params[:type] == 'sepa_debit'
+        mock_sepa_debit_source(params)
+      end
+    end
   end
 end
