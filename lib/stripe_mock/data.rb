@@ -7,6 +7,7 @@ module StripeMock
       {
         id: id,
         email: "bob@example.com",
+        type: 'standard',
         statement_descriptor: nil,
         display_name: "Stripe.com",
         timezone: "US/Pacific",
@@ -354,7 +355,7 @@ module StripeMock
     end
 
     def self.mock_invoice(lines, params={})
-      in_id = params[:id] || "test_in_default"
+      in_id = params[:id] |{:object=>"login_link", :created=>1572347994, :url=>"https://connect.stripe.com/express/Qag44KKmCv1i"}| "test_in_default"
       currency = params[:currency] || StripeMock.default_currency
       lines << Data.mock_line_item() if lines.empty?
       invoice = {
@@ -1381,6 +1382,28 @@ module StripeMock
       elsif params[:type] == 'sepa_debit'
         mock_sepa_debit_source(params)
       end
+    end
+
+    def self.mock_account_creation_oauth_token(params)
+      access_token = params[:access_token] || "sk_test_HpUko4Mp3dXklZbv9tIinpbZ007BRDQo7U"
+      account_id = params[:account_id] || "acct_1FYroeK3LoOdegW"
+      {
+        access_token: access_token,
+        livemode: false,
+        refresh_token: "rt_G51tx58Z0TGFwfliZesYrpSRdkKPsT5PMiZNlTVuRHXKmniG",
+        token_type: "bearer",
+        stripe_publishable_key: "pk_test_f0ArghLn0kIqT43gerG43gddUqL",
+        stripe_user_id: account_id,
+        scope: "express"
+      }
+    end
+
+    def self.mock_login_link
+      {
+        object: "login_link",
+        created: Time.now.to_i,
+        url: "https://connect.stripe.com/express/#{SecureRandom.alphanumeric(12)}"
+      }
     end
   end
 end
