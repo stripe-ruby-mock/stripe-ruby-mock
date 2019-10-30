@@ -355,7 +355,7 @@ module StripeMock
     end
 
     def self.mock_invoice(lines, params={})
-      in_id = params[:id] |{:object=>"login_link", :created=>1572347994, :url=>"https://connect.stripe.com/express/Qag44KKmCv1i"}| "test_in_default"
+      in_id = params[:id] || "test_in_default"
       currency = params[:currency] || StripeMock.default_currency
       lines << Data.mock_line_item() if lines.empty?
       invoice = {
