@@ -174,7 +174,8 @@ module StripeMock
         payment_intent[:status] = 'succeeded'
 
         payment_intent[:charges][:data] << Data.mock_charge(
-          amount: payment_intent[:amount]
+          amount: payment_intent[:amount],
+          currency: payment_intent[:currency]
         )
 
         payment_intent
