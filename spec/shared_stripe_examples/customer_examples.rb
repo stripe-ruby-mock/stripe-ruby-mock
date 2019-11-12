@@ -270,6 +270,25 @@ shared_examples 'Customer API' do
     }
   end
 
+  context 'with coupon on customer' do
+    before do
+      Stripe::Coupon.create(id: '10PERCENT', duration: 'once')
+      Stripe::Customer.create(id: 'test_cus_coupon', coupon: '10PERCENT')
+    end
+
+    it 'remove the coupon from customer' do
+      customer = Stripe::Customer.retrieve('test_cus_coupon')
+      expect(customer.discount).to_not be_nil
+      expect(customer.discount.coupon).to_not be_nil
+      expect(customer.discount.customer).to eq customer.id
+      expect(customer.discount.start).to be_within(1).of Time.now.to_i
+
+      Stripe::Customer.update('test_cus_coupon', coupon: '')
+      customer = Stripe::Customer.retrieve('test_cus_coupon')
+      expect(customer.discount).to be_nil
+    end
+  end
+
   it "stores a created stripe customer in memory" do
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',

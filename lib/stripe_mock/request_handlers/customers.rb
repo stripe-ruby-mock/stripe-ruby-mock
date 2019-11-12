@@ -87,10 +87,14 @@ module StripeMock
         end
 
         if params[:coupon]
-          coupon = coupons[ params[:coupon] ]
-          assert_existence :coupon, params[:coupon], coupon
+          if params[:coupon] == ''
+            delete_coupon_from_object(cus)
+          else
+            coupon = coupons[params[:coupon]]
+            assert_existence :coupon, params[:coupon], coupon
 
-          add_coupon_to_object(cus, coupon)
+            add_coupon_to_object(cus, coupon)
+          end
         end
 
         cus
