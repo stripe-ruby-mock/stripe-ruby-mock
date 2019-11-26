@@ -12,7 +12,7 @@ end
 shared_examples 'Stripe Error Mocking' do
 
   it "mocks a manually given stripe card error" do
-    error = Stripe::CardError.new('Test Msg', 'param_name', 'bad_code', http_status: 444, http_body: 'body', json_body: 'json body')
+    error = Stripe::CardError.new('Test Msg', 'param_name', code: 'bad_code', http_status: 444, http_body: 'body', json_body: 'json body')
     StripeMock.prepare_error(error)
 
     expect { Stripe::Customer.create() }.to raise_error {|e|
