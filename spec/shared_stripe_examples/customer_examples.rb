@@ -353,6 +353,15 @@ shared_examples 'Customer API' do
     expect(customer.discount.coupon).to be_a Stripe::Coupon
   end
 
+  it "preserves stripe customer metadata", focus: true do
+    metadata = {user_id: "38"}
+    customer = Stripe::Customer.create(metadata: metadata)
+    expect(customer.metadata.to_h).to eq(metadata)
+
+    updated = Stripe::Customer.update(customer.id, metadata: {fruit: "apples"})
+    expect(updated.metadata.to_h).to eq(metadata.merge(fruit: "apples"))
+  end
+
   it "retrieves the customer's default source after it was updated" do
     customer = Stripe::Customer.create()
     customer.source = gen_card_tk
