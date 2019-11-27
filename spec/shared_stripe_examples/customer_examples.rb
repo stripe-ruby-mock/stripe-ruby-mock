@@ -327,7 +327,7 @@ shared_examples 'Customer API' do
     Stripe::Customer.create({ email: 'one@one.com' })
     Stripe::Customer.create({ email: 'two@two.com' })
 
-    all = Stripe::Customer.all
+    all = Stripe::Customer.list
     expect(all.count).to eq(2)
     expect(all.map &:email).to include('one@one.com', 'two@two.com')
   end

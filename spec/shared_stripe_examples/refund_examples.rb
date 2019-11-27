@@ -262,7 +262,7 @@ shared_examples 'Refund API' do
       end
 
       it "stores all charges in memory" do
-        expect(Stripe::Refund.all.data.map(&:id)).to eq([@refund2.id, @refund.id])
+        expect(Stripe::Refund.list.data.map(&:id)).to eq([@refund2.id, @refund.id])
       end
 
       it "defaults count to 10 charges" do
@@ -275,7 +275,7 @@ shared_examples 'Refund API' do
           Stripe::Refund.create(charge: charge.id)
         end
 
-        expect(Stripe::Refund.all.data.count).to eq(10)
+        expect(Stripe::Refund.list.data.count).to eq(10)
       end
 
       it "is marked as having more when more objects exist" do
@@ -288,12 +288,12 @@ shared_examples 'Refund API' do
           Stripe::Refund.create(charge: charge.id)
         end
 
-        expect(Stripe::Refund.all.has_more).to eq(true)
+        expect(Stripe::Refund.list.has_more).to eq(true)
       end
 
       context "when passing limit" do
         it "gets that many charges" do
-          expect(Stripe::Refund.all(limit: 1).count).to eq(1)
+          expect(Stripe::Refund.list(limit: 1).count).to eq(1)
         end
       end
     end
@@ -318,9 +318,9 @@ shared_examples 'Refund API' do
         Stripe::Refund.create(charge: charge.id)
       end
 
-      all = Stripe::Refund.all
+      all = Stripe::Refund.list
       default_limit = 10
-      half = Stripe::Refund.all(starting_after: all.data.at(1).id)
+      half = Stripe::Refund.list(starting_after: all.data.at(1).id)
 
       expect(half).to be_a(Stripe::ListObject)
       expect(half.data.count).to eq(default_limit)

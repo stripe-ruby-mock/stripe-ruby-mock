@@ -168,7 +168,7 @@ shared_examples 'Webhook Events API' do
       expect(invoice_item_created_event).to be_a(Stripe::Event)
       expect(invoice_item_created_event).to_not be_nil
 
-      events = Stripe::Event.all
+      events = Stripe::Event.list
 
       expect(events.count).to eq(5)
       expect(events.map &:id).to include(customer_created_event.id, plan_created_event.id, coupon_created_event.id, invoice_created_event.id, invoice_item_created_event.id)
@@ -196,7 +196,7 @@ shared_examples 'Webhook Events API' do
       expect(invoice_item_created_event).to be_a(Stripe::Event)
       expect(invoice_item_created_event).to_not be_nil
 
-      events = Stripe::Event.all(limit: 3)
+      events = Stripe::Event.list(limit: 3)
 
       expect(events.count).to eq(3)
       expect(events.map &:id).to include(invoice_item_created_event.id, invoice_created_event.id, coupon_created_event.id)

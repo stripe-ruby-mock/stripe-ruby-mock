@@ -361,24 +361,24 @@ shared_examples 'Charge API' do
     end
 
     it "stores all charges in memory" do
-      expect(Stripe::Charge.all.data.map(&:id).reverse).to eq([@charge.id, @charge2.id])
+      expect(Stripe::Charge.list.data.map(&:id).reverse).to eq([@charge.id, @charge2.id])
     end
 
     it "defaults count to 10 charges" do
       11.times { Stripe::Charge.create(amount: 1, currency: 'usd', source: stripe_helper.generate_card_token) }
 
-      expect(Stripe::Charge.all.data.count).to eq(10)
+      expect(Stripe::Charge.list.data.count).to eq(10)
     end
 
     it "is marked as having more when more objects exist" do
       11.times { Stripe::Charge.create(amount: 1, currency: 'usd', source: stripe_helper.generate_card_token) }
 
-      expect(Stripe::Charge.all.has_more).to eq(true)
+      expect(Stripe::Charge.list.has_more).to eq(true)
     end
 
     context "when passing limit" do
       it "gets that many charges" do
-        expect(Stripe::Charge.all(limit: 1).count).to eq(1)
+        expect(Stripe::Charge.list(limit: 1).count).to eq(1)
       end
     end
   end
@@ -398,9 +398,9 @@ shared_examples 'Charge API' do
       Stripe::Charge.create(customer: cus.id, amount: 100, currency: "usd")
     end
 
-    all = Stripe::Charge.all
+    all = Stripe::Charge.list
     default_limit = 10
-    half = Stripe::Charge.all(starting_after: all.data.at(1).id)
+    half = Stripe::Charge.list(starting_after: all.data.at(1).id)
 
     expect(half).to be_a(Stripe::ListObject)
     expect(half.data.count).to eq(default_limit)
