@@ -51,9 +51,10 @@ module StripeMock
     end
 
     def self.add_json_body(error_values)
-      error_keys = [:message, :param, :code]
+      error_keys = [:message, :param, :optional_values]
 
       json_hash = Hash[error_keys.zip error_values]
+      json_hash[:code] = json_hash[:optional_values][:code]
       json_hash[:type] = 'card_error'
       json_hash[:decline_code] = get_decline_code(json_hash[:code])
 
