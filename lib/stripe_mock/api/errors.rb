@@ -58,6 +58,8 @@ module StripeMock
       json_hash[:type] = 'card_error'
       json_hash[:decline_code] = get_decline_code(json_hash[:code])
 
+      json_hash.reject! {|k| k == :optional_values}
+
       error_values.last.merge!(json_body: { error: json_hash }, http_body: { error: json_hash })
 
       error_values
