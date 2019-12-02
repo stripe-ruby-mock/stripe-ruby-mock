@@ -88,11 +88,6 @@ module StripeMock
           raise Stripe::InvalidRequestError.new(message, :id)
         end
 
-        unless products[product_id]
-          message = not_found_message(Stripe::Product, product_id)
-          raise Stripe::InvalidRequestError.new(message, :product)
-        end
-
         unless SUPPORTED_PLAN_INTERVALS.include?(params[:interval])
           message = invalid_plan_interval_message
           raise Stripe::InvalidRequestError.new(message, :interval)
