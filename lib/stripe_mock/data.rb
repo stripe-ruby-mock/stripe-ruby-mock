@@ -340,7 +340,7 @@ module StripeMock
         cancel_at_period_end: false,
         canceled_at: nil,
         ended_at: nil,
-        start: 1308595038,
+        start_date: 1308595038,
         object: 'subscription',
         trial_start: 1308595038,
         trial_end: 1308681468,

@@ -29,8 +29,14 @@ module StripeMock
 
         now = Time.now.utc.to_i
         created_time = options[:created] || now
-        start_time = options[:current_period_start] || now
-        params = { customer: cus[:id], current_period_start: start_time, created: created_time }
+        start_time =
+          options[:backdate_start_date] || options[:current_period_start] || now
+        params = {
+          customer: cus[:id],
+          current_period_start: start_time,
+          start_date: start_time,
+          created: created_time,
+        }
         params.merge!({ :plan => (plans.size == 1 ? plans.first : nil) })
         keys_to_merge = /application_fee_percent|quantity|metadata|tax_percent|billing|days_until_due|default_tax_rates|enable_incomplete_payments|collection_method|prorate/
         params.merge! options.select {|k,v| k =~ keys_to_merge}
