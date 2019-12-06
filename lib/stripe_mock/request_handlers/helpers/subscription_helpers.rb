@@ -36,6 +36,7 @@ module StripeMock
           current_period_start: start_time,
           start_date: start_time,
           created: created_time,
+          prorate: true,
         }
         params.merge!({ :plan => (plans.size == 1 ? plans.first : nil) })
         keys_to_merge = /application_fee_percent|quantity|metadata|tax_percent|billing|days_until_due|default_tax_rates|enable_incomplete_payments|collection_method|prorate/
