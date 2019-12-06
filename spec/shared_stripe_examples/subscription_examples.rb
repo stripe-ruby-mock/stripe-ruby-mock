@@ -219,6 +219,23 @@ shared_examples 'Customer Subscriptions' do
       expect(customer.default_source).to eq customer.sources.data.first.id
     end
 
+    it "creates subscription with backdated start date" do
+      plan = stripe_helper.create_plan(id: 'enterprise', product: product.id, amount: 499)
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      backdated_start_date = Time.now - 100_000
+      renewal_date = backdated_start_date + (365*24*3600)
+      sub = Stripe::Subscription.create({
+        items: [ { plan: plan.id, quantity: 1 } ],
+        customer: customer.id,
+        backdate_start_date: backdated_start_date.utc.to_i,
+        billing_cycle_anchor: renewal_date.utc.to_i,
+      })
+
+      expect(sub.start_date).to eq(backdated_start_date.utc.to_i)
+      expect(sub.current_period_end).to eq(renewal_date.utc.to_i)
+    end
+
     it "throws an error when plan does not exist" do
       customer = Stripe::Customer.create(id: 'cardless')
 
