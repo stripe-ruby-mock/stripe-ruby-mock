@@ -2,8 +2,9 @@ require 'spec_helper'
 
 shared_examples 'Subscription Items API' do
   let(:stripe_helper) { StripeMock.create_test_helper }
-  let(:plan) { stripe_helper.create_plan }
-  let(:plan2) { stripe_helper.create_plan(amount: 100, id: 'one_more_1_plan') }
+  let(:product) { stripe_helper.create_product(name: 'Silver Product') }
+  let(:plan) { stripe_helper.create_plan(product: product.id, id: 'silver_plan') }
+  let(:plan2) { stripe_helper.create_plan(amount: 100, id: 'one_more_1_plan', product: product.id) }
   let(:customer) { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
   let(:subscription) { Stripe::Subscription.create(customer: customer.id, items: [{ plan: plan.id }]) }
 
