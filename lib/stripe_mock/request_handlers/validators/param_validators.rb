@@ -49,7 +49,7 @@ module StripeMock
       SUPPORTED_PLAN_INTERVALS = ["month", "year", "week", "day"]
 
       def invalid_plan_interval_message
-        "Invalid interval: must be one of month, year, week, or day"
+        "Invalid interval: must be one of day, month, week, or year"
       end
 
       SUPPORTED_CURRENCIES = [

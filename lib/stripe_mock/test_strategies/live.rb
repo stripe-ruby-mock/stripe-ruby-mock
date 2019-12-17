@@ -11,7 +11,7 @@ module StripeMock
 
       def delete_product(product_id)
         product = Stripe::Product.retrieve(product_id)
-        Stripe::Plan.all(product: product_id).each(&:delete) if product.type == 'service'
+        Stripe::Plan.list(product: product_id).each(&:delete) if product.type == 'service'
         product.delete
       rescue Stripe::StripeError => e
         # do nothing

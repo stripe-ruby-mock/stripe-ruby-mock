@@ -48,27 +48,28 @@ shared_examples 'Invoice API' do
     end
 
     it "stores invoices for a customer in memory" do
-      expect(@customer.invoices.map(&:id)).to eq([@invoice.id])
+      invoices = Stripe::Invoice.list(customer: @customer.id)
+      expect(invoices.map(&:id)).to eq([@invoice.id])
     end
 
     it "stores all invoices in memory" do
-      expect(Stripe::Invoice.all.map(&:id)).to match_array([@invoice.id, @invoice2.id])
+      expect(Stripe::Invoice.list.map(&:id)).to match_array([@invoice.id, @invoice2.id])
     end
 
     it "defaults count to 10 invoices" do
       11.times { Stripe::Invoice.create }
-      expect(Stripe::Invoice.all.count).to eq(10)
+      expect(Stripe::Invoice.list.count).to eq(10)
     end
 
     it "is marked as having more when more objects exist" do
       11.times { Stripe::Invoice.create }
 
-      expect(Stripe::Invoice.all.has_more).to eq(true)
+      expect(Stripe::Invoice.list.has_more).to eq(true)
     end
 
     context "when passing limit" do
       it "gets that many invoices" do
-        expect(Stripe::Invoice.all(limit: 1).count).to eq(1)
+        expect(Stripe::Invoice.list(limit: 1).count).to eq(1)
       end
     end
   end
@@ -429,7 +430,7 @@ shared_examples 'Invoice API' do
     context 'retrieving invoice line items' do
       it 'returns all line items for created invoice' do
         invoice = Stripe::Invoice.create(customer: customer.id)
-        line_items = invoice.lines.all
+        line_items = invoice.lines.list
 
         expect(invoice).to be_a Stripe::Invoice
         expect(line_items.count).to eq(1)

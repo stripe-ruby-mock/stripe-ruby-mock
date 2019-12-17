@@ -134,7 +134,7 @@ shared_examples 'Card API' do
     let!(:card) { customer.sources.create(source: card_token) }
 
     it "can retrieve all customer's cards" do
-      retrieved = customer.sources.all
+      retrieved = customer.sources.list
       expect(retrieved.count).to eq(1)
     end
 
@@ -198,7 +198,7 @@ shared_examples 'Card API' do
     let!(:card) { recipient.cards.create(card: card_token) }
 
     it "can retrieve all recipient's cards" do
-      retrieved = recipient.cards.all
+      retrieved = recipient.cards.list
       expect(retrieved.count).to eq(1)
     end
 
@@ -279,7 +279,7 @@ shared_examples 'Card API' do
 
       customer = Stripe::Customer.retrieve('test_customer_card')
 
-      list = customer.sources.all
+      list = customer.sources.list
 
       expect(list.object).to eq("list")
       expect(list.count).to eq(2)
@@ -296,7 +296,7 @@ shared_examples 'Card API' do
       Stripe::Customer.create(id: 'no_cards')
       customer = Stripe::Customer.retrieve('no_cards')
 
-      list = customer.sources.all
+      list = customer.sources.list
 
       expect(list.object).to eq("list")
       expect(list.count).to eq(0)
