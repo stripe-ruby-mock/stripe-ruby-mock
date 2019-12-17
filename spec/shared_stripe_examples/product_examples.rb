@@ -70,7 +70,7 @@ shared_examples "Product API" do
     stripe_helper.create_product(id: "prod_123", name: "First Product")
     stripe_helper.create_product(id: "prod_456", name: "Second Product")
 
-    all = Stripe::Product.all
+    all = Stripe::Product.list
     expect(all.count).to eq(2)
     expect(all.map &:id).to include("prod_123", "prod_456")
     expect(all.map &:name).to include("First Product", "Second Product")
@@ -80,7 +80,7 @@ shared_examples "Product API" do
     101.times do |i|
       stripe_helper.create_product(id: "Product #{i}", name: "My Product ##{i}")
     end
-    all = Stripe::Product.all(limit: 100)
+    all = Stripe::Product.list(limit: 100)
 
     expect(all.count).to eq(100)
   end

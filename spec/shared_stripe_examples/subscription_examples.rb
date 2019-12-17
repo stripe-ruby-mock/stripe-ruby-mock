@@ -33,25 +33,29 @@ shared_examples 'Customer Subscriptions' do
       expect(subscription.metadata.example).to eq("yes")
 
       customer = Stripe::Customer.retrieve(customer.id)
-      expect(customer.subscriptions.data).to_not be_empty
-      expect(customer.subscriptions.count).to eq(1)
-      expect(customer.subscriptions.data.length).to eq(1)
-      expect(customer.charges.data.length).to eq(1)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
+      charges = Stripe::Charge.list(customer: customer.id)
+
+      expect(subscriptions.data).to_not be_empty
+      expect(subscriptions.count).to eq(1)
+      expect(subscriptions.data.length).to eq(1)
+      expect(charges.data.length).to eq(1)
       expect(customer.currency).to eq("usd")
 
-      expect(customer.subscriptions.data.first.id).to eq(subscription.id)
-      expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
-      expect(customer.subscriptions.data.first.customer).to eq(customer.id)
-      expect(customer.subscriptions.data.first.metadata.foo).to eq( "bar" )
-      expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
+      expect(subscriptions.data.first.id).to eq(subscription.id)
+      expect(subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
+      expect(subscriptions.data.first.customer).to eq(customer.id)
+      expect(subscriptions.data.first.metadata.foo).to eq( "bar" )
+      expect(subscriptions.data.first.metadata.example).to eq( "yes" )
     end
 
     it "adds a new subscription to customer with none", :live => true do
       plan
       customer = Stripe::Customer.create(source: gen_card_tk)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
 
-      expect(customer.subscriptions.data).to be_empty
-      expect(customer.subscriptions.count).to eq(0)
+      expect(subscriptions.data).to be_empty
+      expect(subscriptions.count).to eq(0)
 
       sub = Stripe::Subscription.create({ plan: 'silver', customer: customer.id, metadata: { foo: "bar", example: "yes" } })
 
@@ -61,26 +65,30 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.metadata.example).to eq( "yes" )
 
       customer = Stripe::Customer.retrieve(customer.id)
-      expect(customer.subscriptions.data).to_not be_empty
-      expect(customer.subscriptions.count).to eq(1)
-      expect(customer.subscriptions.data.length).to eq(1)
-      expect(customer.charges.data.length).to eq(1)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
+      charges = Stripe::Charge.list(customer: customer.id)
+
+      expect(subscriptions.data).to_not be_empty
+      expect(subscriptions.count).to eq(1)
+      expect(subscriptions.data.length).to eq(1)
+      expect(charges.data.length).to eq(1)
       expect(customer.currency).to eq( "usd" )
 
-      expect(customer.subscriptions.data.first.id).to eq(sub.id)
-      expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
-      expect(customer.subscriptions.data.first.customer).to eq(customer.id)
-      expect(customer.subscriptions.data.first.billing).to eq('charge_automatically')
-      expect(customer.subscriptions.data.first.metadata.foo).to eq( "bar" )
-      expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
+      expect(subscriptions.data.first.id).to eq(sub.id)
+      expect(subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
+      expect(subscriptions.data.first.customer).to eq(customer.id)
+      expect(subscriptions.data.first.billing).to eq('charge_automatically')
+      expect(subscriptions.data.first.metadata.foo).to eq( "bar" )
+      expect(subscriptions.data.first.metadata.example).to eq( "yes" )
     end
 
     it 'when customer object provided' do
       plan
       customer = Stripe::Customer.create(source: gen_card_tk)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
 
-      expect(customer.subscriptions.data).to be_empty
-      expect(customer.subscriptions.count).to eq(0)
+      expect(subscriptions.data).to be_empty
+      expect(subscriptions.count).to eq(0)
 
       sub = Stripe::Subscription.create({ plan: 'silver', customer: customer, metadata: { foo: "bar", example: "yes" } })
 
@@ -91,39 +99,46 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.metadata.example).to eq( "yes" )
 
       customer = Stripe::Customer.retrieve(customer.id)
-      expect(customer.subscriptions.data).to_not be_empty
-      expect(customer.subscriptions.count).to eq(1)
-      expect(customer.subscriptions.data.length).to eq(1)
-      expect(customer.charges.data.length).to eq(1)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
+      charges = Stripe::Charge.list(customer: customer.id)
+
+      expect(subscriptions.data).to_not be_empty
+      expect(subscriptions.count).to eq(1)
+      expect(subscriptions.data.length).to eq(1)
+      expect(charges.data.length).to eq(1)
       expect(customer.currency).to eq( "usd" )
 
-      expect(customer.subscriptions.data.first.id).to eq(sub.id)
-      expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
+      expect(subscriptions.data.first.id).to eq(sub.id)
+      expect(subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
 
-      expect(customer.subscriptions.data.first.customer).to eq(customer.id)
-      expect(customer.subscriptions.data.first.billing).to eq('charge_automatically')
-      expect(customer.subscriptions.data.first.metadata.foo).to eq( "bar" )
-      expect(customer.subscriptions.data.first.metadata.example).to eq( "yes" )
+      expect(subscriptions.data.first.customer).to eq(customer.id)
+      expect(subscriptions.data.first.billing).to eq('charge_automatically')
+      expect(subscriptions.data.first.metadata.foo).to eq( "bar" )
+      expect(subscriptions.data.first.metadata.example).to eq( "yes" )
     end
 
     it "adds a new subscription to customer (string/symbol agnostic)" do
       customer = Stripe::Customer.create(source: gen_card_tk)
-      expect(customer.subscriptions.count).to eq(0)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
+      expect(subscriptions.count).to eq(0)
 
       plan
       sub = Stripe::Subscription.create({plan: plan.id, customer: customer.id })
+
       customer = Stripe::Customer.retrieve(customer.id)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
       expect(sub.plan.to_hash).to eq(plan.to_hash)
-      expect(customer.subscriptions.count).to eq(1)
+      expect(subscriptions.count).to eq(1)
     end
 
     it 'creates a charge for the customer', live: true do
       customer = Stripe::Customer.create(source: gen_card_tk)
       Stripe::Subscription.create({ plan: plan.id, customer: customer.id, metadata: { foo: "bar", example: "yes" } })
       customer = Stripe::Customer.retrieve(customer.id)
+      charges = Stripe::Charge.list(customer: customer.id)
 
-      expect(customer.charges.data.length).to eq(1)
-      expect(customer.charges.data.first.amount).to eq(4999)
+      expect(charges.data.length).to eq(1)
+      expect(charges.data.first.amount).to eq(4999)
     end
 
     it 'contains coupon object', live: true do
@@ -132,11 +147,13 @@ shared_examples 'Customer Subscriptions' do
       Stripe::Subscription.create(plan: plan.id, customer: customer.id, coupon: coupon.id)
       customer = Stripe::Customer.retrieve(customer.id)
 
-      expect(customer.subscriptions.data).to be_a(Array)
-      expect(customer.subscriptions.data.count).to eq(1)
-      expect(customer.subscriptions.data.first.discount).not_to be_nil
-      expect(customer.subscriptions.data.first.discount).to be_a(Stripe::Discount)
-      expect(customer.subscriptions.data.first.discount.coupon.id).to eq(coupon.id)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
+
+      expect(subscriptions.data).to be_a(Array)
+      expect(subscriptions.data.count).to eq(1)
+      expect(subscriptions.data.first.discount).not_to be_nil
+      expect(subscriptions.data.first.discount).to be_a(Stripe::Discount)
+      expect(subscriptions.data.first.discount.coupon.id).to eq(coupon.id)
     end
 
     it 'when coupon is not exist', live: true do
@@ -282,15 +299,18 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.trial_end - sub.trial_start).to eq(14 * 86400)
       expect(sub.billing_cycle_anchor).to be_nil
 
-      customer = Stripe::Customer.retrieve('cardless')
-      expect(customer.subscriptions.data).to_not be_empty
-      expect(customer.subscriptions.count).to eq(1)
-      expect(customer.subscriptions.data.length).to eq(1)
+      customer = Stripe::Customer.retrieve(customer.id)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
+      charges = Stripe::Charge.list(customer: customer.id)
 
-      expect(customer.subscriptions.data.first.id).to eq(sub.id)
-      expect(customer.subscriptions.data.first.plan.to_hash).to eq(plan_with_trial.to_hash)
-      expect(customer.subscriptions.data.first.customer).to eq(customer.id)
-      expect(customer.charges.count).to eq(0)
+      expect(subscriptions.data).to_not be_empty
+      expect(subscriptions.count).to eq(1)
+      expect(subscriptions.data.length).to eq(1)
+
+      expect(subscriptions.data.first.id).to eq(sub.id)
+      expect(subscriptions.data.first.plan.to_hash).to eq(plan_with_trial.to_hash)
+      expect(subscriptions.data.first.customer).to eq(customer.id)
+      expect(charges.count).to eq(0)
     end
 
     it "subscribes a customer with no card to a plan with a free trial with plan as item" do
@@ -1053,7 +1073,7 @@ shared_examples 'Customer Subscriptions' do
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: free_plan.id)
       Stripe::Subscription.create({ plan: 'paid', customer: customer.id })
 
-      subs = Stripe::Subscription.all({ customer: customer.id })
+      subs = Stripe::Subscription.list({ customer: customer.id })
 
       expect(subs.object).to eq("list")
       expect(subs.count).to eq(2)
@@ -1064,7 +1084,7 @@ shared_examples 'Customer Subscriptions' do
       Stripe::Customer.create(id: 'no_subs')
       customer = Stripe::Customer.retrieve('no_subs')
 
-      list = Stripe::Subscription.all({ customer: customer.id })
+      list = Stripe::Subscription.list({ customer: customer.id })
 
       expect(list.object).to eq("list")
       expect(list.count).to eq(0)

@@ -63,7 +63,7 @@ shared_examples 'External Account API' do
     let!(:bank) { account.external_accounts.create(external_account: bank_token) }
 
     it "can retrieve all account's banks" do
-      retrieved = account.external_accounts.all
+      retrieved = account.external_accounts.list
       expect(retrieved.count).to eq(1)
     end
 
@@ -142,7 +142,7 @@ shared_examples 'External Account API' do
 
       account = Stripe::Account.retrieve('test_account')
 
-      list = account.external_accounts.all
+      list = account.external_accounts.list
 
       expect(list.object).to eq("list")
       expect(list.count).to eq(2)
@@ -159,7 +159,7 @@ shared_examples 'External Account API' do
       Stripe::Account.create(id: 'no_banks', type: 'custom', country: "US")
       account = Stripe::Account.retrieve('no_banks')
 
-      list = account.external_accounts.all
+      list = account.external_accounts.list
 
       expect(list.object).to eq("list")
       expect(list.count).to eq(0)

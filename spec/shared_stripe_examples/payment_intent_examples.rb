@@ -44,11 +44,11 @@ shared_examples 'PaymentIntent API' do
     end
 
     it "without params retrieves all stripe payment_intent" do
-      expect(Stripe::PaymentIntent.all.count).to eq(3)
+      expect(Stripe::PaymentIntent.list.count).to eq(3)
     end
 
     it "accepts a limit param" do
-      expect(Stripe::PaymentIntent.all(limit: 2).count).to eq(2)
+      expect(Stripe::PaymentIntent.list(limit: 2).count).to eq(2)
     end
   end
 
