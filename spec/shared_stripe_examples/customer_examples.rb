@@ -114,7 +114,7 @@ shared_examples 'Customer API' do
     expect(customer.subscriptions.first.customer).to eq(customer.id)
   end
 
-  it "creates a customer with a plan (string/symbol agnostic)" do
+  it 'creates a customer with a plan (string/symbol agnostic)' do
     stripe_helper.create_plan(id: 'silver', product: product.id)
 
     Stripe::Customer.create(id: 'cust_SLV1', source: gen_card_tk, :plan => 'silver')
@@ -135,7 +135,6 @@ shared_examples 'Customer API' do
   end
 
   context "create customer" do
-
     it "with a trial when trial_end is set" do
       plan = stripe_helper.create_plan(id: 'no_trial', product: product.id, amount: 999)
       trial_end = Time.now.utc.to_i + 3600
@@ -195,7 +194,7 @@ shared_examples 'Customer API' do
       expect(customer.subscriptions.first.trial_end).to be_nil
     end
 
-    it "returns an error if trial_end is set to a past time" do
+    it 'returns an error if trial_end is set to a past time' do
       plan = stripe_helper.create_plan(id: 'silver', product: product.id, amount: 999)
       expect {
         Stripe::Customer.create(id: 'test_cus_trial_end', source: gen_card_tk, plan: 'silver', trial_end: Time.now.utc.to_i - 3600)
@@ -205,7 +204,7 @@ shared_examples 'Customer API' do
       }
     end
 
-    it "returns an error if trial_end is set without a plan" do
+    it 'returns an error if trial_end is set without a plan' do
       expect {
         Stripe::Customer.create(id: 'test_cus_trial_end', source: gen_card_tk, trial_end: "now")
       }.to raise_error {|e|
@@ -218,7 +217,7 @@ shared_examples 'Customer API' do
 
   it 'cannot create a customer with a plan that does not exist' do
     expect {
-      customer = Stripe::Customer.create(id: 'test_cus_no_plan', source: gen_card_tk, :plan => 'non-existant')
+      Stripe::Customer.create(id: 'test_cus_no_plan', source: gen_card_tk, :plan => 'non-existant')
     }.to raise_error {|e|
       expect(e).to be_a(Stripe::InvalidRequestError)
       expect(e.message).to eq('No such plan: non-existant')
@@ -228,7 +227,7 @@ shared_examples 'Customer API' do
   it 'cannot create a customer with an existing plan, but no card token' do
     plan = stripe_helper.create_plan(id: 'p', product: product.id)
     expect {
-      customer = Stripe::Customer.create(id: 'test_cus_no_plan', :plan => 'p')
+      Stripe::Customer.create(id: 'test_cus_no_plan', :plan => 'p')
     }.to raise_error {|e|
       expect(e).to be_a(Stripe::InvalidRequestError)
       expect(e.message).to eq('You must supply a valid card')
@@ -236,10 +235,9 @@ shared_examples 'Customer API' do
   end
 
   it 'creates a customer with a coupon discount' do
-    coupon = Stripe::Coupon.create(id: "10PERCENT", duration: 'once')
+    coupon = Stripe::Coupon.create(id: '10PERCENT', duration: 'once')
 
-    customer =
-      Stripe::Customer.create(id: 'test_cus_coupon', coupon: '10PERCENT')
+    Stripe::Customer.create(id: 'test_cus_coupon', coupon: '10PERCENT')
 
     customer = Stripe::Customer.retrieve('test_cus_coupon')
     expect(customer.discount).to_not be_nil
@@ -251,23 +249,44 @@ shared_examples 'Customer API' do
   describe 'repeating coupon with duration limit', live: true do
     let!(:coupon) { stripe_helper.create_coupon(id: '10OFF', amount_off: 1000, currency: 'usd', duration: 'repeating', duration_in_months: 12) }
     let!(:customer) { Stripe::Customer.create(coupon: coupon.id) }
+
     it 'creates the discount with the end date', live: true do
       discount = Stripe::Customer.retrieve(customer.id).discount
       expect(discount).to_not be_nil
       expect(discount.coupon).to_not be_nil
       expect(discount.end).to be_within(10).of (DateTime.now >> 12).to_time.to_i
     end
+
     after { Stripe::Coupon.retrieve(coupon.id).delete }
     after { Stripe::Customer.retrieve(customer.id).delete }
   end
 
   it 'cannot create a customer with a coupon that does not exist' do
     expect{
-      customer = Stripe::Customer.create(id: 'test_cus_no_coupon', coupon: '5OFF')
+      Stripe::Customer.create(id: 'test_cus_no_coupon', coupon: '5OFF')
     }.to raise_error {|e|
       expect(e).to be_a(Stripe::InvalidRequestError)
       expect(e.message).to eq('No such coupon: 5OFF')
     }
+  end
+
+  context 'with coupon on customer' do
+    before do
+      Stripe::Coupon.create(id: '10PERCENT', duration: 'once')
+      Stripe::Customer.create(id: 'test_cus_coupon', coupon: '10PERCENT')
+    end
+
+    it 'remove the coupon from customer' do
+      customer = Stripe::Customer.retrieve('test_cus_coupon')
+      expect(customer.discount).to_not be_nil
+      expect(customer.discount.coupon).to_not be_nil
+      expect(customer.discount.customer).to eq customer.id
+      expect(customer.discount.start).to be_within(1).of Time.now.to_i
+
+      Stripe::Customer.update('test_cus_coupon', coupon: '')
+      customer = Stripe::Customer.retrieve('test_cus_coupon')
+      expect(customer.discount).to be_nil
+    end
   end
 
   it "stores a created stripe customer in memory" do
