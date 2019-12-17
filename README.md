@@ -6,13 +6,13 @@
 
 # REQUEST: Looking for More Core Contributors
 
-This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'm currently looking for more core contributors to help me out. If you're interested, there is only one requirement: submit a significant enough pull request and have it merged into master (many of you have already done this). Afterwards, ping me in [chat](https://gitter.im/rebelidealist/stripe-ruby-mock) and I will add you as a collaborator.
+This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'm currently looking for more core contributors to help me out. If you're interested, there is only one requirement: submit a significant enough pull request and have it merged into master (many of you have already done this). Afterwards, ping [@gilbert](https://gitter.im/gilbert) in [chat](https://gitter.im/rebelidealist/stripe-ruby-mock) and I will add you as a collaborator.
 
 ## Install
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 2.5.8', :require => 'stripe_mock'
+    gem 'stripe-ruby-mock', '~> 3.0.0', :require => 'stripe_mock'
 
 ## Features
 
@@ -23,12 +23,12 @@ In your gemfile:
 
 ### Requirements
 
-* ruby >= 2.0.0
-* stripe >= 2.0.3
+* ruby >= 2.4.0
+* stripe >= 5.0.0
 
 ### Specifications
 
-**STRIPE API TARGET VERSION:** 2017-06-05 (master)
+**STRIPE API TARGET VERSION:** 2019-08-20 (master) - we try, but some features are not implemented yet.
 
 Older API version branches:
 
