@@ -37,6 +37,9 @@ module StripeMock
       when :processing_error then build_card_error('An error occurred while processing the card', nil, code: 'processing_error', http_status: 402)
       when :card_error then build_card_error('The card number is not a valid credit card number.', 'number', code: 'invalid_number', http_status: 402)
       when :incorrect_zip then build_card_error('The zip code you supplied failed validation.', 'address_zip', code: 'incorrect_zip', http_status: 402)
+      when :insufficient_funds then build_card_error('The card has insufficient funds to complete the purchase.', nil, code: 'insufficient_funds', http_status: 402)
+      when :lost_card then build_card_error('The payment has been declined because the card is reported lost.', nil, code: 'lost_card', http_status: 402)
+      when :stolen_card then build_card_error('The payment has been declined because the card is reported stolen.', nil, code: 'stolen_card', http_status: 402)
       end
     end
 
