@@ -40,22 +40,22 @@ shared_examples 'Transfer API' do
     end
 
     it "without params retrieves all tripe transfers" do
-      expect(Stripe::Transfer.all.count).to eq(3)
+      expect(Stripe::Transfer.list.count).to eq(3)
     end
 
     it "accepts a limit param" do
-      expect(Stripe::Transfer.all(limit: 2).count).to eq(2)
+      expect(Stripe::Transfer.list(limit: 2).count).to eq(2)
     end
 
     it "filters the search to a specific destination" do
       d2 = Stripe::Account.create(type: "custom", email: "#{SecureRandom.uuid}@example.com", business_name: "MyCo")
       Stripe::Transfer.create(amount: "100", currency: "usd", destination: d2.id)
 
-      expect(Stripe::Transfer.all(destination: d2.id).count).to eq(1)
+      expect(Stripe::Transfer.list(destination: d2.id).count).to eq(1)
     end
 
     it "disallows unknown parameters" do
-      expect { Stripe::Transfer.all(recipient: "foo") }.to raise_error {|e|
+      expect { Stripe::Transfer.list(recipient: "foo") }.to raise_error {|e|
         expect(e).to be_a Stripe::InvalidRequestError
         expect(e.param).to eq("recipient")
         expect(e.message).to eq("Received unknown parameter: recipient")

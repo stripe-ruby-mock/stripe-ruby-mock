@@ -327,7 +327,7 @@ shared_examples 'Customer API' do
     Stripe::Customer.create({ email: 'one@one.com' })
     Stripe::Customer.create({ email: 'two@two.com' })
 
-    all = Stripe::Customer.all
+    all = Stripe::Customer.list
     expect(all.count).to eq(2)
     expect(all.map &:email).to include('one@one.com', 'two@two.com')
   end
@@ -437,14 +437,6 @@ shared_examples 'Customer API' do
     customer = Stripe::Customer.create(id: 'test_customer_sub')
     customer = customer.delete
     expect(customer.deleted).to eq(true)
-  end
-
-  it 'works with the update_subscription method' do
-    stripe_helper.create_plan(id: 'silver', product: product.id)
-    cus   = Stripe::Customer.create(source: gen_card_tk)
-    expect {
-      cus.update_subscription(plan: 'silver')
-    }.not_to raise_error
   end
 
   it "deletes a stripe customer discount" do
