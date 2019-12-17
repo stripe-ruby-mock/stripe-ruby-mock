@@ -99,7 +99,6 @@ shared_examples "Product API" do
       end
 
       it("requires a name") { @attribute_name = :name }
-      it("requires a type") { @attribute_name = :type }
     end
 
     describe "Inclusion" do

@@ -451,13 +451,7 @@ shared_examples 'Customer Subscriptions' do
 
       plan2 = stripe_helper.create_plan(id: 'PER_USER_PLAN1', product: product.id)
       customer = Stripe::Customer.create(
-        source: {
-          object: 'card',
-          exp_month: 11,
-          exp_year: 2019,
-          number: '4242424242424242',
-          cvc: '123'
-        }
+        source: stripe_helper.generate_card_token
       )
       subscription = Stripe::Subscription.create(
         customer: customer.id,
