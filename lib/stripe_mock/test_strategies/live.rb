@@ -2,6 +2,21 @@ module StripeMock
   module TestStrategies
     class Live < Base
 
+      def create_product(params={})
+        params = create_product_params(params)
+        raise "create_product requires an :id" if params[:id].nil?
+        delete_product(params[:id])
+        Stripe::Product.create params
+      end
+
+      def delete_product(product_id)
+        product = Stripe::Product.retrieve(product_id)
+        Stripe::Plan.list(product: product_id).each(&:delete) if product.type == 'service'
+        product.delete
+      rescue Stripe::StripeError => e
+        # do nothing
+      end
+
       def create_plan(params={})
         raise "create_plan requires an :id" if params[:id].nil?
         delete_plan(params[:id])
@@ -9,12 +24,10 @@ module StripeMock
       end
 
       def delete_plan(plan_id)
-        begin
-          plan = Stripe::Plan.retrieve(plan_id)
-          plan.delete
-        rescue Stripe::StripeError => e
-          # Do nothing; we just want to make sure this plan ceases to exists
-        end
+        plan = Stripe::Plan.retrieve(plan_id)
+        plan.delete
+      rescue Stripe::StripeError => e
+        # do nothing
       end
 
       def create_coupon(params={})
@@ -23,12 +36,10 @@ module StripeMock
       end
 
       def delete_coupon(id)
-        begin
-          coupon = Stripe::Coupon.retrieve(id)
-          coupon.delete
-        rescue Stripe::StripeError
-          # do nothing
-        end
+        coupon = Stripe::Coupon.retrieve(id)
+        coupon.delete
+      rescue Stripe::StripeError
+        # do nothing
       end
 
       def upsert_stripe_object(object, attributes)

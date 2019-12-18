@@ -30,9 +30,7 @@ shared_examples 'Refund API' do
         description: 'card charge'
       )
 
-      Stripe::Refund.create(
-        charge: charge.id
-      )
+      Stripe::Refund.create(charge: charge.id)
 
       charge = Stripe::Charge.retrieve(charge.id)
 
@@ -262,7 +260,7 @@ shared_examples 'Refund API' do
       end
 
       it "stores all charges in memory" do
-        expect(Stripe::Refund.all.data.map(&:id)).to eq([@refund2.id, @refund.id])
+        expect(Stripe::Refund.list.data.map(&:id)).to eq([@refund2.id, @refund.id])
       end
 
       it "defaults count to 10 charges" do
@@ -275,7 +273,7 @@ shared_examples 'Refund API' do
           Stripe::Refund.create(charge: charge.id)
         end
 
-        expect(Stripe::Refund.all.data.count).to eq(10)
+        expect(Stripe::Refund.list.data.count).to eq(10)
       end
 
       it "is marked as having more when more objects exist" do
@@ -288,12 +286,12 @@ shared_examples 'Refund API' do
           Stripe::Refund.create(charge: charge.id)
         end
 
-        expect(Stripe::Refund.all.has_more).to eq(true)
+        expect(Stripe::Refund.list.has_more).to eq(true)
       end
 
       context "when passing limit" do
         it "gets that many charges" do
-          expect(Stripe::Refund.all(limit: 1).count).to eq(1)
+          expect(Stripe::Refund.list(limit: 1).count).to eq(1)
         end
       end
     end
@@ -318,13 +316,13 @@ shared_examples 'Refund API' do
         Stripe::Refund.create(charge: charge.id)
       end
 
-      all = Stripe::Refund.all
+      all_refunds = Stripe::Refund.list
       default_limit = 10
-      half = Stripe::Refund.all(starting_after: all.data.at(1).id)
+      half = Stripe::Refund.list(starting_after: all_refunds.data.at(1).id)
 
       expect(half).to be_a(Stripe::ListObject)
       expect(half.data.count).to eq(default_limit)
-      expect(half.data.first.id).to eq(all.data.at(2).id)
+      expect(half.data.first.id).to eq(all_refunds.data.at(2).id)
     end
 
     describe "idempotency" do
@@ -337,26 +335,32 @@ shared_examples 'Refund API' do
           capture: true
         )
       end
-      let(:idempotent_refund_params) {{
-        charge: charge.id,
+      let(:refund_params) {{
+        charge: charge.id
+      }}
+
+      let(:refund_headers) {{
         idempotency_key: 'onceisenough'
       }}
 
       it "returns the original refund if the same idempotency_key is passed in" do
-        refund1 = Stripe::Refund.create(idempotent_refund_params)
-        refund2 = Stripe::Refund.create(idempotent_refund_params)
+        refund1 = Stripe::Refund.create(refund_params, refund_headers)
+        refund2 = Stripe::Refund.create(refund_params, refund_headers)
 
         expect(refund1).to eq(refund2)
       end
 
-      it "returns different charges if different idempotency_keys are used for each charge" do
-        idempotent_refund_params2 = idempotent_refund_params.clone
-        idempotent_refund_params2[:idempotency_key] = 'thisoneisdifferent'
+      context 'different key' do
+        let(:different_refund_headers) {{
+          idempotency_key: 'thisoneisdifferent'
+        }}
 
-        refund1 = Stripe::Refund.create(idempotent_refund_params)
-        refund2 = Stripe::Refund.create(idempotent_refund_params2)
+        it "returns different charges if different idempotency_keys are used for each charge" do
+          refund1 = Stripe::Refund.create(refund_params, refund_headers)
+          refund2 = Stripe::Refund.create(refund_params, different_refund_headers)
 
-        expect(refund1).not_to eq(refund2)
+          expect(refund1).not_to eq(refund2)
+        end
       end
     end
   end
@@ -372,7 +376,8 @@ shared_examples 'Refund API' do
         description: 'card charge'
       )
 
-      charge = charge.refund(amount: 999)
+      Stripe::Refund.create(charge: charge.id, amount: 999)
+      charge.refresh
 
       expect(charge.refunded).to eq(true)
       expect(charge.refunds.data.first.amount).to eq(999)
@@ -386,10 +391,10 @@ shared_examples 'Refund API' do
         source: stripe_helper.generate_card_token,
         description: 'card charge'
       )
-      refund = charge.refund
+      refund = Stripe::Refund.create(charge: charge.id)
 
       expect(charge.id).to match(/^(test_)?ch/)
-      expect(refund.id).to eq(charge.id)
+      expect(refund.charge).to eq(charge.id)
     end
 
     it "creates a stripe refund with a refund ID" do
@@ -399,10 +404,12 @@ shared_examples 'Refund API' do
         source: stripe_helper.generate_card_token,
         description: 'card charge'
       )
-      refund = charge.refund
 
-      expect(refund.refunds.data.count).to eq 1
-      expect(refund.refunds.data.first.id).to match(/^test_re/)
+      Stripe::Refund.create(charge: charge.id)
+      refunds = Stripe::Refund.list(charge: charge.id)
+
+      expect(refunds.data.count).to eq 1
+      expect(refunds.data.first.id).to match(/^test_re/)
     end
 
     it "creates a stripe refund with a status" do
@@ -412,10 +419,12 @@ shared_examples 'Refund API' do
         source: stripe_helper.generate_card_token,
         description: 'card charge'
       )
-      refund = charge.refund
 
-      expect(refund.refunds.data.count).to eq 1
-      expect(refund.refunds.data.first.status).to eq("succeeded")
+      Stripe::Refund.create(charge: charge.id)
+      refunds = Stripe::Refund.list(charge: charge.id)
+
+      expect(refunds.data.count).to eq 1
+      expect(refunds.data.first.status).to eq("succeeded")
     end
 
     it "creates a stripe refund with a different balance transaction than the charge" do
@@ -425,9 +434,10 @@ shared_examples 'Refund API' do
         source: stripe_helper.generate_card_token,
         description: 'card charge'
       )
-      refund = charge.refund
+      Stripe::Refund.create(charge: charge.id)
+      refunds = Stripe::Refund.list(charge: charge.id)
 
-      expect(charge.balance_transaction).not_to eq(refund.refunds.data.first.balance_transaction)
+      expect(charge.balance_transaction).not_to eq(refunds.data.first.balance_transaction)
     end
 
     it "creates a refund off a charge", :live => true do

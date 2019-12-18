@@ -15,7 +15,7 @@ shared_examples 'Account API' do
       expect(account.id).to match /acct\_/
     end
     it 'retrieves all' do
-      accounts = Stripe::Account.all
+      accounts = Stripe::Account.list
 
       expect(accounts).to be_a Stripe::ListObject
       expect(accounts.data.count).to satisfy { |n| n >= 1 }
@@ -56,6 +56,33 @@ shared_examples 'Account API' do
       expect {
         account.save
       }.to raise_error
+    end
+
+    context 'with tos acceptance date' do
+      let(:error_message) { "ToS acceptance date is not valid. Dates are expected to be integers, measured in seconds, not in the future, and after 2009" }
+
+      it 'raises error when tos date is before 2009' do
+        date = Date.new(2008,1,1).strftime("%s").to_i
+
+        account = Stripe::Account.retrieve
+        account.tos_acceptance.date = date
+
+        expect {
+          account.save
+        }.to raise_error Stripe::InvalidRequestError, error_message
+      end
+
+      it 'raises error when tos date is in the future' do
+        year = Time.now.year + 5
+        date = Date.new(year,1,1).strftime("%s").to_i
+
+        account = Stripe::Account.retrieve
+        account.tos_acceptance.date = date
+
+        expect {
+          account.save
+        }.to raise_error Stripe::InvalidRequestError, error_message
+      end
     end
   end
 

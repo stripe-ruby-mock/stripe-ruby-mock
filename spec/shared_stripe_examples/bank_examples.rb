@@ -77,7 +77,7 @@ shared_examples 'Bank API' do
     let!(:bank) { customer.sources.create(source: bank_token) }
 
     it "can retrieve all customer's banks" do
-      retrieved = customer.sources.all
+      retrieved = customer.sources.list
       expect(retrieved.count).to eq(1)
     end
 
@@ -174,7 +174,7 @@ shared_examples 'Bank API' do
 
       customer = Stripe::Customer.retrieve('test_customer_bank')
 
-      list = customer.sources.all
+      list = customer.sources.list
 
       expect(list.object).to eq("list")
       expect(list.count).to eq(2)
@@ -191,7 +191,7 @@ shared_examples 'Bank API' do
       Stripe::Customer.create(id: 'no_banks')
       customer = Stripe::Customer.retrieve('no_banks')
 
-      list = customer.sources.all
+      list = customer.sources.list
 
       expect(list.object).to eq("list")
       expect(list.count).to eq(0)

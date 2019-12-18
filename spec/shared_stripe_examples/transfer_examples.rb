@@ -3,7 +3,7 @@ require 'spec_helper'
 shared_examples 'Transfer API' do
 
   it "creates a stripe transfer" do
-    destination = Stripe::Account.create(email: "#{SecureRandom.uuid}@example.com", id: "acct_12345")
+    destination = Stripe::Account.create(type: "custom", email: "#{SecureRandom.uuid}@example.com", id: "acct_12345")
     transfer = Stripe::Transfer.create(amount: 100, currency: "usd", destination: destination.id)
 
     expect(transfer.id).to match /^test_tr/
@@ -31,7 +31,7 @@ shared_examples 'Transfer API' do
   end
 
   describe "listing transfers" do
-    let(:destination) { Stripe::Account.create(email: "#{SecureRandom.uuid}@example.com", business_name: "MyCo") }
+    let(:destination) { Stripe::Account.create(type: "custom", email: "#{SecureRandom.uuid}@example.com", business_name: "MyCo") }
 
     before do
       3.times do
@@ -40,22 +40,22 @@ shared_examples 'Transfer API' do
     end
 
     it "without params retrieves all tripe transfers" do
-      expect(Stripe::Transfer.all.count).to eq(3)
+      expect(Stripe::Transfer.list.count).to eq(3)
     end
 
     it "accepts a limit param" do
-      expect(Stripe::Transfer.all(limit: 2).count).to eq(2)
+      expect(Stripe::Transfer.list(limit: 2).count).to eq(2)
     end
 
     it "filters the search to a specific destination" do
-      d2 = Stripe::Account.create(email: "#{SecureRandom.uuid}@example.com", business_name: "MyCo")
+      d2 = Stripe::Account.create(type: "custom", email: "#{SecureRandom.uuid}@example.com", business_name: "MyCo")
       Stripe::Transfer.create(amount: "100", currency: "usd", destination: d2.id)
 
-      expect(Stripe::Transfer.all(destination: d2.id).count).to eq(1)
+      expect(Stripe::Transfer.list(destination: d2.id).count).to eq(1)
     end
 
     it "disallows unknown parameters" do
-      expect { Stripe::Transfer.all(recipient: "foo") }.to raise_error {|e|
+      expect { Stripe::Transfer.list(recipient: "foo") }.to raise_error {|e|
         expect(e).to be_a Stripe::InvalidRequestError
         expect(e.param).to eq("recipient")
         expect(e.message).to eq("Received unknown parameter: recipient")
@@ -104,7 +104,7 @@ shared_examples 'Transfer API' do
   end
 
   it "when amount is not integer", live: true do
-    dest = Stripe::Account.create(type: "standard", email: "#{SecureRandom.uuid}@example.com", business_name: "Alex Smith")
+    dest = Stripe::Account.create(type: "custom", email: "#{SecureRandom.uuid}@example.com", requested_capabilities: ['card_payments', 'platform_payments'])
     expect { Stripe::Transfer.create(amount: '400.2',
                                      currency: 'usd',
                                      destination: dest.id,
@@ -116,7 +116,7 @@ shared_examples 'Transfer API' do
   end
 
   it "when amount is negative", live: true do
-    dest = Stripe::Account.create(type: "standard", email: "#{SecureRandom.uuid}@example.com", business_name: "Alex Smith")
+    dest = Stripe::Account.create(type: "custom", email: "#{SecureRandom.uuid}@example.com", requested_capabilities: ['card_payments', 'platform_payments'])
     expect { Stripe::Transfer.create(amount: '-400',
                                      currency: 'usd',
                                      destination: dest.id,

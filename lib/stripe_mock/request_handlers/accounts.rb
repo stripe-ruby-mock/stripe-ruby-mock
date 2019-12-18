@@ -1,6 +1,7 @@
 module StripeMock
   module RequestHandlers
     module Accounts
+      VALID_START_YEAR = 2009
 
       def Accounts.included(klass)
         klass.add_handler 'post /v1/accounts',      :new_account
@@ -30,6 +31,8 @@ module StripeMock
         account.merge!(params)
         if blank_value?(params[:tos_acceptance], :date)
           raise Stripe::InvalidRequestError.new("Invalid integer: ", "tos_acceptance[date]", http_status: 400)
+        elsif params[:tos_acceptance] && params[:tos_acceptance][:date]
+          validate_acceptance_date(params[:tos_acceptance][:date])
         end
         account
       end
@@ -64,6 +67,19 @@ module StripeMock
           return true if value.nil? || "" == value
         end
         false
+      end
+
+      def validate_acceptance_date(unix_date)
+        unix_now = Time.now.strftime("%s").to_i
+        formatted_date = Time.at(unix_date)
+
+        return if formatted_date.year >= VALID_START_YEAR && unix_now >= unix_date
+
+        raise Stripe::InvalidRequestError.new(
+          "ToS acceptance date is not valid. Dates are expected to be integers, measured in seconds, not in the future, and after 2009",
+          "tos_acceptance[date]", 
+          http_status: 400
+        )
       end
     end
   end

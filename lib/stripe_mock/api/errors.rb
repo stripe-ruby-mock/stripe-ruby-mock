@@ -1,5 +1,4 @@
 module StripeMock
-
   def self.prepare_error(stripe_error, *handler_names)
     handler_names.push(:all) if handler_names.count == 0
 
@@ -15,13 +14,15 @@ module StripeMock
   def self.prepare_card_error(code, *handler_names)
     handler_names.push(:new_charge) if handler_names.count == 0
 
-    args = CardErrors.argument_map[code]
-    raise StripeMockError.new("Unrecognized stripe card error code: #{code}") if args.nil?
-    self.prepare_error Stripe::CardError.new(*args), *handler_names
+    error = CardErrors.build_error_for(code)
+    if error.nil?
+      raise StripeMockError, "Unrecognized stripe card error code: #{code}"
+    end
+
+    prepare_error error, *handler_names
   end
 
   module CardErrors
-
     def self.argument_map
       @__map ||= {
         incorrect_number: add_json_body(["The card number is incorrect", 'number', code: 'incorrect_number', http_status: 402]),
@@ -57,9 +58,9 @@ module StripeMock
       json_hash[:type] = 'card_error'
       json_hash[:decline_code] = get_decline_code(error_values.last.slice!(:http_status)[:code])
 
-      error_values.last.merge!(json_body: { error: json_hash }, http_body: { error: json_hash })
+      error_keyword_args = kwargs.merge(json_body: { error: json_hash }, http_body: { error: json_hash }.to_json)
 
-      error_values
+      Stripe::CardError.new(message, param, **error_keyword_args)
     end
   end
 end

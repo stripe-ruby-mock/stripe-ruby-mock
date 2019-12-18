@@ -3,10 +3,11 @@
   "livemode": false,
   "id": "evt_00000000000000",
   "type": "invoice.updated",
+  "status": "paid",
   "object": "event",
   "data": {
     "object": {
-      "date": 1380674206,
+      "created": 1380674206,
       "id": "in_00000000000000",
       "period_start": 1378082075,
       "period_end": 1380674075,
@@ -30,7 +31,7 @@
             "quantity": 1,
             "plan": {
               "interval": "month",
-              "name": "Member's Club",
+              "product": "pr_00000000000000",
               "amount": 100,
               "currency": "usd",
               "id": "fkx0AFo",

@@ -163,15 +163,19 @@ shared_examples 'Charge API' do
   end
 
   it "creates a balance transaction" do
+    amount = 300
+    fee = 10
     charge = Stripe::Charge.create({
-      amount: 300,
+      amount: amount,
       currency: 'USD',
-      source: stripe_helper.generate_card_token
+      source: stripe_helper.generate_card_token,
+      application_fee: fee,
     })
     bal_trans = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
-    expect(bal_trans.amount).to eq(charge.amount)
-    expect(bal_trans.fee).to eq(39)
+    expect(bal_trans.amount).to eq(amount)
+    expect(bal_trans.fee).to eq(39 + fee)
     expect(bal_trans.source).to eq(charge.id)
+    expect(bal_trans.net).to eq(amount - bal_trans.fee)
   end
 
   context 'when conversion rate is set' do
@@ -274,20 +278,6 @@ shared_examples 'Charge API' do
     }.not_to raise_error
   end
 
-  it "marks a charge as safe" do
-    original = Stripe::Charge.create({
-      amount: 777,
-      currency: 'USD',
-      source: stripe_helper.generate_card_token
-    })
-    charge = Stripe::Charge.retrieve(original.id)
-
-    charge.mark_as_safe
-
-    updated = Stripe::Charge.retrieve(original.id)
-    expect(updated.fraud_details[:user_report]).to eq "safe"
-  end
-
   it "does not lose data when updating a charge" do
     original = Stripe::Charge.create({
       amount: 777,
@@ -353,28 +343,29 @@ shared_examples 'Charge API' do
     end
 
     it "stores charges for a customer in memory" do
-      expect(@customer.charges.data.map(&:id)).to eq([@charge.id])
+      charges = Stripe::Charge.list(customer: @customer.id)
+      expect(charges.map(&:id)).to eq([@charge.id])
     end
 
     it "stores all charges in memory" do
-      expect(Stripe::Charge.all.data.map(&:id).reverse).to eq([@charge.id, @charge2.id])
+      expect(Stripe::Charge.list.data.map(&:id).reverse).to eq([@charge.id, @charge2.id])
     end
 
     it "defaults count to 10 charges" do
       11.times { Stripe::Charge.create(amount: 1, currency: 'usd', source: stripe_helper.generate_card_token) }
 
-      expect(Stripe::Charge.all.data.count).to eq(10)
+      expect(Stripe::Charge.list.data.count).to eq(10)
     end
 
     it "is marked as having more when more objects exist" do
       11.times { Stripe::Charge.create(amount: 1, currency: 'usd', source: stripe_helper.generate_card_token) }
 
-      expect(Stripe::Charge.all.has_more).to eq(true)
+      expect(Stripe::Charge.list.has_more).to eq(true)
     end
 
     context "when passing limit" do
       it "gets that many charges" do
-        expect(Stripe::Charge.all(limit: 1).count).to eq(1)
+        expect(Stripe::Charge.list(limit: 1).count).to eq(1)
       end
     end
   end
@@ -394,13 +385,13 @@ shared_examples 'Charge API' do
       Stripe::Charge.create(customer: cus.id, amount: 100, currency: "usd")
     end
 
-    all = Stripe::Charge.all
+    all_charges = Stripe::Charge.list
     default_limit = 10
-    half = Stripe::Charge.all(starting_after: all.data.at(1).id)
+    half = Stripe::Charge.list(starting_after: all_charges.data.at(1).id)
 
     expect(half).to be_a(Stripe::ListObject)
     expect(half.data.count).to eq(default_limit)
-    expect(half.data.first.id).to eq(all.data.at(2).id)
+    expect(half.data.first.id).to eq(all_charges.data.at(2).id)
   end
 
 
@@ -472,29 +463,34 @@ shared_examples 'Charge API' do
 
   describe "idempotency" do
     let(:customer) { Stripe::Customer.create(email: 'johnny@appleseed.com') }
-    let(:idempotent_charge_params) {{
+    let(:charge_params) {{
       amount: 777,
       currency: 'USD',
       customer: customer.id,
-      capture: true,
+      capture: true
+    }}
+    let(:charge_headers) {{
       idempotency_key: 'onceisenough'
     }}
 
     it "returns the original charge if the same idempotency_key is passed in" do
-      charge1 = Stripe::Charge.create(idempotent_charge_params)
-      charge2 = Stripe::Charge.create(idempotent_charge_params)
+      charge1 = Stripe::Charge.create(charge_params, charge_headers)
+      charge2 = Stripe::Charge.create(charge_params, charge_headers)
 
       expect(charge1).to eq(charge2)
     end
 
-    it "returns different charges if different idempotency_keys are used for each charge" do
-      idempotent_charge_params2 = idempotent_charge_params.clone
-      idempotent_charge_params2[:idempotency_key] = 'thisoneisdifferent'
+    context 'different key' do
+      let(:different_charge_headers) {{
+        idempotency_key: 'thisoneisdifferent'
+      }}
 
-      charge1 = Stripe::Charge.create(idempotent_charge_params)
-      charge2 = Stripe::Charge.create(idempotent_charge_params2)
+      it "returns different charges if different idempotency_keys are used for each charge" do
+        charge1 = Stripe::Charge.create(charge_params, charge_headers)
+        charge2 = Stripe::Charge.create(charge_params, different_charge_headers)
 
-      expect(charge1).not_to eq(charge2)
+        expect(charge1).not_to eq(charge2)
+      end
     end
   end
 

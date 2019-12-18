@@ -29,7 +29,7 @@ module StripeMock
           params[:default_source] = sources.first[:id]
         end
 
-        customers[ params[:id] ] = Data.mock_customer(sources, params)
+        customers[params[:id]] = Data.mock_customer(sources, params)
 
         if params[:plan]
           plan_id = params[:plan].to_s
@@ -48,13 +48,12 @@ module StripeMock
         end
 
         if params[:coupon]
-          coupon = coupons[ params[:coupon] ]
+          coupon = coupons[params[:coupon]]
           assert_existence :coupon, params[:coupon], coupon
-
-          add_coupon_to_customer(customers[params[:id]], coupon)
+          add_coupon_to_object(customers[params[:id]], coupon)
         end
 
-        customers[ params[:id] ]
+        customers[params[:id]]
       end
 
       def update_customer(route, method_url, params, headers)
@@ -87,10 +86,14 @@ module StripeMock
         end
 
         if params[:coupon]
-          coupon = coupons[ params[:coupon] ]
-          assert_existence :coupon, params[:coupon], coupon
+          if params[:coupon] == ''
+            delete_coupon_from_object(cus)
+          else
+            coupon = coupons[params[:coupon]]
+            assert_existence :coupon, params[:coupon], coupon
 
-          add_coupon_to_customer(cus, coupon)
+            add_coupon_to_object(cus, coupon)
+          end
         end
 
         cus

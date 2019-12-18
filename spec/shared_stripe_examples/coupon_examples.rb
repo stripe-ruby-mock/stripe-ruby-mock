@@ -53,7 +53,7 @@ shared_examples 'Coupon API' do
       coupon1
       coupon2
 
-      all = Stripe::Coupon.all
+      all = Stripe::Coupon.list
 
       expect(all.count).to eq(2)
       expect(all.map &:id).to include('10BUCKS', '11BUCKS')

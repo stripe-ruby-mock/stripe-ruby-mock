@@ -19,6 +19,7 @@ describe 'StripeMock Server', :mock_server => true do
 
   after { StripeMock.stop_client(:clear_server_data => true) }
 
+  let(:product) { stripe_helper.create_product }
 
   it "uses an RPC client for mock requests" do
     charge = Stripe::Charge.create(
@@ -51,7 +52,7 @@ describe 'StripeMock Server', :mock_server => true do
 
 
   it "returns a response with symbolized hash keys" do
-    stripe_helper.create_plan(id: 'x')
+    stripe_helper.create_plan(id: 'x', product: product.id)
     response, api_key = StripeMock.redirect_to_mock_server('get', '/v1/plans/x', api_key: 'xxx')
     response.data.keys.each {|k| expect(k).to be_a(Symbol) }
   end

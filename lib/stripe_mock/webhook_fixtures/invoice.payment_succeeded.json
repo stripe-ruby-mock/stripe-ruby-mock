@@ -16,7 +16,7 @@
       "closed": true,
       "currency": "eur",
       "customer": "cus_00000000000000",
-      "date": 1464084258,
+      "created": 1464084258,
       "description": null,
       "discount": null,
       "ending_balance": 0,
