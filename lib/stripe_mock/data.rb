@@ -205,7 +205,7 @@ module StripeMock
           data: []
         },
         transfer: nil,
-        balance_transaction: "txn_2dyYXXP90MN26R",
+        balance_transaction: params[:balance_transaction] || "txn_2dyYXXP90MN26R",
         failure_message: nil,
         failure_code: nil,
         amount_refunded: 0,
@@ -1213,6 +1213,44 @@ module StripeMock
         :payment_method_types => ["card"],
         :status => "requires_payment_method",
         :usage => "off_session"
+      }.merge(params)
+    end
+
+    def self.mock_checkout_session(params = {})
+      cs_id = params[:id] || "test_cs_default"
+      currency = params[:currency] || StripeMock.default_currency
+      {
+        id: cs_id,
+        object: 'checkout.session',
+        billing_address_collection: nil,
+        cancel_url: 'https://example.com/cancel',
+        client_reference_id: nil,
+        customer: nil,
+        customer_email: nil,
+        display_items: [
+          {
+            amount: 1500,
+            currency: currency,
+            custom: {
+              description: 'Comfortable cotton t-shirt',
+              images: nil,
+              name: 'T-shirt'
+            },
+            quantity: 2,
+            type: 'custom'
+          }
+        ],
+        livemode: false,
+        locale: nil,
+        mode: nil,
+        payment_intent: mock_payment_intent[:id],
+        payment_method_types: [
+          'card'
+        ],
+        setup_intent: nil,
+        submit_type: nil,
+        subscription: nil,
+        success_url: 'https://example.com/success'
       }.merge(params)
     end
   end

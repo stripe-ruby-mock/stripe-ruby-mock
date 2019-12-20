@@ -26,7 +26,7 @@ shared_examples 'Balance Transaction API' do
   describe "listing balance transactions" do
 
     it "retrieves all balance transactions" do
-      disputes = Stripe::BalanceTransaction.all
+      disputes = Stripe::BalanceTransaction.list
 
       expect(disputes.count).to eq(10)
       expect(disputes.map &:id).to include('txn_05RsQX2eZvKYlo2C0FRTGSSA','txn_15RsQX2eZvKYlo2C0ERTYUIA', 'txn_25RsQX2eZvKYlo2C0ZXCVBNM', 'txn_35RsQX2eZvKYlo2C0QAZXSWE', 'txn_45RsQX2eZvKYlo2C0EDCVFRT', 'txn_55RsQX2eZvKYlo2C0OIKLJUY', 'txn_65RsQX2eZvKYlo2C0ASDFGHJ', 'txn_75RsQX2eZvKYlo2C0EDCXSWQ', 'txn_85RsQX2eZvKYlo2C0UJMCDET', 'txn_95RsQX2eZvKYlo2C0EDFRYUI')
@@ -38,7 +38,7 @@ shared_examples 'Balance Transaction API' do
     transfer_id = Stripe::Transfer.create({ amount: 2730, currency: "usd" })
 
     # verify transfer currently has no balance transactions
-    transfer_transactions = Stripe::BalanceTransaction.all({transfer: transfer_id})
+    transfer_transactions = Stripe::BalanceTransaction.list({transfer: transfer_id})
     expect(transfer_transactions.count).to eq(0)
 
     # verify we can create a new balance transaction associated with the transfer
@@ -55,7 +55,7 @@ shared_examples 'Balance Transaction API' do
     stripe_helper.upsert_stripe_object(:balance_transaction, {id: existing_txn_id, transfer: transfer_id})
 
     # now verify that only these balance transactions are retrieved with the transfer
-    transfer_transactions = Stripe::BalanceTransaction.all({transfer: transfer_id})
+    transfer_transactions = Stripe::BalanceTransaction.list({transfer: transfer_id})
     expect(transfer_transactions.count).to eq(2)
     expect(transfer_transactions.map &:id).to include(new_txn_id, existing_txn_id)
   end

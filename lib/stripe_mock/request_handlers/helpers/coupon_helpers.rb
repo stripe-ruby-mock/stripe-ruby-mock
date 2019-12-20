@@ -12,6 +12,11 @@ module StripeMock
         object[:discount] = Stripe::Discount.construct_from(discount_attrs)
         object
       end
+
+      def delete_coupon_from_object(object)
+        object[:discount] = nil
+        object
+      end
     end
   end
 end

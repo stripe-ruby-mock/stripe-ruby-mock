@@ -44,11 +44,11 @@ shared_examples 'PaymentIntent API' do
     end
 
     it "without params retrieves all stripe payment_intent" do
-      expect(Stripe::PaymentIntent.all.count).to eq(3)
+      expect(Stripe::PaymentIntent.list.count).to eq(3)
     end
 
     it "accepts a limit param" do
-      expect(Stripe::PaymentIntent.all(limit: 2).count).to eq(2)
+      expect(Stripe::PaymentIntent.list(limit: 2).count).to eq(2)
     end
   end
 
@@ -77,6 +77,9 @@ shared_examples 'PaymentIntent API' do
     expect(payment_intent.status).to eq('succeeded')
     expect(payment_intent.charges.data.size).to eq(1)
     expect(payment_intent.charges.data.first.object).to eq('charge')
+    balance_txn = payment_intent.charges.data.first.balance_transaction
+    expect(balance_txn).to match(/^test_txn/)
+    expect(Stripe::BalanceTransaction.retrieve(balance_txn).id).to eq(balance_txn)
   end
 
   it "confirms a stripe payment_intent" do

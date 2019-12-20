@@ -1,7 +1,6 @@
 module StripeMock
   module RequestHandlers
     module PaymentMethods
-
       ALLOWED_PARAMS = [:customer, :type]
 
       def PaymentMethods.included(klass)
@@ -51,26 +50,6 @@ module StripeMock
         end
 
         Data.mock_list_object(clone.values, params)
-      end
-
-      #
-      # params: {:customer=>"test_cus_3"}
-      #
-      def attach_payment_method(route, method_url, params, headers)
-        route =~ method_url
-        id = $1
-        payment_methods[id].merge!(params)
-        payment_methods[id].clone
-      end
-
-      def detach_payment_method(route, method_url, params, headers)
-
-      end
-
-      def get_payment_method(route, method_url, params, headers)
-        route =~ method_url
-        id = $1
-        assert_existence(:payment_method, $1, payment_methods[id])
       end
       
       # post /v1/payment_methods/:id/attach

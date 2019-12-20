@@ -105,7 +105,7 @@ shared_examples 'Plan API' do
     stripe_helper.create_plan(id: 'Plan One', product: product_id, amount: 54321)
     stripe_helper.create_plan(id: 'Plan Two', product: product_id, amount: 98765)
 
-    all = Stripe::Plan.all
+    all = Stripe::Plan.list
     expect(all.count).to eq(2)
     expect(all.map &:id).to include('Plan One', 'Plan Two')
     expect(all.map &:amount).to include(54321, 98765)
@@ -115,7 +115,7 @@ shared_examples 'Plan API' do
     101.times do | i|
       stripe_helper.create_plan(id: "Plan #{i}", product: product_id, amount: 11)
     end
-    all = Stripe::Plan.all(limit: 100)
+    all = Stripe::Plan.list(limit: 100)
 
     expect(all.count).to eq(100)
   end
