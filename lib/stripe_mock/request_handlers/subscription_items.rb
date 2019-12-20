@@ -6,6 +6,7 @@ module StripeMock
         klass.add_handler 'get /v1/subscription_items', :retrieve_subscription_items
         klass.add_handler 'post /v1/subscription_items/([^/]*)', :update_subscription_item
         klass.add_handler 'post /v1/subscription_items', :create_subscription_items
+        klass.add_handler 'delete /v1/subscription_items/([^/]*)', :delete_subscription_item
       end
 
       def retrieve_subscription_items(route, method_url, params, headers)
@@ -30,6 +31,16 @@ module StripeMock
 
         subscription_item = assert_existence :subscription_item, $1, subscriptions_items[$1]
         subscription_item.merge!(params.merge(plan: plans[params[:plan]]))
+      end
+
+      def delete_subscription_item(route, method_url, params, headers)
+        route =~ method_url
+        assert_existence :subscription_item, $1, subscriptions_items[$1]
+
+        subscriptions_items[$1] = {
+          id: subscriptions_items[$1][:id],
+          deleted: true
+        }
       end
     end
   end

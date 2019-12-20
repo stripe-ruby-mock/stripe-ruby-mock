@@ -73,4 +73,10 @@ shared_examples 'Subscription Items API' do
       }
     end
   end
+
+  it "deletes a subscription item" do
+    subscription_item = Stripe::SubscriptionItem.create(id: 'test_subscription_item')
+    subscription_item = subscription_item.delete
+    expect(subscription_item.deleted).to eq true
+  end
 end
