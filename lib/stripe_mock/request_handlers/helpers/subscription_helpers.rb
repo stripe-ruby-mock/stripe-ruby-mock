@@ -16,9 +16,9 @@ module StripeMock
             quantity = items &&
               items.detect { |item| item[:plan] == plan[:id] }[:quantity] || 1
             subscriptions_items[item_id] =
-              Data.mock_subscription_item({ plan: plan, quantity: quantity })
+              Data.mock_subscription_item({ id: item_id, plan: plan, quantity: quantity })
           else
-            subscriptions_items[item_id] = Data.mock_subscription_item({ plan: plan })
+            subscriptions_items[item_id] = Data.mock_subscription_item({ id: item_id, plan: plan })
           end
           subscriptions_items[item_id]
         end
