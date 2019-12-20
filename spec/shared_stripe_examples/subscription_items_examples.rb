@@ -32,6 +32,14 @@ shared_examples 'Subscription Items API' do
     end
   end
 
+  context "retrieves a subscription item" do
+    it "retrieves a stripe subscription item" do
+      original = Stripe::SubscriptionItem.create
+      subscription_item = Stripe::SubscriptionItem.retrieve(original.id)
+      expect(subscription_item.id).to eq(original.id)
+    end
+  end
+
   context 'updates an item' do
     let(:item) { Stripe::SubscriptionItem.create(plan: plan.id, subscription: subscription.id, quantity: 2 ) }
 

@@ -3,10 +3,16 @@ module StripeMock
     module SubscriptionItems
 
       def SubscriptionItems.included(klass)
+        klass.add_handler 'get /v1/subscription_items/([^/]*)', :retrieve_subscription_item
         klass.add_handler 'get /v1/subscription_items', :retrieve_subscription_items
         klass.add_handler 'post /v1/subscription_items/([^/]*)', :update_subscription_item
         klass.add_handler 'post /v1/subscription_items', :create_subscription_items
         klass.add_handler 'delete /v1/subscription_items/([^/]*)', :delete_subscription_item
+      end
+
+      def retrieve_subscription_item(route, method_url, params, headers)
+        route =~ method_url
+        assert_existence :subscription_item, $1, subscriptions_items[$1]
       end
 
       def retrieve_subscription_items(route, method_url, params, headers)
