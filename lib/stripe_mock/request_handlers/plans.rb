@@ -34,7 +34,7 @@ module StripeMock
 
       def list_plans(route, method_url, params, headers)
         limit = params[:limit] ? params[:limit] : 10
-        Data.mock_list_object(plans.values.first(limit), limit: limit)
+        Data.mock_list_object(plans.values.first(limit), params.merge!(limit: limit))
       end
 
     end
