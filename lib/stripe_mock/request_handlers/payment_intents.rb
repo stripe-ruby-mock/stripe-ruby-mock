@@ -10,6 +10,8 @@ module StripeMock
         klass.add_handler 'post /v1/payment_intents/(.*)/confirm',  :confirm_payment_intent
         klass.add_handler 'post /v1/payment_intents/(.*)/capture',  :capture_payment_intent
         klass.add_handler 'post /v1/payment_intents/(.*)/cancel',   :cancel_payment_intent
+        klass.add_handler 'post /v1/payment_intents/(.*)/refund',   :refund_payment_intent
+        klass.add_handler 'post /v1/payment_intents/(.*)/refunds',  :refund_payment_intent
         klass.add_handler 'post /v1/payment_intents/(.*)',          :update_payment_intent
       end
 
@@ -162,6 +164,17 @@ module StripeMock
           },
           type: "invalid_request_error"
         }
+      end
+
+      def refund_payment_intent(route, method_url, params, headers)
+        payment_intent = get_payment_intent(route, method_url, params, headers)
+
+        new_refund(
+          route,
+          method_url,
+          params.merge(:payment_intent => payment_intent[:id]),
+          headers
+        )
       end
 
       def succeeded_payment_intent(payment_intent)
