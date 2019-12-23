@@ -18,21 +18,41 @@ module StripeMock
           end
         end
 
-        charge = assert_existence :charge, params[:charge], charges[params[:charge]]
-        params[:amount] ||= charge[:amount]
-        id = new_id('re')
-        bal_trans_params = {
-          amount: params[:amount] * -1,
-          source: id,
-          type: 'refund'
-        }
-        balance_transaction_id = new_balance_transaction('txn', bal_trans_params)
-        refund = Data.mock_refund params.merge(
-          :balance_transaction => balance_transaction_id,
-          :id => id,
-          :charge => charge[:id],
-        )
-        add_refund_to_charge(refund, charge)
+
+        if params.key?(:charge)
+          charge = assert_existence :charge, params[:charge], charges[params[:charge]]
+          params[:amount] ||= charge[:amount]
+          id = new_id('re')
+          bal_trans_params = {
+            amount: params[:amount] * -1,
+            source: id,
+            type: 'refund'
+          }
+          balance_transaction_id = new_balance_transaction('txn', bal_trans_params)
+          refund = Data.mock_refund params.merge(
+            :balance_transaction => balance_transaction_id,
+            :id => id,
+            :charge => charge[:id],
+          )
+          add_refund_to_charge(refund, charge)
+        elsif params.key?(:payment_intent) #payment_intent
+          payment_intent = assert_existence :payment_intent, params[:payment_intent], payment_intents[params[:payment_intent]]
+          params[:amount] ||= payment_intent[:amount]
+          id = new_id('re')
+          bal_trans_params = {
+            amount: params[:amount] * -1,
+            source: id,
+            type: 'refund'
+          }
+          balance_transaction_id = new_balance_transaction('txn', bal_trans_params)
+          refund = Data.mock_refund params.merge(
+            :balance_transaction => balance_transaction_id,
+            :id => id,
+            :payment_intent => payment_intent[:id],
+          )
+          add_refund_to_payment_intent(refund, payment_intent)
+        end
+
         refunds[id] = refund
 
         if params[:expand] == ['balance_transaction']
