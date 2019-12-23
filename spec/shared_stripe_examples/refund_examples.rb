@@ -473,4 +473,114 @@ shared_examples 'Refund API' do
       expect(charge.amount_refunded).to eq 700
     end
   end
+
+  describe 'payment_intent refund API' do
+    it "refunds a stripe payment_intent item" do
+      payment_intent = Stripe::PaymentIntent.create(
+        amount: 999,
+        currency: 'USD',
+        source: stripe_helper.generate_card_token,
+        description: 'card payment_intent'
+      )
+
+      Stripe::Refund.create(payment_intent: payment_intent.id, amount: 999)
+      payment_intent.refresh
+
+      #payment_intent = Stripe::PaymentIntent.retrieve(payment_intent.id)
+
+      expect(payment_intent.refunded).to eq(true)
+      expect(payment_intent.refunds.data.first.amount).to eq(999)
+      expect(payment_intent.amount_refunded).to eq(999)
+    end
+
+    it "creates a stripe refund with the payment_intent ID", :live => true do
+      payment_intent = Stripe::PaymentIntent.create(
+        amount: 999,
+        currency: 'USD',
+        source: stripe_helper.generate_card_token,
+        description: 'payment_intent payment_intent'
+      )
+      refund = Stripe::Refund.create(payment_intent: payment_intent.id)
+
+      expect(payment_intent.id).to match(/^(test_)?pi/)
+      expect(refund.payment_intent).to eq(payment_intent.id)
+    end
+
+    it "creates a stripe refund with a refund ID" do
+      payment_intent = Stripe::PaymentIntent.create(
+        amount: 999,
+        currency: 'USD',
+        source: stripe_helper.generate_card_token,
+        description: 'card payment_intent'
+      )
+
+      Stripe::Refund.create(payment_intent: payment_intent.id)
+      refunds = Stripe::Refund.list(payment_intent: payment_intent.id)
+
+      expect(refunds.data.count).to eq 1
+      expect(refunds.data.first.id).to match(/^test_re/)
+    end
+
+    it "creates a stripe refund with a status" do
+      payment_intent = Stripe::PaymentIntent.create(
+        amount: 999,
+        currency: 'USD',
+        source: stripe_helper.generate_card_token,
+        description: 'card payment_intent'
+      )
+
+      Stripe::Refund.create(payment_intent: payment_intent.id)
+
+      payment_intent = Stripe::PaymentIntent.retrieve(payment_intent.id)
+
+      expect(payment_intent.refunds.data.count).to eq 1
+      expect(payment_intent.refunds.data.first.status).to eq("succeeded")
+    end
+
+    it "creates a stripe refund with a different balance transaction than the payment_intent" do
+      payment_intent = Stripe::PaymentIntent.create(
+        amount: 999,
+        currency: 'USD',
+        source: stripe_helper.generate_card_token,
+        description: 'card payment_intent'
+      )
+      Stripe::Refund.create(payment_intent: payment_intent.id)
+      refunds = Stripe::Refund.list(payment_intent: payment_intent.id)
+
+      expect(payment_intent.balance_transaction).not_to eq(refunds.data.first.balance_transaction)
+    end
+
+    it "creates a refund off a payment_intent", :live => true do
+      original = Stripe::PaymentIntent.create(amount: 555, currency: 'USD', source: stripe_helper.generate_card_token)
+
+      payment_intent = Stripe::PaymentIntent.retrieve(original.id)
+
+      refund = payment_intent.refunds.create(amount: 555)
+      expect(refund.amount).to eq 555
+      expect(refund.payment_intent).to eq payment_intent.id
+    end
+
+    it "handles multiple refunds", :live => true do
+      original = Stripe::PaymentIntent.create(amount: 1100, currency: 'USD', source: stripe_helper.generate_card_token)
+
+      payment_intent = Stripe::PaymentIntent.retrieve(original.id)
+
+      refund_1 = payment_intent.refunds.create(amount: 300)
+      expect(refund_1.amount).to eq 300
+      expect(refund_1.payment_intent).to eq payment_intent.id
+
+      refund_2 = payment_intent.refunds.create(amount: 400)
+      expect(refund_2.amount).to eq 400
+      expect(refund_2.payment_intent).to eq payment_intent.id
+
+      expect(payment_intent.refunds.count).to eq 0
+      expect(payment_intent.refunds.total_count).to eq 0
+      expect(payment_intent.amount_refunded).to eq 0
+
+      payment_intent = Stripe::PaymentIntent.retrieve(original.id)
+      expect(payment_intent.refunds.count).to eq 2
+      expect(payment_intent.refunds.total_count).to eq 2
+      expect(payment_intent.amount_refunded).to eq 700
+    end
+  end
 end
