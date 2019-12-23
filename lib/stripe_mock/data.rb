@@ -221,7 +221,7 @@ module StripeMock
 
     def self.mock_refund(params={})
       currency = params[:currency] || StripeMock.default_currency
-      {
+      refund = {
         id: "re_4fWhgUh5si7InF",
         amount: 1,
         currency: currency,
@@ -229,11 +229,14 @@ module StripeMock
         object: "refund",
         balance_transaction: "txn_4fWh2RKvgxcXqV",
         metadata: {},
-        charge: "ch_4fWhYjzQ23UFWT",
         receipt_number: nil,
         status: "succeeded",
         reason: "requested_by_customer"
-      }.merge(params)
+      }
+
+      refund.merge(charge: "ch_4fWhYjzQ23UFWT") unless params.key(:payment_intent)
+
+      refund.merge(params)
     end
 
     def self.mock_charge_array
@@ -1130,6 +1133,8 @@ module StripeMock
           canceled_at: nil,
           cancellation_reason: nil,
           capture_method: "automatic",
+          refunded: false,
+          amount_refunded: 0,
           charges: {
               object: "list",
               data: [],
@@ -1137,6 +1142,14 @@ module StripeMock
               total_count: 1,
               url: "/v1/charges?payment_intent=pi_1EwXFB2eZvKYlo2CggNnFBo8"
           },
+          refunds: {
+            object: "list",
+            total_count: 0,
+            has_more: false,
+            url: "/v1/payment_intents/#{payment_intent_id}/refunds",
+            data: []
+          },
+          balance_transaction: params[:balance_transaction] || "txn_2dyYXXP90MN26R",
           client_secret: "pi_1EwXFB2eZvKYlo2CggNnFBo8_secret_vOMkpqZu8ca7hxhfiO80tpT3v",
           confirmation_method: "manual",
           created: 1563208901,
