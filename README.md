@@ -14,6 +14,12 @@ In your gemfile:
 
     gem 'stripe-ruby-mock', '~> 3.0.0', :require => 'stripe_mock'
 
+## !!! Important
+
+We don't have [changelog yet](https://github.com/stripe-ruby-mock/stripe-ruby-mock/issues/532).
+
+version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/658) - we support stripe > 5 and < 6 for now and try to follow the newest API version. But if you still use older versions please [read](https://github.com/stripe-ruby-mock/stripe-ruby-mock#specifications).  
+
 ## Features
 
 * No stripe server access required
