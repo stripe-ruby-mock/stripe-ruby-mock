@@ -11,7 +11,7 @@ module StripeMock
         items = options[:items]
         items = items.values if items.respond_to?(:values)
         subscription[:items][:data] = plans.map do |plan|
-          item_id = item[:id] || new_id('si')
+          item_id = items[:id] || new_id('si')
           if items
             quantity = items.detect { |item| item[:plan] == plan[:id] }[:quantity] || 1
             subscriptions_items[item_id] =
