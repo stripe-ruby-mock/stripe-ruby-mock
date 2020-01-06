@@ -257,7 +257,7 @@ module StripeMock
                    elsif params[:items]
                      items = params[:items]
                      items = items.values if items.respond_to?(:values)
-                     items.map { |item| item[:plan].to_s if item[:plan] }
+                     items.map { |item| item[:plan].to_s if item[:plan] }.compact
                    else
                      []
                    end
