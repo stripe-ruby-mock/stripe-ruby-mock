@@ -60,6 +60,10 @@ module StripeMock
         route =~ method_url
         cus = assert_existence :customer, $1, customers[$1]
 
+        # get existing and pending metadata
+        metadata = cus.delete(:metadata) || {}
+        metadata_updates = params.delete(:metadata) || {}
+
         # Delete those params if their value is nil. Workaround of the problematic way Stripe serialize objects
         params.delete(:sources) if params[:sources] && params[:sources][:data].nil?
         params.delete(:subscriptions) if params[:subscriptions] && params[:subscriptions][:data].nil?
@@ -71,6 +75,7 @@ module StripeMock
           params.delete(:subscriptions) unless params[:subscriptions][:data].any?{ |v| !!v[:type]}
         end
         cus.merge!(params)
+        cus[:metadata] = {**metadata, **metadata_updates}
 
         if params[:source]
           if params[:source].is_a?(String)
