@@ -183,6 +183,20 @@ shared_examples 'Customer Subscriptions' do
       expect(subscription.tax_percent).to eq(20)
     end
 
+    it "correctly sets pending invoice item interval" do
+      customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
+
+      subscription = Stripe::Subscription.create({
+        plan: plan.id,
+        customer: customer.id,
+        quantity: 2,
+        pending_invoice_item_interval: { interval: 'month', interval_count: 1 }
+      })
+
+      expect(subscription.pending_invoice_item_interval.interval).to eq 'month'
+      expect(subscription.pending_invoice_item_interval.interval_count).to eq 1
+    end
+
     it "correctly sets created when it's not provided as a parameter", live: true do
       customer = Stripe::Customer.create(source: gen_card_tk)
       subscription = Stripe::Subscription.create({ plan: plan.id, customer: customer.id })
@@ -718,6 +732,26 @@ shared_examples 'Customer Subscriptions' do
       expect(sub.save).to be_truthy
       expect(sub.cancel_at_period_end).to be_falsey
       expect(sub.canceled_at).to be_falsey
+    end
+
+    it "updates a subscription's pending invoice item interval" do
+      customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
+
+      subscription = Stripe::Subscription.create({
+        plan: plan.id,
+        customer: customer.id,
+        quantity: 2,
+        pending_invoice_item_interval: { interval: 'month', interval_count: 1 }
+      })
+
+      expect(subscription.pending_invoice_item_interval.interval).to eq 'month'
+      expect(subscription.pending_invoice_item_interval.interval_count).to eq 1
+
+      subscription.pending_invoice_item_interval = { interval: 'week', interval_count: 3 }
+      subscription.save
+
+      expect(subscription.pending_invoice_item_interval.interval).to eq 'week'
+      expect(subscription.pending_invoice_item_interval.interval_count).to eq 3
     end
 
     it 'when adds coupon', live: true do
