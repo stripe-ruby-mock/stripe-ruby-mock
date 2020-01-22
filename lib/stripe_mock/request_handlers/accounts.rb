@@ -7,6 +7,7 @@ module StripeMock
         klass.add_handler 'post /v1/accounts',      :new_account
         klass.add_handler 'get /v1/account',        :get_account
         klass.add_handler 'get /v1/accounts/(.*)',  :get_account
+        klass.add_handler 'post /v1/accounts/(.*)/persons', :new_person
         klass.add_handler 'post /v1/accounts/(.*)', :update_account
         klass.add_handler 'get /v1/accounts',       :list_accounts
         klass.add_handler 'post /oauth/deauthorize',:deauthorize
@@ -16,6 +17,13 @@ module StripeMock
         params[:id] ||= new_id('acct')
         route =~ method_url
         accounts[params[:id]] ||= Data.mock_account(params)
+      end
+
+      def new_person(route, method_url, params, _headers)
+        params[:id] ||= new_id('person')
+        route =~ method_url
+        account = assert_existence :account, $1, accounts[$1]
+        persons[params[:id]] ||= Data.mock_person(account, params)
       end
 
       def get_account(route, method_url, params, headers)

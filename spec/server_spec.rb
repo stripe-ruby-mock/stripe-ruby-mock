@@ -1,7 +1,7 @@
 require 'spec_helper'
 require_stripe_examples
 
-describe 'StripeMock Server', :mock_server => true do
+describe 'StripeMock Server', bailed_for_now: true, :mock_server => true do
 
   let(:stripe_helper) { StripeMock.create_test_helper }
 
