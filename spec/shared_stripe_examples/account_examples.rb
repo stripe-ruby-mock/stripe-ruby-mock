@@ -39,7 +39,7 @@ shared_examples 'Account API' do
       expect(account.external_accounts.url).to match /\/v1\/accounts\/.*\/external_accounts/
     end
   end
-  describe 'updates account', focus: true do
+  describe 'updates account' do
     it 'updates account' do
       account = Stripe::Account.retrieve
       account.support_phone = '1234567'
