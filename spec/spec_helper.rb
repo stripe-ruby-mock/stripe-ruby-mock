@@ -53,6 +53,6 @@ RSpec.configure do |c|
   end
 
   c.filter_run focus: true
-  c.run_all_when_everything_filtered = true
   c.filter_run_excluding bailed_for_now: true
+  c.run_all_when_everything_filtered = true
 end
