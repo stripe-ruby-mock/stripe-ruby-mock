@@ -53,22 +53,10 @@ module StripeMock
         end
       end
 
-      # Checks if setting a blank value
-      #
-      # returns true if the key is included in the hash
-      # and its value is empty or nil
-      def blank_value?(hash, key)
-        if hash.key?(key)
-          value = hash[key]
-          return true if value.nil? || "" == value
-        end
-        false
-      end
-
       def validate_acceptance_date(tos_node)
         return if tos_node.nil? || !tos_node.key?(:date)
-        raise Stripe::InvalidRequestError.new("Invalid integer: ", "tos_acceptance[date]", http_status: 400) if blank_value?(tos_node, :date)
         unix_date = tos_node[:date]
+        raise Stripe::InvalidRequestError.new("Invalid integer: ", "tos_acceptance[date]", http_status: 400) if (unix_date.nil? || "" == unix_date)
         unix_now = Time.now.strftime("%s").to_i
         formatted_date = Time.at(unix_date)
 
