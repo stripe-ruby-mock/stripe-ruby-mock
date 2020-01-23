@@ -39,7 +39,7 @@ shared_examples 'Account API' do
       expect(account.external_accounts.url).to match /\/v1\/accounts\/.*\/external_accounts/
     end
   end
-  describe 'updates account' do
+  describe 'updates account', focus: true do
     it 'updates account' do
       account = Stripe::Account.retrieve
       account.support_phone = '1234567'
@@ -50,12 +50,20 @@ shared_examples 'Account API' do
       expect(account.support_phone).to eq '1234567'
     end
 
+    it 'doesnt mind if an update doesnt include tos when updating using Stripe::Account.update' do
+      account = Stripe::Account.retrieve
+      account_id = account.id
+      expect{
+        Stripe::Account.update(account_id, {company: {owners_provided: true}})
+      }.not_to raise_error
+    end
+
     it 'raises when sending an empty tos date' do
       account = Stripe::Account.retrieve
       account.tos_acceptance.date = nil
       expect {
         account.save
-      }.to raise_error
+      }.to raise_error(Stripe::InvalidRequestError)
     end
 
     context 'with tos acceptance date' do

@@ -29,11 +29,7 @@ module StripeMock
         route =~ method_url
         account = assert_existence :account, $1, accounts[$1]
         account.merge!(params)
-        if blank_value?(params[:tos_acceptance], :date)
-          raise Stripe::InvalidRequestError.new("Invalid integer: ", "tos_acceptance[date]", http_status: 400)
-        elsif params[:tos_acceptance] && params[:tos_acceptance][:date]
-          validate_acceptance_date(params[:tos_acceptance][:date])
-        end
+        validate_acceptance_date(params[:tos_acceptance])
         account
       end
 
@@ -69,7 +65,10 @@ module StripeMock
         false
       end
 
-      def validate_acceptance_date(unix_date)
+      def validate_acceptance_date(tos_node)
+        return if tos_node.nil? || !tos_node.key?(:date)
+        raise Stripe::InvalidRequestError.new("Invalid integer: ", "tos_acceptance[date]", http_status: 400) if blank_value?(tos_node, :date)
+        unix_date = tos_node[:date]
         unix_now = Time.now.strftime("%s").to_i
         formatted_date = Time.at(unix_date)
 
@@ -77,7 +76,7 @@ module StripeMock
 
         raise Stripe::InvalidRequestError.new(
           "ToS acceptance date is not valid. Dates are expected to be integers, measured in seconds, not in the future, and after 2009",
-          "tos_acceptance[date]", 
+          "tos_acceptance[date]",
           http_status: 400
         )
       end
