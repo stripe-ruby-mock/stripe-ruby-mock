@@ -88,7 +88,7 @@ module StripeMock
       @country_spec = {}
       @tax_rates = {}
       @checkout_sessions = {}
-      @topups = {}
+      @topups = Data.mock_disputes(['tu_05RsQX2eZvKYlo2C0FRTGSSA','tu_15RsQX2eZvKYlo2C0ERTYUIA', 'tu_25RsQX2eZvKYlo2C0ZXCVBNM', 'tu_35RsQX2eZvKYlo2C0QAZXSWE', 'tu_45RsQX2eZvKYlo2C0EDCVFRT', 'tu_55RsQX2eZvKYlo2C0OIKLJUY', 'tu_65RsQX2eZvKYlo2C0ASDFGHJ', 'tu_75RsQX2eZvKYlo2C0EDCXSWQ', 'tu_85RsQX2eZvKYlo2C0UJMCDET', 'tu_95RsQX2eZvKYlo2C0EDFRYUI'])
 
       @debug = false
       @error_queue = ErrorQueue.new

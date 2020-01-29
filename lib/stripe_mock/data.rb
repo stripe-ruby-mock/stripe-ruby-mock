@@ -1,6 +1,14 @@
 module StripeMock
   module Data
 
+    def self.mock_topups(ids=[])
+      topups = {}
+      ids.each do |id|
+        topups[id] = self.mock_topup(id: id, amount: rand(100..100000), destination_balance: "issuing")
+      end
+      topups
+    end
+
     def self.mock_topup(params = {})
       id = params[:id] || 'tu_1G1j0YJPLY370EMk0Kzvtuka'
       {

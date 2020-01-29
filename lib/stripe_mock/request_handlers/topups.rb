@@ -2,17 +2,26 @@ module StripeMock
   module RequestHandlers
     module Topups
       def Topups.included(klass)
-        klass.add_handler 'post /v1/topups',         :new_topup
-        klass.add_handler 'get /v1/topups/([^/]*)',  :get_customer
-        klass.add_handler 'get /v1/topups',       :list_customers
+        klass.add_handler 'post /v1/topups',         :create_topup
+        klass.add_handler 'get /v1/topups/([^/]*)',  :get_topup
+        klass.add_handler 'get /v1/topups',          :list_topups
       end
 
 
-      def new_topup(route, method_url, params, headers)
+      def create_topup(route, method_url, params, headers)
         params[:id] ||= new_id('tu')
         assert_amount_valid(params)
         assert_currency_valid(params)
         topups[params[:id]] ||= Data.mock_topup(params)
+      end
+
+      def get_topup(route, method_url, params, headers)
+        route =~ method_url
+        assert_existence :topup, $1, topups[$1]
+      end
+
+      def list_topups(route, method_url, params, headers)
+        Data.mock_list_object(topups.values, params)
       end
 
       private

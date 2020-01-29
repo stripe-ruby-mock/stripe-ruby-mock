@@ -5,7 +5,7 @@ shared_examples 'Topup API' do
 
   let(:stripe_helper) { StripeMock.create_test_helper }
 
-  describe "new topup", focus:true do
+  describe "new topup" do
     let(:account) { Stripe::Account.create(id: 'test_account', type: 'custom', country: "US") }
     let(:action) { Stripe::Topup.create({
                                             amount: amount,
@@ -54,6 +54,33 @@ shared_examples 'Topup API' do
         }
       end
     end
+  end
+
+  it "retrieves a single topup" do
+    topup_id = 'tu_05RsQX2eZvKYlo2C0FRTGSSA'
+    topup = Stripe::Topup.retrieve(topup_id)
+
+    expect(topup).to be_a(Stripe::Topup)
+    expect(topup.id).to eq(topup_id)
+  end
+
+  describe "listing topups" do
+
+    it "retrieves all topups" do
+      topups = Stripe::Topup.list
+
+      expect(topups.count).to eq(10)
+      expect(topups.map &:id).to include('tu_05RsQX2eZvKYlo2C0FRTGSSA','tu_15RsQX2eZvKYlo2C0ERTYUIA', 'tu_25RsQX2eZvKYlo2C0ZXCVBNM', 'tu_35RsQX2eZvKYlo2C0QAZXSWE', 'tu_45RsQX2eZvKYlo2C0EDCVFRT', 'tu_55RsQX2eZvKYlo2C0OIKLJUY', 'tu_65RsQX2eZvKYlo2C0ASDFGHJ', 'tu_75RsQX2eZvKYlo2C0EDCXSWQ', 'tu_85RsQX2eZvKYlo2C0UJMCDET', 'tu_95RsQX2eZvKYlo2C0EDFRYUI')
+    end
+
+    it "retrieves topups with a limit(3)" do
+      topups = Stripe::Topup.list(limit: 3)
+
+      expect(topups.count).to eq(3)
+      expected = ['tu_95RsQX2eZvKYlo2C0EDFRYUI','tu_85RsQX2eZvKYlo2C0UJMCDET', 'tu_75RsQX2eZvKYlo2C0EDCXSWQ']
+      expect(topups.map &:id).to include(*expected)
+    end
+
   end
 
 end
