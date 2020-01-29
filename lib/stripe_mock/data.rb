@@ -1,6 +1,14 @@
 module StripeMock
   module Data
 
+    def self.mock_topup(params = {})
+      id = params[:id] || 'tu_sgdfjdfgskf'
+      {
+         id: id
+          #...
+      }.mereg(params)
+    end
+
     def self.mock_account(params = {})
       id = params[:id] || 'acct_103ED82ePvKYlo2C'
       currency = params[:currency] || StripeMock.default_currency
