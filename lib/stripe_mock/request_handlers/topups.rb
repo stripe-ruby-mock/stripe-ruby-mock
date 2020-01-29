@@ -18,14 +18,14 @@ module StripeMock
       private
 
       def assert_amount_valid(params)
-        if params[:amount].nil? || params[:amount].match(/\A\d+\Z/).nil?
+        if !params[:amount].to_i.positive?
           raise Stripe::InvalidRequestError.new('Amount must be a positive integer', nil, http_status: 400)
         end
       end
 
       def assert_currency_valid(params)
         curr = params[:currency]
-        if curr.nil? || curr.match(/[[:lower:][:lower:][:lower:]]/).nil?
+        if curr.nil? || curr.match(/[[:lower:]]{3}/).nil?
           raise Stripe::InvalidRequestError.new('Currency must be a three-letter ISO currency code, in lowercase', nil, http_status: 400)
         end
       end
