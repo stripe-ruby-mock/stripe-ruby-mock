@@ -20,6 +20,7 @@ module StripeMock
         status = case params[:amount]
         when 3184 then 'requires_action'
         when 3178 then 'requires_payment_method'
+        when 3055 then 'requires_capture'
         else
           'succeeded'
         end
@@ -31,6 +32,10 @@ module StripeMock
             last_payment_error: last_payment_error
           )
         )
+
+        if params[:confirm] && status == 'succeeded'
+          payment_intents[id] = succeeded_payment_intent(payment_intents[id])
+        end
 
         payment_intents[id].clone
       end
@@ -69,16 +74,14 @@ module StripeMock
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        payment_intent[:status] = 'succeeded'
-        payment_intent
+        succeeded_payment_intent(payment_intent)
       end
 
       def confirm_payment_intent(route, method_url, params, headers)
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        payment_intent[:status] = 'succeeded'
-        payment_intent
+        succeeded_payment_intent(payment_intent)
       end
 
       def cancel_payment_intent(route, method_url, params, headers)
@@ -111,7 +114,7 @@ module StripeMock
         params[:amount] && params[:amount] < 1
       end
 
-      def last_payment_error_generator(code:, message:, decline_code:)
+      def last_payment_error_generator(code: nil, message: nil, decline_code: nil)
         {
           code: code,
           doc_url: "https://stripe.com/docs/error-codes/payment-intent-authentication-failure",
@@ -160,6 +163,19 @@ module StripeMock
           },
           type: "invalid_request_error"
         }
+      end
+
+      def succeeded_payment_intent(payment_intent)
+        payment_intent[:status] = 'succeeded'
+        btxn = new_balance_transaction('txn', { source: payment_intent[:id] })
+
+        payment_intent[:charges][:data] << Data.mock_charge(
+          balance_transaction: btxn,
+          amount: payment_intent[:amount],
+          currency: payment_intent[:currency]
+        )
+
+        payment_intent
       end
     end
   end
