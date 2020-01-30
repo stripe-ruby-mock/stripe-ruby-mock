@@ -1,6 +1,65 @@
 module StripeMock
   module Data
 
+    def self.mock_person(account, params = {})
+      id = params[:id] || 'person_103ED82ePvKYlo2C'
+      {
+          id: id,
+          object: 'person',
+          account: account[:id],
+          address: {
+              line1: nil,
+              line2: nil,
+              city: nil,
+              state: nil,
+              postal_code: nil,
+              country: "US"
+          },
+          created: 1579735054,
+          dob: {
+              day: nil,
+              month: nil,
+              year: nil
+          },
+          first_name: nil,
+          id_number_provided: false,
+          last_name: nil,
+          metadata: {},
+          relationship: {
+              director: false,
+              executive: false,
+              owner: false,
+              percent_ownership: false,
+              representative: false,
+              title: nil
+          },
+          requirements:{
+              currently_due: [],
+              eventually_due: [],
+              past_due: [],
+              pending_verification: []
+          },
+          ssn_last_4_provided: !params.delete(:ssn_last_4).nil?,
+          verification:{
+              additional_document:{
+                  back: nil,
+                  details: nil,
+                  details_code: nil,
+                  front: nil
+              },
+              details: nil,
+              details_code: nil,
+              document: {
+                  back: nil,
+                  details: nil,
+                  details_code: nil,
+                  front: nil
+              },
+              status: 'unverified'
+          }
+      }.merge(params)
+    end
+
     def self.mock_topup(params = {})
       id = params[:id] || 'tu_sgdfjdfgskf'
       {
