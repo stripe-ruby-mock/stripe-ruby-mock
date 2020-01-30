@@ -34,7 +34,7 @@ module StripeMock
 
       def assert_currency_valid(params)
         curr = params[:currency]
-        if curr.nil? || curr.match(/[[:lower:]]{3}/).nil?
+        if !StripeMock::RequestHandlers::ParamValidators::SUPPORTED_CURRENCIES.include?(params[:currency])
           raise Stripe::InvalidRequestError.new('Currency must be a three-letter ISO currency code, in lowercase', nil, http_status: 400)
         end
       end

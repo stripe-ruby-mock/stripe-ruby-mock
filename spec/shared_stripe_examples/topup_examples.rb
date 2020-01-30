@@ -56,31 +56,33 @@ shared_examples 'Topup API' do
     end
   end
 
-  it "retrieves a single topup" do
-    topup_id = 'tu_05RsQX2eZvKYlo2C0FRTGSSA'
-    topup = Stripe::Topup.retrieve(topup_id)
-
-    expect(topup).to be_a(Stripe::Topup)
-    expect(topup.id).to eq(topup_id)
-  end
-
-  describe "listing topups" do
-
+  describe "retrieve topup details" do
+    before do
+      Stripe::Topup.create(id: "tu_05RsQX2eZvKYlo2C0FRTGSSA", amount: rand(100..100000), destination_balance: "issuing", currency: 'usd')
+      Stripe::Topup.create(id: "tu_15RsQX2eZvKYlo2C0ERTYUIA", amount: rand(100..100000), destination_balance: "issuing", currency: 'usd')
+      Stripe::Topup.create(id: "tu_25RsQX2eZvKYlo2C0ZXCVBNM", amount: rand(100..100000), destination_balance: "issuing", currency: 'usd')
+      Stripe::Topup.create(id: "tu_35RsQX2eZvKYlo2C0QAZXSWE", amount: rand(100..100000), destination_balance: "issuing", currency: 'usd')
+    end
     it "retrieves all topups" do
       topups = Stripe::Topup.list
 
-      expect(topups.count).to eq(10)
-      expect(topups.map &:id).to include('tu_05RsQX2eZvKYlo2C0FRTGSSA','tu_15RsQX2eZvKYlo2C0ERTYUIA', 'tu_25RsQX2eZvKYlo2C0ZXCVBNM', 'tu_35RsQX2eZvKYlo2C0QAZXSWE', 'tu_45RsQX2eZvKYlo2C0EDCVFRT', 'tu_55RsQX2eZvKYlo2C0OIKLJUY', 'tu_65RsQX2eZvKYlo2C0ASDFGHJ', 'tu_75RsQX2eZvKYlo2C0EDCXSWQ', 'tu_85RsQX2eZvKYlo2C0UJMCDET', 'tu_95RsQX2eZvKYlo2C0EDFRYUI')
+      expect(topups.count).to eq(4)
+      expect(topups.map &:id).to include('tu_05RsQX2eZvKYlo2C0FRTGSSA','tu_15RsQX2eZvKYlo2C0ERTYUIA', 'tu_25RsQX2eZvKYlo2C0ZXCVBNM', 'tu_35RsQX2eZvKYlo2C0QAZXSWE')
     end
-
     it "retrieves topups with a limit(3)" do
       topups = Stripe::Topup.list(limit: 3)
 
-      expect(topups.count).to eq(3)
-      expected = ['tu_95RsQX2eZvKYlo2C0EDFRYUI','tu_85RsQX2eZvKYlo2C0UJMCDET', 'tu_75RsQX2eZvKYlo2C0EDCXSWQ']
+      expected = ['tu_15RsQX2eZvKYlo2C0ERTYUIA','tu_25RsQX2eZvKYlo2C0ZXCVBNM', 'tu_35RsQX2eZvKYlo2C0QAZXSWE']
       expect(topups.map &:id).to include(*expected)
+      expect(topups.count).to eq(3)
     end
+    it "retrieves a single topup" do
+      topup_id = 'tu_05RsQX2eZvKYlo2C0FRTGSSA'
+      topup = Stripe::Topup.retrieve(topup_id)
 
+      expect(topup).to be_a(Stripe::Topup)
+      expect(topup.id).to eq(topup_id)
+    end
   end
 
-end
+  end
