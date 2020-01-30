@@ -61,11 +61,69 @@ module StripeMock
     end
 
     def self.mock_topup(params = {})
-      id = params[:id] || 'tu_sgdfjdfgskf'
+      id = params[:id] || 'tu_1G1j0YJPLY370EMk0Kzvtuka'
       {
-         id: id
-          #...
-      }.mereg(params)
+          id: id,
+          object: "topup",
+          amount: params[:amount],
+          balance_transaction: nil,
+          created: 1580318927,
+          currency: "usd",
+          description: nil,
+          destination_balance: params[:destination_balance],
+          expected_availability_date: 1580318928,
+          failure_code: nil,
+          failure_message: nil,
+          livemode: false,
+          metadata: {},
+          source: {
+              id: "src_1G6KLLAZGJUpBuEwJxgGjJ8A",
+              object: "source",
+              ach_debit: {
+                  country: "US",
+                  type: "individual",
+                  routing_number: "110000000",
+                  last4: "6789",
+                  fingerprint: "zNYJqSxUWThCgk2Q",
+                  bank_name: "STRIPE TEST BANK"
+              },
+              amount: nil,
+              client_secret: "src_client_secret_XdbY9ttwepfTFnEjjo9",
+              code_verification: {
+                  attempts_remaining: 10,
+                  status: "succeeded"
+              },
+              created: 1580318927,
+              currency: "usd",
+              flow: "code_verification",
+              livemode: false,
+              metadata: {},
+              owner: {
+                  address: {
+                      city: nil,
+                      country: "US",
+                      line1: nil,
+                      line2: nil,
+                      postal_code: nil,
+                      state: nil
+                  },
+                  email: nil,
+                  name: "Jenny Rosen",
+                  phone: nil,
+                  verified_address: nil,
+                  verified_email: nil,
+                  verified_name: nil,
+                  verified_phone: nil
+              },
+              statement_descriptor: nil,
+              status: "chargeable",
+              type: "ach_debit",
+              usage: "reusable"
+          },
+          statement_descriptor: nil,
+          status: "pending",
+          transfer_group: nil
+      }.merge(params)
     end
 
     def self.mock_account(params = {})
