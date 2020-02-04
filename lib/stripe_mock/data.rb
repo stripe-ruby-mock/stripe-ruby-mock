@@ -1169,6 +1169,7 @@ module StripeMock
     def self.mock_payment_method(params = {})
       payment_method_id = params[:id] || 'pm_1ExEuFL2DI6wht39WNJgbybl'
 
+      type = params[:type].to_sym
       data = {
         card: {
           brand: 'visa',
@@ -1200,7 +1201,7 @@ module StripeMock
           fingerprint: 'FD81kbVPe7M05BMj',
           last4: '3000'
         }
-      }.slice(params[:type].to_sym)
+      }
 
       {
         id: payment_method_id,
@@ -1223,7 +1224,7 @@ module StripeMock
         metadata: {
           order_id: '123456789'
         }
-      }.merge(data).merge(params)
+      }.merge(type => data[type]).merge(params)
     end
 
     def self.mock_setup_intent(params = {})
