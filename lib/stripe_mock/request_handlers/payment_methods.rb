@@ -77,7 +77,7 @@ module StripeMock
 
       # post /v1/payment_methods/:id
       def update_payment_method(route, method_url, params, headers)
-        allowed_params = [:billing_details, :card, :metadata]
+        allowed_params = [:billing_details, :card, :ideal, :sepa_debit, :metadata]
 
         id = method_url.match(route)[1]
 
@@ -103,14 +103,14 @@ module StripeMock
 
         if invalid_type?(params[:type])
           raise Stripe::InvalidRequestError.new(
-            'Invalid type: must be one of card or card_present',
+            'Invalid type: must be one of card, ideal or sepa_debit',
             http_status: 400
           )
         end
       end
 
       def invalid_type?(type)
-        !['card', 'card_present'].include?(type)
+        !%w(card ideal sepa_debit).include?(type)
       end
     end
   end

@@ -1072,9 +1072,9 @@ module StripeMock
     end
 
     def self.mock_subscription_item(params = {})
-      iid = params[:id] || 'test_txn_default'
+      id = params[:id] || 'test_txn_default'
       {
-        id: iid,
+        id: id,
         object: 'subscription_item',
         created: 1504716183,
         metadata: {
@@ -1167,29 +1167,63 @@ module StripeMock
     end
 
     def self.mock_payment_method(params = {})
-      payment_method_id = params[:id] || "pm_1ExEuFL2DI6wht39WNJgbybl"
-      {
-          id: payment_method_id,
-          object: "payment_method",
-          type: "card",
-          billing_details: {},
-          card: {
-              brand: "visa",
-              checks: { address_line1_check: nil, address_postal_code_check: nil, cvc_check: "pass" },
-              country: "FR",
-              exp_month: 2,
-              exp_year: 2022,
-              fingerprint: "Hr3Ly5z5IYxsokWA",
-              funding: "credit",
-              last4: "3155",
-              three_d_secure_usage: { supported: true }
-          },
-          customer: params[:customer] || nil,
-          metadata: {
-            order_id: "123456789"
-          }
+      payment_method_id = params[:id] || 'pm_1ExEuFL2DI6wht39WNJgbybl'
 
-      }.merge(params)
+      data = {
+        card: {
+          brand: 'visa',
+          checks: {
+            address_line1_check: nil,
+            address_postal_code_check: nil,
+            cvc_check: 'pass'
+          },
+          country: 'FR',
+          exp_month: 2,
+          exp_year: 2022,
+          fingerprint: 'Hr3Ly5z5IYxsokWA',
+          funding: 'credit',
+          generated_from: nil,
+          last4: '3155',
+          three_d_secure_usage: { supported: true },
+          wallet: nil
+        },
+        ideal: {
+          bank: 'ing',
+          bic: 'INGBNL2A',
+          iban_last4: '****',
+          verified_name: 'JENNY ROSEN'
+        },
+        sepa_debit: {
+          bank_code: '37040044',
+          branch_code: '',
+          country: 'DE',
+          fingerprint: 'FD81kbVPe7M05BMj',
+          last4: '3000'
+        }
+      }.slice(params[:type].to_sym)
+
+      {
+        id: payment_method_id,
+        object: 'payment_method',
+        type: params[:type],
+        billing_details: {
+          address: {
+            city: 'New Orleans',
+            country: 'US',
+            line1: 'Bourbon Street 23',
+            line2: nil,
+            postal_code: '10000',
+            state: nil
+          },
+          email: 'foo@bar.com',
+          name: 'John Dolton',
+          phone: nil
+        },
+        customer: params[:customer] || nil,
+        metadata: {
+          order_id: '123456789'
+        }
+      }.merge(data).merge(params)
     end
 
     def self.mock_setup_intent(params = {})
