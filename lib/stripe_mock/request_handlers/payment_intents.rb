@@ -175,7 +175,7 @@ module StripeMock
           balance_transaction: btxn,
           amount: payment_intent[:amount],
           currency: payment_intent[:currency]
-        )
+        ).to_h
 
         payment_intent
       end
