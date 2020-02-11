@@ -1,6 +1,38 @@
 module StripeMock
   module Data
 
+    def self.mock_cardholder(params = {})
+      id = params[:id] || 'ich_1GAqP7C38dnJBVBrGXgHMeHA'
+      billing = params[:billing]
+      bname = billing[:name] || params[:name]
+      StripeMock::Util.rmerge({
+          id: id,
+          object: 'issuing.cardholder',
+          authorization_controls:{
+              allowed_categories: [],
+              blocked_categories: [],
+              spending_limits: [],
+              spending_limits_currency: nil
+          },
+          billing: {
+              name: bname
+          },
+          company: nil,
+          created: 1559079603,
+          email: nil,
+          individual: nil,
+          is_default: false,
+          livemode: false,
+          metadata: {},
+          phone_number: nil,
+          requirements: {
+              disabled_reason: nil,
+              past_due: []
+          },
+          status: 'active'
+      }, params)
+    end
+
     def self.mock_account(params = {})
       id = params[:id] || 'acct_103ED82ePvKYlo2C'
       currency = params[:currency] || StripeMock.default_currency
