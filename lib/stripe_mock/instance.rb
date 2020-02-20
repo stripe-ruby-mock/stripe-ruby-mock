@@ -21,6 +21,8 @@ module StripeMock
     end
 
     include StripeMock::RequestHandlers::PaymentIntents
+    include StripeMock::RequestHandlers::PaymentMethods
+    include StripeMock::RequestHandlers::SetupIntents
     include StripeMock::RequestHandlers::ExternalAccounts
     include StripeMock::RequestHandlers::Accounts
     include StripeMock::RequestHandlers::Balance
@@ -47,11 +49,12 @@ module StripeMock
     include StripeMock::RequestHandlers::Payouts
     include StripeMock::RequestHandlers::EphemeralKey
     include StripeMock::RequestHandlers::TaxRates
+    include StripeMock::RequestHandlers::Checkout
 
     attr_reader :accounts, :balance, :balance_transactions, :bank_tokens, :charges, :coupons, :customers,
-                :disputes, :events, :invoices, :invoice_items, :orders, :payment_intents, :plans, :recipients,
-                :refunds, :transfers, :payouts, :subscriptions, :country_spec, :subscriptions_items,
-                :products, :tax_rates
+                :disputes, :events, :invoices, :invoice_items, :orders, :payment_intents, :payment_methods,
+                :setup_intents, :plans, :recipients, :refunds, :transfers, :payouts, :subscriptions, :country_spec,
+                :subscriptions_items, :products, :tax_rates, :checkout_sessions
 
     attr_accessor :error_queue, :debug, :conversion_rate, :account_balance
 
@@ -64,12 +67,15 @@ module StripeMock
       @customers = {}
       @charges = {}
       @payment_intents = {}
+      @payment_methods = {}
+      @setup_intents = {}
       @coupons = {}
       @disputes = Data.mock_disputes(['dp_05RsQX2eZvKYlo2C0FRTGSSA','dp_15RsQX2eZvKYlo2C0ERTYUIA', 'dp_25RsQX2eZvKYlo2C0ZXCVBNM', 'dp_35RsQX2eZvKYlo2C0QAZXSWE', 'dp_45RsQX2eZvKYlo2C0EDCVFRT', 'dp_55RsQX2eZvKYlo2C0OIKLJUY', 'dp_65RsQX2eZvKYlo2C0ASDFGHJ', 'dp_75RsQX2eZvKYlo2C0EDCXSWQ', 'dp_85RsQX2eZvKYlo2C0UJMCDET', 'dp_95RsQX2eZvKYlo2C0EDFRYUI'])
       @events = {}
       @invoices = {}
       @invoice_items = {}
       @orders = {}
+      @payment_methods = {}
       @plans = {}
       @products = {}
       @recipients = {}
@@ -80,6 +86,7 @@ module StripeMock
       @subscriptions_items = {}
       @country_spec = {}
       @tax_rates = {}
+      @checkout_sessions = {}
 
       @debug = false
       @error_queue = ErrorQueue.new

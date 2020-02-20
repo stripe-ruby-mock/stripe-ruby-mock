@@ -1,13 +1,14 @@
 module StripeMock
   module Data
     class List
-      attr_reader :data, :limit, :offset, :starting_after, :ending_before
+      attr_reader :data, :limit, :offset, :starting_after, :ending_before, :active
 
       def initialize(data, options = {})
         @data = Array(data.clone)
         @limit = [[options[:limit] || 10, 100].min, 1].max # restrict @limit to 1..100
         @starting_after = options[:starting_after]
         @ending_before  = options[:ending_before]
+        @active = options[:active]
         if @data.first.is_a?(Hash) && @data.first[:created]
           @data.sort_by! { |x| x[:created] }
           @data.reverse!
@@ -53,14 +54,21 @@ module StripeMock
           (index || raise("No such object id: #{starting_after}")) + 1
         when ending_before
           index = data.index { |datum| datum[:id] == ending_before }
-          (index || raise("No such object id: #{ending_before}")) - 1          
+          (index || raise("No such object id: #{ending_before}")) - 1
         else
           0
         end
       end
 
       def data_page
-        data[offset, limit]
+        filtered_data[offset, limit]
+      end
+
+      def filtered_data
+        filtered_data = data
+        filtered_data = filtered_data.select { |d| d[:active] == active } unless active.nil?
+
+        filtered_data
       end
 
       def object_types

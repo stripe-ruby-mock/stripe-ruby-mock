@@ -1,18 +1,24 @@
-# stripe-ruby-mock [![Build Status](https://travis-ci.org/rebelidealist/stripe-ruby-mock.png?branch=master)](https://travis-ci.org/rebelidealist/stripe-ruby-mock) [![Gitter chat](https://badges.gitter.im/rebelidealist/stripe-ruby-mock.png)](https://gitter.im/rebelidealist/stripe-ruby-mock)
+# stripe-ruby-mock [![Build Status](https://travis-ci.org/stripe-ruby-mock/stripe-ruby-mock.png?branch=master)](https://travis-ci.org/stripe-ruby-mock/stripe-ruby-mock) [![Gitter chat](https://badges.gitter.im/rebelidealist/stripe-ruby-mock.png)](https://gitter.im/rebelidealist/stripe-ruby-mock)
 
-* Homepage: https://github.com/rebelidealist/stripe-ruby-mock
-* Issues: https://github.com/rebelidealist/stripe-ruby-mock/issues
+* Homepage: https://github.com/stripe-ruby-mock/stripe-ruby-mock
+* Issues: https://github.com/stripe-ruby-mock/stripe-ruby-mock/issues
 * **CHAT**: https://gitter.im/rebelidealist/stripe-ruby-mock
 
 # REQUEST: Looking for More Core Contributors
 
-This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'm currently looking for more core contributors to help me out. If you're interested, there is only one requirement: submit a significant enough pull request and have it merged into master (many of you have already done this). Afterwards, ping me in [chat](https://gitter.im/rebelidealist/stripe-ruby-mock) and I will add you as a collaborator.
+This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'm currently looking for more core contributors to help me out. If you're interested, there is only one requirement: submit a significant enough pull request and have it merged into master (many of you have already done this). Afterwards, ping [@gilbert](https://gitter.im/gilbert) in [chat](https://gitter.im/rebelidealist/stripe-ruby-mock) and I will add you as a collaborator.
 
 ## Install
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 2.5.8', :require => 'stripe_mock'
+    gem 'stripe-ruby-mock', '~> 3.0.1', :require => 'stripe_mock'
+
+## !!! Important
+
+We have [changelog](https://github.com/stripe-ruby-mock/stripe-ruby-mock/blob/master/CHANGELOG.md). It's first attempt. Feel free to update it and suggest to a new format of it.
+
+version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/658) - we support stripe > 5 and < 6 for now and try to follow the newest API version. But if you still use older versions please [read](https://github.com/stripe-ruby-mock/stripe-ruby-mock#specifications).
 
 ## Features
 
@@ -23,12 +29,12 @@ In your gemfile:
 
 ### Requirements
 
-* ruby >= 2.0.0
-* stripe >= 2.0.3
+* ruby >= 2.4.0
+* stripe >= 5.0.0
 
 ### Specifications
 
-**STRIPE API TARGET VERSION:** 2017-06-05 (master)
+**STRIPE API TARGET VERSION:** 2019-08-20 (master) - we try, but some features are not implemented yet.
 
 Older API version branches:
 
@@ -141,7 +147,7 @@ end
 ```
 
 ## Mocking Card Errors
-
+** Ensure you start StripeMock in a before filter `StripeMock.start`
 Tired of manually inputting fake credit card numbers to test against errors? Tire no more!
 
 ```ruby
@@ -176,7 +182,7 @@ StripeMock.prepare_card_error(:incorrect_zip)
 You can see the details of each error in [lib/stripe_mock/api/errors.rb](lib/stripe_mock/api/errors.rb)
 
 ### Specifying Card Errors
-
+** Ensure you start StripeMock in a before filter `StripeMock.start`
 By default, `prepare_card_error` only triggers for `:new_charge`, the event that happens when you run `Charge.create`. More explicitly, this is what happens by default:
 
 ```ruby
@@ -195,7 +201,7 @@ customer.cards.create
 `:new_charge` and `:create_card` are names of methods in the [StripeMock request handlers](lib/stripe_mock/request_handlers). You can also set `StripeMock.toggle_debug(true)` to see the event name for each Stripe request made in your tests.
 
 ### Custom Errors
-
+** Ensure you start StripeMock in a before filter `StripeMock.start`
 To raise an error on a specific type of request, take a look at the [request handlers folder](lib/stripe_mock/request_handlers/) and pass a method name to `StripeMock.prepare_error`.
 
 If you wanted to raise an error for creating a new customer, for instance, you would do the following:

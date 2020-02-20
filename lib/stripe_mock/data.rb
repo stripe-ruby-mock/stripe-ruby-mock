@@ -128,11 +128,17 @@ module StripeMock
         created: 1372126710,
         id: cus_id,
         name: nil,
+        preferred_locales: [],
         livemode: false,
         delinquent: false,
         discount: nil,
         account_balance: 0,
         currency: currency,
+        invoice_settings: {
+          default_payment_method: nil,
+          custom_fields: nil,
+          footer: nil
+        },
         sources: {
           object: "list",
           total_count: sources.size,
@@ -199,7 +205,7 @@ module StripeMock
           data: []
         },
         transfer: nil,
-        balance_transaction: "txn_2dyYXXP90MN26R",
+        balance_transaction: params[:balance_transaction] || "txn_2dyYXXP90MN26R",
         failure_message: nil,
         failure_code: nil,
         amount_refunded: 0,
@@ -342,7 +348,10 @@ module StripeMock
         quantity: 1,
         tax_percent: nil,
         discount: nil,
-        metadata: {}
+        metadata: {},
+        default_tax_rates: nil,
+        pending_invoice_item_interval: nil,
+        next_pending_invoice_item_invoice: nil
       }, params)
     end
 
@@ -358,6 +367,7 @@ module StripeMock
         created: 1349738950,
         period_end: 1349738950,
         period_start: 1349738950,
+        due_date: nil,
         lines: {
           object: "list",
           total_count: lines.count,
@@ -385,7 +395,7 @@ module StripeMock
         amount_paid: 0,
         currency: currency,
         starting_balance: 0,
-        ending_balance: nil,
+        ending_balance: 0,
         next_payment_attempt: 1349825350,
         charge: nil,
         discount: nil,
@@ -399,6 +409,7 @@ module StripeMock
       end
       due = invoice[:total] + invoice[:starting_balance]
       invoice[:amount_due] = due < 0 ? 0 : due
+      invoice[:ending_balance] = invoice[:starting_balance] + invoice[:total] if invoice[:amount_due] == 0
       invoice
     end
 
@@ -521,33 +532,49 @@ module StripeMock
     def self.mock_plan(params={})
       currency = params[:currency] || StripeMock.default_currency
       {
-        id: "2",
+        id: "mock_plan_123",
         object: "plan",
+        active: true,
+        aggregate_usage: nil,
         amount: 2300,
+        billing_scheme: "per_unit",
         created: 1466698898,
         currency: currency,
         interval: "month",
         interval_count: 1,
         livemode: false,
         metadata: {},
-        name: "The Basic Plan",
-        statement_descriptor: nil,
-        trial_period_days: nil
+        nickname: "My Mock Plan",
+        product: "mock_prod_NONEXIST", # override this with your own existing product id
+        tiers: nil,
+        tiers_mode: nil,
+        transform_usage: nil,
+        trial_period_days: nil,
+        usage_type: "licensed"
       }.merge(params)
     end
 
-    def self.mock_product(params = {})
+    def self.mock_product(params={})
       {
-        id: "default_test_prod",
+        id: "mock_prod_abc123",
         object: "product",
         active: true,
-        created: 1556896214,
+        attributes:[],
+        caption: nil,
+        created: 1466698000,
+        deactivate_on: [],
+        description: nil,
+        images: [],
         livemode: false,
         metadata: {},
-        name: "Default Test Product",
-        statement_descriptor: "PRODUCT",
+        name: "The Mock Product",
+        package_dimensions: nil,
+        shippable: nil,
+        statement_descriptor: nil,
         type: "service",
-        updated: 1556918200,
+        unit_label: "my_unit",
+        updated: 1537939442,
+        url: nil
       }.merge(params)
     end
 
@@ -1091,50 +1118,141 @@ module StripeMock
 
     def self.mock_payment_intent(params = {})
       payment_intent_id = params[:id] || "pi_1EwXFB2eZvKYlo2CggNnFBo8"
+      amount = params[:amount] || 49900
       currency = params[:currency] || StripeMock.default_currency
       {
-        id: payment_intent_id,
-        object: "payment_intent",
-        amount: 49900,
-        amount_capturable: 0,
-        amount_received: 0,
-        application: nil,
-        application_fee_amount: nil,
-        canceled_at: nil,
-        cancellation_reason: nil,
-        capture_method: "automatic",
-        charges: {
-          object: "list",
-          data: [],
-          has_more: false,
-          total_count: 0,
-          url: "/v1/charges?payment_intent=pi_1EwXFB2eZvKYlo2CggNnFBo8"
+          id: payment_intent_id,
+          object: "payment_intent",
+          amount: amount,
+          amount_capturable: 0,
+          amount_received: 0,
+          application: nil,
+          application_fee_amount: nil,
+          canceled_at: nil,
+          cancellation_reason: nil,
+          capture_method: "automatic",
+          charges: {
+              object: "list",
+              data: [],
+              has_more: false,
+              total_count: 1,
+              url: "/v1/charges?payment_intent=pi_1EwXFB2eZvKYlo2CggNnFBo8"
+          },
+          client_secret: "pi_1EwXFB2eZvKYlo2CggNnFBo8_secret_vOMkpqZu8ca7hxhfiO80tpT3v",
+          confirmation_method: "manual",
+          created: 1563208901,
+          currency: currency,
+          customer: nil,
+          description: nil,
+          invoice: nil,
+          last_payment_error: nil,
+          livemode: false,
+          metadata: {},
+          next_action: { type: "use_stripe_sdk" },
+          on_behalf_of: nil,
+          payment_method: nil,
+          payment_method_types: [
+              "card"
+          ],
+          receipt_email: nil,
+          review: nil,
+          setup_future_usage: nil,
+          shipping: nil,
+          source: nil,
+          statement_descriptor: nil,
+          status: "requires_action",
+          transfer_data: nil,
+          transfer_group: nil
+      }.merge(params)
+    end
+
+    def self.mock_payment_method(params = {})
+      payment_method_id = params[:id] || "pm_1ExEuFL2DI6wht39WNJgbybl"
+      {
+          id: payment_method_id,
+          object: "payment_method",
+          type: "card",
+          billing_details: {},
+          card: {
+              brand: "visa",
+              checks: { address_line1_check: nil, address_postal_code_check: nil, cvc_check: "pass" },
+              country: "FR",
+              exp_month: 2,
+              exp_year: 2022,
+              fingerprint: "Hr3Ly5z5IYxsokWA",
+              funding: "credit",
+              last4: "3155",
+              three_d_secure_usage: { supported: true }
+          },
+          customer: params[:customer] || nil,
+          metadata: {
+            order_id: "123456789"
+          }
+
+      }.merge(params)
+    end
+
+    def self.mock_setup_intent(params = {})
+      setup_intent_id = params[:id] || "seti_1F96eK2aLAadsDqo0AVIyPmC"
+      {
+        :id => setup_intent_id,
+        :object => "setup_intent",
+        :application => nil,
+        :cancellation_reason => nil,
+        :client_secret => "seti_1F96eK2aLAadsDqo0AVIyPmC_secret_FePTYgOoPFxDOUL53fFMSoTAyiXsWAV",
+        :created => 1566204936,
+        :customer => nil,
+        :description => nil,
+        :last_setup_error => nil,
+        :livemode => false,
+        :metadata => {},
+        :next_action => nil,
+        :on_behalf_of => nil,
+        :payment_method => nil,
+        :payment_method_options => {
+          card: {request_three_d_secure: "automatic"}
         },
-        client_secret: "pi_1EwXFB2eZvKYlo2CggNnFBo8_secret_vOMkpqZu8ca7hxhfiO80tpT3v",
-        confirmation_method: "manual",
-        created: 1563208901,
-        currency: "gbp",
+        :payment_method_types => ["card"],
+        :status => "requires_payment_method",
+        :usage => "off_session"
+      }.merge(params)
+    end
+
+    def self.mock_checkout_session(params = {})
+      cs_id = params[:id] || "test_cs_default"
+      currency = params[:currency] || StripeMock.default_currency
+      {
+        id: cs_id,
+        object: 'checkout.session',
+        billing_address_collection: nil,
+        cancel_url: 'https://example.com/cancel',
+        client_reference_id: nil,
         customer: nil,
-        description: nil,
-        invoice: nil,
-        last_payment_error: nil,
-        livemode: false,
-        metadata: {},
-        next_action: nil,
-        on_behalf_of: nil,
-        payment_method: nil,
-        payment_method_types: [
-          "card"
+        customer_email: nil,
+        display_items: [
+          {
+            amount: 1500,
+            currency: currency,
+            custom: {
+              description: 'Comfortable cotton t-shirt',
+              images: nil,
+              name: 'T-shirt'
+            },
+            quantity: 2,
+            type: 'custom'
+          }
         ],
-        receipt_email: nil,
-        review: nil,
-        setup_future_usage: nil,
-        shipping: nil,
-        source: nil,
-        statement_descriptor: nil,
-        status: "requires_action",
-        transfer_data: nil,
-        transfer_group: nil
+        livemode: false,
+        locale: nil,
+        mode: nil,
+        payment_intent: mock_payment_intent[:id],
+        payment_method_types: [
+          'card'
+        ],
+        setup_intent: nil,
+        submit_type: nil,
+        subscription: nil,
+        success_url: 'https://example.com/success'
       }.merge(params)
     end
   end
