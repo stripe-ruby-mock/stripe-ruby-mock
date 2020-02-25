@@ -3,7 +3,6 @@
   "livemode": false,
   "id": "evt_00000000000000",
   "type": "invoice.created",
-  "status": "paid",
   "object": "event",
   "data": {
     "object": {
@@ -57,6 +56,7 @@
       "attempt_count": 1,
       "amount_due": 1000,
       "amount_paid": 1000,
+      "status": "paid",
       "currency": "usd",
       "starting_balance": 0,
       "ending_balance": 0,
