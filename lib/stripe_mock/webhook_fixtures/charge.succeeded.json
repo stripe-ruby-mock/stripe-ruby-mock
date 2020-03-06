@@ -13,6 +13,7 @@
       "paid": true,
       "amount": 1000,
       "currency": "usd",
+      "status": "succeeded",
       "refunded": false,
       "source": {
         "id": "cc_00000000000000",
