@@ -47,7 +47,7 @@
       "customer": "cus_00000000000000",
       "invoice": "in_00000000000000",
       "description": null,
-      "dispute": null,
+      "disputed": false,
       "metadata": {
       }
     }
