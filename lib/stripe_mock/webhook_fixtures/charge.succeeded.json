@@ -46,6 +46,7 @@
       "amount_refunded": 0,
       "customer": "cus_00000000000000",
       "invoice": "in_00000000000000",
+      "payment_intent": "pi_00000000000000",
       "description": null,
       "disputed": false,
       "metadata": {
