@@ -88,14 +88,6 @@ module StripeMock
         customer_id = customer.is_a?(Stripe::Customer) ? customer[:id] : customer.to_s
         customer = assert_existence :customer, customer_id, customers[customer_id]
 
-        if subscription_plans && customer
-          subscription_plans.each do |plan|
-            unless customer[:currency].to_s == plan[:currency].to_s
-              raise Stripe::InvalidRequestError.new("Customer's currency of #{customer[:currency]} does not match plan's currency of #{plan[:currency]}", 'currency', http_status: 400)
-            end
-          end
-        end
-
         if params[:source]
           new_card = get_card_by_token(params.delete(:source))
           add_card_to_object(:customer, new_card, customer)
