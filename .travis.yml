@@ -3,8 +3,6 @@ group: deprecated-2017Q2
 sudo: required
 language: ruby
 rvm:
-  - 2.4.6
-  - 2.5.5
   - 2.6.3
 
 before_script:
