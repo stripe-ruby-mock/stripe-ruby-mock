@@ -104,7 +104,7 @@ shared_examples 'Transfer API' do
   end
 
   it "when amount is not integer", live: true do
-    dest = Stripe::Account.create(type: "custom", email: "#{SecureRandom.uuid}@example.com", requested_capabilities: ['card_payments', 'platform_payments'])
+    dest = Stripe::Account.create(type: "custom", email: "#{SecureRandom.uuid}@example.com", requested_capabilities: ['card_payments', 'transfers'])
     expect { Stripe::Transfer.create(amount: '400.2',
                                      currency: 'usd',
                                      destination: dest.id,
@@ -116,14 +116,14 @@ shared_examples 'Transfer API' do
   end
 
   it "when amount is negative", live: true do
-    dest = Stripe::Account.create(type: "custom", email: "#{SecureRandom.uuid}@example.com", requested_capabilities: ['card_payments', 'platform_payments'])
+    dest = Stripe::Account.create(type: "custom", email: "#{SecureRandom.uuid}@example.com", requested_capabilities: ['card_payments', 'transfers'])
     expect { Stripe::Transfer.create(amount: '-400',
                                      currency: 'usd',
                                      destination: dest.id,
                                      description: 'Transfer for test@example.com') }.to raise_error { |e|
       expect(e).to be_a Stripe::InvalidRequestError
       expect(e.param).to eq('amount')
-      expect(e.message).to match(/^Invalid.*integer/)
+      expect(e.message).to match(/^This value must be greater than or equal to 1./)
       expect(e.http_status).to eq(400)
     }
   end

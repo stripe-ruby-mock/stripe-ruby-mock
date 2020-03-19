@@ -61,7 +61,7 @@ shared_examples 'Payout API' do
                                      description: 'Payout for test@example.com') }.to raise_error { |e|
       expect(e).to be_a Stripe::InvalidRequestError
       expect(e.param).to eq('amount')
-      expect(e.message).to match(/^Invalid.*integer/)
+      expect(e.message).to match(/^This value must be greater than or equal to 1./)
       expect(e.http_status).to eq(400)
     }
   end

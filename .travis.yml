@@ -6,17 +6,18 @@ rvm:
   - 2.4.6
   - 2.5.5
   - 2.6.3
-before_install:
-  - rvm 2.1.10 do gem install mime-types -v 2.6.2
-  - gem install bundler -v '< 2'
+
 before_script:
   - "sudo touch /var/log/stripe-mock-server.log"
   - "sudo chown travis /var/log/stripe-mock-server.log"
-script: "bundle exec rspec && bundle exec rspec -t live"
 
 env:
   global:
-    - IS_TRAVIS=true STRIPE_TEST_SECRET_KEY_A=sk_test_BsztzqQjzd7lqkgo1LjEG5DF00KzH7tWKF STRIPE_TEST_SECRET_KEY_B=sk_test_rKCEu0x8jzg6cKPqoey8kUPQ00usQO3KYE STRIPE_TEST_SECRET_KEY_C=sk_test_qeaB7R6Ywp8sC9pzd1ZIABH700YLC7nhmZ
+    - STRIPE_TEST_SECRET_KEY=sk_test_BsztzqQjzd7lqkgo1LjEG5DF00KzH7tWKF
+  matrix:
+    - STRIPE_API_VERSION=2020-03-02
+
+script: "bundle exec rspec && bundle exec rspec -t live"
 
 notifications:
   webhooks:

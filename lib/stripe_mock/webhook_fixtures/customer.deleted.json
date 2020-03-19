@@ -2,7 +2,7 @@
   "created": 1326853478,
   "data": {
     "object": {
-      "account_balance": 0,
+      "balance": 0,
       "active_card": {
         "address_city": null,
         "address_country": null,

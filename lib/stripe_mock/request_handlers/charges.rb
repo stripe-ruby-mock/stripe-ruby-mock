@@ -144,7 +144,7 @@ module StripeMock
         elsif non_integer_charge_amount?(params)
           raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', http_status: 400)
         elsif non_positive_charge_amount?(params)
-          raise Stripe::InvalidRequestError.new('Invalid positive integer', 'amount', http_status: 400)
+          raise Stripe::InvalidRequestError.new('This value must be greater than or equal to 1.', 'amount', http_status: 400)
         elsif params[:source].nil? && params[:customer].nil?
           raise Stripe::InvalidRequestError.new('Must provide source or customer.', http_status: nil)
         end

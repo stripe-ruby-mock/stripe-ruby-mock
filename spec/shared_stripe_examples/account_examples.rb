@@ -55,7 +55,7 @@ shared_examples 'Account API' do
       account.tos_acceptance.date = nil
       expect {
         account.save
-      }.to raise_error
+      }.to raise_error(Stripe::InvalidRequestError)
     end
 
     context 'with tos acceptance date' do

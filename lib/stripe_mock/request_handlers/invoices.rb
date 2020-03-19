@@ -144,7 +144,7 @@ module StripeMock
           customer: customer[:id],
           discount: customer[:discount],
           created: invoice_date,
-          starting_balance: customer[:account_balance],
+          starting_balance: customer[:balance],
           subscription: preview_subscription[:id],
           period_start: prorating ? invoice_date : preview_subscription[:current_period_start],
           period_end: prorating ? invoice_date : preview_subscription[:current_period_end],

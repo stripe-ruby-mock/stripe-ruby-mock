@@ -77,7 +77,7 @@ shared_examples 'Customer Subscriptions' do
       expect(subscriptions.data.first.id).to eq(sub.id)
       expect(subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
       expect(subscriptions.data.first.customer).to eq(customer.id)
-      expect(subscriptions.data.first.billing).to eq('charge_automatically')
+      expect(subscriptions.data.first.collection_method).to eq('charge_automatically')
       expect(subscriptions.data.first.metadata.foo).to eq( "bar" )
       expect(subscriptions.data.first.metadata.example).to eq( "yes" )
     end
@@ -94,7 +94,7 @@ shared_examples 'Customer Subscriptions' do
 
       expect(sub.object).to eq('subscription')
       expect(sub.plan.to_hash).to eq(plan.to_hash)
-      expect(sub.billing).to eq('charge_automatically')
+      expect(sub.collection_method).to eq('charge_automatically')
       expect(sub.metadata.foo).to eq( "bar" )
       expect(sub.metadata.example).to eq( "yes" )
 
@@ -112,7 +112,7 @@ shared_examples 'Customer Subscriptions' do
       expect(subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
 
       expect(subscriptions.data.first.customer).to eq(customer.id)
-      expect(subscriptions.data.first.billing).to eq('charge_automatically')
+      expect(subscriptions.data.first.collection_method).to eq('charge_automatically')
       expect(subscriptions.data.first.metadata.foo).to eq( "bar" )
       expect(subscriptions.data.first.metadata.example).to eq( "yes" )
     end
@@ -518,13 +518,13 @@ shared_examples 'Customer Subscriptions' do
         plan: 'silver',
         customer: customer.id,
         metadata: { foo: 'bar', example: 'yes' },
-        billing: 'send_invoice',
+        collection_method: 'send_invoice',
         days_until_due: 30,
       })
 
       expect(sub.object).to eq('subscription')
       expect(sub.plan.to_hash).to eq(plan.to_hash)
-      expect(sub.billing).to eq 'send_invoice'
+      expect(sub.collection_method).to eq 'send_invoice'
       expect(sub.days_until_due).to eq 30
     end
 
@@ -833,7 +833,7 @@ shared_examples 'Customer Subscriptions' do
 
           expect {
             sub.save
-          }.to raise_error(Stripe::InvalidRequestError, "This customer has no attached payment source")
+          }.to raise_error(Stripe::InvalidRequestError, "This customer has no attached payment source or default payment method.")
         ensure
           customer.delete if customer
           paid_plan.delete if paid_plan
