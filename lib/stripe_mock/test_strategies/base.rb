@@ -97,8 +97,25 @@ module StripeMock
         }.merge(params)
       end
 
+      def create_checkout_session_params(params = {})
+        {
+            payment_method_types: ['card'],
+            line_items: [{
+                             name: 'T-shirt',
+                             quantity: 1,
+                             amount: 500,
+                             currency: 'usd',
+                         }],
+        }.merge(params)
+      end
+
+
       def create_coupon(params = {})
         Stripe::Coupon.create create_coupon_params(params)
+      end
+
+      def create_checkout_session(params = {})
+        Stripe::Checkout::Session.create create_checkout_session_params(params)
       end
 
       def delete_all_coupons

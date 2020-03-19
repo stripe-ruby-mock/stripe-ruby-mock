@@ -15,5 +15,24 @@ shared_examples 'Checkout API' do
     expect(session.id).to match(/^test_cs/)
     expect(session.line_items.count).to eq(1)
   end
-  
+
+  context 'retrieve a checkout session' do
+    let(:checkout_session1) { stripe_helper.create_checkout_session }
+
+    it 'ca be retrieved by id' do
+      checkout_session1
+
+      checkout_session = Stripe::Checkout::Session.retrieve(checkout_session1.id)
+
+      expect(checkout_session.id).to eq(checkout_session1.id)
+    end
+
+    it "cannot retrieve a checkout session that doesn't exist" do
+      expect { Stripe::Checkout::Session.retrieve('nope') }.to raise_error {|e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.param).to eq('checkout_session')
+        expect(e.http_status).to eq(404)
+      }
+    end
+  end
 end
