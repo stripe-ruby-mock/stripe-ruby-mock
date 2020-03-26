@@ -101,6 +101,16 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_account_link(params = {})
+      now = Time.now.to_i
+      {
+        object: 'account_link',
+        created: now,
+        expires_at: now + 300,
+        url: 'https://connect.stripe.com/setup/c/iB0ph1cPnRLY'
+      }.merge(params)
+    end
+
     def self.mock_tax_rate(params)
       {
         id: 'test_cus_default',
