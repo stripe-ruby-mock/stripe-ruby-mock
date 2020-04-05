@@ -126,7 +126,7 @@ shared_examples 'PaymentIntent API' do
     expect(updated.amount).to eq(200)
   end
 
-  it 'when amount is not integer', live: true do
+  it 'requires an integer amount', live: true do
     expect { Stripe::PaymentIntent.create(amount: 400.2,
                                          currency: 'usd') }.to raise_error { |e|
       expect(e).to be_a Stripe::InvalidRequestError
@@ -135,7 +135,7 @@ shared_examples 'PaymentIntent API' do
     }
   end
 
-  it 'when amount is negative', live: true do
+  it 'requires a positive amount', live: true do
     expect { Stripe::PaymentIntent.create(amount: -400,
                                      currency: 'usd') }.to raise_error { |e|
       expect(e).to be_a Stripe::InvalidRequestError
@@ -143,5 +143,22 @@ shared_examples 'PaymentIntent API' do
       expect(e.message).to match(/^Invalid.*integer/)
       expect(e.http_status).to eq(400)
     }
+  end
+
+  it "can expand balance transaction when creating a confirmed payment_intent" do
+    payment_intent = Stripe::PaymentIntent.create(amount:  100, currency: "usd", confirm: true, expand: ['charges.data.balance_transaction'])
+    pp payment_intent
+    expect(payment_intent.charges.data.first.balance_transaction).to be_a(Stripe::BalanceTransaction)
+  end
+
+  it "can expand balance transaction when retrieving a confirmed payment_intent" do
+    original = Stripe::PaymentIntent.create(amount:  100, currency: "usd", confirm: true)
+
+    payment_intent = Stripe::PaymentIntent.retrieve(
+      id: original.id,
+      expand: ['charges.data.balance_transaction']
+    )
+    pp payment_intent.charges.data.first
+    expect(payment_intent.charges.data.first.balance_transaction).to be_a(Stripe::BalanceTransaction)
   end
 end

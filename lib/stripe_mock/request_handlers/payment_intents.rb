@@ -34,7 +34,7 @@ module StripeMock
         )
 
         if params[:confirm] && status == 'succeeded'
-          payment_intents[id] = succeeded_payment_intent(payment_intents[id])
+          payment_intents[id] = succeeded_payment_intent(payment_intents[id], params)
         end
 
         payment_intents[id].clone
@@ -67,6 +67,12 @@ module StripeMock
         payment_intent = assert_existence :payment_intent, payment_intent_id, payment_intents[payment_intent_id]
 
         payment_intent = payment_intent.clone
+
+        if params[:expand] == ['charges.data.balance_transaction']
+          charge = payment_intent.dig(:charges, :data).first
+          charge[:balance_transaction] = balance_transactions[charge[:balance_transaction]]
+        end
+
         payment_intent
       end
 
@@ -74,14 +80,14 @@ module StripeMock
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        succeeded_payment_intent(payment_intent)
+        succeeded_payment_intent(payment_intent, params)
       end
 
       def confirm_payment_intent(route, method_url, params, headers)
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
-        succeeded_payment_intent(payment_intent)
+        succeeded_payment_intent(payment_intent, params)
       end
 
       def cancel_payment_intent(route, method_url, params, headers)
@@ -165,12 +171,12 @@ module StripeMock
         }
       end
 
-      def succeeded_payment_intent(payment_intent)
+      def succeeded_payment_intent(payment_intent, params)
         payment_intent[:status] = 'succeeded'
-        btxn = new_balance_transaction('txn', { source: payment_intent[:id] })
+        btxn_id = new_balance_transaction('txn', { source: payment_intent[:id] })
 
         payment_intent[:charges][:data] << Data.mock_charge(
-          balance_transaction: btxn,
+          balance_transaction: params[:expand] == ['charges.data.balance_transaction'] ? balance_transactions[btxn_id] : btxn_id,
           amount: payment_intent[:amount],
           currency: payment_intent[:currency]
         )
