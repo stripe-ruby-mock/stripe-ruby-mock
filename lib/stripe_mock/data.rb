@@ -176,6 +176,7 @@ module StripeMock
         paid: true,
         amount: 0,
         application_fee: nil,
+        application_fee_amount: nil,
         currency: currency,
         destination: nil,
         fraud_details: {},
