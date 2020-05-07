@@ -30,9 +30,9 @@ RSpec.configure do |c|
     if ENV['IS_TRAVIS']
       puts "Travis ruby version: #{RUBY_VERSION}"
       api_key = case RUBY_VERSION
-      when '2.4.6'  then ENV['STRIPE_TEST_SECRET_KEY_A']
-      when '2.5.5' then ENV['STRIPE_TEST_SECRET_KEY_B']
-      when '2.6.3'  then ENV['STRIPE_TEST_SECRET_KEY_C']
+      when '2.4.10'  then ENV['STRIPE_TEST_SECRET_KEY_A']
+      when '2.5.8' then ENV['STRIPE_TEST_SECRET_KEY_B']
+      when '2.6.6'  then ENV['STRIPE_TEST_SECRET_KEY_C']
       end
     else
       api_key = ENV['STRIPE_TEST_SECRET_KEY']
