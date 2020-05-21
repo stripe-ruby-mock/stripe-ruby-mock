@@ -34,7 +34,7 @@ version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/strip
 
 ### Specifications
 
-**STRIPE API TARGET VERSION:** 2019-08-20 (master) - we try, but some features are not implemented yet.
+**STRIPE API TARGET VERSION:** 2020-03-02 (master) - we try, but some features are not implemented yet.
 
 Older API version branches:
 

@@ -87,13 +87,13 @@ shared_examples 'Webhook Events API' do
 
   it "takes a hash and deep merges into the data object" do
     event = StripeMock.mock_webhook_event('customer.created', {
-      :account_balance => 12345
+      :balance => 12345
     })
     payload = StripeMock.mock_webhook_event('customer.created', {
-      :account_balance => 12345
+      :balance => 12345
     })
-    expect(event.data.object.account_balance).to eq(12345)
-    expect(payload[:data][:object][:account_balance]).to eq(12345)
+    expect(event.data.object.balance).to eq(12345)
+    expect(payload[:data][:object][:balance]).to eq(12345)
   end
 
   it "takes a hash and deep merges arrays in the data object" do

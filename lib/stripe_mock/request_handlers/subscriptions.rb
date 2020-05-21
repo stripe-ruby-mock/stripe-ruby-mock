@@ -76,7 +76,6 @@ module StripeMock
         if headers && headers[:idempotency_key]
           if subscriptions.any?
             original_subscription = subscriptions.values.find { |c| c[:idempotency_key] == headers[:idempotency_key]}
-            puts original_subscription
             return subscriptions[original_subscription[:id]] if original_subscription
           end
         end
@@ -102,7 +101,7 @@ module StripeMock
           customer[:default_source] = new_card[:id]
         end
 
-        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate billing_cycle_anchor billing days_until_due idempotency_key enable_incomplete_payments cancel_at_period_end default_tax_rates payment_behavior pending_invoice_item_interval)
+        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate billing_cycle_anchor collection_method days_until_due idempotency_key enable_incomplete_payments cancel_at_period_end default_tax_rates payment_behavior pending_invoice_item_interval)
         unknown_params = params.keys - allowed_params.map(&:to_sym)
         if unknown_params.length > 0
           raise Stripe::InvalidRequestError.new("Received unknown parameter: #{unknown_params.join}", unknown_params.first.to_s, http_status: 400)
@@ -292,9 +291,9 @@ module StripeMock
           return if trial
         end
 
-        return if params[:billing] == 'send_invoice'
+        return if params[:collection_method] == 'send_invoice'
 
-        raise Stripe::InvalidRequestError.new('This customer has no attached payment source', nil, http_status: 400)
+        raise Stripe::InvalidRequestError.new('This customer has no attached payment source or default payment method.', nil, http_status: 400)
       end
 
       def verify_active_status(subscription)

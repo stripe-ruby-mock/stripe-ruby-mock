@@ -1,6 +1,6 @@
 ### 3.0.2 (Next)
 
-* Your contribution here.
+* [#710](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/710): Support API 2020-03-02 - [@coorasse](https://github.com/coorasse).
 
 ### 3.0.1 (TBD)
 * Added Changelog file 

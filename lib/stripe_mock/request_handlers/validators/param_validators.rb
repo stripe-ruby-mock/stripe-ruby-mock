@@ -3,7 +3,7 @@ module StripeMock
     module ParamValidators
 
       def already_exists_message(obj_class)
-        "#{obj_class.to_s.split("::").last} already exists."
+        /#{obj_class.to_s.split("::").last.downcase} already exists./i
       end
 
       def not_found_message(obj_class, obj_id)
@@ -49,7 +49,7 @@ module StripeMock
       SUPPORTED_PLAN_INTERVALS = ["month", "year", "week", "day"]
 
       def invalid_plan_interval_message
-        "Invalid interval: must be one of day, month, week, or year"
+        "Invalid interval: must be one of month, year, week, or day"
       end
 
       SUPPORTED_CURRENCIES = [

@@ -27,24 +27,16 @@ RSpec.configure do |c|
       c.filter_run_excluding :mock_server => true, :oauth => true
     end
 
-    if ENV['IS_TRAVIS']
-      puts "Travis ruby version: #{RUBY_VERSION}"
-      api_key = case RUBY_VERSION
-      when '2.4.6'  then ENV['STRIPE_TEST_SECRET_KEY_A']
-      when '2.5.5' then ENV['STRIPE_TEST_SECRET_KEY_B']
-      when '2.6.3'  then ENV['STRIPE_TEST_SECRET_KEY_C']
-      end
-    else
-      api_key = ENV['STRIPE_TEST_SECRET_KEY']
-      if api_key.nil? || api_key == ''
-        raise "Please set your STRIPE_TEST_SECRET_KEY environment variable."
-      end
+    api_key = ENV['STRIPE_TEST_SECRET_KEY']
+    if api_key.nil? || api_key == ''
+      raise "Please set your STRIPE_TEST_SECRET_KEY environment variable."
     end
 
     c.before(:each) do
       allow(StripeMock).to receive(:start).and_return(nil)
       allow(StripeMock).to receive(:stop).and_return(nil)
       Stripe.api_key = api_key
+      Stripe.api_version = ENV['STRIPE_API_VERSION']
     end
     c.after(:each) { sleep 0.01 }
   else

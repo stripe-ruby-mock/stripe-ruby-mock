@@ -18,7 +18,7 @@
       "preferred_locales": [],
       "subscription": null,
       "discount": null,
-      "account_balance": 0,
+      "balance": 0,
       "sources": {
         "object": "list",
         "count": 1,

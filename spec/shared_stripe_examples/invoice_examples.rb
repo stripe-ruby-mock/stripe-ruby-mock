@@ -262,7 +262,7 @@ shared_examples 'Invoice API' do
             remaining_amount = new_monthly_plan.amount * new_quantity * (subscription.current_period_end - proration_date.to_i) / (subscription.current_period_end - subscription.current_period_start)
             prorated_amount_due = new_monthly_plan.amount * new_quantity - unused_amount + remaining_amount
             credit_balance = 1000
-            customer.account_balance = -credit_balance
+            customer.balance = -credit_balance
             customer.save
             query = { customer: customer.id, subscription: subscription.id, subscription_plan: new_monthly_plan.id, subscription_proration_date: proration_date.to_i, subscription_quantity: new_quantity }
             query[:subscription_trial_end] = (DateTime.now >> 1).to_time.to_i if with_trial
@@ -312,7 +312,7 @@ shared_examples 'Invoice API' do
             prorated_amount_due = new_yearly_plan.amount * new_quantity - unused_amount
             credit_balance = 1000
             amount_due = prorated_amount_due - credit_balance
-            customer.account_balance = -credit_balance
+            customer.balance = -credit_balance
             customer.save
             query = { customer: customer.id, subscription: subscription.id, subscription_plan: new_yearly_plan.id, subscription_proration_date: proration_date.to_i, subscription_quantity: new_quantity }
             query[:subscription_trial_end] = (DateTime.now >> 1).to_time.to_i if with_trial

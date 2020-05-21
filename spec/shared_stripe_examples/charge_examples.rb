@@ -46,7 +46,7 @@ shared_examples 'Charge API' do
         currency: 'usd',
         source: stripe_helper.generate_card_token
       )
-    }.to raise_error(Stripe::InvalidRequestError, /invalid positive integer/i)
+    }.to raise_error(Stripe::InvalidRequestError, /This value must be greater than or equal to 1./i)
   end
 
   it "requires a valid integer amount", :live => true do
