@@ -41,6 +41,17 @@ module StripeMock
         }.merge(params)
       end
 
+      def create_payment_method(params={})
+        Stripe::PaymentMethod.create(params)
+      end
+
+      def create_customer(params={})
+        Stripe::Customer.create(params)
+      end
+
+      def create_subscription(params={})
+        Stripe::Subscription.create(params)
+      end
 
       def list_subscriptions(limit)
         Stripe::Subscription.list(limit: limit)
