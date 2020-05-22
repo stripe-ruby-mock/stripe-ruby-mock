@@ -117,6 +117,33 @@ shared_examples 'Customer Subscriptions' do
       expect(subscriptions.data.first.metadata.example).to eq( "yes" )
     end
 
+    it "adds a new subscription with payment method provided as default" do
+      plan
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      payment_method = Stripe::PaymentMethod.create(
+        type: 'card',
+        card: {
+          number: 4242_4242_4242_4242,
+          exp_month: 9,
+          exp_year: (Time.now.year + 5),
+          cvc: 999
+        }
+      )
+      sub = Stripe::Subscription.create(
+        plan: 'silver',
+        customer: customer,
+        metadata: { foo: "bar", example: "yes" },
+        collection_method: 'send_invoice',
+        default_payment_method: payment_method.id,
+      )
+
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
+      expect(subscriptions.count).to eq(1)
+      expect(subscriptions.data.first.id).to eq(sub.id)
+      expect(subscriptions.data.first.collection_method).to eq('send_invoice')
+      expect(subscriptions.data.first.default_payment_method).to eq(payment_method.id)
+    end
+
     it "adds a new subscription to customer (string/symbol agnostic)" do
       customer = Stripe::Customer.create(source: gen_card_tk)
       subscriptions = Stripe::Subscription.list(customer: customer.id)
@@ -752,6 +779,43 @@ shared_examples 'Customer Subscriptions' do
 
       expect(subscription.pending_invoice_item_interval.interval).to eq 'week'
       expect(subscription.pending_invoice_item_interval.interval_count).to eq 3
+    end
+
+    it "updates a subscription's default payment method" do
+      plan
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      payment_method_card = Stripe::PaymentMethod.create(
+        type: 'card',
+        card: {
+          number: 4242_4242_4242_4242,
+          exp_month: 9,
+          exp_year: (Time.now.year + 5),
+          cvc: 999
+        }
+      )
+      payment_method_sepa = Stripe::PaymentMethod.create(
+        type: 'sepa_debit',
+        sepa_debit: {iban: 'DE89370400440532013000'},
+      )
+      subscription = Stripe::Subscription.create(
+        plan: 'silver',
+        customer: customer,
+        metadata: { foo: "bar", example: "yes" },
+        default_payment_method: payment_method_card.id,
+      )
+      
+      subscriptions = Stripe::Subscription.list(customer: customer)
+      expect(subscriptions.data.first.default_payment_method).to eq(payment_method_card.id)
+
+      Stripe::Subscription.update(
+        subscription.id,
+        default_payment_method: payment_method_sepa.id,
+        collection_method: 'send_invoice',
+      )
+      
+      subscriptions = Stripe::Subscription.list(customer: customer)
+      expect(subscriptions.data.first.collection_method).to eq('send_invoice')
+      expect(subscriptions.data.first.default_payment_method).to eq(payment_method_sepa.id)
     end
 
     it 'when adds coupon', live: true do

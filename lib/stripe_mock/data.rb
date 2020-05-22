@@ -350,6 +350,7 @@ module StripeMock
         },
         cancel_at_period_end: false,
         canceled_at: nil,
+        collection_method: 'charge_automatically',
         ended_at: nil,
         start: 1308595038,
         object: 'subscription',
@@ -361,6 +362,7 @@ module StripeMock
         discount: nil,
         metadata: {},
         default_tax_rates: nil,
+        default_payment_method: nil,
         pending_invoice_item_interval: nil,
         next_pending_invoice_item_invoice: nil
       }, params)
