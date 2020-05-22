@@ -133,12 +133,14 @@ shared_examples 'Customer Subscriptions' do
         plan: 'silver',
         customer: customer,
         metadata: { foo: "bar", example: "yes" },
+        collection_method: 'send_invoice',
         default_payment_method: payment_method.id,
       )
 
       subscriptions = Stripe::Subscription.list(customer: customer.id)
       expect(subscriptions.count).to eq(1)
       expect(subscriptions.data.first.id).to eq(sub.id)
+      expect(subscriptions.data.first.collection_method).to eq('send_invoice')
       expect(subscriptions.data.first.default_payment_method).to eq(payment_method.id)
     end
 
@@ -808,9 +810,11 @@ shared_examples 'Customer Subscriptions' do
       Stripe::Subscription.update(
         subscription.id,
         default_payment_method: payment_method_sepa.id,
+        collection_method: 'send_invoice',
       )
       
       subscriptions = Stripe::Subscription.list(customer: customer)
+      expect(subscriptions.data.first.collection_method).to eq('send_invoice')
       expect(subscriptions.data.first.default_payment_method).to eq(payment_method_sepa.id)
     end
 

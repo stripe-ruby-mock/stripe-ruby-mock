@@ -350,6 +350,7 @@ module StripeMock
         },
         cancel_at_period_end: false,
         canceled_at: nil,
+        collection_method: 'charge_automatically',
         ended_at: nil,
         start: 1308595038,
         object: 'subscription',
