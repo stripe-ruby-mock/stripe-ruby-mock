@@ -33,6 +33,7 @@ RSpec.configure do |c|
       when '2.4.6'  then ENV['STRIPE_TEST_SECRET_KEY_A']
       when '2.5.5' then ENV['STRIPE_TEST_SECRET_KEY_B']
       when '2.6.3'  then ENV['STRIPE_TEST_SECRET_KEY_C']
+      when '2.7.0'  then ENV['STRIPE_TEST_SECRET_KEY_D']
       end
     else
       api_key = ENV['STRIPE_TEST_SECRET_KEY']
