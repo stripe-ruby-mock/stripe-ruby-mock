@@ -152,12 +152,14 @@ module StripeMock
         sources: {
           object: "list",
           total_count: sources.size,
+          has_more: false,
           url: "/v1/customers/#{cus_id}/sources",
           data: sources
         },
         subscriptions: {
           object: "list",
           total_count: 0,
+          has_more: false,
           url: "/v1/customers/#{cus_id}/subscriptions",
           data: []
         },
@@ -384,6 +386,7 @@ module StripeMock
         lines: {
           object: "list",
           total_count: lines.count,
+          has_more: false,
           url: "/v1/invoices/#{in_id}/lines",
           data: lines
         },
@@ -614,6 +617,7 @@ module StripeMock
           object: "list",
           url: "/v1/recipients/#{rp_id}/cards",
           data: cards,
+          has_more: false,
           total_count: cards.count
         },
         default_card: nil
