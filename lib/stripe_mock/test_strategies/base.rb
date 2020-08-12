@@ -41,6 +41,15 @@ module StripeMock
         }.merge(params)
       end
 
+      def create_price(params={})
+        Stripe::Price.create create_price_params(params)
+      end
+
+      def create_price_params(params={})
+        {
+          :currency => StripeMock.default_currency,
+        }.merge(params)
+      end
 
       def list_subscriptions(limit)
         Stripe::Subscription.list(limit: limit)
