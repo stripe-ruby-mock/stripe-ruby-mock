@@ -92,7 +92,7 @@ module StripeMock
             get_bank_by_token(params[:bank_account])
           else
             begin
-              get_card_by_token(params[:source])
+              source_from_unattached_sources(params[:source]) || get_card_by_token(params[:source])
             rescue Stripe::InvalidRequestError
               get_bank_by_token(params[:source])
             end
@@ -121,6 +121,10 @@ module StripeMock
         end
         card = get_card_by_token(attrs_or_token)
         validate_card(card)
+      end
+
+      def source_from_unattached_sources(source_id)
+        unattached_sources[source_id]
       end
     end
   end
