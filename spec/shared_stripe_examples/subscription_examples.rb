@@ -1097,6 +1097,7 @@ shared_examples 'Customer Subscriptions' do
 
     expect(customer.subscriptions.data.first.status).to eq('active')
     expect(customer.subscriptions.data.first.cancel_at_period_end).to eq(false)
+    expect(customer.subscriptions.data.first.cancel_at).to be_nil
     expect(customer.subscriptions.data.first.ended_at).to be_nil
     expect(customer.subscriptions.data.first.canceled_at).to be_nil
   end
