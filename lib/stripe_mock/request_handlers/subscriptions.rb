@@ -17,26 +17,29 @@ module StripeMock
       end
 
       def retrieve_customer_subscription(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
-        customer = assert_existence :customer, $1, customers[$1]
+        customer = assert_existence :customer, $1, customers[stripe_account][$1]
         subscription = get_customer_subscription(customer, $2)
 
         assert_existence :subscription, $2, subscription
       end
 
       def retrieve_customer_subscriptions(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
-        customer = assert_existence :customer, $1, customers[$1]
+        customer = assert_existence :customer, $1, customers[stripe_account][$1]
         customer[:subscriptions]
       end
 
       def create_customer_subscription(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         subscription_plans = get_subscription_plans_from_params(params)
-        customer = assert_existence :customer, $1, customers[$1]
+        customer = assert_existence :customer, $1, customers[stripe_account][$1]
 
         if params[:source]
           new_card = get_card_by_token(params.delete(:source))
@@ -73,6 +76,7 @@ module StripeMock
       end
 
       def create_subscription(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         if headers && headers[:idempotency_key]
           if subscriptions.any?
             original_subscription = subscriptions.values.find { |c| c[:idempotency_key] == headers[:idempotency_key]}
@@ -86,7 +90,7 @@ module StripeMock
 
         customer = params[:customer]
         customer_id = customer.is_a?(Stripe::Customer) ? customer[:id] : customer.to_s
-        customer = assert_existence :customer, customer_id, customers[customer_id]
+        customer = assert_existence :customer, customer_id, customers[stripe_account][customer_id]
 
         if subscription_plans && customer
           subscription_plans.each do |plan|
@@ -151,14 +155,16 @@ module StripeMock
       end
 
       def retrieve_subscriptions(route, method_url, params, headers)
+        # stripe_account = headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         Data.mock_list_object(subscriptions.values, params)
-        #customer = assert_existence :customer, $1, customers[$1]
+        #customer = assert_existence :customer, $1, customers[stripe_account][$1]
         #customer[:subscriptions]
       end
 
       def update_subscription(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         subscription_id = $2 ? $2 : $1
@@ -166,7 +172,7 @@ module StripeMock
         verify_active_status(subscription)
 
         customer_id = subscription[:customer]
-        customer = assert_existence :customer, customer_id, customers[customer_id]
+        customer = assert_existence :customer, customer_id, customers[stripe_account][customer_id]
 
         if params[:source]
           new_card = get_card_by_token(params.delete(:source))
@@ -222,13 +228,14 @@ module StripeMock
       end
 
       def cancel_subscription(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         subscription_id = $2 ? $2 : $1
         subscription = assert_existence :subscription, subscription_id, subscriptions[subscription_id]
 
         customer_id = subscription[:customer]
-        customer = assert_existence :customer, customer_id, customers[customer_id]
+        customer = assert_existence :customer, customer_id, customers[stripe_account][customer_id]
 
         cancel_params = { canceled_at: Time.now.utc.to_i }
         cancelled_at_period_end = (params[:at_period_end] == true)

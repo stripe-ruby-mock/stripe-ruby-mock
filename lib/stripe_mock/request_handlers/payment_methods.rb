@@ -51,14 +51,15 @@ module StripeMock
 
         Data.mock_list_object(clone.values, params)
       end
-      
+
       # post /v1/payment_methods/:id/attach
       def attach_payment_method(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         allowed_params = [:customer]
 
         id = method_url.match(route)[1]
 
-        assert_existence :customer, params[:customer], customers[params[:customer]]
+        assert_existence :customer, params[:customer], customers[stripe_account][params[:customer]]
 
         payment_method = assert_existence :payment_method, id, payment_methods[id]
         payment_methods[id] = Util.rmerge(payment_method, params.select { |k, _v| allowed_params.include?(k) })

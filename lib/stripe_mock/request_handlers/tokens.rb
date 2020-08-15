@@ -8,6 +8,8 @@ module StripeMock
       end
 
       def create_token(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
+
         if params[:customer].nil? && params[:card].nil? && params[:bank_account].nil?
           raise Stripe::InvalidRequestError.new('You must supply either a card, customer, or bank account to create a token.', nil, http_status: 400)
         end
@@ -15,13 +17,13 @@ module StripeMock
         cus_id = params[:customer]
 
         if cus_id && params[:source]
-          customer = assert_existence :customer, cus_id, customers[cus_id]
+          customer = assert_existence :customer, cus_id, customers[stripe_account][cus_id]
 
           # params[:card] is an id; grab it from the db
           customer_card = get_card(customer, params[:source])
           assert_existence :card, params[:source], customer_card
         elsif params[:card].is_a?(String)
-          customer = assert_existence :customer, cus_id, customers[cus_id]
+          customer = assert_existence :customer, cus_id, customers[stripe_account][cus_id]
 
           # params[:card] is an id; grab it from the db
           customer_card = get_card(customer, params[:card])
@@ -32,7 +34,7 @@ module StripeMock
           params[:card][:last4] = params[:card][:number][-4,4]
           customer_card = params[:card]
         elsif params[:bank_account].is_a?(String)
-          customer = assert_existence :customer, cus_id, customers[cus_id]
+          customer = assert_existence :customer, cus_id, customers[stripe_account][cus_id]
 
           # params[:bank_account] is an id; grab it from the db
           bank_account = verify_bank_account(customer, params[:bank_account])
@@ -41,7 +43,7 @@ module StripeMock
           # params[:card] is a hash of cc info; "Sanitize" the card number
           bank_account = params[:bank_account]
         else
-          customer = assert_existence :customer, cus_id, customers[cus_id]
+          customer = assert_existence :customer, cus_id, customers[stripe_account][cus_id] || customers[Stripe.api_key][cus_id]
           customer_card = get_card(customer, customer[:default_source])
         end
 

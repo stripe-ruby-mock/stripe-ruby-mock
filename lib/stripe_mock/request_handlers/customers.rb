@@ -12,6 +12,7 @@ module StripeMock
       end
 
       def new_customer(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         params[:id] ||= new_id('cus')
         sources = []
 
@@ -29,7 +30,8 @@ module StripeMock
           params[:default_source] = sources.first[:id]
         end
 
-        customers[params[:id]] = Data.mock_customer(sources, params)
+        customers[stripe_account] = {} if customers[stripe_account].blank?
+        customers[stripe_account][params[:id]] = Data.mock_customer(sources, params)
 
         if params[:plan]
           plan_id = params[:plan].to_s
@@ -40,8 +42,8 @@ module StripeMock
           end
 
           subscription = Data.mock_subscription({ id: new_id('su') })
-          subscription = resolve_subscription_changes(subscription, [plan], customers[ params[:id] ], params)
-          add_subscription_to_customer(customers[ params[:id] ], subscription)
+          subscription = resolve_subscription_changes(subscription, [plan], customers[stripe_account][params[:id]], params)
+          add_subscription_to_customer(customers[stripe_account][params[:id]], subscription)
           subscriptions[subscription[:id]] = subscription
         elsif params[:trial_end]
           raise Stripe::InvalidRequestError.new('Received unknown parameter: trial_end', nil, http_status: 400)
@@ -50,15 +52,16 @@ module StripeMock
         if params[:coupon]
           coupon = coupons[params[:coupon]]
           assert_existence :coupon, params[:coupon], coupon
-          add_coupon_to_object(customers[params[:id]], coupon)
+          add_coupon_to_object(customers[stripe_account][params[:id]], coupon)
         end
 
-        customers[params[:id]]
+        customers[stripe_account][params[:id]]
       end
 
       def update_customer(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         route =~ method_url
-        cus = assert_existence :customer, $1, customers[$1]
+        cus = assert_existence :customer, $1, customers[stripe_account][$1]
 
         # get existing and pending metadata
         metadata = cus.delete(:metadata) || {}
@@ -80,6 +83,8 @@ module StripeMock
         if params[:source]
           if params[:source].is_a?(String)
             new_card = get_card_or_bank_by_token(params.delete(:source))
+          elsif params[:source].is_a?(Stripe::Token)
+            new_card = get_card_or_bank_by_token(params[:source][:id])
           elsif params[:source].is_a?(Hash)
             unless params[:source][:object] && params[:source][:number] && params[:source][:exp_month] && params[:source][:exp_year]
               raise Stripe::InvalidRequestError.new('You must supply a valid card', nil, http_status: 400)
@@ -105,18 +110,20 @@ module StripeMock
       end
 
       def delete_customer(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         route =~ method_url
-        assert_existence :customer, $1, customers[$1]
+        assert_existence :customer, $1, customers[stripe_account][$1]
 
-        customers[$1] = {
-          id: customers[$1][:id],
+        customers[stripe_account][$1] = {
+          id: customers[stripe_account][$1][:id],
           deleted: true
         }
       end
 
       def get_customer(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         route =~ method_url
-        customer = assert_existence :customer, $1, customers[$1]
+        customer = assert_existence :customer, $1, customers[stripe_account][$1]
 
         customer = customer.clone
         if params[:expand] == ['default_source']
@@ -129,12 +136,14 @@ module StripeMock
       end
 
       def list_customers(route, method_url, params, headers)
-        Data.mock_list_object(customers.values, params)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
+        Data.mock_list_object(customers[stripe_account]&.values, params)
       end
 
       def delete_customer_discount(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
         route =~ method_url
-        cus = assert_existence :customer, $1, customers[$1]
+        cus = assert_existence :customer, $1, customers[stripe_account][$1]
 
         cus[:discount] = nil
 

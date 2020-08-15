@@ -13,6 +13,8 @@ module StripeMock
       end
 
       def new_charge(route, method_url, params, headers)
+        stripe_account = headers[:stripe_account] || Stripe.api_key
+
         if headers && headers[:idempotency_key]
           params[:idempotency_key] = headers[:idempotency_key]
           if charges.any?
@@ -29,7 +31,7 @@ module StripeMock
             # card id, not a token. in this case we'll find the card in the customer
             # object and return that.
             if params[:customer]
-              params[:source] = get_card(customers[params[:customer]], params[:source])
+              params[:source] = get_card(customers[stripe_account][params[:customer]], params[:source])
             else
               params[:source] = get_card_or_bank_by_token(params[:source])
             end
@@ -37,7 +39,7 @@ module StripeMock
             raise Stripe::InvalidRequestError.new("Invalid token id: #{params[:source]}", 'card', http_status: 400)
           end
         elsif params[:customer]
-          customer = customers[params[:customer]]
+          customer = customers[stripe_account][params[:customer]]
           if customer && customer[:default_source]
             params[:source] = get_card(customer, customer[:default_source])
           end
