@@ -110,9 +110,35 @@ module StripeMock
 
       end
 
+      def validate_create_price_params(params)
+        price_id = params[:id].to_s
+        product_id = params[:product]
+
+        @base_strategy.create_price_params.keys.each do |attr_name|
+          message = "Missing required param: #{attr_name}."
+          raise Stripe::InvalidRequestError.new(message, attr_name) if params[attr_name].nil?
+        end
+
+        if prices[price_id]
+          message = already_exists_message(Stripe::Price)
+          raise Stripe::InvalidRequestError.new(message, :id)
+        end
+
+        unless products[product_id]
+          message = not_found_message(Stripe::Product, product_id)
+          raise Stripe::InvalidRequestError.new(message, :product)
+        end
+
+        unless SUPPORTED_CURRENCIES.include?(params[:currency])
+          message = invalid_currency_message(params[:currency])
+          raise Stripe::InvalidRequestError.new(message, :currency)
+        end
+      end
+
       def require_param(param_name)
         raise Stripe::InvalidRequestError.new("Missing required param: #{param_name}.", param_name.to_s, http_status: 400)
       end
+
     end
   end
 end

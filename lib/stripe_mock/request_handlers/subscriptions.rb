@@ -257,14 +257,16 @@ module StripeMock
                    elsif params[:items]
                      items = params[:items]
                      items = items.values if items.respond_to?(:values)
-                     items.map { |item| item[:plan].to_s if item[:plan] }
+                     items.map { |item| item[:plan] ? item[:plan] : item[:price] }
                    else
                      []
                    end
         plan_ids.each do |plan_id|
           assert_existence :plan, plan_id, plans[plan_id]
+        rescue Stripe::InvalidRequestError
+          assert_existence :price, plan_id, prices[plan_id]
         end
-        plan_ids.map { |plan_id| plans[plan_id] }
+        plan_ids.map { |plan_id| plans[plan_id] || prices[plan_id]}
       end
 
       # Ensure customer has card to charge unless one of the following criterias is met:
