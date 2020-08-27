@@ -117,6 +117,38 @@ shared_examples 'Customer Subscriptions' do
       expect(subscriptions.data.first.metadata.example).to eq( "yes" )
     end
 
+    it "adds a new subscription with on_behalf_of set" do
+      plan
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
+
+      expect(subscriptions.data).to be_empty
+      expect(subscriptions.count).to eq(0)
+
+      sub = Stripe::Subscription.create({ plan: 'silver', customer: customer, on_behalf_of: "acc_3483821", metadata: { foo: "bar", example: "yes" } })
+
+      expect(sub.object).to eq('subscription')
+      expect(sub.plan.to_hash).to eq(plan.to_hash)
+      expect(sub.billing).to eq('charge_automatically')
+      expect(sub.on_behalf_of).to eq("acc_3483821")
+
+      customer = Stripe::Customer.retrieve(customer.id)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
+      charges = Stripe::Charge.list(customer: customer.id)
+
+      expect(subscriptions.data).to_not be_empty
+      expect(subscriptions.count).to eq(1)
+      expect(subscriptions.data.length).to eq(1)
+      expect(charges.data.length).to eq(1)
+      expect(customer.currency).to eq( "usd" )
+
+      expect(subscriptions.data.first.id).to eq(sub.id)
+      expect(subscriptions.data.first.plan.to_hash).to eq(plan.to_hash)
+
+      expect(subscriptions.data.first.customer).to eq(customer.id)
+      expect(subscriptions.data.first.on_behalf_of).to eq("acc_3483821")
+    end
+
     it "adds a new subscription with payment method provided as default" do
       plan
       customer = Stripe::Customer.create(source: gen_card_tk)
