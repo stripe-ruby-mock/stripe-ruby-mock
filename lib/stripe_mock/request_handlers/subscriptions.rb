@@ -122,6 +122,10 @@ module StripeMock
           subscription[:on_behalf_of] = params[:on_behalf_of]
         end
 
+        if params[:transfer_data]
+          subscription[:transfer_data] = params[:transfer_data]
+        end
+
         if params[:coupon]
           coupon_id = params[:coupon]
 
