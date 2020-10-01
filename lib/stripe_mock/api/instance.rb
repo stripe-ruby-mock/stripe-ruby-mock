@@ -7,7 +7,7 @@ module StripeMock
   def self.start
     return false if @state == 'live'
     @instance = instance = Instance.new
-    Stripe::StripeClient.send(:define_method, :execute_request) { |*args| instance.mock_request(*args) }
+    Stripe::StripeClient.send(:define_method, :execute_request) { |*args, **keyword_args| instance.mock_request(*args, **keyword_args) }
     @state = 'local'
   end
 
