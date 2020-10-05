@@ -111,7 +111,31 @@ module StripeMock
 
       def total_items_amount(items)
         total = 0
-        items.each { |i| total += (i[:quantity] || 1) * i[:plan][:amount] }
+        items.each do |item|
+          if not item[:plan][:amount].nil?
+            total += item[:quantity] * item[:plan][:amount]
+          elsif not item[:plan][:tiers].nil? and item[:plan][:tiers_mode] == "graduated"
+            copied_number_targets = item[:quantity]
+
+            item[:plan][:tiers].each do |tier|
+              if copied_number_targets <= 0
+                next
+              end
+
+              if tier[:up_to].present? and copied_number_targets >= tier[:up_to]
+                total += tier[:up_to] * tier[:unit_amount]
+                copied_number_targets -= tier[:up_to]
+              else
+                total += copied_number_targets * tier[:unit_amount]
+                copied_number_targets = 0
+              end
+
+              if tier[:flat_amount].present?
+                total += tier[:flat_amount]
+              end
+            end
+          end
+        end
         total
       end
     end

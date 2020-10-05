@@ -80,7 +80,7 @@ module StripeMock
             else
               "Missing required param: #{attr_name}."
             end
-          raise Stripe::InvalidRequestError.new(message, attr_name) if params[attr_name].nil?
+          raise Stripe::InvalidRequestError.new(message, attr_name) if params[attr_name].nil? and params[:tiers].nil?
         end
 
         if plans[plan_id]
@@ -103,9 +103,11 @@ module StripeMock
           raise Stripe::InvalidRequestError.new(message, :currency)
         end
 
-        unless params[:amount].integer?
-          message = invalid_integer_message(params[:amount])
-          raise Stripe::InvalidRequestError.new(message, :amount)
+        if not params[:amount].nil?
+          unless params[:amount].integer?
+            message = invalid_integer_message(params[:amount])
+            raise Stripe::InvalidRequestError.new(message, :amount)
+          end
         end
 
       end
