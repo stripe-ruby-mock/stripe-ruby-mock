@@ -1317,5 +1317,12 @@ module StripeMock
         success_url: 'https://example.com/success'
       }.merge(params)
     end
+
+    def self.mock_apple_pay_domain(params = {})
+      {
+        id: params[:id] || "apwc_apd_default",
+        domain_name: params[:domain_name] || 'test.example.com'
+      }
+    end
   end
 end

@@ -52,11 +52,12 @@ module StripeMock
     include StripeMock::RequestHandlers::TaxRates
     include StripeMock::RequestHandlers::Checkout
     include StripeMock::RequestHandlers::Checkout::Session
+    include StripeMock::RequestHandlers::ApplePayDomains
 
     attr_reader :accounts, :balance, :balance_transactions, :bank_tokens, :charges, :coupons, :customers,
                 :disputes, :events, :invoices, :invoice_items, :orders, :payment_intents, :payment_methods,
                 :setup_intents, :plans, :recipients, :refunds, :transfers, :payouts, :subscriptions, :country_spec,
-                :subscriptions_items, :products, :tax_rates, :checkout_sessions
+                :subscriptions_items, :products, :tax_rates, :checkout_sessions, :apple_pay_domains
 
     attr_accessor :error_queue, :debug, :conversion_rate, :account_balance
 
@@ -89,6 +90,7 @@ module StripeMock
       @country_spec = {}
       @tax_rates = {}
       @checkout_sessions = {}
+      @apple_pay_domains = {}
 
       @debug = false
       @error_queue = ErrorQueue.new

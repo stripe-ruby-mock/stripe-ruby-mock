@@ -79,6 +79,7 @@ require 'stripe_mock/request_handlers/products.rb'
 require 'stripe_mock/request_handlers/tax_rates.rb'
 require 'stripe_mock/request_handlers/checkout.rb'
 require 'stripe_mock/request_handlers/checkout_session.rb'
+require 'stripe_mock/request_handlers/apple_pay_domains.rb'
 require 'stripe_mock/instance'
 
 require 'stripe_mock/test_strategies/base.rb'

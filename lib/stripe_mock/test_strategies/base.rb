@@ -127,6 +127,15 @@ module StripeMock
         StripeMock.prepare_card_error(:card_error, :new_customer) if StripeMock.state == 'local'
       end
 
+      def create_apple_pay_domain(params = {})
+        Stripe::ApplePayDomain.create({ domain_name: 'example.com' }.merge(params))
+      end
+
+      def delete_all_apple_pay_domains
+        apple_pay_domains = Stripe::ApplePayDomain.list
+        apple_pay_domains.data.map(&:delete)
+      end
+
     end
   end
 end
