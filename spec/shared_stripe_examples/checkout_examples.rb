@@ -14,6 +14,9 @@ shared_examples 'Checkout API' do
     })
     expect(session.id).to match(/^test_cs/)
     expect(session.line_items.count).to eq(1)
+
+    payment_intent = Stripe::PaymentIntent.retrieve(session.payment_intent)
+    expect(payment_intent).not_to be_nil
   end
 
   describe "idempotency" do

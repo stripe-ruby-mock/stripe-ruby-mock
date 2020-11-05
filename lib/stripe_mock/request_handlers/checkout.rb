@@ -14,6 +14,10 @@ module StripeMock
           end
         end
 
+        pi_id = new_id('pi')
+        payment_intents[pi_id] = StripeMock::Data.mock_payment_intent(id: pi_id)
+        params[:payment_intent] = pi_id
+
         params[:id] ||= new_id('cs')
 
         checkout_sessions[params[:id]] = Data.mock_checkout_session(params)
