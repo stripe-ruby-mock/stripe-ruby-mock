@@ -149,6 +149,8 @@
       "statement_descriptor_suffix": null,
       "status": "processing",
       "transfer_data": null,
+        "destination": "acct_00000000000000"
+      },
       "transfer_group": null
     }
   },
