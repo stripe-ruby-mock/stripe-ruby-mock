@@ -24,6 +24,18 @@ shared_examples 'Invoice API' do
     end
   end
 
+  context "deleting an invoice" do
+    it "marks the invoice as deleted" do
+      invoice = Stripe::Invoice.create(currency: "cad", statement_description: "orig-desc")
+
+      Stripe::Invoice.delete(invoice.id)
+
+      invoice = Stripe::Invoice.retrieve(invoice.id)
+
+      expect(invoice.deleted).to eq(true)
+    end
+  end
+
   context "updating an invoice" do
     it "updates a stripe invoice" do
       invoice = Stripe::Invoice.create(currency: "cad", statement_description: "orig-desc")
