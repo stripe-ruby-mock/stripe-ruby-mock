@@ -11,9 +11,9 @@ module StripeMock
         items = options[:items]
         items = items.values if items.respond_to?(:values)
         subscription[:items][:data] = plans.map do |plan|
-          if items && items.size == plans.size
-            quantity = items &&
-              items.detect { |item| item[:plan] == plan[:id] }[:quantity] || 1
+          if options[:items] && options[:items].size == plans.size
+            quantity = options[:items] &&
+              options[:items].detect { |item| item[:plan][:id] == plan[:id] }[:quantity] || 1
             Data.mock_subscription_item({ plan: plan, quantity: quantity })
           else
             Data.mock_subscription_item({ plan: plan })
