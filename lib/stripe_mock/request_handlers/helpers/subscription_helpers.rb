@@ -8,6 +8,8 @@ module StripeMock
 
       def resolve_subscription_changes(subscription, plans, customer, options = {})
         subscription.merge!(custom_subscription_params(plans, customer, options))
+        items = options[:items]
+        items = items.values if items.respond_to?(:values)
         subscription[:items][:data] = plans.map do |plan|
           if options[:items] && options[:items].size == plans.size
             quantity = options[:items] &&
@@ -30,8 +32,15 @@ module StripeMock
         start_time = options[:current_period_start] || now
         params = { customer: cus[:id], current_period_start: start_time, created: created_time }
         params.merge!({ :plan => (plans.size == 1 ? plans.first : nil) })
-        keys_to_merge = /application_fee_percent|quantity|metadata|tax_percent|billing|days_until_due/
+        keys_to_merge = /application_fee_percent|quantity|metadata|tax_percent|billing|days_until_due|default_tax_rates|pending_invoice_item_interval|default_payment_method|collection_method/
         params.merge! options.select {|k,v| k =~ keys_to_merge}
+
+        if options[:cancel_at_period_end] == true
+          params.merge!(cancel_at_period_end: true, canceled_at: now)
+        elsif options[:cancel_at_period_end] == false
+          params.merge!(cancel_at_period_end: false, canceled_at: nil)
+        end
+
         # TODO: Implement coupon logic
 
         if (((plan && plan[:trial_period_days]) || 0) == 0 && options[:trial_end].nil?) || options[:trial_end] == "now"
