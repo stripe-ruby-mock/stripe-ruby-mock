@@ -417,11 +417,17 @@ module StripeMock
         next_payment_attempt: 1349825350,
         charge: nil,
         discount: nil,
-        subscription: nil
+        subscription: nil,
+        total_discount_amounts: []
       }.merge(params)
       if invoice[:discount]
-        invoice[:total] = [0, invoice[:subtotal] - invoice[:discount][:coupon][:amount_off]].max if invoice[:discount][:coupon][:amount_off]
-        invoice[:total] = invoice[:subtotal] * invoice[:discount][:coupon][:percent_off] / 100 if invoice[:discount][:coupon][:percent_off]
+        amount = if invoice[:discount][:coupon][:amount_off]
+                   invoice[:discount][:coupon][:amount_off]
+                 else
+                   invoice[:subtotal] * invoice[:discount][:coupon][:percent_off] / 100
+                 end
+        invoice[:total] = [0, invoice[:subtotal] - amount].max
+        invoice[:total_discount_amounts].push({ amount: amount })
       else
         invoice[:total] = invoice[:subtotal]
       end
