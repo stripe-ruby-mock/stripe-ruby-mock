@@ -107,7 +107,8 @@ module StripeMock
         object: 'account_link',
         created: now,
         expires_at: now + 300,
-        url: 'https://connect.stripe.com/setup/c/iB0ph1cPnRLY'
+        url: 'https://connect.stripe.com/setup/c/iB0ph1cPnRLY',
+        data: {}
       }.merge(params)
     end
 
