@@ -261,6 +261,7 @@ module StripeMock
                    else
                      []
                    end
+        plan_ids.compact!
         plan_ids.each do |plan_id|
           assert_existence :plan, plan_id, plans[plan_id]
         rescue Stripe::InvalidRequestError
