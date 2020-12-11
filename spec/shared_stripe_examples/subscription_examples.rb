@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'securerandom'
 
-shared_examples 'Customer Subscriptions' do
+shared_examples 'Customer Subscriptions with plans' do
   let(:gen_card_tk) { stripe_helper.generate_card_token }
 
   let(:product) { stripe_helper.create_product }
@@ -803,7 +803,7 @@ shared_examples 'Customer Subscriptions' do
         metadata: { foo: "bar", example: "yes" },
         default_payment_method: payment_method_card.id,
       )
-      
+
       subscriptions = Stripe::Subscription.list(customer: customer)
       expect(subscriptions.data.first.default_payment_method).to eq(payment_method_card.id)
 
@@ -812,7 +812,7 @@ shared_examples 'Customer Subscriptions' do
         default_payment_method: payment_method_sepa.id,
         collection_method: 'send_invoice',
       )
-      
+
       subscriptions = Stripe::Subscription.list(customer: customer)
       expect(subscriptions.data.first.collection_method).to eq('send_invoice')
       expect(subscriptions.data.first.default_payment_method).to eq(payment_method_sepa.id)
@@ -1214,4 +1214,47 @@ shared_examples 'Customer Subscriptions' do
     end
   end
 
+end
+
+shared_examples 'Customer Subscriptions with prices' do
+  let(:gen_card_tk) { stripe_helper.generate_card_token }
+
+  let(:product) { stripe_helper.create_product }
+  let(:price) { {product: product.id, amount: 4999, currency: 'usd'} }
+
+  context "creating a new subscription" do
+    it "adds a new subscription to customer with none using items", :live => true do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      expect(customer.subscriptions.data).to be_empty
+      expect(customer.subscriptions.count).to eq(0)
+
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        items: [{ price: price.id }],
+        metadata: { foo: "bar", example: "yes" }
+      })
+
+      expect(subscription.object).to eq('subscription')
+      expect(subscription.plan.to_hash).to eq(price.to_hash)
+      expect(subscription.metadata.foo).to eq("bar")
+      expect(subscription.metadata.example).to eq("yes")
+
+      customer = Stripe::Customer.retrieve(customer.id)
+      subscriptions = Stripe::Subscription.list(customer: customer.id)
+      charges = Stripe::Charge.list(customer: customer.id)
+
+      expect(subscriptions.data).to_not be_empty
+      expect(subscriptions.count).to eq(1)
+      expect(subscriptions.data.length).to eq(1)
+      expect(charges.data.length).to eq(1)
+      expect(customer.currency).to eq("usd")
+
+      expect(subscriptions.data.first.id).to eq(subscription.id)
+      expect(subscriptions.data.first.plan.to_hash).to eq(price.to_hash)
+      expect(subscriptions.data.first.customer).to eq(customer.id)
+      expect(subscriptions.data.first.metadata.foo).to eq( "bar" )
+      expect(subscriptions.data.first.metadata.example).to eq( "yes" )
+    end
+  end
 end
