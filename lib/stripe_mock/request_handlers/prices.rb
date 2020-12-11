@@ -28,9 +28,17 @@ module StripeMock
 
       def list_prices(route, method_url, params, headers)
         limit = params[:limit] ? params[:limit] : 10
-        Data.mock_list_object(prices.values.first(limit), params.merge!(limit: limit))
-      end
+        price_data = prices.values
+        validate_list_prices_params
 
+        if params.key?(:lookup_keys)
+          price_data.select! do |price|
+            params[:lookup_keys].include?(price[:lookup_key])
+          end
+        end
+
+        Data.mock_list_object(price_data.first(limit), params.merge!(limit: limit))
+      end
     end
   end
 end

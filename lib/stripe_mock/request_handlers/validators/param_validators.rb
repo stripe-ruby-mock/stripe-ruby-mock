@@ -135,6 +135,12 @@ module StripeMock
         end
       end
 
+      def validate_list_prices_params(params)
+        if params[:lookup_keys] && !params[:lookup_keys].is_a?(Array)
+          raise Stripe::InvalidRequestError.new('Invalid array', :lookup_keys)
+        end
+      end
+
       def require_param(param_name)
         raise Stripe::InvalidRequestError.new("Missing required param: #{param_name}.", param_name.to_s, http_status: 400)
       end

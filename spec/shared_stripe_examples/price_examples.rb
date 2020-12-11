@@ -105,6 +105,26 @@ shared_examples 'Price API' do
     expect(all.count).to eq(100)
   end
 
+  it "retrieves prices with lookup keys" do
+    stripe_helper.create_price(id: 'price One', product: product_id, amount: 54321, lookup_key: 'one')
+    stripe_helper.create_price(id: 'price Two', product: product_id, amount: 98765, lookup_key: 'two')
+
+    all = Stripe::Price.list({lookup_keys: ['one', 'two']})
+    expect(all.count).to eq(2)
+    expect(all.map &:id).to include('price One', 'price Two')
+    expect(all.map &:amount).to include(54321, 98765)
+
+    one = Stripe::Price.list({lookup_keys: ['one']})
+    expect(all.count).to eq(1)
+    expect(all.map &:id).to include('price One')
+    expect(all.map &:amount).to include(54321)
+
+    two = Stripe::Price.list({lookup_keys: ['two']})
+    expect(all.count).to eq(1)
+    expect(all.map &:id).to include('price Two')
+    expect(all.map &:amount).to include(98765)
+  end
+
   describe "Validations", :live => true do
     include_context "stripe validator"
     let(:params) { stripe_helper.create_price_params(product: product_id) }
