@@ -489,6 +489,7 @@ module StripeMock
           :attempt_count => 1,
           :attempted => true,
           :closed => true,
+          :status => 'paid',
           :paid => true,
           :charge => 'ch_test_charge',
           :ending_balance => 0,
