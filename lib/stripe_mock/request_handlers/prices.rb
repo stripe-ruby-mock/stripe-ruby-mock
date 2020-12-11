@@ -29,7 +29,7 @@ module StripeMock
       def list_prices(route, method_url, params, headers)
         limit = params[:limit] ? params[:limit] : 10
         price_data = prices.values
-        validate_list_prices_params
+        validate_list_prices_params(params)
 
         if params.key?(:lookup_keys)
           price_data.select! do |price|
