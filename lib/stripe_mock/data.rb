@@ -112,6 +112,16 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_express_login_link(params = {})
+      now = Time.now.to_i
+      {
+        object: 'login_link',
+        created: now,
+        url: 'https://connect.stripe.com/express/Ln7FfnNpUcCU',
+        data: {}
+      }.merge(params)
+    end
+
     def self.mock_tax_rate(params)
       {
         id: 'test_cus_default',

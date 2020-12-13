@@ -48,6 +48,7 @@ require 'stripe_mock/request_handlers/helpers/token_helpers.rb'
 require 'stripe_mock/request_handlers/validators/param_validators.rb'
 
 require 'stripe_mock/request_handlers/account_links.rb'
+require 'stripe_mock/request_handlers/express_login_links.rb'
 require 'stripe_mock/request_handlers/accounts.rb'
 require 'stripe_mock/request_handlers/external_accounts.rb'
 require 'stripe_mock/request_handlers/balance.rb'
