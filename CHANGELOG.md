@@ -1,6 +1,7 @@
 ### 3.0.2 (Next)
 
 * Your contribution here.
+* [#715](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/715): Added application_fee_amount to mock charge object - [@espen](https://github.com/espen)
 
 ### 3.0.1 (TBD)
 * Added Changelog file 
