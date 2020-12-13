@@ -25,6 +25,7 @@ module StripeMock
     include StripeMock::RequestHandlers::SetupIntents
     include StripeMock::RequestHandlers::ExternalAccounts
     include StripeMock::RequestHandlers::AccountLinks
+    include StripeMock::RequestHandlers::ExpressLoginLinks
     include StripeMock::RequestHandlers::Accounts
     include StripeMock::RequestHandlers::Balance
     include StripeMock::RequestHandlers::BalanceTransactions
