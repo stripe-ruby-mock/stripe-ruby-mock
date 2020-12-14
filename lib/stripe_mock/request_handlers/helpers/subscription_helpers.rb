@@ -113,7 +113,7 @@ module StripeMock
         total = 0
         items.each do |item|
           quantity = item[:quantity] || 1
-          amount = item[:price].present? ? item[:price][:unit_amount]: item[:plan][:amount]
+          amount = item[:plan][:unit_amount] || item[:plan][:amount]
           total += quantity * amount
         end
         total
