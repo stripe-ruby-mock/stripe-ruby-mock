@@ -1128,7 +1128,7 @@ module StripeMock
     end
 
     def self.mock_subscription_item(params = {})
-      id = params[:id] || 'test_txn_default'
+      id = params[:id] || 'test_si_default'
       {
         id: id,
         object: 'subscription_item',
