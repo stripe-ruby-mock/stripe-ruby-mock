@@ -1,7 +1,6 @@
 module StripeMock
   module RequestHandlers
     module Charges
-
       def Charges.included(klass)
         klass.add_handler 'post /v1/charges',               :new_charge
         klass.add_handler 'get /v1/charges',                :get_charges
@@ -16,7 +15,7 @@ module StripeMock
         if headers && headers[:idempotency_key]
           params[:idempotency_key] = headers[:idempotency_key]
           if charges.any?
-            original_charge = charges.values.find { |c| c[:idempotency_key] == headers[:idempotency_key]}
+            original_charge = charges.values.find { |c| c[:idempotency_key] == headers[:idempotency_key] }
             return charges[original_charge[:id]] if original_charge
           end
         end
@@ -49,8 +48,9 @@ module StripeMock
         balance_transaction_id = new_balance_transaction('txn', bal_trans_params)
 
         charges[id] = Data.mock_charge(
-            params.merge :id => id,
-            :balance_transaction => balance_transaction_id)
+          params.merge :id => id,
+                       :balance_transaction => balance_transaction_id
+        )
 
         charge = charges[id].clone
         if params[:expand] == ['balance_transaction']
@@ -69,7 +69,7 @@ module StripeMock
         allowed = allowed_params(params)
         disallowed = params.keys - allowed
         if disallowed.count > 0
-          raise Stripe::InvalidRequestError.new("Received unknown parameters: #{disallowed.join(', ')}" , '', http_status: 400)
+          raise Stripe::InvalidRequestError.new("Received unknown parameters: #{disallowed.join(', ')}", '', http_status: 400)
         end
 
         charges[id] = Util.rmerge(charge, params)
@@ -82,7 +82,7 @@ module StripeMock
         clone = charges.clone
 
         if params[:customer]
-          clone.delete_if { |k,v| v[:customer] != params[:customer] }
+          clone.delete_if { |k, v| v[:customer] != params[:customer] }
         end
 
         Data.mock_list_object(clone.values, params)
@@ -146,7 +146,7 @@ module StripeMock
         elsif non_positive_charge_amount?(params)
           raise Stripe::InvalidRequestError.new('Invalid positive integer', 'amount', http_status: 400)
         elsif params[:source].nil? && params[:customer].nil?
-          raise Stripe::InvalidRequestError.new('Must provide source or customer.', http_status: nil)
+          raise Stripe::InvalidRequestError.new('Must provide source or customer.', { http_status: nil })
         end
       end
 
