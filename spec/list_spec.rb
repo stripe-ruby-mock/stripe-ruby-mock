@@ -152,4 +152,27 @@ describe StripeMock::Data::List do
       expect { list.to_h }.to raise_error
     end
   end
+
+  context "with data containing records marked 'deleted'" do
+    let(:customer_data) { StripeMock.instance.customers.values }
+    let(:customers) do
+      customer_data.map { |datum| Stripe::Util.convert_to_stripe_object(datum) }
+    end
+
+    before do
+      StripeMock.instance.customers.clear
+      Stripe::Customer.create
+      Stripe::Customer.delete(Stripe::Customer.create.id)
+    end
+
+    it "does not raise error on initialization" do
+      expect { StripeMock::Data::List.new(customer_data) }.to_not raise_error
+      expect { StripeMock::Data::List.new(customers) }.to_not raise_error
+    end
+
+    it "omits records marked 'deleted'" do
+      expect(StripeMock::Data::List.new(customer_data).data.size).to eq(1)
+      expect(StripeMock::Data::List.new(customers).data.size).to eq(1)
+    end
+  end
 end

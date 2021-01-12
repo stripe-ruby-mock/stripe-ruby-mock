@@ -2,6 +2,7 @@
 
 * Your contribution here.
 * [#748](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/758): Support Prices - [@hidenba](https://github.com/hidenba) and [@jamesprior](https://github.com/jamesprior).
+* [#715](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/715): Added application_fee_amount to mock charge object - [@espen](https://github.com/espen)
 
 ### 3.0.1 (TBD)
 * Added Changelog file
