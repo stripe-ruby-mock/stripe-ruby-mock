@@ -60,7 +60,8 @@
       "trial_end": null,
       "canceled_at": null,
       "quantity": 1,
-      "application_fee_percent": null
+      "application_fee_percent": null,
+      "latest_invoice": "in_00000000000000"
     }
   }
 }
