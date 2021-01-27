@@ -65,7 +65,8 @@
       "application_fee": null,
       "subscription": "sub_00000000000000",
       "metadata": {},
-      "description": null
+      "description": null,
+      "total_discount_amounts": []
     },
     "previous_attributes": {
       "lines": []
