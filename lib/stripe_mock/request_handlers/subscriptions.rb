@@ -137,6 +137,10 @@ module StripeMock
           end
         end
 
+        if params[:trial_period_days]
+          subscription[:status] = 'trialing'
+        end
+
         if params[:cancel_at_period_end]
           subscription[:cancel_at_period_end] = true
           subscription[:canceled_at] = Time.now.utc.to_i
@@ -201,6 +205,10 @@ module StripeMock
           else
             raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
           end
+        end
+
+        if params[:trial_period_days]
+          subscription[:status] = 'trialing'
         end
 
         if params[:cancel_at_period_end]
