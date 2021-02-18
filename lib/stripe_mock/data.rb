@@ -377,7 +377,8 @@ module StripeMock
         default_tax_rates: nil,
         default_payment_method: nil,
         pending_invoice_item_interval: nil,
-        next_pending_invoice_item_invoice: nil
+        next_pending_invoice_item_invoice: nil,
+        latest_invoice: nil
       }, params)
     end
 
@@ -578,6 +579,34 @@ module StripeMock
         transform_usage: nil,
         trial_period_days: nil,
         usage_type: "licensed"
+      }.merge(params)
+    end
+
+    def self.mock_price(params={})
+      currency = params[:currency] || StripeMock.default_currency
+      {
+        id: "mock_price_123",
+        object: "price",
+        active: true,
+        billing_scheme: "per_unit",
+        created: 1593044959,
+        currency: currency,
+        livemode: false,
+        lookup_key: nil,
+        metadata: {},
+        nickname: 'My Mock Price',
+        product: "mock_prod_NONEXIST",  # override this with your own existing product id
+        recurring: {
+          aggregate_usage: nil,
+          interval: "month",
+          interval_count: 1,
+          usage_type: "licensed"
+        },
+        tiers_mode: nil,
+        transform_quantity: nil,
+        type: "recurring",
+        unit_amount: 2000,
+        unit_amount_decimal: "2000"
       }.merge(params)
     end
 
@@ -1110,7 +1139,7 @@ module StripeMock
     end
 
     def self.mock_subscription_item(params = {})
-      id = params[:id] || 'test_txn_default'
+      id = params[:id] || 'test_si_default'
       {
         id: id,
         object: 'subscription_item',
