@@ -126,7 +126,7 @@ module StripeMock
         customer = assert_existence :customer, $1, customers[stripe_account][$1]
 
         customer = customer.clone
-        if params[:expand] == ['default_source']
+        if params[:expand] == ['default_source'] && customer[:sources][:data]
           customer[:default_source] = customer[:sources][:data].detect do |source|
             source[:id] == customer[:default_source]
           end
