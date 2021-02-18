@@ -1,10 +1,13 @@
 ### 3.0.2 (pre-release 2021-02-17)
 
-- Your contribution here.
+- [#765](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/765): Properly set the status of a trialing subscription. [@csalvato](https://github.com/csalvato)
+- [#764](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/764): Fixes erroneous error message when fetching upcoming invoices. [@csalvato](https://github.com/csalvato)
+- [#762](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/762): Support Stripe Connect with Customers by adding stripe_account header namespace for customer object [@csalvato](https://github.com/csalvato)
+- [#755](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/755): Add allowed params to subscriptions [@dominikdarnel ](https://github.com/dominikdarnel)
 - [#748](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/758): Support Prices - [@hidenba](https://github.com/hidenba) and [@jamesprior](https://github.com/jamesprior).
 - [#747](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/747/files): Fix ruby 2.7 deprecation warnings. Adds Ruby 3.0.0 compatibility. [@coding-chimp](https://github.com/coding-chimp)
-- [#762](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/762): Support Stripe Connect with Customers by adding stripe_account header namespace for customer object [@csalvato](https://github.com/csalvato)
 - [#715](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/715): Added application_fee_amount to mock charge object - [@espen](https://github.com/espen)
+- [#709](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/709): Remove unnecessary check on customer's currency - [@coorasse](https://github.com/coorasse)
 
 ### 3.0.1 (TBD)
 
