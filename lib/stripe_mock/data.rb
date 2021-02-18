@@ -140,7 +140,7 @@ module StripeMock
 
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
-      currency = params[:currency] || StripeMock.default_currency
+      currency = params[:currency]
       sources.each {|source| source[:customer] = cus_id}
       {
         email: 'stripe_mock@example.com',
