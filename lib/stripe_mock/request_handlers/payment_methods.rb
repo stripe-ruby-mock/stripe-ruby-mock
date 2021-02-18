@@ -51,7 +51,7 @@ module StripeMock
 
         Data.mock_list_object(clone.values, params)
       end
-      
+
       # post /v1/payment_methods/:id/attach
       def attach_payment_method(route, method_url, params, headers)
         allowed_params = [:customer]
@@ -86,6 +86,7 @@ module StripeMock
         if payment_method[:customer].nil?
           raise Stripe::InvalidRequestError.new(
             'You must save this PaymentMethod to a customer before you can update it.',
+            nil,
             http_status: 400
           )
         end
@@ -104,6 +105,7 @@ module StripeMock
         if invalid_type?(params[:type])
           raise Stripe::InvalidRequestError.new(
             'Invalid type: must be one of card, ideal or sepa_debit',
+            nil,
             http_status: 400
           )
         end
