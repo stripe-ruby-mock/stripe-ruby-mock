@@ -67,7 +67,7 @@ module StripeMock
       @balance_transactions = Data.mock_balance_transactions(['txn_05RsQX2eZvKYlo2C0FRTGSSA','txn_15RsQX2eZvKYlo2C0ERTYUIA', 'txn_25RsQX2eZvKYlo2C0ZXCVBNM', 'txn_35RsQX2eZvKYlo2C0QAZXSWE', 'txn_45RsQX2eZvKYlo2C0EDCVFRT', 'txn_55RsQX2eZvKYlo2C0OIKLJUY', 'txn_65RsQX2eZvKYlo2C0ASDFGHJ', 'txn_75RsQX2eZvKYlo2C0EDCXSWQ', 'txn_85RsQX2eZvKYlo2C0UJMCDET', 'txn_95RsQX2eZvKYlo2C0EDFRYUI'])
       @bank_tokens = {}
       @card_tokens = {}
-      @customers = {}
+      @customers = { Stripe.api_key => {} }
       @charges = {}
       @payment_intents = {}
       @payment_methods = {}
