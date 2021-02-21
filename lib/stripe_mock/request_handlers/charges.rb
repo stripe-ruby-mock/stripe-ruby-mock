@@ -12,8 +12,8 @@ module StripeMock
         klass.add_handler 'post /v1/charges/(.*)',          :update_charge
       end
 
-      def new_charge(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+      def new_charge(route, method_url, params, headers = {})
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
 
         if headers && headers[:idempotency_key]
           params[:idempotency_key] = headers[:idempotency_key]

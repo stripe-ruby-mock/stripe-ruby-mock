@@ -115,14 +115,14 @@ shared_examples 'Price API' do
     expect(all.map &:amount).to include(54321, 98765)
 
     one = Stripe::Price.list({lookup_keys: ['one']})
-    expect(all.count).to eq(1)
-    expect(all.map &:id).to include('price One')
-    expect(all.map &:amount).to include(54321)
+    expect(one.count).to eq(1)
+    expect(one.map &:id).to include('price One')
+    expect(one.map &:amount).to include(54321)
 
     two = Stripe::Price.list({lookup_keys: ['two']})
-    expect(all.count).to eq(1)
-    expect(all.map &:id).to include('price Two')
-    expect(all.map &:amount).to include(98765)
+    expect(two.count).to eq(1)
+    expect(two.map &:id).to include('price Two')
+    expect(two.map &:amount).to include(98765)
   end
 
   describe "Validations", :live => true do

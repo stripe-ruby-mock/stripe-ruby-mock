@@ -12,19 +12,19 @@ module StripeMock
       end
 
       def create_source(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         add_source_to(:customer, $1, params, customers[stripe_account])
       end
 
       def retrieve_sources(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         retrieve_object_cards(:customer, $1, customers[stripe_account])
       end
 
       def retrieve_source(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         customer = assert_existence :customer, $1, customers[stripe_account][$1]
 
@@ -32,13 +32,13 @@ module StripeMock
       end
 
       def delete_source(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         delete_card_from(:customer, $1, $2, customers[stripe_account])
       end
 
       def update_source(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         customer = assert_existence :customer, $1, customers[stripe_account][$1]
 
@@ -48,7 +48,7 @@ module StripeMock
       end
 
       def verify_source(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         customer = assert_existence :customer, $1, customers[stripe_account][$1]
 

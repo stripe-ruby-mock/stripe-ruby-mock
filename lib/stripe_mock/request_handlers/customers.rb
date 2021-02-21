@@ -12,7 +12,7 @@ module StripeMock
       end
 
       def new_customer(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         params[:id] ||= new_id('cus')
         sources = []
 
@@ -30,7 +30,7 @@ module StripeMock
           params[:default_source] = sources.first[:id]
         end
 
-        customers[stripe_account] = {} if customers[stripe_account].blank?
+        customers[stripe_account] ||= {}
         customers[stripe_account][params[:id]] = Data.mock_customer(sources, params)
 
         if params[:plan]
@@ -59,7 +59,7 @@ module StripeMock
       end
 
       def update_customer(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         cus = assert_existence :customer, $1, customers[stripe_account][$1]
 
@@ -110,7 +110,7 @@ module StripeMock
       end
 
       def delete_customer(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         assert_existence :customer, $1, customers[stripe_account][$1]
 
@@ -121,7 +121,7 @@ module StripeMock
       end
 
       def get_customer(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         customer = assert_existence :customer, $1, customers[stripe_account][$1]
 
@@ -136,12 +136,12 @@ module StripeMock
       end
 
       def list_customers(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         Data.mock_list_object(customers[stripe_account]&.values, params)
       end
 
       def delete_customer_discount(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         cus = assert_existence :customer, $1, customers[stripe_account][$1]
 

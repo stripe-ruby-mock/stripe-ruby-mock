@@ -17,7 +17,7 @@ module StripeMock
       end
 
       def retrieve_customer_subscription(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         customer = assert_existence :customer, $1, customers[stripe_account][$1]
@@ -27,7 +27,7 @@ module StripeMock
       end
 
       def retrieve_customer_subscriptions(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         customer = assert_existence :customer, $1, customers[stripe_account][$1]
@@ -35,7 +35,7 @@ module StripeMock
       end
 
       def create_customer_subscription(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         subscription_plans = get_subscription_plans_from_params(params)
@@ -76,11 +76,10 @@ module StripeMock
       end
 
       def create_subscription(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         if headers && headers[:idempotency_key]
           if subscriptions.any?
             original_subscription = subscriptions.values.find { |c| c[:idempotency_key] == headers[:idempotency_key]}
-            puts original_subscription
             return subscriptions[original_subscription[:id]] if original_subscription
           end
         end
@@ -151,7 +150,7 @@ module StripeMock
       end
 
       def retrieve_subscriptions(route, method_url, params, headers)
-        # stripe_account = headers[:stripe_account] || Stripe.api_key
+        # stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         Data.mock_list_object(subscriptions.values, params)
@@ -160,7 +159,7 @@ module StripeMock
       end
 
       def update_subscription(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         subscription_id = $2 ? $2 : $1
@@ -228,7 +227,7 @@ module StripeMock
       end
 
       def cancel_subscription(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         subscription_id = $2 ? $2 : $1
