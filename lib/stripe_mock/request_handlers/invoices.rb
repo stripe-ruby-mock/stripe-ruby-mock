@@ -56,8 +56,8 @@ module StripeMock
         invoices[$1].merge!(:paid => true, :attempted => true, :charge => charge[:id])
       end
 
-      def upcoming_invoice(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+      def upcoming_invoice(route, method_url, params, headers = {})
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         raise Stripe::InvalidRequestError.new('Missing required param: customer if subscription is not provided', nil, http_status: 400) if params[:customer].nil? && params[:subscription].nil?
         raise Stripe::InvalidRequestError.new('When previewing changes to a subscription, you must specify either `subscription` or `subscription_items`', nil, http_status: 400) if !params[:subscription_proration_date].nil? && params[:subscription].nil? && params[:subscription_plan].nil?

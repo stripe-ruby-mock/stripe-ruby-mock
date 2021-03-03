@@ -54,7 +54,7 @@ module StripeMock
 
       # post /v1/payment_methods/:id/attach
       def attach_payment_method(route, method_url, params, headers)
-        stripe_account = headers[:stripe_account] || Stripe.api_key
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         allowed_params = [:customer]
 
         id = method_url.match(route)[1]
