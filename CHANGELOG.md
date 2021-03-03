@@ -1,4 +1,8 @@
-### 3.0.2 (pre-release 2021-02-17)
+### 3.1.0.rc2 (pre-release 2021-03-03)
+
+- [#767](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/767): Fixes tests and more [@lpsBetty](https://github.com/lpsBetty)
+
+### 3.1.0.rc1 (pre-release 2021-02-17)
 
 - [#765](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/765): Properly set the status of a trialing subscription. [@csalvato](https://github.com/csalvato)
 - [#764](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/764): Fixes erroneous error message when fetching upcoming invoices. [@csalvato](https://github.com/csalvato)
