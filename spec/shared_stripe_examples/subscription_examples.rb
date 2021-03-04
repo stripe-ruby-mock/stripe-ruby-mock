@@ -1148,12 +1148,10 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(subscription.items.data.class).to eq(Array)
       expect(subscription.items.data.count).to eq(1)
       expect(subscription.items.data.first.id).to include('test_si_')
-      expect(subscription.items.data.first.created).to eq(1504716183)
       expect(subscription.items.data.first.object).to eq('subscription_item')
-      expect(subscription.items.data.first.plan.amount).to eq(0)
-      expect(subscription.items.data.first.plan.created).to eq(1466698898)
-      expect(subscription.items.data.first.plan.currency).to eq('usd')
-      expect(subscription.items.data.first.quantity).to eq(2)
+      expect(subscription.items.data.first.price.unit_amount).to eq(2000)
+      expect(subscription.items.data.first.price.created).to eq(1593044959)
+      expect(subscription.items.data.first.price.currency).to eq('usd')
     end
   end
 
