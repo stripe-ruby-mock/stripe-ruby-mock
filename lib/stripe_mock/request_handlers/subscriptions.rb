@@ -210,13 +210,17 @@ module StripeMock
 
         plan_amount_was = subscription.dig(:plan, :amount)
 
-        subscription = resolve_subscription_changes(subscription, subscription_plans, customer, params)
+        # Allow making the status incomplete, since it's not supported by #create
+        # https://github.com/stripe-ruby-mock/stripe-ruby-mock/issues/729
+        subscription = resolve_subscription_changes(subscription, subscription_plans, customer, params) unless subscription[:status] == 'incomplete'
 
         verify_card_present(customer, subscription_plans.first, subscription, params) if plan_amount_was == 0 && subscription.dig(:plan, :amount) && subscription.dig(:plan, :amount) > 0
 
         # delete the old subscription, replace with the new subscription
         customer[:subscriptions][:data].reject! { |sub| sub[:id] == subscription[:id] }
         customer[:subscriptions][:data] << subscription
+
+        subscription[:status] = params[:status] if params[:status]
 
         subscription
       end
