@@ -162,6 +162,10 @@ module StripeMock
         stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
+        if params[:billing_cycle_anchor] == 'now'
+          params[:billing_cycle_anchor] = Time.now.utc.to_i
+        end
+
         subscription_id = $2 ? $2 : $1
         subscription = assert_existence :subscription, subscription_id, subscriptions[subscription_id]
         verify_active_status(subscription)
