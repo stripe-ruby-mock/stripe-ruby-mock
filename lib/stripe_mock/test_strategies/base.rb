@@ -14,7 +14,6 @@ module StripeMock
         {
           :id => 'stripe_mock_default_product_id',
           :name => 'Default Product',
-          :type => 'service'
         }.merge(params)
       end
 
