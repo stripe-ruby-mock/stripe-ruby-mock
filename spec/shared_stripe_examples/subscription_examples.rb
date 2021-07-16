@@ -1237,6 +1237,7 @@ shared_examples 'Customer Subscriptions with prices' do
 
       expect(subscription.object).to eq('subscription')
       expect(subscription.plan.to_hash).to eq(price.to_hash)
+      expect(subscription.items.first.price.to_hash).to eq(price.to_hash)
       expect(subscription.metadata.foo).to eq("bar")
       expect(subscription.metadata.example).to eq("yes")
 
@@ -1252,6 +1253,7 @@ shared_examples 'Customer Subscriptions with prices' do
 
       expect(subscriptions.data.first.id).to eq(subscription.id)
       expect(subscriptions.data.first.plan.to_hash).to eq(price.to_hash)
+      expect(subscriptions.data.first.items.first.price.to_hash).to eq(price.to_hash)
       expect(subscriptions.data.first.customer).to eq(customer.id)
       expect(subscriptions.data.first.metadata.foo).to eq( "bar" )
       expect(subscriptions.data.first.metadata.example).to eq( "yes" )

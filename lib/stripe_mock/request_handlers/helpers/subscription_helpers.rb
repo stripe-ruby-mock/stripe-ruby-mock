@@ -15,9 +15,13 @@ module StripeMock
           if matching_item
             quantity = matching_item[:quantity] || 1
             id = matching_item[:id] || new_id('si')
-            Data.mock_subscription_item({ plan: plan, quantity: quantity, id: id })
+            params = { plan: plan, quantity: quantity, id: id }
+            params[:price] = plan if plan[:object] == "price"
+            Data.mock_subscription_item(params)
           else
-            Data.mock_subscription_item({ plan: plan, id: new_id('si') })
+            params = { plan: plan, id: new_id('si') }
+            params[:price] = plan if plan[:object] == "price"
+            Data.mock_subscription_item(params)
           end
         end
         subscription
