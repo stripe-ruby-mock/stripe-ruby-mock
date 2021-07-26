@@ -107,13 +107,15 @@ module StripeMock
 
       def create_checkout_session_params(params = {})
         {
-            payment_method_types: ['card'],
-            line_items: [{
-                             name: 'T-shirt',
-                             quantity: 1,
-                             amount: 500,
-                             currency: 'usd',
-                         }],
+          payment_method_types: ['card'],
+          line_items: [{
+            name: 'T-shirt',
+            quantity: 1,
+            amount: 500,
+            currency: 'usd',
+          }],
+          cancel_url: "https://example.com/cancel",
+          success_url: "https://example.com/success",
         }.merge(params)
       end
 
