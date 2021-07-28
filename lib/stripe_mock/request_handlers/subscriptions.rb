@@ -141,6 +141,21 @@ module StripeMock
           subscription[:canceled_at] = Time.now.utc.to_i
         end
 
+        if (s = params[:expand]&.first { |s| s.starts_with? 'latest_invoice' })
+          intent = Data.mock_payment_intent({
+            status: 'succeeded',
+            amount: subscription[:plan][:amount],
+            currency: subscription[:plan][:currency]
+          })
+          invoice = nil
+          if s.include?('latest_invoice.payment_intent')
+            invoice = Data.mock_invoice([], { payment_intent: intent })
+          else
+            invoice = Data.mock_invoice([], { payment_intent: intent.id })
+          end
+          subscription[:latest_invoice] = invoice
+        end
+
         subscriptions[subscription[:id]] = subscription
         add_subscription_to_customer(customer, subscription)
 
