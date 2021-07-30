@@ -4,7 +4,7 @@ shared_examples "Checkout Session API" do
   it "creates PaymentIntent with payment mode" do
     line_items = [{
       name: "T-shirt",
-      quantity: 1,
+      quantity: 2,
       amount: 500,
       currency: "usd",
     }]
@@ -17,7 +17,9 @@ shared_examples "Checkout Session API" do
 
     expect(session.payment_intent).to_not be_empty
     payment_intent = Stripe::PaymentIntent.retrieve(session.payment_intent)
-    expect(payment_intent.line_items.map(&:to_hash)).to eq(line_items)
+    expect(payment_intent.amount).to eq(1000)
+    expect(payment_intent.currency).to eq("usd")
+    expect(payment_intent.customer).to eq(session.customer)
   end
 
   it "creates SetupIntent with setup mode" do
