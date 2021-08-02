@@ -403,7 +403,9 @@ module StripeMock
         next_pending_invoice_item_invoice: nil,
         pending_setup_intent: nil,
         latest_invoice: nil,
-        application_fee_percent: nil
+        application_fee_percent: nil,
+        cancel_at: nil,
+        end_at: nil
       }, params)
     end
 
