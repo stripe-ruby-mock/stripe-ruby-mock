@@ -1182,6 +1182,18 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(list.count).to eq(0)
       expect(list.data.length).to eq(0)
     end
+
+    it "does not include canceled subscriptions by default" do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      subscription = Stripe::Subscription.create({ plan: plan.id, customer: customer.id })
+      subscription.delete
+
+      list = Stripe::Subscription.list({customer: customer.id})
+
+      expect(list.object).to eq("list")
+      expect(list.data).to be_empty
+      expect(list.data.length).to eq(0)
+    end
   end
 
   describe "metadata" do
