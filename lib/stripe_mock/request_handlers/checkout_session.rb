@@ -101,7 +101,7 @@ module StripeMock
             customer_email: nil,
             livemode: false,
             locale: nil,
-            metadata: {},
+            metadata: params[:metadata] || {},
             mode: params[:mode],
             payment_intent: payment_intent,
             payment_method_options: params[:payment_method_options],
