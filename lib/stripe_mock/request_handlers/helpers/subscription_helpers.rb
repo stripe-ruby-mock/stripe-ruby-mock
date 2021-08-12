@@ -11,12 +11,17 @@ module StripeMock
         items = options[:items]
         items = items.values if items.respond_to?(:values)
         subscription[:items][:data] = plans.map do |plan|
-          if items && items.size == plans.size
-            quantity = items &&
-              items.detect { |item| item[:plan] == plan[:id] }[:quantity] || 1
-            Data.mock_subscription_item({ plan: plan, quantity: quantity })
+          matching_item = items && items.detect { |item| [item[:price], item[:plan]].include? plan[:id] }
+          if matching_item
+            quantity = matching_item[:quantity] || 1
+            id = matching_item[:id] || new_id('si')
+            params = { plan: plan, quantity: quantity, id: id }
+            params[:price] = plan if plan[:object] == "price"
+            Data.mock_subscription_item(params)
           else
-            Data.mock_subscription_item({ plan: plan })
+            params = { plan: plan, id: new_id('si') }
+            params[:price] = plan if plan[:object] == "price"
+            Data.mock_subscription_item(params)
           end
         end
         subscription
@@ -32,7 +37,7 @@ module StripeMock
         start_time = options[:current_period_start] || now
         params = { customer: cus[:id], current_period_start: start_time, created: created_time }
         params.merge!({ :plan => (plans.size == 1 ? plans.first : nil) })
-        keys_to_merge = /application_fee_percent|quantity|metadata|tax_percent|billing|days_until_due|default_tax_rates|pending_invoice_item_interval/
+        keys_to_merge = /application_fee_percent|quantity|metadata|tax_percent|billing|days_until_due|default_tax_rates|pending_invoice_item_interval|default_payment_method|collection_method/
         params.merge! options.select {|k,v| k =~ keys_to_merge}
 
         if options[:cancel_at_period_end] == true
@@ -111,7 +116,11 @@ module StripeMock
 
       def total_items_amount(items)
         total = 0
-        items.each { |i| total += (i[:quantity] || 1) * i[:plan][:amount] }
+        items.each do |item|
+          quantity = item[:quantity] || 1
+          amount = item[:plan][:unit_amount] || item[:plan][:amount]
+          total += quantity * amount
+        end
         total
       end
     end

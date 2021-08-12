@@ -10,7 +10,12 @@ Gem::Specification.new do |gem|
   gem.license       = "MIT"
   gem.authors       = ["Gilbert"]
   gem.email         = "gilbertbgarza@gmail.com"
-  gem.homepage      = "https://github.com/rebelidealist/stripe-ruby-mock"
+  gem.homepage      = "https://github.com/stripe-ruby-mock/stripe-ruby-mock"
+  gem.metadata      = {
+    "bug_tracker_uri" => "https://github.com/stripe-ruby-mock/stripe-ruby-mock/issues",
+    "changelog_uri"   => "https://github.com/stripe-ruby-mock/stripe-ruby-mock/blob/master/CHANGELOG.md",
+    "source_code_uri" => "https://github.com/stripe-ruby-mock/stripe-ruby-mock"
+  }
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
