@@ -93,7 +93,7 @@ module StripeMock
               status: nil
             },
             billing_address_collection: nil,
-            cancel_url: "http://example.com/checkout/cancel?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url: params[:cancel_url],
             client_reference_id: nil,
             currency: currency,
             customer: params[:customer],
@@ -112,7 +112,7 @@ module StripeMock
             shipping_address_collection: nil,
             submit_type: nil,
             subscription: nil,
-            success_url: "http://example.com/checkout/success?session_id={CHECKOUT_SESSION_ID}",
+            success_url: params[:success_url],
             total_details: nil,
             url: "https://checkout.stripe.com/pay/#{id}"
           }
