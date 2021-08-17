@@ -52,6 +52,7 @@ module StripeMock
         'charge.dispute.closed',
         'charge.dispute.funds_reinstated',
         'charge.dispute.funds_withdrawn',
+        'checkout.session.completed.setup_mode',
         'customer.source.created',
         'customer.source.deleted',
         'customer.source.updated',
