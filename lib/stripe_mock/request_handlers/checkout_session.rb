@@ -99,7 +99,7 @@ module StripeMock
             currency: currency,
             customer: params[:customer],
             customer_details: nil,
-            customer_email: nil,
+            customer_email: params[:customer_email],
             livemode: false,
             locale: nil,
             metadata: params[:metadata],
