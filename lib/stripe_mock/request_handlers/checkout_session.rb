@@ -4,6 +4,7 @@ module StripeMock
       module Session
         def Session.included(klass)
           klass.add_handler 'post /v1/checkout/sessions', :new_session
+          klass.add_handler 'get /v1/checkout/sessions', :list_checkout_sessions
           klass.add_handler 'get /v1/checkout/sessions/([^/]*)', :get_checkout_session
           klass.add_handler 'get /v1/checkout/sessions/([^/]*)/line_items', :list_line_items
         end
@@ -116,6 +117,10 @@ module StripeMock
             total_details: nil,
             url: "https://checkout.stripe.com/pay/#{id}"
           }
+        end
+
+        def list_checkout_sessions(route, method_url, params, headers)
+          Data.mock_list_object(checkout_sessions.values)
         end
 
         def get_checkout_session(route, method_url, params, headers)
