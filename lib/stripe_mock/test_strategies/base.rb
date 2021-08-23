@@ -44,9 +44,15 @@ module StripeMock
       end
 
       def create_price_params(params = {})
-        {
-          :currency => StripeMock.default_currency,
+        price_params = {
+          currency: StripeMock.default_currency,
         }.merge(params)
+        unless price_params.key?(:product) || price_params.key?(:product_data)
+          price_params[:product_data] = {
+            name: 'Product created for price'
+          }
+        end
+        price_params
       end
 
       def list_subscriptions(limit)
