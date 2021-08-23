@@ -338,7 +338,7 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(sub.object).to eq('subscription')
       expect(sub.plan.to_hash).to eq(plan_with_trial.to_hash)
       expect(sub.trial_end - sub.trial_start).to eq(14 * 86400)
-      expect(sub.billing_cycle_anchor).to be_nil
+      expect(sub.billing_cycle_anchor).to eq sub.trial_start
 
       customer = Stripe::Customer.retrieve(customer.id)
       subscriptions = Stripe::Subscription.list(customer: customer.id)
@@ -530,6 +530,45 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(subscription.plan).to eq nil
       expect(subscription.items.data[0].plan.id).to eq plan.id
       expect(subscription.items.data[1].plan.id).to eq plan2.id
+    end
+
+    it 'sets current_period_end based on price week interval', live: true do
+      price = stripe_helper.create_price(recurring: {interval: 'week'})
+
+      subscription = Stripe::Subscription.create(
+        customer: Stripe::Customer.create(source: gen_card_tk).id,
+        items: [
+          {price: price.id, quantity: 1}
+        ]
+      )
+
+      expect(subscription.current_period_end).to eq (Time.now + (7 * 60 * 60 * 24)).to_i
+    end
+
+    it 'sets current_period_end based on price month interval', live: true do
+      price = stripe_helper.create_price(recurring: {interval: 'month'})
+
+      subscription = Stripe::Subscription.create(
+        customer: Stripe::Customer.create(source: gen_card_tk).id,
+        items: [
+          {price: price.id, quantity: 1}
+        ]
+      )
+
+      expect(subscription.current_period_end).to eq (DateTime.now >> 1).to_time.to_i
+    end
+
+    it 'sets current_period_end based on price year interval', live: true do
+      price = stripe_helper.create_price(recurring: {interval: 'year'})
+
+      subscription = Stripe::Subscription.create(
+        customer: Stripe::Customer.create(source: gen_card_tk).id,
+        items: [
+          {price: price.id, quantity: 1}
+        ]
+      )
+
+      expect(subscription.current_period_end).to eq (DateTime.now >> 12).to_time.to_i
     end
 
     it 'add a new subscription to bill via an invoice' do
