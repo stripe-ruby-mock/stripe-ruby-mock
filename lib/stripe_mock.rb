@@ -89,12 +89,14 @@ require 'stripe_mock/test_strategies/live.rb'
 module StripeMock
 
   @default_currency = 'usd'
+  @checkout_base = "https://checkout.stripe.com/pay/"
   lib_dir = File.expand_path(File.dirname(__FILE__), '../..')
   @webhook_fixture_path = './spec/fixtures/stripe_webhooks/'
   @webhook_fixture_fallback_path = File.join(lib_dir, 'stripe_mock/webhook_fixtures')
 
   class << self
     attr_accessor :default_currency
+    attr_accessor :checkout_base
     attr_accessor :webhook_fixture_path
   end
 end

@@ -115,7 +115,7 @@ module StripeMock
             subscription: nil,
             success_url: params[:success_url],
             total_details: nil,
-            url: "https://checkout.stripe.com/pay/#{id}"
+            url: URI.join(StripeMock.checkout_base, id).to_s
           }
         end
 
