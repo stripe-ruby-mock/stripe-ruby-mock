@@ -9,12 +9,9 @@ module StripeMock
         @starting_after = options[:starting_after]
         @ending_before  = options[:ending_before]
         @active = options[:active]
-        if @data.first.is_a?(Hash) && @data.first[:created]
-          @data.sort_by! { |x| x[:created] }
-          @data.reverse!
-        elsif @data.first.respond_to?(:created)
-          @data.sort_by { |x| x.created }
-          @data.reverse!
+        if contains_stripe_objects?
+          prune_deleted_data
+          sort_data
         end
       end
 
@@ -75,6 +72,34 @@ module StripeMock
         if first_object = data[0]
           "#{first_object.class.to_s.split('::')[-1].downcase}s"
         end
+      end
+
+      def contains_stripe_objects?
+        return false if data.empty?
+
+        object = data.first
+        object.is_a?(Stripe::StripeObject) || (
+          object.is_a?(Hash) && [:created, :deleted].any? { |k| object.key?(k) }
+        )
+      end
+
+      def prune_deleted_data
+        data.reject! do |object|
+          (object.is_a?(Hash) && object[:deleted]) ||
+            (object.is_a?(Stripe::StripeObject) && object.deleted?)
+        end
+      end
+
+      def sort_data
+        # Reverse must follow sort to preserve existing test dependencies. The
+        # alternative would be to simply reverse lhs and rhs in the comparison,
+        # however, being a stable sort this breaks the existing dependency when
+        # more than one record share the same `created` value.
+        @data = data.sort { |lhs, rhs| sort_val(lhs) <=> sort_val(rhs) }.reverse
+      end
+
+      def sort_val(object)
+        object.is_a?(Stripe::StripeObject) ? object.created : object[:created]
       end
     end
   end

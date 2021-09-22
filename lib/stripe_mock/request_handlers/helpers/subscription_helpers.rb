@@ -11,12 +11,17 @@ module StripeMock
         items = options[:items]
         items = items.values if items.respond_to?(:values)
         subscription[:items][:data] = plans.map do |plan|
-          if items && items.size == plans.size
-            quantity = items &&
-              items.detect { |item| item[:plan] == plan[:id] }[:quantity] || 1
-            Data.mock_subscription_item({ id: new_id('si'), plan: plan, quantity: quantity })
+          matching_item = items && items.detect { |item| [item[:price], item[:plan]].include? plan[:id] }
+          if matching_item
+            quantity = matching_item[:quantity] || 1
+            id = matching_item[:id] || new_id('si')
+            params = { plan: plan, quantity: quantity, id: id }
+            params[:price] = plan if plan[:object] == "price"
+            Data.mock_subscription_item(params)
           else
-            Data.mock_subscription_item({ id: new_id('si'), plan: plan })
+            params = { plan: plan, id: new_id('si') }
+            params[:price] = plan if plan[:object] == "price"
+            Data.mock_subscription_item(params)
           end
         end
         subscription
@@ -45,10 +50,10 @@ module StripeMock
 
         if (((plan && plan[:trial_period_days]) || 0) == 0 && options[:trial_end].nil?) || options[:trial_end] == "now"
           end_time = options[:billing_cycle_anchor] || get_ending_time(start_time, plan)
-          params.merge!({status: 'active', current_period_end: end_time, trial_start: nil, trial_end: nil, billing_cycle_anchor: options[:billing_cycle_anchor]})
+          params.merge!({status: 'active', current_period_end: end_time, trial_start: nil, trial_end: nil, billing_cycle_anchor: options[:billing_cycle_anchor] || created_time})
         else
           end_time = options[:trial_end] || (Time.now.utc.to_i + plan[:trial_period_days]*86400)
-          params.merge!({status: 'trialing', current_period_end: end_time, trial_start: start_time, trial_end: end_time, billing_cycle_anchor: nil})
+          params.merge!({status: 'trialing', current_period_end: end_time, trial_start: start_time, trial_end: end_time, billing_cycle_anchor: options[:billing_cycle_anchor] || created_time})
         end
 
         params
@@ -85,11 +90,13 @@ module StripeMock
       def get_ending_time(start_time, plan, intervals = 1)
         return start_time unless plan
 
-        case plan[:interval]
+        interval = plan[:interval] || plan.dig(:recurring, :interval)
+        interval_count = plan[:interval_count] || plan.dig(:recurring, :interval_count) || 1
+        case interval
         when "week"
-          start_time + (604800 * (plan[:interval_count] || 1) * intervals)
+          start_time + (604800 * (interval_count) * intervals)
         when "month"
-          (Time.at(start_time).to_datetime >> ((plan[:interval_count] || 1) * intervals)).to_time.to_i
+          (Time.at(start_time).to_datetime >> ((interval_count) * intervals)).to_time.to_i
         when "year"
           (Time.at(start_time).to_datetime >> (12 * intervals)).to_time.to_i # max period is 1 year
         else
@@ -111,7 +118,11 @@ module StripeMock
 
       def total_items_amount(items)
         total = 0
-        items.each { |i| total += (i[:quantity] || 1) * i[:plan][:amount] }
+        items.each do |item|
+          quantity = item[:quantity] || 1
+          amount = item[:plan][:unit_amount] || item[:plan][:amount]
+          total += quantity * amount
+        end
         total
       end
     end

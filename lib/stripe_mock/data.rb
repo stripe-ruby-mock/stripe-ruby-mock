@@ -107,7 +107,18 @@ module StripeMock
         object: 'account_link',
         created: now,
         expires_at: now + 300,
-        url: 'https://connect.stripe.com/setup/c/iB0ph1cPnRLY'
+        url: 'https://connect.stripe.com/setup/c/iB0ph1cPnRLY',
+        data: {}
+      }.merge(params)
+    end
+
+    def self.mock_express_login_link(params = {})
+      now = Time.now.to_i
+      {
+        object: 'login_link',
+        created: now,
+        url: 'https://connect.stripe.com/express/Ln7FfnNpUcCU',
+        data: {}
       }.merge(params)
     end
 
@@ -129,7 +140,7 @@ module StripeMock
 
     def self.mock_customer(sources, params)
       cus_id = params[:id] || "test_cus_default"
-      currency = params[:currency] || StripeMock.default_currency
+      currency = params[:currency]
       sources.each {|source| source[:customer] = cus_id}
       {
         email: 'stripe_mock@example.com',
@@ -569,6 +580,34 @@ module StripeMock
         transform_usage: nil,
         trial_period_days: nil,
         usage_type: "licensed"
+      }.merge(params)
+    end
+
+    def self.mock_price(params={})
+      currency = params[:currency] || StripeMock.default_currency
+      {
+        id: "mock_price_123",
+        object: "price",
+        active: true,
+        billing_scheme: "per_unit",
+        created: 1593044959,
+        currency: currency,
+        livemode: false,
+        lookup_key: nil,
+        metadata: {},
+        nickname: 'My Mock Price',
+        product: "mock_prod_NONEXIST",  # override this with your own existing product id
+        recurring: {
+          aggregate_usage: nil,
+          interval: "month",
+          interval_count: 1,
+          usage_type: "licensed"
+        },
+        tiers_mode: nil,
+        transform_quantity: nil,
+        type: "recurring",
+        unit_amount: 2000,
+        unit_amount_decimal: "2000"
       }.merge(params)
     end
 
@@ -1101,13 +1140,12 @@ module StripeMock
     end
 
     def self.mock_subscription_item(params = {})
-      id = params[:id] || 'test_txn_default'
+      id = params[:id] || 'test_si_default'
       {
         id: id,
         object: 'subscription_item',
         created: 1504716183,
-        metadata: {
-      },
+        metadata: {},
         plan: {
           id: 'PER_USER_PLAN1',
           object: 'plan',
