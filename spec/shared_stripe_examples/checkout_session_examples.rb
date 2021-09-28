@@ -22,6 +22,20 @@ shared_examples "Checkout Session API" do
     expect(payment_intent.customer).to eq(session.customer)
   end
 
+  context "when creating a payment" do
+    it "requires line_items" do
+      expect do
+        session = Stripe::Checkout::Session.create(
+          customer: "customer_id",
+          success_url: "localhost/nada",
+          cancel_url: "localhost/nada",
+          payment_method_types: ["card"],
+        )
+      end.to raise_error(Stripe::InvalidRequestError, /line_items/i)
+
+    end
+  end
+
   it "creates SetupIntent with setup mode" do
     session = Stripe::Checkout::Session.create(
       mode: "setup",
@@ -33,6 +47,21 @@ shared_examples "Checkout Session API" do
     expect(session.setup_intent).to_not be_empty
     setup_intent = Stripe::SetupIntent.retrieve(session.setup_intent)
     expect(setup_intent.payment_method_types).to eq(["card"])
+  end
+
+  context "when creating a subscription" do
+    it "requires line_items" do
+      expect do
+        session = Stripe::Checkout::Session.create(
+          customer: "customer_id",
+          success_url: "localhost/nada",
+          cancel_url: "localhost/nada",
+          payment_method_types: ["card"],
+          mode: "subscription",
+        )
+      end.to raise_error(Stripe::InvalidRequestError, /line_items/i)
+
+    end
   end
 
   context "retrieve a checkout session" do
