@@ -56,7 +56,7 @@ module StripeMock
           case params[:mode]
           when nil, "payment"
             params[:customer] ||= new_customer(nil, nil, {email: params[:customer_email]}, nil)[:id]
-            require_params(:line_items) if params[:line_items].nil? || params[:line_items].empty?
+            require_param(:line_items) if params[:line_items].nil? || params[:line_items].empty?
             payment_intent = new_payment_intent(nil, nil, {
               amount: amount,
               currency: currency,
@@ -77,7 +77,7 @@ module StripeMock
             payment_status = "no_payment_required"
           when "subscription"
             params[:customer] ||= new_customer(nil, nil, {email: params[:customer_email]}, nil)[:id]
-            require_params(:line_items) if params[:line_items].nil? || params[:line_items].empty?
+            require_param(:line_items) if params[:line_items].nil? || params[:line_items].empty?
             checkout_session_line_items[id] = line_items
           else
             throw Stripe::InvalidRequestError.new("Invalid mode: must be one of payment, setup, or subscription", :mode, http_status: 400)
