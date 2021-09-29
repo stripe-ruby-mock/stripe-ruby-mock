@@ -29,10 +29,6 @@ module StripeMock
           raise Stripe::InvalidRequestError.new(missing_param_message(k), k) if params[k].nil?
         end
 
-        if !%w[good service].include?(params[:type])
-          raise Stripe::InvalidRequestError.new("Invalid type: must be one of good or service", :type)
-        end
-
         if products[ params[:id] ]
           raise Stripe::InvalidRequestError.new(already_exists_message(Stripe::Product), :id)
         end
@@ -112,12 +108,13 @@ module StripeMock
 
       def validate_create_price_params(params)
         price_id = params[:id].to_s
-        product_id = params[:product]
 
-        @base_strategy.create_price_params.keys.each do |attr_name|
-          message = "Missing required param: #{attr_name}."
-          raise Stripe::InvalidRequestError.new(message, attr_name) if params[attr_name].nil?
+        require_param(:currency) unless params[:currency]
+        unless params[:product] || params[:product_data]
+          raise Stripe::InvalidRequestError("Requires product or product_data")
         end
+
+        product_id = params[:product] || create_product(nil, nil, params[:product_data], nil).id
 
         if prices[price_id]
           message = already_exists_message(Stripe::Price)

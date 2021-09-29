@@ -153,9 +153,18 @@ module StripeMock
         # stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
-        Data.mock_list_object(subscriptions.values, params)
-        #customer = assert_existence :customer, $1, customers[stripe_account][$1]
-        #customer[:subscriptions]
+        subs = subscriptions.values
+
+        case params[:status]
+        when nil
+          subs = subs.filter {|subscription| subscription[:status] != "canceled"}
+        when "all"
+          # Include all subscriptions
+        else
+          subs = subs.filter {|subscription| subscription[:status] == params[:status]}
+        end
+
+        Data.mock_list_object(subs, params)
       end
 
       def update_subscription(route, method_url, params, headers)

@@ -1144,8 +1144,7 @@ module StripeMock
         id: id,
         object: 'subscription_item',
         created: 1504716183,
-        metadata: {
-      },
+        metadata: {},
         plan: {
           id: 'PER_USER_PLAN1',
           object: 'plan',
