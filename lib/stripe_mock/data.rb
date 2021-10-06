@@ -1290,7 +1290,7 @@ module StripeMock
         metadata: {
           order_id: '123456789'
         }
-      }.merge(type => data[type]).merge(params)
+      }.merge(type => data[type]).deep_merge(params)
     end
 
     def self.mock_setup_intent(params = {})
