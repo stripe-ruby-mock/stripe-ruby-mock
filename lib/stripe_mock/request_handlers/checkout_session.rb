@@ -115,7 +115,7 @@ module StripeMock
             shipping: nil,
             shipping_address_collection: nil,
             submit_type: nil,
-            subscription: nil,
+            subscription: params[:subscription],
             success_url: params[:success_url],
             total_details: nil,
             url: URI.join(StripeMock.checkout_base, id).to_s
