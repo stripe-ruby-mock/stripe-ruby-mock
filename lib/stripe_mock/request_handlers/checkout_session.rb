@@ -48,7 +48,7 @@ module StripeMock
 
           amount = nil
           currency = nil
-          if line_items && prices.present?
+          if line_items && !prices.empty?
             amount = line_items.map { |line_item| prices[line_item[:price]][:unit_amount] * line_item[:quantity] }.sum
             currency = prices[line_items.first[:price]][:currency]
           end
