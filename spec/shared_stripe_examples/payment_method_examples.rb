@@ -25,6 +25,12 @@ shared_examples 'PaymentMethod API' do
       cvc: 999
     }
   end
+  let(:visa_card_details) do
+    card_details
+  end
+  let(:mastercard_card_details) do
+    card_details.merge(:number => 5555_5555_5555_4444)
+  end
   let(:sepa_debit_details) do
     {
       iban: 'DE89370400440532013000'
@@ -385,6 +391,7 @@ shared_examples 'PaymentMethod API' do
           .from(original_card_exp_month).to(new_card_exp_month)
       end
 
+
       context 'without a customer' do
         it 'raises invalid requestion exception' do
           expect do
@@ -394,29 +401,39 @@ shared_examples 'PaymentMethod API' do
       end
     end
 
+    context 'with visa card' do
+      let(:payment_method) do
+        Stripe::PaymentMethod.create(type: 'card', card: visa_card_details)
+      end
+
+      it 'uses correct brand' do
+        expect(payment_method.card.brand).to eq('visa')
+      end
+    end
+
+    context 'with mastercard card' do
+      let(:payment_method) do
+        Stripe::PaymentMethod.create(type: 'card', card: mastercard_card_details)
+      end
+
+      it 'uses correct brand' do
+        expect(payment_method.card.brand).to eq('mastercard')
+      end
+    end
+
     context 'with ideal' do
       let(:payment_method) do
         Stripe::PaymentMethod.create(type: 'ideal', ideal: ideal_details)
       end
 
-      it 'updates the ideal for the payment method' do
+      it 'cannot update' do
         Stripe::PaymentMethod.attach(payment_method.id, customer: customer.id)
 
-        original_ideal_bank = payment_method.ideal.bank
         new_ideal_bank = 12
 
         expect do
           Stripe::PaymentMethod.update(payment_method.id, ideal: { bank: new_ideal_bank })
-        end.to change { Stripe::PaymentMethod.retrieve(payment_method.id).ideal.bank }
-          .from(original_ideal_bank).to(new_ideal_bank)
-      end
-
-      context 'without a customer' do
-        it 'raises invalid requestion exception' do
-          expect do
-            Stripe::PaymentMethod.update(payment_method.id, ideal: { bank: 12 })
-          end.to raise_error(Stripe::InvalidRequestError)
-        end
+        end.to raise_error(Stripe::InvalidRequestError)
       end
     end
 
@@ -425,24 +442,12 @@ shared_examples 'PaymentMethod API' do
         Stripe::PaymentMethod.create(type: 'sepa_debit', sepa_debit: sepa_debit_details)
       end
 
-      it 'updates the sepa_debit for the payment method' do
+      it 'cannot update' do
         Stripe::PaymentMethod.attach(payment_method.id, customer: customer.id)
 
-        original_iban = payment_method.sepa_debit.iban
-        new_iban = 'DE62370400440532013001'
-
         expect do
-          Stripe::PaymentMethod.update(payment_method.id, sepa_debit: { iban: new_iban })
-        end.to change { Stripe::PaymentMethod.retrieve(payment_method.id).sepa_debit.iban }
-          .from(original_iban).to(new_iban)
-      end
-
-      context 'without a customer' do
-        it 'raises invalid requestion exception' do
-          expect do
-            Stripe::PaymentMethod.update(payment_method.id, sepa_debit: { iban: 'DE62370400440532013001' })
-          end.to raise_error(Stripe::InvalidRequestError)
-        end
+          Stripe::PaymentMethod.update(payment_method.id, sepa_debit: { iban: 'DE62370400440532013001'})
+        end.to raise_error(Stripe::InvalidRequestError)
       end
     end
   end
