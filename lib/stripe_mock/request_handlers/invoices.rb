@@ -63,7 +63,8 @@ module StripeMock
         raise Stripe::InvalidRequestError.new('When previewing changes to a subscription, you must specify either `subscription` or `subscription_items`', nil, http_status: 400) if !params[:subscription_proration_date].nil? && params[:subscription].nil? && params[:subscription_plan].nil?
         raise Stripe::InvalidRequestError.new('Cannot specify proration date without specifying a subscription', nil, http_status: 400) if !params[:subscription_proration_date].nil? && params[:subscription].nil?
 
-        customer = customers[stripe_account][params[:customer]]
+        customer_id = params[:customer] || subscriptions[params[:subscription]][:customer]
+        customer = customers[stripe_account][customer_id]
         assert_existence :customer, params[:customer], customer
 
         raise Stripe::InvalidRequestError.new("No upcoming invoices for customer: #{customer[:id]}", nil, http_status: 404) if customer[:subscriptions][:data].length == 0
