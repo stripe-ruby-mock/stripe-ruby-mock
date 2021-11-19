@@ -1238,19 +1238,26 @@ module StripeMock
       type = params[:type].to_sym
       data = {
         card: {
-          brand: 'visa',
+          brand: case params.dig(:card, :number)&.to_s
+          when /^4/, nil
+            'visa'
+          when /^5[1-5]/
+            'mastercard'
+          else
+            'unknown'
+          end,
           checks: {
             address_line1_check: nil,
             address_postal_code_check: nil,
             cvc_check: 'pass'
           },
           country: 'FR',
-          exp_month: 2,
-          exp_year: 2022,
+          exp_month: params.dig(:card, :exp_month) || 2,
+          exp_year: params.dig(:card, :exp_year) || 2022,
           fingerprint: 'Hr3Ly5z5IYxsokWA',
           funding: 'credit',
           generated_from: nil,
-          last4: '3155',
+          last4: params.dig(:card, :number)&.[](-4..) || '3155',
           three_d_secure_usage: { supported: true },
           wallet: nil
         },
@@ -1265,7 +1272,7 @@ module StripeMock
           branch_code: '',
           country: 'DE',
           fingerprint: 'FD81kbVPe7M05BMj',
-          last4: '3000'
+          last4: params.dig(:sepa_debit, :iban)&.[](-4..) || '3000'
         }
       }
 
@@ -1290,7 +1297,7 @@ module StripeMock
         metadata: {
           order_id: '123456789'
         }
-      }.merge(type => data[type]).merge(params)
+      }.merge(params).merge(type => data[type])
     end
 
     def self.mock_setup_intent(params = {})
