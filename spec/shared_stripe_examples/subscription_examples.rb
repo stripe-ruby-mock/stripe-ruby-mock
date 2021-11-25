@@ -684,6 +684,35 @@ shared_examples 'Customer Subscriptions with plans' do
         expect(subscription.default_tax_rates.first.id).to eq(tax_rate.id)
       end
     end
+
+    it 'expands latest_invoice.payment_intent' do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.payment_intent']
+      })
+
+      expect(subscription.latest_invoice.payment_intent.status).to eq('succeeded')
+
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.payment_intent'],
+        payment_behavior: 'default_incomplete'
+      })
+
+      expect(subscription.latest_invoice.payment_intent.status).to eq('requires_payment_method')
+      
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.payment_intent'],
+        trial_period_days: 14
+      })
+
+      expect(subscription.latest_invoice.payment_intent).to be_nil
+    end
   end
 
   context "updating a subscription" do
