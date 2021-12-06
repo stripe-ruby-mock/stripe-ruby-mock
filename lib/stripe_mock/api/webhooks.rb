@@ -74,7 +74,7 @@ module StripeMock
         'invoiceitem.created',
         'invoiceitem.updated',
         'invoiceitem.deleted',
-        'payment_intent.cancelled',
+        'payment_intent.canceled',
         'payment_intent.payment_failed',
         'payment_intent.processing',
         'payment_intent.succeeded',
