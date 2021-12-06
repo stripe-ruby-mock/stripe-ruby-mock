@@ -713,6 +713,37 @@ shared_examples 'Customer Subscriptions with plans' do
 
       expect(subscription.latest_invoice.payment_intent).to be_nil
     end
+
+    it "expands latest_invoice.charge.balance_transaction" do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.charge.balance_transaction']
+      })
+
+      charge = subscription.latest_invoice.charge
+      expect(charge.status).to eq("succeeded")
+      expect(charge.currency).to eq(plan.currency)
+      expect(charge.amount).to eq(plan.amount)
+
+      balance_transaction = charge.balance_transaction
+      expect(balance_transaction.status).to eq("available")
+      expect(balance_transaction.currency).to eq(plan.currency)
+      expect(balance_transaction.amount).to eq(plan.amount)
+      expect(balance_transaction.fee).to eq(plan.amount * 0.04)
+      expect(balance_transaction.fee_details.first.amount).to eq(plan.amount * 0.04)
+      expect(balance_transaction.fee_details.first.currency).to eq(plan.currency)
+
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.charge.balance_transaction'],
+        trial_period_days: 14
+      })
+
+      expect(subscription.latest_invoice.charge).to be_nil
+    end
   end
 
   context "updating a subscription" do

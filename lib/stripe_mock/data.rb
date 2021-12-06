@@ -1106,25 +1106,29 @@ module StripeMock
       currency = params[:currency] || StripeMock.default_currency
       bt_id = params[:id] || 'test_txn_default'
       source = params[:source] || 'ch_test_charge'
+      amount = params[:amount] || 10000
+      status = params[:status] || 'pending'
+      fee = amount * 0.04
+
       {
         id: bt_id,
         object: "balance_transaction",
-        amount: 10000,
+        amount: amount,
         available_on: 1462406400,
         created: 1461880226,
         currency: currency,
         description: nil,
-        fee: 320,
+        fee: fee,
         fee_details: [
           {
-            amount: 320,
+            amount: fee,
             application: nil,
             currency: currency,
             description: "Stripe processing fees",
             type: "stripe_fee"
           }
         ],
-        net: 9680,
+        net: amount - fee,
         source: source,
         sourced_transfers: {
           object: "list",
@@ -1133,7 +1137,7 @@ module StripeMock
           total_count: 0,
           url: "/v1/transfers?source_transaction=#{source}"
         },
-        status: "pending",
+        status: status,
         type: "charge"
       }.merge(params)
     end

@@ -150,9 +150,24 @@ module StripeMock
               amount: subscription[:plan][:amount],
               currency: subscription[:plan][:currency]
             })
-            payment_intent = s.include?('latest_invoice.payment_intent') ? intent : intent.id
+            payment_intent = s.include?('latest_invoice.payment_intent') ? intent : intent[:id]
+            balance_transaction = Data.mock_balance_transaction({
+              status: "available",
+              amount: subscription.dig(:plan, :amount),
+              currency: subscription.dig(:plan, :currency)
+            })
+            transaction = balance_transaction if s.include?('latest_invoice.charge.balance_transaction')
+            first_charge = Data.mock_charge({
+              amount: subscription.dig(:plan, :amount),
+              currency: subscription.dig(:plan, :currency),
+              balance_transaction: transaction,
+            })
+            charge = first_charge if s.include?('latest_invoice.charge')
           end
-          invoice = Data.mock_invoice([], { payment_intent: payment_intent })
+          invoice = Data.mock_invoice([], {
+            payment_intent: payment_intent,
+            charge: charge,
+          })
           subscription[:latest_invoice] = invoice
         end
 
