@@ -148,7 +148,8 @@
       "statement_descriptor": "ACME Corp",
       "statement_descriptor_suffix": null,
       "status": "processing",
-      "transfer_data": null,
+      "transfer_data": {
+        "amount": null,
         "destination": "acct_00000000000000"
       },
       "transfer_group": null
