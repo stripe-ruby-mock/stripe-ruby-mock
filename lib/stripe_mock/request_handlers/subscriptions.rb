@@ -158,11 +158,16 @@ module StripeMock
             })
             transaction = balance_transaction if s.include?('latest_invoice.charge.balance_transaction')
             first_charge = Data.mock_charge({
+              id: new_id('ch'),
               amount: subscription.dig(:plan, :amount),
               currency: subscription.dig(:plan, :currency),
               balance_transaction: transaction,
             })
-            charge = first_charge if s.include?('latest_invoice.charge')
+
+            if s.include?('latest_invoice.charge')
+              charge = first_charge
+              charges[charge[:id]] = charge
+            end
           end
           invoice = Data.mock_invoice([], {
             payment_intent: payment_intent,
@@ -172,7 +177,7 @@ module StripeMock
         end
 
         subscriptions[subscription[:id]] = subscription
-        add_subscription_to_customer(customer, subscription)
+        add_subscription_to_customer(customer, subscription, charge)
 
         subscriptions[subscription[:id]]
       end

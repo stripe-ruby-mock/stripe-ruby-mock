@@ -727,6 +727,9 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(charge.currency).to eq(plan.currency)
       expect(charge.amount).to eq(plan.amount)
 
+      expect(Stripe::Charge.list.count).to eq(1)
+      expect(Stripe::Charge.list.first.id).to eq(charge.id)
+
       balance_transaction = charge.balance_transaction
       expect(balance_transaction.status).to eq("available")
       expect(balance_transaction.currency).to eq(plan.currency)

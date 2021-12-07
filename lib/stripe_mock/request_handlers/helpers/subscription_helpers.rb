@@ -59,8 +59,8 @@ module StripeMock
         params
       end
 
-      def add_subscription_to_customer(cus, sub)
-        if sub[:trial_end].nil? || sub[:trial_end] == "now"
+      def add_subscription_to_customer(cus, sub, ch = nil)
+        if (sub[:trial_end].nil? || sub[:trial_end] == "now") && ch.nil?
           id = new_id('ch')
           charges[id] = Data.mock_charge(
             :id => id,
