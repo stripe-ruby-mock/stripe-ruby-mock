@@ -302,6 +302,15 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(customer.subscriptions.data.first.status).to eq('incomplete')
     end
 
+    it "allows setting transfer_data" do
+      customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
+
+      sub = Stripe::Subscription.create({ customer: customer.id, plan: plan.id, transfer_data: {destination: "acct_0000000000000000", amount_percent: 50} })
+
+      expect(sub.transfer_data.destination).to eq("acct_0000000000000000")
+      expect(sub.transfer_data.amount_percent).to eq(50)
+    end
+
     it "throws an error when subscribing a customer with no card" do
       plan = stripe_helper.create_plan(id: 'enterprise', product: product.id, amount: 499)
       customer = Stripe::Customer.create(id: 'cardless')
@@ -1305,7 +1314,6 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(customer.subscriptions.first.metadata['foo']).to eq('bar')
     end
   end
-
 end
 
 shared_examples 'Customer Subscriptions with prices' do
