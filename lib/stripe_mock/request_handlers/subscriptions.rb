@@ -97,7 +97,7 @@ module StripeMock
           customer[:default_source] = new_card[:id]
         end
 
-        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate billing_cycle_anchor billing days_until_due idempotency_key enable_incomplete_payments cancel_at_period_end default_tax_rates payment_behavior pending_invoice_item_interval default_payment_method collection_method off_session trial_from_plan proration_behavior backdate_start_date expand)
+        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate billing_cycle_anchor billing days_until_due idempotency_key enable_incomplete_payments cancel_at_period_end default_tax_rates payment_behavior pending_invoice_item_interval default_payment_method collection_method off_session trial_from_plan proration_behavior backdate_start_date transfer_data expand)
         unknown_params = params.keys - allowed_params.map(&:to_sym)
         if unknown_params.length > 0
           raise Stripe::InvalidRequestError.new("Received unknown parameter: #{unknown_params.join}", unknown_params.first.to_s, http_status: 400)
@@ -132,9 +132,34 @@ module StripeMock
           subscription[:status] = 'trialing'
         end
 
+        if params[:payment_behavior] == 'default_incomplete'
+          subscription[:status] = 'incomplete'
+        end
+
         if params[:cancel_at_period_end]
           subscription[:cancel_at_period_end] = true
           subscription[:canceled_at] = Time.now.utc.to_i
+        end
+
+        if params[:transfer_data] && !params[:transfer_data].empty?
+          throw Stripe::InvalidRequestError.new(missing_param_message("transfer_data[destination]")) unless params[:transfer_data][:destination]
+          subscription[:transfer_data] = params[:transfer_data].dup
+          subscription[:transfer_data][:amount_percent] ||= 100
+        end
+
+        if (s = params[:expand]&.first { |s| s.starts_with? 'latest_invoice' })
+          payment_intent = nil
+          unless subscription[:status] == 'trialing'
+            intent_status = subscription[:status] == 'incomplete' ? 'requires_payment_method' : 'succeeded'
+            intent = Data.mock_payment_intent({
+              status: intent_status,
+              amount: subscription[:plan][:amount],
+              currency: subscription[:plan][:currency]
+            })
+            payment_intent = s.include?('latest_invoice.payment_intent') ? intent : intent.id
+          end
+          invoice = Data.mock_invoice([], { payment_intent: payment_intent })
+          subscription[:latest_invoice] = invoice
         end
 
         subscriptions[subscription[:id]] = subscription
@@ -298,6 +323,7 @@ module StripeMock
         return if customer[:invoice_settings][:default_payment_method]
         return if customer[:trial_end]
         return if params[:trial_end]
+        return if params[:payment_behavior] == 'default_incomplete'
         return if subscription[:default_payment_method]
 
         plan_trial_period_days = plan[:trial_period_days] || 0
