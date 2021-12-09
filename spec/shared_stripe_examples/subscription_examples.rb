@@ -1119,6 +1119,18 @@ shared_examples 'Customer Subscriptions with plans' do
         expect(e.message).to eq("Invalid timestamp: must be an integer")
       }
     end
+
+    it "converts billing_cycle_anchor=now to a timestamp" do
+      customer = Stripe::Customer.create(id: 'test_billing_anchor', plan: plan.id, source: gen_card_tk)
+
+      sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+      sub.billing_cycle_anchor = 'now'
+      sub.save
+
+      expect(sub.billing_cycle_anchor).to be_a(Integer)
+    end
+
+
   end
 
   context "cancelling a subscription" do
