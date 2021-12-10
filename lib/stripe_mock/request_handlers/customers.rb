@@ -27,7 +27,11 @@ module StripeMock
               get_card_or_bank_by_token(params.delete(:source))
             end
           sources << new_card
-          params[:default_source] = sources.first[:id]
+          if params[:expand] && params[:expand].include?(:default_source)
+            params[:default_source] = sources.first
+          else
+            params[:default_source] = sources.first[:id]
+          end
         end
 
         customers[stripe_account] ||= {}
