@@ -2,7 +2,11 @@ module StripeMock
   module RequestHandlers
     module Helpers
 
-      def get_card(object, card_id, class_name='Customer')
+      def get_card(object, card, class_name='Customer')
+
+        # Customer object may contain a expanded default_source
+        card_id = card.is_a?(String) ? card : card[:id]
+
         cards = object[:cards] || object[:sources] || object[:external_accounts]
         card = cards[:data].find{|cc| cc[:id] == card_id }
         if card.nil?
