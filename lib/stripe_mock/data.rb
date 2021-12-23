@@ -1106,25 +1106,29 @@ module StripeMock
       currency = params[:currency] || StripeMock.default_currency
       bt_id = params[:id] || 'test_txn_default'
       source = params[:source] || 'ch_test_charge'
+      amount = params[:amount] || 10000
+      status = params[:status] || 'pending'
+      fee = amount * 0.04
+
       {
         id: bt_id,
         object: "balance_transaction",
-        amount: 10000,
+        amount: amount,
         available_on: 1462406400,
         created: 1461880226,
         currency: currency,
         description: nil,
-        fee: 320,
+        fee: fee,
         fee_details: [
           {
-            amount: 320,
+            amount: fee,
             application: nil,
             currency: currency,
             description: "Stripe processing fees",
             type: "stripe_fee"
           }
         ],
-        net: 9680,
+        net: amount - fee,
         source: source,
         sourced_transfers: {
           object: "list",
@@ -1133,7 +1137,7 @@ module StripeMock
           total_count: 0,
           url: "/v1/transfers?source_transaction=#{source}"
         },
-        status: "pending",
+        status: status,
         type: "charge"
       }.merge(params)
     end
@@ -1238,19 +1242,26 @@ module StripeMock
       type = params[:type].to_sym
       data = {
         card: {
-          brand: 'visa',
+          brand: case params.dig(:card, :number)&.to_s
+          when /^4/, nil
+            'visa'
+          when /^5[1-5]/
+            'mastercard'
+          else
+            'unknown'
+          end,
           checks: {
             address_line1_check: nil,
             address_postal_code_check: nil,
             cvc_check: 'pass'
           },
           country: 'FR',
-          exp_month: 2,
-          exp_year: 2022,
+          exp_month: params.dig(:card, :exp_month) || 2,
+          exp_year: params.dig(:card, :exp_year) || 2022,
           fingerprint: 'Hr3Ly5z5IYxsokWA',
           funding: 'credit',
           generated_from: nil,
-          last4: '3155',
+          last4: params.dig(:card, :number)&.[](-4..) || '3155',
           three_d_secure_usage: { supported: true },
           wallet: nil
         },
@@ -1265,7 +1276,7 @@ module StripeMock
           branch_code: '',
           country: 'DE',
           fingerprint: 'FD81kbVPe7M05BMj',
-          last4: '3000'
+          last4: params.dig(:sepa_debit, :iban)&.[](-4..) || '3000'
         }
       }
 
@@ -1290,7 +1301,7 @@ module StripeMock
         metadata: {
           order_id: '123456789'
         }
-      }.merge(type => data[type]).deep_merge(params)
+      }.merge(params).merge(type => data[type])
     end
 
     def self.mock_setup_intent(params = {})

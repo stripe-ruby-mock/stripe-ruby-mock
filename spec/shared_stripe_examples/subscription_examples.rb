@@ -290,6 +290,18 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(customer.subscriptions.count).to eq(0)
     end
 
+    it "creates a subscription when subscription's payment_behavior is default_incomplete" do
+      plan = stripe_helper.create_plan(id: 'enterprise', product: product.id, amount: 499)
+      customer = Stripe::Customer.create(id: 'cardless')
+
+      sub = Stripe::Subscription.create({ plan: plan.id, customer: customer.id, payment_behavior: 'default_incomplete' })
+      customer = Stripe::Customer.retrieve('cardless')
+
+      expect(customer.subscriptions.count).to eq(1)
+      expect(customer.subscriptions.data.first.id).to eq(sub.id)
+      expect(customer.subscriptions.data.first.status).to eq('incomplete')
+    end
+
     it "throws an error when subscribing a customer with no card" do
       plan = stripe_helper.create_plan(id: 'enterprise', product: product.id, amount: 499)
       customer = Stripe::Customer.create(id: 'cardless')
@@ -671,6 +683,69 @@ shared_examples 'Customer Subscriptions with plans' do
         expect(subscription.default_tax_rates.length).to eq(1)
         expect(subscription.default_tax_rates.first.id).to eq(tax_rate.id)
       end
+    end
+
+    it 'expands latest_invoice.payment_intent' do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.payment_intent']
+      })
+
+      expect(subscription.latest_invoice.payment_intent.status).to eq('succeeded')
+
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.payment_intent'],
+        payment_behavior: 'default_incomplete'
+      })
+
+      expect(subscription.latest_invoice.payment_intent.status).to eq('requires_payment_method')
+      
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.payment_intent'],
+        trial_period_days: 14
+      })
+
+      expect(subscription.latest_invoice.payment_intent).to be_nil
+    end
+
+    it "expands latest_invoice.charge.balance_transaction" do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.charge.balance_transaction']
+      })
+
+      charge = subscription.latest_invoice.charge
+      expect(charge.status).to eq("succeeded")
+      expect(charge.currency).to eq(plan.currency)
+      expect(charge.amount).to eq(plan.amount)
+
+      expect(Stripe::Charge.list.count).to eq(1)
+      expect(Stripe::Charge.list.first.id).to eq(charge.id)
+
+      balance_transaction = charge.balance_transaction
+      expect(balance_transaction.status).to eq("available")
+      expect(balance_transaction.currency).to eq(plan.currency)
+      expect(balance_transaction.amount).to eq(plan.amount)
+      expect(balance_transaction.fee).to eq(plan.amount * 0.04)
+      expect(balance_transaction.fee_details.first.amount).to eq(plan.amount * 0.04)
+      expect(balance_transaction.fee_details.first.currency).to eq(plan.currency)
+
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.charge.balance_transaction'],
+        trial_period_days: 14
+      })
+
+      expect(subscription.latest_invoice.charge).to be_nil
     end
   end
 
