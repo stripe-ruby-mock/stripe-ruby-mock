@@ -89,7 +89,7 @@ module StripeMock
           checkout_sessions[id] = {
             id: id,
             object: "checkout.session",
-            allow_promotion_codes: nil,
+            allow_promotion_codes: params[:allow_promotion_codes],
             amount_subtotal: amount,
             amount_total: amount,
             automatic_tax: {
