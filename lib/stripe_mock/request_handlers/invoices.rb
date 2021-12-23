@@ -79,7 +79,6 @@ module StripeMock
           raise Stripe::InvalidRequestError.new('Cannot specify proration date outside of current subscription period', nil, http_status: 400)
         end
 
-
         prorating = false
         subscription_proration_date = nil
         subscription_plan_id = params[:subscription_plan] || subscription[:plan][:id]
@@ -160,7 +159,7 @@ module StripeMock
           id: subscription[:id],
           type: "subscription",
           plan: subscription[:plan],
-          amount: subscription[:status] == 'trialing' ? 0 : subscription[:plan][:unit_amount] * subscription[:quantity],
+          amount: subscription[:status] == 'trialing' ? 0 : subscription[:plan][:amount] * subscription[:quantity],
           discountable: true,
           quantity: subscription[:quantity],
           period: {

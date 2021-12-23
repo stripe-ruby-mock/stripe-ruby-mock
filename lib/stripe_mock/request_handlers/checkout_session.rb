@@ -16,12 +16,9 @@ module StripeMock
             require_param(p) if params[p].nil? || params[p].empty?
           end
 
-
           line_items = nil
           if params[:line_items]
             line_items = params[:line_items].each_with_index.map do |line_item, i|
-              line_item[:quantity] ||= 1
-
               throw Stripe::InvalidRequestError("Quantity is required. Add `quantity` to `line_items[#{i}]`") unless line_item[:quantity]
               unless line_item[:price] || line_item[:price_data] || (line_item[:amount] && line_item[:currency] && line_item[:name])
                 throw Stripe::InvalidRequestError("Price or amount and currency is required. Add `price`, `price_data`, or `amount`, `currency` and `name` to `line_items[#{i}]`")
@@ -48,7 +45,7 @@ module StripeMock
 
           amount = nil
           currency = nil
-          if line_items && !prices.empty?
+          if line_items
             amount = line_items.map { |line_item| prices[line_item[:price]][:unit_amount] * line_item[:quantity] }.sum
             currency = prices[line_items.first[:price]][:currency]
           end
@@ -115,7 +112,7 @@ module StripeMock
             shipping: nil,
             shipping_address_collection: nil,
             submit_type: nil,
-            subscription: params[:subscription],
+            subscription: nil,
             success_url: params[:success_url],
             total_details: nil,
             url: URI.join(StripeMock.checkout_base, id).to_s
