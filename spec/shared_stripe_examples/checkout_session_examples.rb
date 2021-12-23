@@ -22,24 +22,6 @@ shared_examples "Checkout Session API" do
     expect(payment_intent.customer).to eq(session.customer)
   end
 
-  it "creates session with allow_promotion_codes" do
-    line_items = [{
-      name: "T-shirt",
-      quantity: 2,
-      amount: 500,
-      currency: "usd",
-    }]
-    session = Stripe::Checkout::Session.create(
-      payment_method_types: ["card"],
-      line_items: line_items,
-      cancel_url: "https://example.com/cancel",
-      success_url: "https://example.com/success",
-      allow_promotion_codes: true,
-    )
-
-    expect(session.allow_promotion_codes).to eq(true)
-  end
-
   context "when creating a payment" do
     it "requires line_items" do
       expect do
