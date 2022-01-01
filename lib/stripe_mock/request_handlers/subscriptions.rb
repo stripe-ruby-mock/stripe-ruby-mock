@@ -147,7 +147,7 @@ module StripeMock
           subscription[:transfer_data][:amount_percent] ||= 100
         end
 
-        if (s = params[:expand]&.first { |s| s.starts_with? 'latest_invoice' })
+        if (s = params[:expand]&.find { |s| s.starts_with? 'latest_invoice' })
           payment_intent = nil
           unless subscription[:status] == 'trialing'
             intent_status = subscription[:status] == 'incomplete' ? 'requires_payment_method' : 'succeeded'
