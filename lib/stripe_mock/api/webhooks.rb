@@ -4,7 +4,7 @@ module StripeMock
 
     fixture_file = File.join(@webhook_fixture_path, "#{type}.json")
 
-    unless File.exists?(fixture_file)
+    unless File.exist?(fixture_file)
       unless Webhooks.event_list.include?(type)
         raise UnsupportedRequestError.new "Unsupported webhook event `#{type}` (Searched in #{@webhook_fixture_path})"
       end
