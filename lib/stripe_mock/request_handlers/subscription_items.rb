@@ -13,7 +13,7 @@ module StripeMock
 
         require_param(:subscription) unless params[:subscription]
 
-        Data.mock_list_object(subscriptions_items, params)
+        Data.mock_list_object(subscriptions_items.values, params)
       end
 
       def create_subscription_items(route, method_url, params, headers)
