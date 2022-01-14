@@ -18,6 +18,18 @@ module StripeMock
         end
       end
 
+      def create_sku(params={})
+        Stripe::SKU.create create_sku_params(params)
+      end
+
+      def delete_sku(sku_id)
+        if StripeMock.state == 'remote'
+          StripeMock.client.destroy_resource('skus', sku_id)
+        elsif StripeMock.state == 'local'
+          StripeMock.instance.skus.delete(sku_id)
+        end
+      end
+
       def upsert_stripe_object(object, attributes = {})
         if StripeMock.state == 'remote'
           StripeMock.client.upsert_stripe_object(object, attributes)

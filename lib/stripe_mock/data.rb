@@ -616,6 +616,23 @@ module StripeMock
       }
     end
 
+    def self.mock_sku(params={})
+      sku_id = params[:id] || "test_sku_default"
+      {
+        id: sku_id,
+        active: true,
+        currency: 'usd',
+        price: 1337,
+        inventory: {
+          type: 'infinite'
+        },
+        product: 'test_prod_default',
+        image: '',
+        attributes: {},
+        metadata: {},
+      }.merge(params)
+    end
+
     def self.mock_card_token(params={})
       {
         :id => 'tok_default',
