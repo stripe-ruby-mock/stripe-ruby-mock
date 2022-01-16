@@ -76,7 +76,6 @@ module StripeMock
       @invoices = {}
       @invoice_items = {}
       @orders = {}
-      @payment_methods = {}
       @plans = {}
       @products = {}
       @skus = {}

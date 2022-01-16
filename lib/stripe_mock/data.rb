@@ -214,6 +214,9 @@ module StripeMock
         invoice: nil,
         description: nil,
         dispute: nil,
+        payment_method: nil,
+        payment_method_details: nil,
+        payment_intent: nil,
         metadata: {
         }
       }.merge(params)
@@ -402,7 +405,8 @@ module StripeMock
         next_payment_attempt: 1349825350,
         charge: nil,
         discount: nil,
-        subscription: nil
+        subscription: nil,
+        payment_intent: nil
       }.merge(params)
       if invoice[:discount]
         invoice[:total] = [0, invoice[:subtotal] - invoice[:discount][:coupon][:amount_off]].max if invoice[:discount][:coupon][:amount_off]
@@ -1192,17 +1196,29 @@ module StripeMock
           id: payment_method_id,
           object: "payment_method",
           type: "card",
-          billing_details: {},
+          billing_details: {
+            address: {
+              city: nil,
+              country: nil,
+              line1: nil,
+              line2: nil,
+              postal_code: nil,
+              state: nil
+            },
+            email: nil,
+            name: nil,
+            phone: nil
+          },
           card: {
-              brand: "visa",
-              checks: { address_line1_check: nil, address_postal_code_check: nil, cvc_check: "pass" },
-              country: "FR",
-              exp_month: 2,
-              exp_year: 2022,
-              fingerprint: "Hr3Ly5z5IYxsokWA",
-              funding: "credit",
-              last4: "3155",
-              three_d_secure_usage: { supported: true }
+            brand: "visa",
+            checks: { address_line1_check: nil, address_postal_code_check: nil, cvc_check: "pass" },
+            country: "FR",
+            exp_month: 2,
+            exp_year: 2022,
+            fingerprint: "Hr3Ly5z5IYxsokWA",
+            funding: "credit",
+            last4: "3155",
+            three_d_secure_usage: { supported: true }
           },
           customer: params[:customer] || nil,
           metadata: {

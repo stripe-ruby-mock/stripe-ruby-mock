@@ -289,6 +289,7 @@ module StripeMock
       # 2) is free
       # 3) has billing set to send invoice
       def verify_card_present(customer, plan, subscription, params={})
+        return if customer[:invoice_settings] && customer[:invoice_settings][:default_payment_method]
         return if customer[:default_source]
         return if customer[:invoice_settings][:default_payment_method]
         return if customer[:trial_end]
@@ -312,6 +313,10 @@ module StripeMock
         return if params[:billing] == 'send_invoice'
 
         raise Stripe::InvalidRequestError.new('This customer has no attached payment source', nil, http_status: 400)
+      end
+
+      def subscription_payment_intent(invoice)
+        new_payment_intent(nil, nil, { payment_method: customers[invoice[:customer]][:invoice_settings][:default_payment_method], customer: invoice[:customer], amount: invoice[:amount_due], currency: invoice[:currency], invoice: invoice[:id], confirm: true }, nil)
       end
 
       def verify_active_status(subscription)
