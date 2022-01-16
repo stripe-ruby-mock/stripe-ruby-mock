@@ -353,7 +353,8 @@ module StripeMock
         pending_setup_intent: nil,
         default_tax_rates: nil,
         pending_invoice_item_interval: nil,
-        next_pending_invoice_item_invoice: nil
+        next_pending_invoice_item_invoice: nil,
+        latest_invoice: nil,
       }, params)
     end
 

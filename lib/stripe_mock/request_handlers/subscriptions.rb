@@ -141,6 +141,19 @@ module StripeMock
         subscriptions[subscription[:id]] = subscription
         add_subscription_to_customer(customer, subscription)
 
+        # add invoice
+        invoice = Data.mock_invoice([Data.mock_line_item({ id: new_id('ii'), currency: subscription_plans.first[:currency], amount: subscription_plans.first[:amount], subscription: subscription[:id], tax_percent: subscription[:tax_percent], plan: subscription_plans.first[:id] })], {id: new_id('in'), customer: params[:customer], subscription: subscription[:id], tax_percent: subscription[:tax_percent]})
+        subscription[:latest_invoice] = invoice[:id]
+        invoices[invoice[:id]] = invoice
+
+        # add payment intent
+        if params[:source].nil? && subscription_plans.first[:amount] > 0 && customer[:invoice_settings] && customer[:invoice_settings][:default_payment_method] # Check how free plan behave on stripe live
+          payment_intent = subscription_payment_intent(invoice)
+          invoice[:payment_intent] = payment_intent[:id]
+          invoice[:paid] = payment_intent[:status] == 'succeeded'
+          invoice[:status] = 'paid' if payment_intent[:status] == 'succeeded'
+        end
+
         subscriptions[subscription[:id]]
       end
 
