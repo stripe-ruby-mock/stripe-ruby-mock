@@ -243,6 +243,8 @@ module StripeMock
       def cancel_subscription(route, method_url, params, headers)
         route =~ method_url
 
+        validate_subscription_cancel!(params)
+
         subscription_id = $2 ? $2 : $1
         subscription = assert_existence :subscription, subscription_id, subscriptions[subscription_id]
 

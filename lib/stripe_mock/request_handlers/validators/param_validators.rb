@@ -22,7 +22,6 @@ module StripeMock
       # ProductValidator
       #
 
-
       def validate_create_product_params(params)
         params[:id] = params[:id].to_s
         @base_strategy.create_product_params.keys.reject{ |k,_| k == :id }.each do |k|
@@ -115,7 +114,10 @@ module StripeMock
           message = invalid_integer_message(params[:amount])
           raise Stripe::InvalidRequestError.new(message, :amount)
         end
+      end
 
+      def validate_subscription_cancel!(params)
+        raise Stripe::InvalidRequestError.new('Received unknown parameter: :at_period_end', :at_period_end) if params.key? :at_period_end
       end
 
       def validate_create_sku_params(params)
