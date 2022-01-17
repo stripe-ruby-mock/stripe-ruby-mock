@@ -1233,6 +1233,7 @@ module StripeMock
             last4: "3155",
             three_d_secure_usage: { supported: true }
           },
+          created: 123456789,
           customer: params[:customer] || nil,
           metadata: {
             order_id: "123456789"
