@@ -1190,6 +1190,18 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.source_to_payment_method(source={})
+      params = {
+        id: source[:id],
+        card: source, customer: source[:customer], metadata: source[:metadata],
+        billing_details: {
+          address: {city: source[:address_city], country: source[:country], line1: source[:address_line1], line2: source[:address_line2], postal_code: source[:address_zip], state: source[:address_state]},
+          name: source[:name]
+        }
+      }
+      Data.mock_payment_method(params)
+    end
+
     def self.mock_payment_method(params = {})
       payment_method_id = params[:id] || "pm_1ExEuFL2DI6wht39WNJgbybl"
       {

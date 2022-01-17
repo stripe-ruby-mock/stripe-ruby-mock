@@ -43,13 +43,17 @@ module StripeMock
         params[:offset] ||= 0
         params[:limit] ||= 10
 
-        clone = payment_methods.clone
+        result = payment_methods.clone
+        sources = retrieve_object_cards(:customers, params[:customer], @customers)[:data]
 
         if params[:customer]
-          clone.delete_if { |_k, v| v[:customer] != params[:customer] }
+          result.delete_if { |_k, v| v[:customer] != params[:customer] }
+          sources = sources.each.select {|source| source[:customer] == params[:customer]}
         end
 
-        Data.mock_list_object(clone.values, params)
+        source_payment_methods = sources.map {|source| Data.source_to_payment_method(source)}
+        result_payment_methods = result.values + source_payment_methods
+        Data.mock_list_object(result_payment_methods, params)
       end
       
       # post /v1/payment_methods/:id/attach
