@@ -15,8 +15,22 @@ module StripeMock
 
       def new_invoice(route, method_url, params, headers)
         id = new_id('in')
-        invoice_item = Data.mock_line_item()
-        invoices[id] = Data.mock_invoice([invoice_item], params.merge(:id => id))
+        line_item_params = {}
+        invoice_params = {}
+        tax_percent = params[:tax_percent] || 0
+
+        if params[:subscription]
+          subscription = @subscriptions[params[:subscription]]
+          amount = (params[:amount] || subscription[:plan][:amount])
+
+          tax_amount = amount * (tax_percent / 100.0)
+
+          line_item_params = {subscription: subscription[:id], tax_amounts: [{amount: tax_amount}], amount: amount, plan: subscription[:plan][:id]}
+          invoice_params = {subscription: subscription[:id], tax: tax_amount, amount_due: amount, customer: params[:customer]}
+        end
+
+        invoice_item = Data.mock_line_item(line_item_params.merge(tax_percent: tax_percent))
+        invoices[id] = Data.mock_invoice([invoice_item], params.merge(:id => id).merge(invoice_params).merge(tax_percent: tax_percent))
       end
 
       def finalize_invoice(route, method_url, params, headers)
