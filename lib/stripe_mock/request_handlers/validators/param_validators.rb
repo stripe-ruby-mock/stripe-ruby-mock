@@ -122,7 +122,7 @@ module StripeMock
         # See: https://stripe.com/docs/upgrades#2018-02-05
         if Stripe.api_version && Stripe.api_version >= '2018-02-05'
           raise Stripe::InvalidRequestError.new('Received unknown parameter: :name', :name) if params.key? :name
-          raise Stripe::InvalidRequestError.new('Received unknown parameter: :name', :statement_descriptor) if params.key? :statement_descriptor
+          raise Stripe::InvalidRequestError.new('Received unknown parameter: :statement_descriptor', :statement_descriptor) if params.key? :statement_descriptor
         end
       end
 
