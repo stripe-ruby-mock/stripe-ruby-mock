@@ -53,7 +53,9 @@ module StripeMock
           add_coupon_to_object(customers[params[:id]], coupon)
         end
 
-        customers[params[:id]]
+        customers[params[:id]].tap do |customer|
+          check_expand_param!(customer, params)
+        end
       end
 
       def update_customer(route, method_url, params, headers)
@@ -102,6 +104,8 @@ module StripeMock
           end
         end
 
+        check_expand_param!(cus, params)
+
         cus
       end
 
@@ -126,6 +130,8 @@ module StripeMock
           end
         end
 
+        check_expand_param!(customer, params)
+
         customer
       end
 
@@ -135,11 +141,25 @@ module StripeMock
 
       def delete_customer_discount(route, method_url, params, headers)
         route =~ method_url
-        cus = assert_existence :customer, $1, customers[$1]
+        customer = assert_existence :customer, $1, customers[$1]
 
-        cus[:discount] = nil
+        customer[:discount] = nil
 
-        cus
+        check_expand_param!(customer, params)
+
+        customer
+      end
+
+      private
+
+      def check_expand_param!(customer, params)
+        # See: https://stripe.com/docs/upgrades#2020-08-27
+        # Some customer attributes are no longer included by default (they can be requested via `expand`)
+        return unless Stripe.api_version && Stripe.api_version >= '2020-08-27'
+
+        customer.delete(:subscriptions) unless params[:expand]&.include?('subscriptions')
+        customer.delete(:sources) unless params[:expand]&.include?('sources')
+        customer.delete(:tax_ids) unless params[:expand]&.include?('tax_ids')
       end
     end
   end
