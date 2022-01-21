@@ -114,6 +114,16 @@ module StripeMock
           message = invalid_integer_message(params[:amount])
           raise Stripe::InvalidRequestError.new(message, :amount)
         end
+
+        # Some plan attributes have moved into Product:
+        # - name
+        # - statement_descriptor
+        #
+        # See: https://stripe.com/docs/upgrades#2018-02-05
+        if Stripe.api_version && Stripe.api_version >= '2018-02-05'
+          raise Stripe::InvalidRequestError.new('Received unknown parameter: :name', :name) if params.key? :name
+          raise Stripe::InvalidRequestError.new('Received unknown parameter: :name', :statement_descriptor) if params.key? :statement_descriptor
+        end
       end
 
       def validate_subscription_cancel!(params)
