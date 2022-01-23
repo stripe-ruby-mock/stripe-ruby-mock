@@ -168,7 +168,7 @@ shared_examples 'Customer Subscriptions' do
       }
     end
 
-    it "correctly sets quantity, application_fee_percent and tax_percent" do
+    it "correctly sets quantity and application_fee_percent" do
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
 
       subscription = Stripe::Subscription.create({
@@ -176,11 +176,9 @@ shared_examples 'Customer Subscriptions' do
         customer: customer.id,
         quantity: 2,
         application_fee_percent: 10,
-        tax_percent: 20
       })
       expect(subscription.quantity).to eq(2)
       expect(subscription.application_fee_percent).to eq(10)
-      expect(subscription.tax_percent).to eq(20)
     end
 
     it "correctly sets pending invoice item interval" do

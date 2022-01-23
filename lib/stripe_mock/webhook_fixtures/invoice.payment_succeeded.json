@@ -104,7 +104,6 @@
       "subscription": "sub_00000000000000",
       "subtotal": 999,
       "tax": null,
-      "tax_percent": null,
       "total": 999,
       "webhooks_delivered_at": 1464084258
     }

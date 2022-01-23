@@ -34,7 +34,6 @@ module StripeMock
 
       def create_customer_subscription(route, method_url, params, headers)
         route =~ method_url
-        tax_percent = params[:tax_percent] || 0
 
         subscription_plans = get_subscription_plans_from_params(params)
         customer = assert_existence :customer, $1, customers[$1]
@@ -45,7 +44,7 @@ module StripeMock
           customer[:default_source] = new_card[:id]
         end
 
-        subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')), tax_percent: tax_percent })
+        subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')) })
         subscription = resolve_subscription_changes(subscription, subscription_plans, customer, params)
 
         # Ensure customer has card to charge if plan has no trial and is not free
@@ -88,7 +87,6 @@ module StripeMock
         customer = params[:customer]
         customer_id = customer.is_a?(Stripe::Customer) ? customer[:id] : customer.to_s
         customer = assert_existence :customer, customer_id, customers[customer_id]
-        tax_percent = params[:tax_percent] || 0
 
         if subscription_plans && customer
           subscription_plans.each do |plan|
@@ -104,13 +102,13 @@ module StripeMock
           customer[:default_source] = new_card[:id]
         end
 
-        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate billing_cycle_anchor billing days_until_due idempotency_key enable_incomplete_payments cancel_at_period_end default_tax_rates payment_behavior pending_invoice_item_interval default_payment_method collection_method off_session trial_from_plan expand)
+        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source trial_end trial_period_days current_period_start created prorate billing_cycle_anchor billing days_until_due idempotency_key enable_incomplete_payments cancel_at_period_end default_tax_rates payment_behavior pending_invoice_item_interval default_payment_method collection_method off_session trial_from_plan expand)
         unknown_params = params.keys - allowed_params.map(&:to_sym)
         if unknown_params.length > 0
           raise Stripe::InvalidRequestError.new("Received unknown parameter: #{unknown_params.join}", unknown_params.first.to_s, http_status: 400)
         end
 
-        subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')), tax_percent: tax_percent })
+        subscription = Data.mock_subscription({ id: (params[:id] || new_id('su')) })
         subscription = resolve_subscription_changes(subscription, subscription_plans, customer, params)
         if headers[:idempotency_key]
           subscription[:idempotency_key] = headers[:idempotency_key]
@@ -144,7 +142,7 @@ module StripeMock
         add_subscription_to_customer(customer, subscription)
 
         # add invoice
-        invoice = Data.mock_invoice([Data.mock_line_item({ id: new_id('ii'), currency: subscription_plans.first[:currency], amount: subscription_plans.first[:amount], subscription: subscription[:id], tax_percent: subscription[:tax_percent], plan: subscription_plans.first[:id] })], {id: new_id('in'), customer: params[:customer], subscription: subscription[:id], tax_percent: subscription[:tax_percent]})
+        invoice = Data.mock_invoice([Data.mock_line_item({ id: new_id('ii'), currency: subscription_plans.first[:currency], amount: subscription_plans.first[:amount], subscription: subscription[:id], plan: subscription_plans.first[:id] })], {id: new_id('in'), customer: params[:customer], subscription: subscription[:id]})
         subscription[:latest_invoice] = invoice[:id]
         invoices[invoice[:id]] = invoice
 

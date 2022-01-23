@@ -350,7 +350,6 @@ module StripeMock
         trial_end: 1308681468,
         customer: 'c_test_customer',
         quantity: 1,
-        tax_percent: nil,
         discount: nil,
         metadata: {},
         pending_setup_intent: nil,
