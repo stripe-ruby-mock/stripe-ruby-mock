@@ -53,9 +53,8 @@ module StripeMock
           add_coupon_to_object(customers[params[:id]], coupon)
         end
 
-        customers[params[:id]].tap do |customer|
-          check_expand_param!(customer, params)
-        end
+        customer = customers[params[:id]]
+        expand_params(customer, params)
       end
 
       def update_customer(route, method_url, params, headers)
@@ -104,9 +103,7 @@ module StripeMock
           end
         end
 
-        check_expand_param!(cus, params)
-
-        cus
+        expand_params(cus, params)
       end
 
       def delete_customer(route, method_url, params, headers)
@@ -130,9 +127,7 @@ module StripeMock
           end
         end
 
-        check_expand_param!(customer, params)
-
-        customer
+        expand_params(customer, params)
       end
 
       def list_customers(route, method_url, params, headers)
@@ -145,21 +140,22 @@ module StripeMock
 
         customer[:discount] = nil
 
-        check_expand_param!(customer, params)
-
-        customer
+        expand_params(customer, params)
       end
 
       private
 
-      def check_expand_param!(customer, params)
+      def expand_params(customer, params)
         # See: https://stripe.com/docs/upgrades#2020-08-27
         # Some customer attributes are no longer included by default (they can be requested via `expand`)
         return unless Stripe.api_version && Stripe.api_version >= '2020-08-27'
 
-        customer.delete(:subscriptions) unless params[:expand]&.include?('subscriptions')
-        customer.delete(:sources) unless params[:expand]&.include?('sources')
-        customer.delete(:tax_ids) unless params[:expand]&.include?('tax_ids')
+        # Ensure we don't mutate the stored customer object, only the object the API is returning
+        customer.clone.tap do |cloned_customer|
+          cloned_customer.delete(:subscriptions) unless params[:expand]&.include?('subscriptions')
+          cloned_customer.delete(:sources) unless params[:expand]&.include?('sources')
+          cloned_customer.delete(:tax_ids) unless params[:expand]&.include?('tax_ids')
+        end
       end
     end
   end
