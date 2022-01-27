@@ -23,7 +23,7 @@ module StripeMock
           amount = (params[:amount] || subscription[:plan][:amount])
 
           line_item_params = {subscription: subscription[:id], amount: amount, plan: subscription[:plan][:id]}
-          invoice_params = {subscription: subscription[:id], tax: tax_amount, amount_due: amount, customer: params[:customer]}
+          invoice_params = {subscription: subscription[:id], amount_due: amount, customer: params[:customer]}
         end
 
         invoice_item = Data.mock_line_item(line_item_params)
