@@ -712,7 +712,7 @@ shared_examples 'Customer Subscriptions with plans' do
       })
 
       expect(subscription.latest_invoice.payment_intent.status).to eq('requires_payment_method')
-      
+
       subscription = Stripe::Subscription.create({
         customer: customer.id,
         plan: plan.id,
@@ -1255,6 +1255,10 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(subscription.items.data.first.plan.created).to eq(1466698898)
       expect(subscription.items.data.first.plan.currency).to eq('usd')
       expect(subscription.items.data.first.quantity).to eq(2)
+    end
+
+    it "has a start_date attribute" do
+      expect(subscription).to respond_to(:start_date)
     end
   end
 
