@@ -193,6 +193,19 @@ module StripeMock
         currency: currency,
         destination: nil,
         fraud_details: {},
+        billing_details: {
+          address: {
+            city: "City",
+            country: nil,
+            line1: "Address",
+            line2: nil,
+            postal_code: "545454",
+            state: nil
+          },
+          email: nil,
+          name: "John Bro",
+          phone: nil
+        },
         payment_method_details: {
           card: {
             brand: "visa",
