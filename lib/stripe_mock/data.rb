@@ -193,6 +193,27 @@ module StripeMock
         currency: currency,
         destination: nil,
         fraud_details: {},
+        payment_method_details: {
+          card: {
+            brand: "visa",
+            checks: {
+              address_line1_check: "pass",
+              address_postal_code_check: "pass",
+              cvc_check: nil
+            },
+            country: "US",
+            exp_month: 1,
+            exp_year: 2024,
+            fingerprint: "QnsCgolnfxuTu3Ih",
+            funding: "credit",
+            installments: nil,
+            last4: "4242",
+            network: "visa",
+            three_d_secure: nil,
+            wallet: nil
+          },
+          "type": "card"
+        },
         receipt_email: nil,
         receipt_number: nil,
         refunded: false,
