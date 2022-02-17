@@ -46,6 +46,8 @@ module StripeMock
       end
 
       def list_invoices(route, method_url, params, headers)
+        raise Stripe::InvalidRequestError.new('Received unknown parameter: date', nil, http_status: 400) if params[:date]
+
         params[:offset] ||= 0
         params[:limit] ||= 10
 
