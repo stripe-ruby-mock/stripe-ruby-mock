@@ -12,7 +12,7 @@ module StripeMock
         def new_session(route, method_url, params, headers)
           id = params[:id] || new_id('cs')
 
-          [:cancel_url, :payment_method_types, :success_url].each do |p|
+          [:cancel_url, :success_url].each do |p|
             require_param(p) if params[p].nil? || params[p].empty?
           end
 
@@ -46,7 +46,18 @@ module StripeMock
           amount = nil
           currency = nil
           if line_items
-            amount = line_items.map { |line_item| prices[line_item[:price]][:unit_amount] * line_item[:quantity] }.sum
+            amount = 0
+
+            line_items.each do |line_item| 
+              price = prices[line_item[:price]]
+
+              if price.nil?
+                raise StripeMock::StripeMockError.new("Price not found for ID: #{line_item[:price]}")
+              end
+
+              amount += (price[:unit_amount] * line_item[:quantity])
+            end
+
             currency = prices[line_items.first[:price]][:currency]
           end
 
@@ -143,6 +154,11 @@ module StripeMock
             line_items = assert_existence :checkout_session_line_items, $1, checkout_session_line_items[$1]
             line_items.map do |line_item|
               price = prices[line_item[:price]].clone
+
+              if price.nil?
+                raise StripeMock::StripeMockError.new("Price not found for ID: #{line_item[:price]}")
+              end
+
               {
                 id: line_item[:id],
                 object: "item",
