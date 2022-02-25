@@ -69,6 +69,7 @@ module StripeMock
         'customer.discount.deleted',
         'invoice.created',
         'invoice.updated',
+        'invoice.finalized',
         'invoice.payment_succeeded',
         'invoice.payment_failed',
         'invoice.upcoming',
