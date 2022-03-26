@@ -1,105 +1,171 @@
 {
-  "created": 1326853478,
-  "livemode": false,
-  "id": "evt_00000000000000",
-  "type": "invoice.payment_failed",
+  "id": "evt_000000000000000000000000",
   "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648320009,
   "data": {
     "object": {
-      "date": 1380674206,
-      "id": "in_00000000000000",
-      "period_start": 1378082075,
-      "period_end": 1380674075,
+      "id": "in_000000000000000000000000",
+      "object": "invoice",
+      "account_country": "US",
+      "account_name": "Example Company, Inc.",
+      "account_tax_ids": null,
+      "amount_due": 2000,
+      "amount_paid": 0,
+      "amount_remaining": 2000,
+      "application_fee_amount": null,
+      "attempt_count": 1,
+      "attempted": true,
+      "auto_advance": false,
+      "automatic_tax": {
+        "enabled": false,
+        "status": null
+      },
+      "billing_reason": "manual",
+      "charge": "ch_000000000000000000000000",
+      "collection_method": "charge_automatically",
+      "created": 1648320007,
+      "currency": "usd",
+      "custom_fields": null,
+      "customer": "cus_00000000000000",
+      "customer_address": null,
+      "customer_email": null,
+      "customer_name": null,
+      "customer_phone": null,
+      "customer_shipping": null,
+      "customer_tax_exempt": "none",
+      "customer_tax_ids": [
+
+      ],
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [
+
+      ],
+      "description": "(created by Stripe CLI)",
+      "discount": null,
+      "discounts": [
+
+      ],
+      "due_date": null,
+      "ending_balance": 0,
+      "footer": null,
+      "hosted_invoice_url": "https://invoice.stripe.com/i/acct_0000000000000000/test_00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "invoice_pdf": "https://pay.stripe.com/invoice/acct_0000000000000000/test_000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/pdf?s=ap",
+      "last_finalization_error": null,
       "lines": {
         "object": "list",
-        "count": 3,
-        "url": "/v1/invoices/in_00000000000000/lines",
         "data": [
           {
-            "id": "ii_00000000000000",
+            "id": "il_000000000000000000000000",
             "object": "line_item",
-            "type": "invoiceitem",
-            "livemode": false,
-            "amount": 19000,
+            "amount": 2000,
             "currency": "usd",
-            "proration": true,
-            "period": {
-              "start": 1393765661,
-              "end": 1393765661
+            "description": "(created by Stripe CLI)",
+            "discount_amounts": [
+
+            ],
+            "discountable": true,
+            "discounts": [
+
+            ],
+            "invoice_item": "ii_000000000000000000000000",
+            "livemode": false,
+            "metadata": {
             },
-            "quantity": null,
-            "plan": null,
-            "description": "Remaining time on Platinum after 02 Mar 2014",
-            "metadata": {}
-          },
-          {
-            "id": "ii_00000000000001",
-            "object": "line_item",
-            "type": "invoiceitem",
-            "livemode": false,
-            "amount": -9000,
-            "currency": "usd",
-            "proration": true,
             "period": {
-              "start": 1393765661,
-              "end": 1393765661
+              "end": 1648320006,
+              "start": 1648320006
             },
-            "quantity": null,
             "plan": null,
-            "description": "Unused time on Gold after 05 Mar 2014",
-            "metadata": {}
-          },
-          {
-            "id": "su_00000000000000",
-            "object": "line_item",
-            "type": "subscription",
-            "livemode": false,
-            "amount": 20000,
-            "currency": "usd",
+            "price": {
+              "id": "price_000000000000000000000000",
+              "object": "price",
+              "active": false,
+              "billing_scheme": "per_unit",
+              "created": 1648320006,
+              "currency": "usd",
+              "livemode": false,
+              "lookup_key": null,
+              "metadata": {
+              },
+              "nickname": null,
+              "product": "prod_00000000000000",
+              "recurring": null,
+              "tax_behavior": "unspecified",
+              "tiers_mode": null,
+              "transform_quantity": null,
+              "type": "one_time",
+              "unit_amount": 2000,
+              "unit_amount_decimal": "2000"
+            },
             "proration": false,
-            "period": {
-              "start": 1383759053,
-              "end": 1386351053
+            "proration_details": {
+              "credited_items": null
             },
             "quantity": 1,
-            "plan": {
-              "interval": "month",
-              "product": "pr_00000000000000",
-              "created": 1300000000,
-              "amount": 20000,
-              "currency": "usd",
-              "id": "platinum",
-              "object": "plan",
-              "livemode": false,
-              "interval_count": 1,
-              "trial_period_days": null,
-              "metadata": {}
-            },
-            "description": null,
-            "metadata": null
+            "subscription": null,
+            "tax_amounts": [
+
+            ],
+            "tax_rates": [
+
+            ],
+            "type": "invoiceitem"
           }
-        ]
+        ],
+        "has_more": false,
+        "total_count": 1,
+        "url": "/v1/invoices/in_000000000000000000000000/lines"
       },
-      "subtotal": 30000,
-      "total": 30000,
-      "customer": "cus_00000000000000",
-      "object": "invoice",
-      "attempted": true,
-      "closed": false,
-      "paid": false,
       "livemode": false,
-      "attempt_count": 1,
-      "amount_due": 30000,
-      "currency": "usd",
+      "metadata": {
+      },
+      "next_payment_attempt": null,
+      "number": "C93E45D7-0001",
+      "on_behalf_of": null,
+      "paid": false,
+      "paid_out_of_band": false,
+      "payment_intent": "pi_000000000000000000000000",
+      "payment_settings": {
+        "payment_method_options": null,
+        "payment_method_types": null
+      },
+      "period_end": 1648320007,
+      "period_start": 1648320007,
+      "post_payment_credit_notes_amount": 0,
+      "pre_payment_credit_notes_amount": 0,
+      "quote": null,
+      "receipt_number": null,
       "starting_balance": 0,
-      "ending_balance": 0,
-      "next_payment_attempt": 1380760475,
-      "charge": "ch_00000000000000",
-      "discount": null,
-      "application_fee": null,
-      "subscription": "su_00000000000000",
-      "metadata": {},
-      "description": null
+      "statement_descriptor": null,
+      "status": "open",
+      "status_transitions": {
+        "finalized_at": 1648320008,
+        "marked_uncollectible_at": null,
+        "paid_at": null,
+        "voided_at": null
+      },
+      "subscription": null,
+      "subtotal": 2000,
+      "tax": null,
+      "test_clock": null,
+      "total": 2000,
+      "total_discount_amounts": [
+
+      ],
+      "total_tax_amounts": [
+
+      ],
+      "transfer_data": null,
+      "webhooks_delivered_at": null
     }
-  }
+  },
+  "livemode": false,
+  "pending_webhooks": 3,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": "01a6e155-8da6-4fce-981d-0957a39bb139"
+  },
+  "type": "invoice.payment_failed"
 }

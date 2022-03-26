@@ -1,42 +1,46 @@
 {
-  "created": 1326853478,
+  "id": "evt_000000000000000000000000",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648319961,
   "data": {
     "object": {
-      "account_balance": 0,
-      "active_card": {
-        "address_city": null,
-        "address_country": null,
-        "address_line1": null,
-        "address_line1_check": null,
-        "address_line2": null,
-        "address_state": null,
-        "address_zip": null,
-        "address_zip_check": null,
-        "country": "US",
-        "cvc_check": "pass",
-        "exp_month": 12,
-        "exp_year": 2013,
-        "fingerprint": "wXWJT135mEK107G8",
-        "last4": "4242",
-        "name": "1231",
-        "object": "card",
-        "type": "Visa",
-        "brand": "Visa",
-        "funding": "credit"
-      },
-      "created": 1359947599,
-      "delinquent": false,
-      "description": null,
-      "discount": null,
-      "email": "ajoe@mailinator.com",
       "id": "cus_00000000000000",
-      "livemode": false,
       "object": "customer",
-      "subscription": null
+      "address": null,
+      "balance": 0,
+      "created": 1648319961,
+      "currency": null,
+      "default_source": null,
+      "delinquent": false,
+      "description": "(created by Stripe CLI)",
+      "discount": null,
+      "email": null,
+      "invoice_prefix": "D343B0B7",
+      "invoice_settings": {
+        "custom_fields": null,
+        "default_payment_method": null,
+        "footer": null
+      },
+      "livemode": false,
+      "metadata": {
+      },
+      "name": null,
+      "next_invoice_sequence": 1,
+      "phone": null,
+      "preferred_locales": [
+
+      ],
+      "shipping": null,
+      "tax_exempt": "none",
+      "test_clock": null
     }
   },
-  "id": "evt_00000000000000",
   "livemode": false,
-  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": null
+  },
   "type": "customer.deleted"
 }

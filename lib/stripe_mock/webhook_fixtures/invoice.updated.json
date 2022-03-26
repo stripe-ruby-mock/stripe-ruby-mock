@@ -1,74 +1,202 @@
 {
-  "created": 1326853478,
-  "livemode": false,
-  "id": "evt_00000000000000",
-  "type": "invoice.updated",
-  "status": "paid",
+  "id": "evt_000000000000000000000000",
   "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648320099,
   "data": {
     "object": {
-      "created": 1380674206,
-      "id": "in_00000000000000",
-      "period_start": 1378082075,
-      "period_end": 1380674075,
+      "id": "in_000000000000000000000000",
+      "object": "invoice",
+      "account_country": "US",
+      "account_name": "Example Company, Inc.",
+      "account_tax_ids": null,
+      "amount_due": 1500,
+      "amount_paid": 0,
+      "amount_remaining": 1500,
+      "application_fee_amount": null,
+      "attempt_count": 0,
+      "attempted": false,
+      "auto_advance": false,
+      "automatic_tax": {
+        "enabled": false,
+        "status": null
+      },
+      "billing_reason": "subscription_create",
+      "charge": null,
+      "collection_method": "charge_automatically",
+      "created": 1648320096,
+      "currency": "usd",
+      "custom_fields": null,
+      "customer": "cus_00000000000000",
+      "customer_address": null,
+      "customer_email": null,
+      "customer_name": null,
+      "customer_phone": null,
+      "customer_shipping": null,
+      "customer_tax_exempt": "none",
+      "customer_tax_ids": [
+
+      ],
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [
+
+      ],
+      "description": null,
+      "discount": null,
+      "discounts": [
+
+      ],
+      "due_date": null,
+      "ending_balance": null,
+      "footer": null,
+      "hosted_invoice_url": null,
+      "invoice_pdf": null,
+      "last_finalization_error": null,
       "lines": {
-        "count": 1,
         "object": "list",
-        "url": "/v1/invoices/in_00000000000000/lines",
         "data": [
           {
-            "id": "su_00000000000000",
+            "id": "il_000000000000000000000000",
             "object": "line_item",
-            "type": "subscription",
-            "livemode": true,
-            "amount": 100,
+            "amount": 1500,
             "currency": "usd",
-            "proration": false,
+            "description": "1 × myproduct (at $15.00 / month)",
+            "discount_amounts": [
+
+            ],
+            "discountable": true,
+            "discounts": [
+
+            ],
+            "livemode": false,
+            "metadata": {
+            },
             "period": {
-              "start": 1383759047,
-              "end": 1386351047
+              "end": 1650998496,
+              "start": 1648320096
+            },
+            "plan": {
+              "id": "price_000000000000000000000000",
+              "object": "plan",
+              "active": true,
+              "aggregate_usage": null,
+              "amount": 1500,
+              "amount_decimal": "1500",
+              "billing_scheme": "per_unit",
+              "created": 1648320095,
+              "currency": "usd",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "metadata": {
+              },
+              "nickname": null,
+              "product": "prod_00000000000000",
+              "tiers_mode": null,
+              "transform_usage": null,
+              "trial_period_days": null,
+              "usage_type": "licensed"
+            },
+            "price": {
+              "id": "price_000000000000000000000000",
+              "object": "price",
+              "active": true,
+              "billing_scheme": "per_unit",
+              "created": 1648320095,
+              "currency": "usd",
+              "livemode": false,
+              "lookup_key": null,
+              "metadata": {
+              },
+              "nickname": null,
+              "product": "prod_00000000000000",
+              "recurring": {
+                "aggregate_usage": null,
+                "interval": "month",
+                "interval_count": 1,
+                "trial_period_days": null,
+                "usage_type": "licensed"
+              },
+              "tax_behavior": "unspecified",
+              "tiers_mode": null,
+              "transform_quantity": null,
+              "type": "recurring",
+              "unit_amount": 1500,
+              "unit_amount_decimal": "1500"
+            },
+            "proration": false,
+            "proration_details": {
+              "credited_items": null
             },
             "quantity": 1,
-            "plan": {
-              "interval": "month",
-              "product": "pr_00000000000000",
-              "amount": 100,
-              "currency": "usd",
-              "id": "fkx0AFo",
-              "object": "plan",
-              "livemode": false,
-              "interval_count": 1,
-              "trial_period_days": null,
-              "metadata": {}
-            },
-            "description": null,
-            "metadata": null
+            "subscription": "sub_000000000000000000000000",
+            "subscription_item": "si_00000000000000",
+            "tax_amounts": [
+
+            ],
+            "tax_rates": [
+
+            ],
+            "type": "subscription"
           }
-        ]
+        ],
+        "has_more": false,
+        "total_count": 1,
+        "url": "/v1/invoices/in_000000000000000000000000/lines"
       },
-      "subtotal": 1000,
-      "total": 1000,
-      "customer": "cus_00000000000000",
-      "object": "invoice",
-      "attempted": true,
-      "closed": true,
-      "paid": true,
       "livemode": false,
-      "attempt_count": 1,
-      "amount_due": 1000,
-      "currency": "usd",
-      "starting_balance": 0,
-      "ending_balance": 0,
+      "metadata": {
+      },
       "next_payment_attempt": null,
-      "charge": "ch_00000000000000",
-      "discount": null,
-      "application_fee": null,
-      "subscription": "sub_00000000000000",
-      "metadata": {},
-      "description": null
+      "number": null,
+      "on_behalf_of": null,
+      "paid": false,
+      "paid_out_of_band": false,
+      "payment_intent": null,
+      "payment_settings": {
+        "payment_method_options": null,
+        "payment_method_types": null
+      },
+      "period_end": 1648320096,
+      "period_start": 1648320096,
+      "post_payment_credit_notes_amount": 0,
+      "pre_payment_credit_notes_amount": 0,
+      "quote": null,
+      "receipt_number": null,
+      "starting_balance": 0,
+      "statement_descriptor": null,
+      "status": "draft",
+      "status_transitions": {
+        "finalized_at": null,
+        "marked_uncollectible_at": null,
+        "paid_at": null,
+        "voided_at": null
+      },
+      "subscription": "sub_000000000000000000000000",
+      "subtotal": 1500,
+      "tax": null,
+      "test_clock": null,
+      "total": 1500,
+      "total_discount_amounts": [
+
+      ],
+      "total_tax_amounts": [
+
+      ],
+      "transfer_data": null,
+      "webhooks_delivered_at": 1648320097
     },
     "previous_attributes": {
-      "lines": []
+      "auto_advance": true,
+      "next_payment_attempt": 1648323696
     }
-  }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "invoice.updated"
 }
