@@ -5,9 +5,6 @@ require 'rspec'
 require 'stripe'
 require 'stripe_mock'
 require 'stripe_mock/server'
-require 'dotenv'
-
-Dotenv.load('.env')
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
@@ -36,7 +33,6 @@ RSpec.configure do |c|
       when '2.4.6'  then ENV['STRIPE_TEST_SECRET_KEY_A']
       when '2.5.5' then ENV['STRIPE_TEST_SECRET_KEY_B']
       when '2.6.3'  then ENV['STRIPE_TEST_SECRET_KEY_C']
-      when '2.7.0'  then ENV['STRIPE_TEST_SECRET_KEY_D']
       end
     else
       api_key = ENV['STRIPE_TEST_SECRET_KEY']
