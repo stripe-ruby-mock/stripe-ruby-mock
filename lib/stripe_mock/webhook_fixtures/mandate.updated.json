@@ -1,0 +1,34 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "mandate.updated",
+  "object": "event",
+  "data": {
+    "object": {
+      "id": "mandate_000000000000000000000000",
+      "object": "mandate",
+      "customer_acceptance": {
+        "accepted_at": 1326853478,
+        "online": {
+          "ip_address": "0.0.0.0",
+          "user_agent": "UserAgent"
+        },
+        "type": "online"
+      },
+      "livemode": false,
+      "multi_use": {},
+      "payment_method": "pm_000000000000000000000000",
+      "payment_method_details": {},
+      "status": "active",
+      "type": "multi_use"
+    },
+    "previous_attributes": {
+      "payment_method_details": {
+        "bacs_debit": {
+          "network_status": "pending"
+        }
+      }
+    }
+  }
+}
