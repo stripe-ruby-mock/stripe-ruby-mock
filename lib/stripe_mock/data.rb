@@ -1327,6 +1327,7 @@ module StripeMock
           name: 'John Dolton',
           phone: nil
         },
+        "created": '1234567890',
         customer: params[:customer] || nil,
         metadata: {
           order_id: '123456789'
