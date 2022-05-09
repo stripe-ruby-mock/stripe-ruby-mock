@@ -494,4 +494,101 @@ shared_examples 'Charge API' do
     end
   end
 
+  context "search" do
+    # the Search API requires about a minute between writes and reads, so add sleeps accordingly when running live
+    it "searches charges for exact matches", :aggregate_failures do
+      response = Stripe::Charge.search({query: 'amount:100'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(0)
+
+      customer = Stripe::Customer.create(email: 'johnny@appleseed.com')
+      one = Stripe::Charge.create(
+        customer: customer.id,
+        amount: 100,
+        currency: "usd",
+        payment_method_details: {
+          card: StripeMock::Data.mock_charge[:payment_method_details][:card].merge(
+            brand: "mastercard",
+            exp_month: 1,
+            exp_year: 2111,
+            fingerprint: "un",
+            last4: "1111",
+          ),
+        },
+        status: "succeeded",
+        metadata: {key: 'uno'},
+      )
+      two = Stripe::Charge.create(
+        customer: customer.id,
+        amount: 200,
+        currency: "gbp",
+        payment_method_details: {
+          card: StripeMock::Data.mock_charge[:payment_method_details][:card].merge(
+            brand: "visa",
+            exp_month: 2,
+            exp_year: 2222,
+            fingerprint: "deux",
+            last4: "2222",
+          ),
+        },
+        status: "pending",
+        metadata: {key: 'dos'},
+      )
+
+      response = Stripe::Charge.search({query: 'amount:100'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Charge.search({query: 'currency:"gbp"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Charge.search({query: %(customer:"#{customer.id}")}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id, two.id])
+
+      response = Stripe::Charge.search({query: 'payment_method_details.card.brand:mastercard'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Charge.search({query: 'payment_method_details.card.exp_month:2'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Charge.search({query: 'payment_method_details.card.exp_year:2111'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Charge.search({query: 'payment_method_details.card.fingerprint:un'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Charge.search({query: 'payment_method_details.card.last4:2222'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Charge.search({query: 'status:"succeeded"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Charge.search({query: 'metadata["key"]:"uno"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+    end
+
+    it "respects limit", :aggregate_failures do
+      customer = Stripe::Customer.create(email: 'johnny@appleseed.com')
+      11.times do
+        Stripe::Charge.create(customer: customer.id, amount: 100, currency: "usd")
+      end
+
+      response = Stripe::Charge.search({query: %(customer:"#{customer.id}")}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(10)
+      response = Stripe::Charge.search({query: %(customer:"#{customer.id}"), limit: 1}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(1)
+    end
+
+    it "reports search errors", :aggregate_failures do
+      expect {
+        Stripe::Charge.search({limit: 1}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Missing required param: query./)
+
+      expect {
+        Stripe::Charge.search({query: 'asdf'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /We were unable to parse your search query./)
+
+      expect {
+        Stripe::Charge.search({query: 'foo:"bar"'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Field `foo` is an unsupported search field for resource `charges`./)
+    end
+  end
 end

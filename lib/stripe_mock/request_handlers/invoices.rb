@@ -6,7 +6,8 @@ module StripeMock
         klass.add_handler 'post /v1/invoices',               :new_invoice
         klass.add_handler 'get /v1/invoices/upcoming',       :upcoming_invoice
         klass.add_handler 'get /v1/invoices/(.*)/lines',     :get_invoice_line_items
-        klass.add_handler 'get /v1/invoices/(.*)',           :get_invoice
+        klass.add_handler 'get /v1/invoices/((?!search).*)', :get_invoice
+        klass.add_handler 'get /v1/invoices/search',         :search_invoices
         klass.add_handler 'get /v1/invoices',                :list_invoices
         klass.add_handler 'post /v1/invoices/(.*)/pay',      :pay_invoice
         klass.add_handler 'post /v1/invoices/(.*)',          :update_invoice
@@ -23,6 +24,14 @@ module StripeMock
         params.delete(:lines) if params[:lines]
         assert_existence :invoice, $1, invoices[$1]
         invoices[$1].merge!(params)
+      end
+
+      SEARCH_FIELDS = ["currency", "customer", "number", "receipt_number", "subscription", "total"].freeze
+      def search_invoices(route, method_url, params, headers)
+        require_param(:query) unless params[:query]
+
+        results = search_results(invoices.values, params[:query], fields: SEARCH_FIELDS, resource_name: "invoices")
+        Data.mock_list_object(results, params)
       end
 
       def list_invoices(route, method_url, params, headers)

@@ -3,10 +3,11 @@ module StripeMock
     module Prices
 
       def Prices.included(klass)
-        klass.add_handler 'post /v1/prices',        :new_price
-        klass.add_handler 'post /v1/prices/(.*)',   :update_price
-        klass.add_handler 'get /v1/prices/(.*)',    :get_price
-        klass.add_handler 'get /v1/prices',         :list_prices
+        klass.add_handler 'post /v1/prices',               :new_price
+        klass.add_handler 'post /v1/prices/(.*)',          :update_price
+        klass.add_handler 'get /v1/prices/((?!search).*)', :get_price
+        klass.add_handler 'get /v1/prices/search',         :search_prices
+        klass.add_handler 'get /v1/prices',                :list_prices
       end
 
       def new_price(route, method_url, params, headers)
@@ -44,6 +45,14 @@ module StripeMock
         end
 
         Data.mock_list_object(price_data.first(limit), params.merge!(limit: limit))
+      end
+
+      SEARCH_FIELDS = ["active", "currency", "lookup_key", "product", "type"].freeze
+      def search_prices(route, method_url, params, headers)
+        require_param(:query) unless params[:query]
+
+        results = search_results(prices.values, params[:query], fields: SEARCH_FIELDS, resource_name: "prices")
+        Data.mock_list_object(results, params)
       end
     end
   end

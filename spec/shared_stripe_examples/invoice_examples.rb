@@ -74,6 +74,88 @@ shared_examples 'Invoice API' do
     end
   end
 
+  context "searching invoices" do
+    # the Search API requires about a minute between writes and reads, so add sleeps accordingly when running live
+    it "searches invoices for exact matches", :aggregate_failures do
+      response = Stripe::Invoice.search({query: 'currency:"usd"'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(0)
+
+      product = stripe_helper.create_product
+      stripe_helper.create_plan(
+        amount: 500,
+        interval: 'month',
+        product: product.id,
+        currency: 'usd',
+        id: 'Sample5',
+      )
+      customer = Stripe::Customer.create(email: 'johnny@appleseed.com', source: stripe_helper.generate_card_token)
+      subscription = Stripe::Subscription.create(customer: customer.id, items: [{plan: 'Sample5'}])
+      one = Stripe::Invoice.create(
+        customer: customer.id,
+        currency: 'usd',
+        subscription: subscription.id,
+        metadata: {key: 'uno'},
+        number: 'one-1',
+        receipt_number: '111',
+      )
+      two = Stripe::Invoice.create(
+        customer: customer.id,
+        currency: 'gbp',
+        subscription: subscription.id,
+        metadata: {key: 'dos'},
+        number: 'two-2',
+        receipt_number: '222',
+      )
+
+      response = Stripe::Invoice.search({query: 'currency:"gbp"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Invoice.search({query: %(customer:"#{customer.id}")}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id, two.id])
+
+      response = Stripe::Invoice.search({query: 'number:"one-1"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Invoice.search({query: 'receipt_number:"222"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Invoice.search({query: %(subscription:"#{subscription.id}")}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id, two.id])
+
+      response = Stripe::Invoice.search({query: 'total:1000'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id, two.id])
+
+      response = Stripe::Invoice.search({query: 'metadata["key"]:"uno"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+    end
+
+    it "respects limit", :aggregate_failures do
+      customer = Stripe::Customer.create(email: 'one@one.com', name: 'one', phone: '1111111111', metadata: {key: 'uno'})
+      11.times do
+        Stripe::Invoice.create(customer: customer.id, currency: 'usd')
+      end
+
+      response = Stripe::Invoice.search({query: %(customer:"#{customer.id}")}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(10)
+      response = Stripe::Invoice.search({query: %(customer:"#{customer.id}"), limit: 1}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(1)
+    end
+
+    it "reports search errors", :aggregate_failures do
+      expect {
+        Stripe::Invoice.search({limit: 1}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Missing required param: query./)
+
+      expect {
+        Stripe::Invoice.search({query: 'asdf'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /We were unable to parse your search query./)
+
+      expect {
+        Stripe::Invoice.search({query: 'foo:"bar"'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Field `foo` is an unsupported search field for resource `invoices`./)
+    end
+  end
+
   context "paying an invoice" do
     before do
       @invoice = Stripe::Invoice.create

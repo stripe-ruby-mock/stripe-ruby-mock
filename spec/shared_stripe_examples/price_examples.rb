@@ -125,6 +125,75 @@ shared_examples 'Price API' do
     expect(two.map &:amount).to include(98765)
   end
 
+  context "searching prices" do
+    # the Search API requires about a minute between writes and reads, so add sleeps accordingly when running live
+    it "searches prices for exact matches", :aggregate_failures do
+      response = Stripe::Price.search({query: 'currency:"usd"'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(0)
+
+      one = stripe_helper.create_price(
+        amount: 100,
+        currency: 'usd',
+        lookup_key: 'one',
+        product: product_id,
+        metadata: {key: 'uno'},
+        type: "one_time",
+      )
+      two = stripe_helper.create_price(
+        active: false,
+        amount: 200,
+        currency: 'gbp',
+        lookup_key: 'two',
+        product: product_id,
+        recurring: {interval: 'month'},
+        metadata: {key: 'dos'},
+      )
+
+      response = Stripe::Price.search({query: 'active:"true"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Price.search({query: 'currency:"gbp"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Price.search({query: 'lookup_key:"one"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Price.search({query: %(product:"#{product.id}")}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id, two.id])
+
+      response = Stripe::Price.search({query: 'type:"recurring"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Price.search({query: 'metadata["key"]:"uno"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+    end
+
+    it "respects limit", :aggregate_failures do
+      11.times do
+        stripe_helper.create_price(product: product_id)
+      end
+
+      response = Stripe::Price.search({query: %(product:"#{product.id}")}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(10)
+      response = Stripe::Price.search({query: %(product:"#{product.id}"), limit: 1}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(1)
+    end
+
+    it "reports search errors", :aggregate_failures do
+      expect {
+        Stripe::Price.search({limit: 1}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Missing required param: query./)
+
+      expect {
+        Stripe::Price.search({query: 'asdf'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /We were unable to parse your search query./)
+
+      expect {
+        Stripe::Price.search({query: 'foo:"bar"'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Field `foo` is an unsupported search field for resource `prices`./)
+    end
+  end
+
   describe "Validations", :live => true do
     include_context "stripe validator"
     let(:params) { stripe_helper.create_price_params(product: product_id) }
