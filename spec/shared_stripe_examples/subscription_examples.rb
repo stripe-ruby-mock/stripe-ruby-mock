@@ -1256,6 +1256,10 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(subscription.items.data.first.plan.currency).to eq('usd')
       expect(subscription.items.data.first.quantity).to eq(2)
     end
+
+    it "has a start_date attribute" do
+      expect(subscription).to respond_to(:start_date)
+    end
   end
 
   context "retrieve multiple subscriptions" do
