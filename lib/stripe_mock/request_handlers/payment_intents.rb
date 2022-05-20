@@ -20,6 +20,7 @@ module StripeMock
         status = case params[:amount]
         when 3184 then 'requires_action'
         when 3178 then 'requires_payment_method'
+        when 3055 then 'requires_capture'
         else
           'succeeded'
         end
@@ -79,6 +80,10 @@ module StripeMock
       def confirm_payment_intent(route, method_url, params, headers)
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
+
+        if params[:payment_method]
+          payment_intent[:payment_method] = params[:payment_method]
+        end
 
         succeeded_payment_intent(payment_intent)
       end
@@ -171,7 +176,8 @@ module StripeMock
         payment_intent[:charges][:data] << Data.mock_charge(
           balance_transaction: btxn,
           amount: payment_intent[:amount],
-          currency: payment_intent[:currency]
+          currency: payment_intent[:currency],
+          payment_method: payment_intent[:payment_method]
         )
 
         payment_intent

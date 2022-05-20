@@ -1,7 +1,7 @@
-# stripe-ruby-mock [![Build Status](https://travis-ci.org/rebelidealist/stripe-ruby-mock.png?branch=master)](https://travis-ci.org/rebelidealist/stripe-ruby-mock) [![Gitter chat](https://badges.gitter.im/rebelidealist/stripe-ruby-mock.png)](https://gitter.im/rebelidealist/stripe-ruby-mock)
+# stripe-ruby-mock [![Build Status](https://travis-ci.org/stripe-ruby-mock/stripe-ruby-mock.png?branch=master)](https://travis-ci.org/stripe-ruby-mock/stripe-ruby-mock) [![Gitter chat](https://badges.gitter.im/rebelidealist/stripe-ruby-mock.png)](https://gitter.im/rebelidealist/stripe-ruby-mock)
 
-* Homepage: https://github.com/rebelidealist/stripe-ruby-mock
-* Issues: https://github.com/rebelidealist/stripe-ruby-mock/issues
+* Homepage: https://github.com/stripe-ruby-mock/stripe-ruby-mock
+* Issues: https://github.com/stripe-ruby-mock/stripe-ruby-mock/issues
 * **CHAT**: https://gitter.im/rebelidealist/stripe-ruby-mock
 
 # REQUEST: Looking for More Core Contributors
@@ -12,7 +12,13 @@ This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 3.0.0', :require => 'stripe_mock'
+    gem 'stripe-ruby-mock', '~> 3.0.1', :require => 'stripe_mock'
+
+## !!! Important
+
+We have [changelog](https://github.com/stripe-ruby-mock/stripe-ruby-mock/blob/master/CHANGELOG.md). It's first attempt. Feel free to update it and suggest to a new format of it.
+
+version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/658) - we support stripe > 5 and < 6 for now and try to follow the newest API version. But if you still use older versions please [read](https://github.com/stripe-ruby-mock/stripe-ruby-mock#specifications).
 
 ## Features
 

@@ -17,26 +17,29 @@ module StripeMock
       end
 
       def retrieve_customer_subscription(route, method_url, params, headers)
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
-        customer = assert_existence :customer, $1, customers[$1]
+        customer = assert_existence :customer, $1, customers[stripe_account][$1]
         subscription = get_customer_subscription(customer, $2)
 
         assert_existence :subscription, $2, subscription
       end
 
       def retrieve_customer_subscriptions(route, method_url, params, headers)
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
-        customer = assert_existence :customer, $1, customers[$1]
+        customer = assert_existence :customer, $1, customers[stripe_account][$1]
         customer[:subscriptions]
       end
 
       def create_customer_subscription(route, method_url, params, headers)
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         subscription_plans = get_subscription_plans_from_params(params)
-        customer = assert_existence :customer, $1, customers[$1]
+        customer = assert_existence :customer, $1, customers[stripe_account][$1]
 
         if params[:source]
           new_card = get_card_by_token(params.delete(:source))
@@ -73,10 +76,10 @@ module StripeMock
       end
 
       def create_subscription(route, method_url, params, headers)
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         if headers && headers[:idempotency_key]
           if subscriptions.any?
             original_subscription = subscriptions.values.find { |c| c[:idempotency_key] == headers[:idempotency_key]}
-            puts original_subscription
             return subscriptions[original_subscription[:id]] if original_subscription
           end
         end
@@ -86,15 +89,7 @@ module StripeMock
 
         customer = params[:customer]
         customer_id = customer.is_a?(Stripe::Customer) ? customer[:id] : customer.to_s
-        customer = assert_existence :customer, customer_id, customers[customer_id]
-
-        if subscription_plans && customer
-          subscription_plans.each do |plan|
-            unless customer[:currency].to_s == plan[:currency].to_s
-              raise Stripe::InvalidRequestError.new("Customer's currency of #{customer[:currency]} does not match plan's currency of #{plan[:currency]}", 'currency', http_status: 400)
-            end
-          end
-        end
+        customer = assert_existence :customer, customer_id, customers[stripe_account][customer_id]
 
         if params[:source]
           new_card = get_card_by_token(params.delete(:source))
@@ -102,7 +97,7 @@ module StripeMock
           customer[:default_source] = new_card[:id]
         end
 
-        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate billing_cycle_anchor billing days_until_due idempotency_key enable_incomplete_payments cancel_at_period_end default_tax_rates collection_method backdate_start_date payment_behavior)
+        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate billing_cycle_anchor billing days_until_due idempotency_key enable_incomplete_payments cancel_at_period_end default_tax_rates payment_behavior pending_invoice_item_interval default_payment_method collection_method off_session trial_from_plan proration_behavior backdate_start_date transfer_data expand automatic_tax)
         unknown_params = params.keys - allowed_params.map(&:to_sym)
         if unknown_params.length > 0
           raise Stripe::InvalidRequestError.new("Received unknown parameter: #{unknown_params.join}", unknown_params.first.to_s, http_status: 400)
@@ -133,9 +128,38 @@ module StripeMock
           end
         end
 
+        if params[:trial_period_days]
+          subscription[:status] = 'trialing'
+        end
+
+        if params[:payment_behavior] == 'default_incomplete'
+          subscription[:status] = 'incomplete'
+        end
+
         if params[:cancel_at_period_end]
           subscription[:cancel_at_period_end] = true
           subscription[:canceled_at] = Time.now.utc.to_i
+        end
+
+        if params[:transfer_data] && !params[:transfer_data].empty?
+          throw Stripe::InvalidRequestError.new(missing_param_message("transfer_data[destination]")) unless params[:transfer_data][:destination]
+          subscription[:transfer_data] = params[:transfer_data].dup
+          subscription[:transfer_data][:amount_percent] ||= 100
+        end
+
+        if (s = params[:expand]&.find { |s| s.start_with? 'latest_invoice' })
+          payment_intent = nil
+          unless subscription[:status] == 'trialing'
+            intent_status = subscription[:status] == 'incomplete' ? 'requires_payment_method' : 'succeeded'
+            intent = Data.mock_payment_intent({
+              status: intent_status,
+              amount: subscription[:plan][:amount],
+              currency: subscription[:plan][:currency]
+            })
+            payment_intent = s.include?('latest_invoice.payment_intent') ? intent : intent.id
+          end
+          invoice = Data.mock_invoice([], { payment_intent: payment_intent })
+          subscription[:latest_invoice] = invoice
         end
 
         subscriptions[subscription[:id]] = subscription
@@ -151,22 +175,37 @@ module StripeMock
       end
 
       def retrieve_subscriptions(route, method_url, params, headers)
+        # stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
-        Data.mock_list_object(subscriptions.values, params)
-        #customer = assert_existence :customer, $1, customers[$1]
-        #customer[:subscriptions]
+        subs = subscriptions.values
+
+        case params[:status]
+        when nil
+          subs = subs.filter {|subscription| subscription[:status] != "canceled"}
+        when "all"
+          # Include all subscriptions
+        else
+          subs = subs.filter {|subscription| subscription[:status] == params[:status]}
+        end
+
+        Data.mock_list_object(subs, params)
       end
 
       def update_subscription(route, method_url, params, headers)
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
+
+        if params[:billing_cycle_anchor] == 'now'
+          params[:billing_cycle_anchor] = Time.now.utc.to_i
+        end
 
         subscription_id = $2 ? $2 : $1
         subscription = assert_existence :subscription, subscription_id, subscriptions[subscription_id]
         verify_active_status(subscription)
 
         customer_id = subscription[:customer]
-        customer = assert_existence :customer, customer_id, customers[customer_id]
+        customer = assert_existence :customer, customer_id, customers[stripe_account][customer_id]
 
         if params[:source]
           new_card = get_card_by_token(params.delete(:source))
@@ -197,6 +236,10 @@ module StripeMock
           end
         end
 
+        if params[:trial_period_days]
+          subscription[:status] = 'trialing'
+        end
+
         if params[:cancel_at_period_end]
           subscription[:cancel_at_period_end] = true
           subscription[:canceled_at] = Time.now.utc.to_i
@@ -222,13 +265,14 @@ module StripeMock
       end
 
       def cancel_subscription(route, method_url, params, headers)
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
         subscription_id = $2 ? $2 : $1
         subscription = assert_existence :subscription, subscription_id, subscriptions[subscription_id]
 
         customer_id = subscription[:customer]
-        customer = assert_existence :customer, customer_id, customers[customer_id]
+        customer = assert_existence :customer, customer_id, customers[stripe_account][customer_id]
 
         cancel_params = { canceled_at: Time.now.utc.to_i }
         cancelled_at_period_end = (params[:at_period_end] == true)
@@ -257,14 +301,17 @@ module StripeMock
                    elsif params[:items]
                      items = params[:items]
                      items = items.values if items.respond_to?(:values)
-                     items.map { |item| item[:plan].to_s if item[:plan] }.compact
+                     items.map { |item| item[:plan] ? item[:plan] : item[:price] }
                    else
                      []
                    end
+        plan_ids.compact!
         plan_ids.each do |plan_id|
           assert_existence :plan, plan_id, plans[plan_id]
+        rescue Stripe::InvalidRequestError
+          assert_existence :price, plan_id, prices[plan_id]
         end
-        plan_ids.map { |plan_id| plans[plan_id] }
+        plan_ids.map { |plan_id| plans[plan_id] || prices[plan_id]}
       end
 
       # Ensure customer has card to charge unless one of the following criterias is met:
@@ -276,6 +323,8 @@ module StripeMock
         return if customer[:invoice_settings][:default_payment_method]
         return if customer[:trial_end]
         return if params[:trial_end]
+        return if params[:payment_behavior] == 'default_incomplete'
+        return if subscription[:default_payment_method]
 
         plan_trial_period_days = plan[:trial_period_days] || 0
         plan_has_trial = plan_trial_period_days != 0 || plan[:amount] == 0 || plan[:trial_end]

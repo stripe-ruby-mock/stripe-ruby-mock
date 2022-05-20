@@ -54,11 +54,12 @@ module StripeMock
 
       # post /v1/payment_methods/:id/attach
       def attach_payment_method(route, method_url, params, headers)
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         allowed_params = [:customer]
 
         id = method_url.match(route)[1]
 
-        assert_existence :customer, params[:customer], customers[params[:customer]]
+        assert_existence :customer, params[:customer], customers[stripe_account][params[:customer]]
 
         payment_method = assert_existence :payment_method, id, payment_methods[id]
         payment_methods[id] = Util.rmerge(payment_method, params.select { |k, _v| allowed_params.include?(k) })
@@ -78,6 +79,10 @@ module StripeMock
       # post /v1/payment_methods/:id
       def update_payment_method(route, method_url, params, headers)
         allowed_params = [:billing_details, :card, :metadata]
+        disallowed_params = params.keys - allowed_params
+        unless disallowed_params.empty?
+          raise Stripe::InvalidRequestError.new("Received unknown parameter: #{disallowed_params.first}", disallowed_params.first)
+        end
 
         id = method_url.match(route)[1]
 
@@ -86,7 +91,8 @@ module StripeMock
         if payment_method[:customer].nil?
           raise Stripe::InvalidRequestError.new(
             'You must save this PaymentMethod to a customer before you can update it.',
-            { http_status: 400 }
+            nil,
+            http_status: 400
           )
         end
 
@@ -103,14 +109,15 @@ module StripeMock
 
         if invalid_type?(params[:type])
           raise Stripe::InvalidRequestError.new(
-            'Invalid type: must be one of card or card_present',
-            { http_status: 400 }
+            'Invalid type: must be one of card, ideal or sepa_debit',
+            nil,
+            http_status: 400
           )
         end
       end
 
       def invalid_type?(type)
-        !['card', 'card_present'].include?(type)
+        !%w(card ideal sepa_debit).include?(type)
       end
     end
   end

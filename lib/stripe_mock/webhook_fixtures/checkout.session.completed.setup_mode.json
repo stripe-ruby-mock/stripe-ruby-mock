@@ -1,0 +1,45 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "checkout.session.completed",
+  "object": "event",
+  "data": {
+    "object": {
+      "id": "cs_00000000000000",
+      "object": "checkout.session",
+      "allow_promotion_codes": null,
+      "amount_subtotal": null,
+      "amount_total": null,
+      "automatic_tax": {
+        "enabled": false,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "cancel_url": "https://example.com/cancel",
+      "client_reference_id": null,
+      "currency": null,
+      "customer": null,
+      "customer_details": null,
+      "customer_email": null,
+      "livemode": false,
+      "locale": null,
+      "metadata": {},
+      "mode": "setup",
+      "payment_intent": null,
+      "payment_method_options": {},
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "no_payment_required",
+      "setup_intent": "seti_00000000000000",
+      "shipping": null,
+      "shipping_address_collection": null,
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://example.com/success",
+      "total_details": null,
+      "url": null
+    }
+  }
+}

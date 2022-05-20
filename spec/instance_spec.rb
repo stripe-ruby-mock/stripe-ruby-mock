@@ -54,17 +54,15 @@ describe StripeMock::Instance do
   end
 
   it "allows non-usd default currency" do
+    pending("Stripe::Plan requires currency param - how can we test this?")
     old_default_currency = StripeMock.default_currency
-    customer = begin
+    plan = begin
       StripeMock.default_currency = "jpy"
-      Stripe::Customer.create({
-        email: 'johnny@appleseed.com',
-        source: stripe_helper.generate_card_token
-      })
+      Stripe::Plan.create(interval: 'month')
     ensure
       StripeMock.default_currency = old_default_currency
     end
-    expect(customer.currency).to eq("jpy")
+    expect(plan.currency).to eq("jpy")
   end
 
   context 'when creating sources with metadata' do

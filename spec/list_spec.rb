@@ -109,6 +109,21 @@ describe StripeMock::Data::List do
     end
   end
 
+  context "active filter" do
+    it "accepts an active param which filters out data accordingly" do
+      product = Stripe::Product.create(id: "prod_123", name: "My Beautiful Product", type: "service")
+
+      plan_attributes = { product: product.id, interval: "month", currency: "usd", amount: 500 }
+      plan_a = Stripe::Plan.create(plan_attributes)
+      plan_b = Stripe::Plan.create(**plan_attributes, active: false)
+
+      list = StripeMock::Data::List.new([plan_a, plan_b], active: true)
+
+      expect(list.active).to eq(true)
+      expect(list.to_h[:data].count).to eq(1)
+    end
+  end
+
   context "pagination" do
     it "has a has_more field when it has more" do
       list = StripeMock::Data::List.new(
@@ -135,6 +150,29 @@ describe StripeMock::Data::List do
       list = StripeMock::Data::List.new(data, starting_after: "test_ch_unknown")
 
       expect { list.to_h }.to raise_error
+    end
+  end
+
+  context "with data containing records marked 'deleted'" do
+    let(:customer_data) { StripeMock.instance.customers.values }
+    let(:customers) do
+      customer_data.map { |datum| Stripe::Util.convert_to_stripe_object(datum) }
+    end
+
+    before do
+      StripeMock.instance.customers.clear
+      Stripe::Customer.create
+      Stripe::Customer.delete(Stripe::Customer.create.id)
+    end
+
+    it "does not raise error on initialization" do
+      expect { StripeMock::Data::List.new(customer_data) }.to_not raise_error
+      expect { StripeMock::Data::List.new(customers) }.to_not raise_error
+    end
+
+    it "omits records marked 'deleted'" do
+      expect(StripeMock::Data::List.new(customer_data).data.size).to eq(1)
+      expect(StripeMock::Data::List.new(customers).data.size).to eq(1)
     end
   end
 end

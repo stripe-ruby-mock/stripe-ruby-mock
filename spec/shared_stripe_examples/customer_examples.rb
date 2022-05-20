@@ -290,20 +290,18 @@ shared_examples 'Customer API' do
   end
 
   it "stores a created stripe customer in memory" do
-    customer = Stripe::Customer.create({
-      email: 'johnny@appleseed.com',
-      source: gen_card_tk
-    })
-    customer2 = Stripe::Customer.create({
-      email: 'bob@bobbers.com',
-      source: gen_card_tk
-    })
+    customer = Stripe::Customer.create(email: 'johnny@appleseed.com')
+    customer2 = Stripe::Customer.create(email: 'bob@bobbers.com')
     data = test_data_source(:customers)
-    expect(data[customer.id]).to_not be_nil
-    expect(data[customer.id][:email]).to eq('johnny@appleseed.com')
+    list = data[data.keys.first]
 
-    expect(data[customer2.id]).to_not be_nil
-    expect(data[customer2.id][:email]).to eq('bob@bobbers.com')
+    customer_hash = list[customer.id.to_sym] || list[customer.id]
+    expect(customer_hash).to_not be_nil
+    expect(customer_hash[:email]).to eq('johnny@appleseed.com')
+
+    customer2_hash = list[customer2.id.to_sym] || list[customer2.id]
+    expect(customer2_hash).to_not be_nil
+    expect(customer2_hash[:email]).to eq('bob@bobbers.com')
   end
 
   it "retrieves a stripe customer" do
@@ -348,7 +346,7 @@ shared_examples 'Customer API' do
 
     all = Stripe::Customer.list
     expect(all.count).to eq(2)
-    expect(all.map &:email).to include('one@one.com', 'two@two.com')
+    expect(all.data.map &:email).to include('one@one.com', 'two@two.com')
   end
 
   it "updates a stripe customer" do
@@ -370,6 +368,15 @@ shared_examples 'Customer API' do
     expect(customer.description).to eq('new desc')
     expect(customer.preferred_locales).to eq(%w(fr en))
     expect(customer.discount.coupon).to be_a Stripe::Coupon
+  end
+
+  it "preserves stripe customer metadata" do
+    metadata = {user_id: "38"}
+    customer = Stripe::Customer.create(metadata: metadata)
+    expect(customer.metadata.to_h).to eq(metadata)
+
+    updated = Stripe::Customer.update(customer.id, metadata: {fruit: "apples"})
+    expect(updated.metadata.to_h).to eq(metadata.merge(fruit: "apples"))
   end
 
   it "retrieves the customer's default source after it was updated" do
