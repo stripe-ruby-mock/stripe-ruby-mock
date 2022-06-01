@@ -206,11 +206,33 @@ module StripeMock
         created: 1366194027,
         customer: nil,
         currency: currency,
+        destination: nil,
         description: nil,
         dispute: nil,
         failure_code: nil,
         failure_message: nil,
         fraud_details: {},
+        payment_method_details: {
+          card: {
+            brand: "visa",
+            checks: {
+              address_line1_check: nil,
+              address_postal_code_check: nil,
+              cvc_check: "pass"
+            },
+            country: "US",
+            exp_month: 12,
+            exp_year: 2013,
+            fingerprint: "3TQGpK9JoY1GgXPw",
+            funding: "credit",
+            installments: nil,
+            last4: "4242",
+            network: "visa",
+            three_d_secure: nil,
+            wallet: nil
+          },
+          type: "card"
+        },
         invoice: nil,
         livemode: false,
         paid: true,
@@ -379,7 +401,7 @@ module StripeMock
         canceled_at: nil,
         collection_method: 'charge_automatically',
         ended_at: nil,
-        start: 1308595038,
+        start_date: 1308595038,
         object: 'subscription',
         trial_start: 1308595038,
         trial_end: 1308681468,

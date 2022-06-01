@@ -171,6 +171,11 @@ module StripeMock
            params[:refunds].has_key?(:data) && params[:refunds][:data].nil?)
           allowed << :refunds
         end
+        if params.has_key?(:payment_method_details) && (params[:payment_method_details].empty? ||
+           params[:payment_method_details].has_key?(:card) && (params[:payment_method_details][:card].empty? ||
+           params[:payment_method_details][:card].has_key?(:checks) && params[:payment_method_details][:card][:checks].empty?))
+          allowed << :payment_method_details
+        end
 
         allowed
       end

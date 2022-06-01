@@ -712,7 +712,7 @@ shared_examples 'Customer Subscriptions with plans' do
       })
 
       expect(subscription.latest_invoice.payment_intent.status).to eq('requires_payment_method')
-      
+
       subscription = Stripe::Subscription.create({
         customer: customer.id,
         plan: plan.id,
@@ -1256,6 +1256,10 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(subscription.items.data.first.plan.currency).to eq('usd')
       expect(subscription.items.data.first.quantity).to eq(2)
     end
+
+    it "has a start_date attribute" do
+      expect(subscription).to respond_to(:start_date)
+    end
   end
 
   context "retrieve multiple subscriptions" do
@@ -1324,6 +1328,27 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(customer.email).to eq('johnny@appleseed.com')
       expect(customer.subscriptions.first.plan.id).to eq('Sample5')
       expect(customer.subscriptions.first.metadata['foo']).to eq('bar')
+    end
+
+    it "saves subscription item metadata" do
+      stripe_helper.
+        create_plan(
+        :amount => 500,
+        :interval => 'month',
+        :product => product.id,
+        :currency => 'usd',
+        :id => 'Sample5'
+      )
+      customer = Stripe::Customer.create({
+        email: 'johnny@appleseed.com',
+        source: gen_card_tk
+      })
+
+      subscription = Stripe::Subscription.create(
+        customer: customer.id,
+        items: [{plan: "Sample5", metadata: {foo: 'bar'}}],
+      )
+      expect(subscription.items.data[0].metadata.to_h).to eq(foo: 'bar')
     end
   end
 end
