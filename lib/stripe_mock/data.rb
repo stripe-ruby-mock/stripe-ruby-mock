@@ -222,7 +222,7 @@ module StripeMock
             checks: {
               address_line1_check: nil,
               address_postal_code_check: nil,
-              cvc_check: "unchecked"
+              cvc_check: "pass"
             },
             country: "US",
             exp_month: 12,
@@ -231,7 +231,6 @@ module StripeMock
             funding: "credit",
             installments: nil,
             last4: "4242",
-            moto: nil,
             network: "visa",
             three_d_secure: nil,
             wallet: nil
