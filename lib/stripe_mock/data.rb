@@ -212,27 +212,6 @@ module StripeMock
         failure_code: nil,
         failure_message: nil,
         fraud_details: {},
-        payment_method_details: {
-          card: {
-            brand: "visa",
-            checks: {
-              address_line1_check: nil,
-              address_postal_code_check: nil,
-              cvc_check: "pass"
-            },
-            country: "US",
-            exp_month: 12,
-            exp_year: 2013,
-            fingerprint: "3TQGpK9JoY1GgXPw",
-            funding: "credit",
-            installments: nil,
-            last4: "4242",
-            network: "visa",
-            three_d_secure: nil,
-            wallet: nil
-          },
-          type: "card"
-        },
         invoice: nil,
         livemode: false,
         paid: true,
