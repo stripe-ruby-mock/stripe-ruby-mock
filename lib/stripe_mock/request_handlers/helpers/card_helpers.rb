@@ -94,6 +94,8 @@ module StripeMock
         source =
           if params[:card]
             card_from_params(params[:card])
+          elsif params[:ach_credit_transfer]
+            get_ach_credit_transfer_by_token(params[:ach_credit_transfer])
           elsif params[:bank_account]
             get_bank_by_token(params[:bank_account])
           else

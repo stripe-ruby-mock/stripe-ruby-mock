@@ -275,6 +275,54 @@ module StripeMock
       }, params)
     end
 
+    def self.mock_ach_credit_transfer(params={})
+      currency = params[:currency] || StripeMock.default_currency
+      {
+        id: 'src_test_ach_transfer',
+        object: 'source',
+        ach_credit_transfer: {
+          account_number: 'test_413658ce3cdd',
+          routing_number: '110000000',
+          fingerprint: 'SceoQ3FO67uf3b8c',
+          swift_code: 'TSTEZ122',
+          bank_name: 'TEST BANK',
+          refund_routing_number: nil,
+          refund_account_holder_type: nil,
+          refund_account_holder_name: nil
+        },
+        amount: nil,
+        client_secret: 'src_client_secret_aaaaa',
+        created: 1653441407,
+        currency: currency,
+        customer: 'c_test_customer',
+        flow: 'receiver',
+        livemode: false,
+        metadata: {},
+        owner: {
+          address: nil,
+          email: 'amount_0@stripe.com',
+          name: nil,
+          phone: nil,
+          verified_address: nil,
+          verified_email: nil,
+          verified_name: nil,
+          verified_phone: nil
+        },
+        receiver: {
+          address: '110000000-test_413658ce3cdd',
+          amount_charged: 0,
+          amount_received: 0,
+          amount_returned: 0,
+          refund_attributes_method: 'email',
+          refund_attributes_status: 'missing'
+        },
+        statement_descriptor: nil,
+        status: 'pending',
+        type: 'ach_credit_transfer',
+        usage: 'reusable'
+      }.merge(params)
+    end
+
     def self.mock_bank_account(params={})
       currency = params[:currency] || StripeMock.default_currency
       {
@@ -1190,6 +1238,10 @@ module StripeMock
     end
 
     def self.source_to_payment_method(source={})
+      if source[:object] == "source" && source[:ach_credit_transfer].present?
+        return Data.mock_ach_credit_transfer_payment_method(source)
+      end
+
       params = {
         id: source[:id],
         card: source, customer: source[:customer], metadata: source[:metadata],
@@ -1199,6 +1251,54 @@ module StripeMock
         }
       }
       Data.mock_payment_method(params)
+    end
+    
+    def self.mock_ach_credit_transfer_payment_method(params = {})
+      payment_method_id = params[:id] || "src_1L38qBEm9XYVHykjLMIpRxfe"
+      {
+        id: payment_method_id,
+        object: "source",
+        type: "ach_credit_transfer",
+        ach_credit_transfer: {
+          account_number: "test_413658ce3cdd",
+          routing_number: "110000000",
+          fingerprint: "SceoQ3FO67uf3b8c",
+          swift_code: "TSTEZ122",
+          bank_name: "TEST BANK",
+          refund_routing_number: nil,
+          refund_account_holder_type: nil,
+          refund_account_holder_name: nil
+        },
+        amount: nil,
+        client_secret: "src_client_secret_SrqTUKKMHBSkDJzWOi0FYXL4",
+        created: 1653441407,
+        currency: "usd",
+        customer: params[:customer] || nil,
+        flow: "receiver",
+        livemode: false,
+        metadata: {},
+        owner: {
+          address: nil,
+          email: "amount_0@stripe.com",
+          name: nil,
+          phone: nil,
+          verified_address: nil,
+          verified_email: nil,
+          verified_name: nil,
+          verified_phone: nil
+        },
+        receiver: {
+          address: "110000000-test_413658ce3cdd",
+          amount_charged: 0,
+          amount_received: 0,
+          amount_returned: 0,
+          refund_attributes_method: "email",
+          refund_attributes_status: "missing"
+        },
+        statement_descriptor: nil,
+        status: "pending",
+        usage: "reusable"
+      }.merge(params)
     end
 
     def self.mock_payment_method(params = {})
