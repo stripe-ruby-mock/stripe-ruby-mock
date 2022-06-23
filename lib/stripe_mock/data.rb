@@ -640,6 +640,7 @@ module StripeMock
         caption: nil,
         created: 1466698000,
         deactivate_on: [],
+        default_price: nil,
         description: nil,
         images: [],
         livemode: false,
