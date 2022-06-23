@@ -29,7 +29,13 @@ module StripeMock
 
       def get_price(route, method_url, params, headers)
         route =~ method_url
-        assert_existence :price, $1, prices[$1]
+        price = assert_existence :price, $1, prices[$1]
+
+        if params[:expand] == ['product']
+          price[:product] = products[price[:product]]
+        end
+
+        price
       end
 
       def list_prices(route, method_url, params, headers)
