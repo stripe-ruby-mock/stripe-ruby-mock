@@ -1,0 +1,114 @@
+{
+  "id": "evt_000000000000000000000000",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648320110,
+  "data": {
+    "object": {
+      "id": "sub_sched_000000000000000000000000",
+      "object": "subscription_schedule",
+      "canceled_at": null,
+      "completed_at": null,
+      "created": 1648320110,
+      "current_phase": {
+        "end_date": 1650998510,
+        "start_date": 1648320110
+      },
+      "customer": "cus_00000000000000",
+      "default_settings": {
+        "application_fee_percent": null,
+        "automatic_tax": {
+          "enabled": false
+        },
+        "billing_cycle_anchor": "automatic",
+        "billing_thresholds": null,
+        "collection_method": "charge_automatically",
+        "default_payment_method": null,
+        "default_source": null,
+        "invoice_settings": null,
+        "transfer_data": null
+      },
+      "end_behavior": "release",
+      "livemode": false,
+      "metadata": {
+      },
+      "phases": [
+        {
+          "add_invoice_items": [
+
+          ],
+          "application_fee_percent": null,
+          "billing_cycle_anchor": null,
+          "billing_thresholds": null,
+          "collection_method": null,
+          "coupon": null,
+          "default_payment_method": null,
+          "default_tax_rates": [
+
+          ],
+          "end_date": 1650998510,
+          "invoice_settings": null,
+          "items": [
+            {
+              "billing_thresholds": null,
+              "plan": "price_000000000000000000000000",
+              "price": "price_000000000000000000000000",
+              "quantity": 1,
+              "tax_rates": [
+
+              ]
+            }
+          ],
+          "proration_behavior": "create_prorations",
+          "start_date": 1648320110,
+          "transfer_data": null,
+          "trial_end": null
+        },
+        {
+          "add_invoice_items": [
+
+          ],
+          "application_fee_percent": null,
+          "billing_cycle_anchor": null,
+          "billing_thresholds": null,
+          "collection_method": null,
+          "coupon": null,
+          "default_payment_method": null,
+          "default_tax_rates": [
+
+          ],
+          "end_date": 1653590510,
+          "invoice_settings": null,
+          "items": [
+            {
+              "billing_thresholds": null,
+              "plan": "price_000000000000000000000000",
+              "price": "price_000000000000000000000000",
+              "quantity": 2,
+              "tax_rates": [
+
+              ]
+            }
+          ],
+          "proration_behavior": "create_prorations",
+          "start_date": 1650998510,
+          "transfer_data": null,
+          "trial_end": null
+        }
+      ],
+      "released_at": null,
+      "released_subscription": null,
+      "renewal_interval": null,
+      "status": "active",
+      "subscription": "sub_000000000000000000000000",
+      "test_clock": null
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": "af06a7d9-5408-4f65-8379-59a93874d04c"
+  },
+  "type": "subscription_schedule.created"
+}
