@@ -10,12 +10,7 @@ Gem::Specification.new do |gem|
   gem.license       = "MIT"
   gem.authors       = ["Gilbert"]
   gem.email         = "gilbertbgarza@gmail.com"
-  gem.homepage      = "https://github.com/stripe-ruby-mock/stripe-ruby-mock"
-  gem.metadata      = {
-    "bug_tracker_uri" => "https://github.com/stripe-ruby-mock/stripe-ruby-mock/issues",
-    "changelog_uri"   => "https://github.com/stripe-ruby-mock/stripe-ruby-mock/blob/master/CHANGELOG.md",
-    "source_code_uri" => "https://github.com/stripe-ruby-mock/stripe-ruby-mock"
-  }
+  gem.homepage      = "https://github.com/rebelidealist/stripe-ruby-mock"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
@@ -28,5 +23,5 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency 'rspec', '~> 3.7.0'
   gem.add_development_dependency 'rubygems-tasks', '~> 0.2'
-  gem.add_development_dependency 'thin', '~> 1.8.1'
+  gem.add_development_dependency 'thin', '~> 1.6.4'
 end

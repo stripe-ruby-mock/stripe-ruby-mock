@@ -18,12 +18,6 @@
           "currency": "usd"
         }
       ],
-      "instant_available": [
-        {
-          "amount": 0,
-          "currency": "usd"
-        }
-      ],
       "livemode": false,
       "object": "balance"
     }

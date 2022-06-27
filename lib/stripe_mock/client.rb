@@ -18,8 +18,7 @@ module StripeMock
         @pipe.mock_request(method, url, api_key: api_key, params: params, headers: headers).tap {|result|
           response, api_key = result
           if response.is_a?(Hash) && response[:error_raised] == 'invalid_request'
-            args, keyword_args = response[:error_params].first(2), response[:error_params].last
-            raise Stripe::InvalidRequestError.new(*args, **keyword_args)
+            raise Stripe::InvalidRequestError.new(*response[:error_params])
           end
         }
       end

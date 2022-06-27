@@ -7,7 +7,6 @@ end
 
 group :test do
   gem 'rake'
-  gem 'dotenv'
 end
 
 gemspec

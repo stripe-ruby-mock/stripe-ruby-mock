@@ -38,16 +38,14 @@ describe 'StripeMock Server', :mock_server => true do
     customer = Stripe::Customer.create(email: 'johnny@appleseed.com')
     expect(customer.email).to eq('johnny@appleseed.com')
 
-    server_customer_data = StripeMock.client.get_server_data(:customers)
-    server_customer_data = server_customer_data[server_customer_data.keys.first][customer.id.to_sym]
+    server_customer_data = StripeMock.client.get_server_data(:customers)[customer.id]
     expect(server_customer_data).to_not be_nil
     expect(server_customer_data[:email]).to eq('johnny@appleseed.com')
 
     StripeMock.stop_client
     StripeMock.start_client
 
-    server_customer_data = StripeMock.client.get_server_data(:customers)
-    server_customer_data = server_customer_data[server_customer_data.keys.first][customer.id.to_sym]
+    server_customer_data = StripeMock.client.get_server_data(:customers)[customer.id]
     expect(server_customer_data).to_not be_nil
     expect(server_customer_data[:email]).to eq('johnny@appleseed.com')
   end

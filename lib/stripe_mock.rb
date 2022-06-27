@@ -47,8 +47,6 @@ require 'stripe_mock/request_handlers/helpers/token_helpers.rb'
 
 require 'stripe_mock/request_handlers/validators/param_validators.rb'
 
-require 'stripe_mock/request_handlers/account_links.rb'
-require 'stripe_mock/request_handlers/express_login_links.rb'
 require 'stripe_mock/request_handlers/accounts.rb'
 require 'stripe_mock/request_handlers/external_accounts.rb'
 require 'stripe_mock/request_handlers/balance.rb'
@@ -64,7 +62,6 @@ require 'stripe_mock/request_handlers/invoices.rb'
 require 'stripe_mock/request_handlers/invoice_items.rb'
 require 'stripe_mock/request_handlers/orders.rb'
 require 'stripe_mock/request_handlers/plans.rb'
-require 'stripe_mock/request_handlers/prices.rb'
 require 'stripe_mock/request_handlers/recipients.rb'
 require 'stripe_mock/request_handlers/refunds.rb'
 require 'stripe_mock/request_handlers/transfers.rb'
@@ -79,7 +76,7 @@ require 'stripe_mock/request_handlers/country_spec.rb'
 require 'stripe_mock/request_handlers/ephemeral_key.rb'
 require 'stripe_mock/request_handlers/products.rb'
 require 'stripe_mock/request_handlers/tax_rates.rb'
-require 'stripe_mock/request_handlers/checkout_session.rb'
+require 'stripe_mock/request_handlers/checkout.rb'
 require 'stripe_mock/instance'
 
 require 'stripe_mock/test_strategies/base.rb'
@@ -89,14 +86,12 @@ require 'stripe_mock/test_strategies/live.rb'
 module StripeMock
 
   @default_currency = 'usd'
-  @checkout_base = "https://checkout.stripe.com/pay/"
   lib_dir = File.expand_path(File.dirname(__FILE__), '../..')
   @webhook_fixture_path = './spec/fixtures/stripe_webhooks/'
   @webhook_fixture_fallback_path = File.join(lib_dir, 'stripe_mock/webhook_fixtures')
 
   class << self
     attr_accessor :default_currency
-    attr_accessor :checkout_base
     attr_accessor :webhook_fixture_path
   end
 end
