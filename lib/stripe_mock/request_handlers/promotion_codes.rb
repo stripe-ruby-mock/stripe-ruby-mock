@@ -17,12 +17,12 @@ module StripeMock
 
       def get_promotion_code(route, method_url, params, headers)
         route =~ method_url
-        assert_existence :coupon, $1, promotion_codes[$1]
+        assert_existence :promotion_code, $1, promotion_codes[$1]
       end
 
       def delete_promotion_code(route, method_url, params, headers)
         route =~ method_url
-        assert_existence :coupon, $1, promotion_codes.delete($1)
+        assert_existence :promotion_code, $1, promotion_codes.delete($1)
       end
 
       def list_promotion_codes
