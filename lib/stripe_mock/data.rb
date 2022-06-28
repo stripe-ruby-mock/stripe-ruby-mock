@@ -318,24 +318,24 @@ module StripeMock
           "amount_off": 800,
           "currency": "usd",
           "duration": "once",
-          "duration_in_months": null,
+          "duration_in_months": nil,
           "livemode": false,
           "max_redemptions": 1,
           "metadata": {},
           "name": "Affiliate Trial Month",
-          "percent_off": null,
-          "redeem_by": null,
+          "percent_off": nil,
+          "redeem_by": nil,
           "times_redeemed": 0,
           "valid": true
         },
-        "customer": null,
+        "customer": nil,
         "livemode": false,
         "max_redemptions": 1,
         "metadata": {},
         "restrictions": {
           "first_time_transaction": false,
-          "minimum_amount": null,
-          "minimum_amount_currency": null
+          "minimum_amount": nil,
+          "minimum_amount_currency": nil
         },
         "times_redeemed": 0
       }.merge(params)
