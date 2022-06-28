@@ -1,8 +1,8 @@
 module StripeMock
   module RequestHandlers
-    module PromotionCode
+    module PromotionCodes
 
-      def PromotionCode.included(klass)
+      def PromotionCodes.included(klass)
         klass.add_handler 'post /v1/promotion_codes',        :new_promotion_code
         klass.add_handler 'get /v1/promotion_codes/(.*)',    :get_promotion_code
         klass.add_handler 'delete /v1/promotion_codes/(.*)', :delete_promotion_code

@@ -34,6 +34,7 @@ module StripeMock
     include StripeMock::RequestHandlers::SubscriptionItems
     include StripeMock::RequestHandlers::Customers
     include StripeMock::RequestHandlers::Coupons
+    include StripeMock::RequestHandlers::PromotionCodes
     include StripeMock::RequestHandlers::Disputes
     include StripeMock::RequestHandlers::Events
     include StripeMock::RequestHandlers::Invoices
