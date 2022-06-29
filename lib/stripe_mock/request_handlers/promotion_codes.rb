@@ -25,7 +25,7 @@ module StripeMock
         assert_existence :promotion_code, $1, promotion_codes.delete($1)
       end
 
-      def list_promotion_codes
+      def list_promotion_codes(route, method_url, params, headers)
         Data.mock_list_object(promotion_codes.values, params)
       end
 
