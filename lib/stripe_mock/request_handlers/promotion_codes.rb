@@ -10,7 +10,7 @@ module StripeMock
       end
 
       def new_promotion_code(route, method_url, params, headers)
-        params[:id] ||= new_id('coupon')
+        params[:id] ||= new_id('promotion_code')
         raise Stripe::InvalidRequestError.new('Missing required param: coupon', 'promotion_code', http_status: 400) unless params[:coupon]
         promotion_codes[ params[:id] ] = Data.mock_promotion_code.merge(params)
       end
