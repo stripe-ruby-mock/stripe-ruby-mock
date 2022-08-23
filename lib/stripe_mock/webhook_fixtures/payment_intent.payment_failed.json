@@ -1,18 +1,18 @@
 {
-  "id": "evt_00000000000000",
+  "id": "evt_000000000000000000000000",
   "object": "event",
-  "api_version": "2018-02-28",
-  "created": 1578401135,
+  "api_version": "2020-08-27",
+  "created": 1648320029,
   "data": {
     "object": {
-      "id": "pi_00000000000000",
+      "id": "pi_000000000000000000000000",
       "object": "payment_intent",
-      "allowed_source_types": ["card", "sepa_debit"],
-      "amount": 200,
+      "amount": 2000,
       "amount_capturable": 0,
       "amount_received": 0,
       "application": null,
       "application_fee_amount": null,
+      "automatic_payment_methods": null,
       "canceled_at": null,
       "cancellation_reason": null,
       "capture_method": "automatic",
@@ -20,9 +20,10 @@
         "object": "list",
         "data": [
           {
-            "id": "py_00000000000000",
+            "id": "ch_000000000000000000000000",
             "object": "charge",
-            "amount": 200,
+            "amount": 2000,
+            "amount_captured": 0,
             "amount_refunded": 0,
             "application": null,
             "application_fee": null,
@@ -37,89 +38,105 @@
                 "postal_code": null,
                 "state": null
               },
-              "email": "john.doe@example.com",
-              "name": "John Doe",
+              "email": null,
+              "name": null,
               "phone": null
             },
-            "captured": true,
-            "created": 1578401129,
-            "currency": "eur",
-            "customer": "cus_00000000000000",
-            "description": null,
-            "destination": "acct_00000000000000",
+            "calculated_statement_descriptor": "EXAMPLECOMPANY",
+            "captured": false,
+            "created": 1648320028,
+            "currency": "usd",
+            "customer": null,
+            "description": "(created by Stripe CLI)",
+            "destination": null,
             "dispute": null,
             "disputed": false,
-            "failure_code": null,
-            "failure_message": null,
-            "fraud_details": {},
+            "failure_code": "card_declined",
+            "failure_message": "Your card was declined.",
+            "fraud_details": {
+            },
             "invoice": null,
             "livemode": false,
-            "metadata": {},
+            "metadata": {
+            },
             "on_behalf_of": null,
             "order": null,
             "outcome": {
-              "network_status": "approved_by_network",
-              "reason": null,
-              "risk_level": "not_assessed",
-              "seller_message": "Payment complete.",
-              "type": "authorized"
+              "network_status": "declined_by_network",
+              "reason": "generic_decline",
+              "risk_level": "normal",
+              "risk_score": 1,
+              "seller_message": "The bank did not return any further details with this decline.",
+              "type": "issuer_declined"
             },
             "paid": false,
-            "payment_intent": "pi_00000000000000",
-            "payment_method": "pm_00000000000000",
+            "payment_intent": "pi_000000000000000000000000",
+            "payment_method": "pm_000000000000000000000000",
             "payment_method_details": {
-              "sepa_debit": {
-                "bank_code": "37040044",
-                "branch_code": null,
-                "country": "DE",
-                "fingerprint": "00000000000000",
-                "last4": "3001",
-                "mandate": "mandate_00000000000000"
+              "card": {
+                "brand": "visa",
+                "checks": {
+                  "address_line1_check": null,
+                  "address_postal_code_check": null,
+                  "cvc_check": null
+                },
+                "country": "US",
+                "exp_month": 3,
+                "exp_year": 2023,
+                "fingerprint": "kMzSwhaalD1uR96R",
+                "funding": "credit",
+                "installments": null,
+                "last4": "0002",
+                "mandate": null,
+                "network": "visa",
+                "three_d_secure": null,
+                "wallet": null
               },
-              "type": "sepa_debit"
+              "type": "card"
             },
             "receipt_email": null,
             "receipt_number": null,
-            "receipt_url": "https://pay.stripe.com/receipts/acct_00000000000000/py_00000000000000/rcpt_00000000000000",
+            "receipt_url": null,
             "refunded": false,
             "refunds": {
               "object": "list",
-              "data": [],
+              "data": [
+
+              ],
               "has_more": false,
               "total_count": 0,
-              "url": "/v1/charges/py_00000000000000/refunds"
+              "url": "/v1/charges/ch_000000000000000000000000/refunds"
             },
             "review": null,
             "shipping": null,
             "source": null,
             "source_transfer": null,
-            "statement_descriptor": "ACME Corp",
+            "statement_descriptor": null,
             "statement_descriptor_suffix": null,
             "status": "failed",
-            "transfer_data": {
-              "amount": null,
-              "destination": "acct_00000000000000"
-            },
-            "transfer_group": "group_pi_00000000000000"
+            "transfer_data": null,
+            "transfer_group": null
           }
         ],
         "has_more": false,
         "total_count": 1,
-        "url": "/v1/charges?payment_intent=pi_00000000000000"
+        "url": "/v1/charges?payment_intent=pi_000000000000000000000000"
       },
-      "client_secret": "pi_00000000000000",
+      "client_secret": "pi_000000000000000000000000_secret_0000000000000000000000000",
       "confirmation_method": "automatic",
-      "created": 1578401129,
-      "currency": "eur",
-      "customer": "cus_00000000000000",
-      "description": null,
+      "created": 1648320028,
+      "currency": "usd",
+      "customer": null,
+      "description": "(created by Stripe CLI)",
       "invoice": null,
       "last_payment_error": {
-        "code": "payment_intent_payment_attempt_failed",
-        "doc_url": "https://stripe.com/docs/error-codes/payment-intent-payment-attempt-failed",
-        "message": "The payment failed.",
+        "charge": "ch_000000000000000000000000",
+        "code": "card_declined",
+        "decline_code": "generic_decline",
+        "doc_url": "https://stripe.com/docs/error-codes/card-declined",
+        "message": "Your card was declined.",
         "payment_method": {
-          "id": "pm_00000000000000",
+          "id": "pm_000000000000000000000000",
           "object": "payment_method",
           "billing_details": {
             "address": {
@@ -130,57 +147,79 @@
               "postal_code": null,
               "state": null
             },
-            "email": "john.doe@example.com",
-            "name": "John Doe",
+            "email": null,
+            "name": null,
             "phone": null
           },
-          "created": 1578400666,
-          "customer": "cus_00000000000000",
-          "livemode": false,
-          "metadata": {},
-          "sepa_debit": {
-            "bank_code": "37040044",
-            "branch_code": "",
-            "country": "DE",
-            "fingerprint": "00000000000000",
-            "last4": "3001"
+          "card": {
+            "brand": "visa",
+            "checks": {
+              "address_line1_check": null,
+              "address_postal_code_check": null,
+              "cvc_check": null
+            },
+            "country": "US",
+            "exp_month": 3,
+            "exp_year": 2023,
+            "fingerprint": "kMzSwhaalD1uR96R",
+            "funding": "credit",
+            "generated_from": null,
+            "last4": "0002",
+            "networks": {
+              "available": [
+                "visa"
+              ],
+              "preferred": null
+            },
+            "three_d_secure_usage": {
+              "supported": true
+            },
+            "wallet": null
           },
-          "type": "sepa_debit"
+          "created": 1648320028,
+          "customer": null,
+          "livemode": false,
+          "metadata": {
+          },
+          "type": "card"
         },
-        "type": "invalid_request_error"
+        "type": "card_error"
       },
       "livemode": false,
-      "metadata": {},
+      "metadata": {
+      },
       "next_action": null,
-      "next_source_action": null,
       "on_behalf_of": null,
       "payment_method": null,
       "payment_method_options": {
         "card": {
           "installments": null,
+          "mandate_options": null,
+          "network": null,
           "request_three_d_secure": "automatic"
         }
       },
-      "payment_method_types": ["card", "sepa_debit"],
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
       "receipt_email": null,
       "review": null,
       "setup_future_usage": null,
       "shipping": null,
       "source": null,
-      "statement_descriptor": "ACME Corp",
+      "statement_descriptor": null,
       "statement_descriptor_suffix": null,
-      "status": "requires_source",
-      "transfer_data": {
-        "destination": "acct_00000000000000"
-      },
+      "status": "requires_payment_method",
+      "transfer_data": null,
       "transfer_group": null
     }
   },
   "livemode": false,
-  "pending_webhooks": 3,
+  "pending_webhooks": 2,
   "request": {
-    "id": null,
-    "idempotency_key": null
+    "id": "req_00000000000000",
+    "idempotency_key": "57ddc22f-1d42-446f-8f91-85cf0d32084a"
   },
   "type": "payment_intent.payment_failed"
 }

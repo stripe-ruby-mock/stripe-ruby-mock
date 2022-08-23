@@ -1,0 +1,100 @@
+{
+  "id": "evt_000000000000000000000000",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648320091,
+  "data": {
+    "object": {
+      "id": "seti_000000000000000000000000",
+      "object": "setup_intent",
+      "application": null,
+      "cancellation_reason": null,
+      "client_secret": "seti_000000000000000000000000_secret_0000000000000000000000000000000",
+      "created": 1648320090,
+      "customer": null,
+      "description": "(created by Stripe CLI)",
+      "last_setup_error": {
+        "code": "card_declined",
+        "decline_code": "generic_decline",
+        "doc_url": "https://stripe.com/docs/error-codes/card-declined",
+        "message": "Your card was declined.",
+        "payment_method": {
+          "id": "pm_000000000000000000000000",
+          "object": "payment_method",
+          "billing_details": {
+            "address": {
+              "city": null,
+              "country": null,
+              "line1": null,
+              "line2": null,
+              "postal_code": null,
+              "state": null
+            },
+            "email": null,
+            "name": null,
+            "phone": null
+          },
+          "card": {
+            "brand": "visa",
+            "checks": {
+              "address_line1_check": null,
+              "address_postal_code_check": null,
+              "cvc_check": null
+            },
+            "country": "US",
+            "exp_month": 3,
+            "exp_year": 2023,
+            "fingerprint": "kMzSwhaalD1uR96R",
+            "funding": "credit",
+            "generated_from": null,
+            "last4": "0002",
+            "networks": {
+              "available": [
+                "visa"
+              ],
+              "preferred": null
+            },
+            "three_d_secure_usage": {
+              "supported": true
+            },
+            "wallet": null
+          },
+          "created": 1648320090,
+          "customer": null,
+          "livemode": false,
+          "metadata": {
+          },
+          "type": "card"
+        },
+        "type": "card_error"
+      },
+      "latest_attempt": "setatt_000000000000000000000000",
+      "livemode": false,
+      "mandate": null,
+      "metadata": {
+      },
+      "next_action": null,
+      "on_behalf_of": null,
+      "payment_method": null,
+      "payment_method_options": {
+        "card": {
+          "mandate_options": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "single_use_mandate": null,
+      "status": "requires_payment_method",
+      "usage": "off_session"
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": "bc94842b-7374-410e-8aa2-935b8cc1250c"
+  },
+  "type": "setup_intent.setup_failed"
+}

@@ -13,9 +13,9 @@ module StripeMock
         subscription[:items][:data] = plans.map do |plan|
           matching_item = items && items.detect { |item| [item[:price], item[:plan]].include? plan[:id] }
           if matching_item
-            quantity = matching_item[:quantity] || 1
-            id = matching_item[:id] || new_id('si')
-            params = { plan: plan, quantity: quantity, id: id }
+            matching_item[:quantity] ||= 1
+            matching_item[:id] ||= new_id('si')
+            params = matching_item.merge(plan: plan)
             params[:price] = plan if plan[:object] == "price"
             Data.mock_subscription_item(params)
           else
