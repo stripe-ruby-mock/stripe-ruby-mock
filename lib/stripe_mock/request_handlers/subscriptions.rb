@@ -188,6 +188,12 @@ module StripeMock
         else
           subs = subs.filter {|subscription| subscription[:status] == params[:status]}
         end
+        if params[:current_period_end]
+          subs = filter_by_timestamp(subs, field: :current_period_end, value: params[:current_period_end])
+        end
+        if params[:current_period_start]
+          subs = filter_by_timestamp(subs, field: :current_period_start, value: params[:current_period_start])
+        end
 
         Data.mock_list_object(subs, params)
       end
