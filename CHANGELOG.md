@@ -1,3 +1,9 @@
+### Unreleased
+
+- [#806](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/806) - Remove `payment_method_types` from required arguments for `Stripe::Checkout::Session`
+- [#806](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/806) - Raise more helpful exception when Stripe::Price cannot be found within a `Stripe::Checkout::Session` `line_items` argument.
+
+
 ### 3.1.0.rc3 (pre-release 2021-07-14)
 
 - [#785](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/785): `Stripe::Product` no longer requires `type`. [@TastyPi](https://github.com/TastyPi)
