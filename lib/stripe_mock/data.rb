@@ -383,7 +383,8 @@ module StripeMock
             },
             quantity: 1,
             price: mock_price
-          }]
+          }],
+          has_more: false
         },
         cancel_at_period_end: false,
         canceled_at: nil,
