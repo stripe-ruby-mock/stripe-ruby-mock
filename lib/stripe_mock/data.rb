@@ -381,8 +381,7 @@ module StripeMock
               created: 1504035972,
               currency: StripeMock.default_currency
             },
-            quantity: 1,
-            price: mock_price
+            quantity: 1
           }],
           has_more: false
         },
