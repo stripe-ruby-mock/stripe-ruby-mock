@@ -406,7 +406,8 @@ module StripeMock
         latest_invoice: nil,
         application_fee_percent: nil,
         cancel_at: nil,
-        end_at: nil
+        end_at: nil,
+        pause_collection: nil
       }, params)
     end
 
