@@ -1,0 +1,79 @@
+{
+  "id": "evt_000000000000000000000000",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648319959,
+  "data": {
+    "object": {
+      "id": "cs_test_0000000000000000000000000000000000000000000000000000000000",
+      "object": "checkout.session",
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 3000,
+      "amount_total": 3000,
+      "automatic_tax": {
+        "enabled": false,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "cancel_url": "https://httpbin.org/post",
+      "client_reference_id": null,
+      "consent": null,
+      "consent_collection": null,
+      "currency": "usd",
+      "customer": "cus_00000000000000",
+      "customer_creation": "always",
+      "customer_details": {
+        "email": "stripe@example.com",
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": [
+
+        ]
+      },
+      "customer_email": null,
+      "expires_at": 1648406355,
+      "livemode": false,
+      "locale": null,
+      "metadata": {
+      },
+      "mode": "payment",
+      "payment_intent": "pi_000000000000000000000000",
+      "payment_link": null,
+      "payment_method_options": {
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "paid",
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "setup_intent": null,
+      "shipping": null,
+      "shipping_address_collection": null,
+      "shipping_options": [
+
+      ],
+      "shipping_rate": null,
+      "status": "complete",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://httpbin.org/post",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "url": null
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}

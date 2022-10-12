@@ -25,6 +25,7 @@ module StripeMock
     include StripeMock::RequestHandlers::SetupIntents
     include StripeMock::RequestHandlers::ExternalAccounts
     include StripeMock::RequestHandlers::AccountLinks
+    include StripeMock::RequestHandlers::ExpressLoginLinks
     include StripeMock::RequestHandlers::Accounts
     include StripeMock::RequestHandlers::Balance
     include StripeMock::RequestHandlers::BalanceTransactions
@@ -41,6 +42,7 @@ module StripeMock
     include StripeMock::RequestHandlers::InvoiceItems
     include StripeMock::RequestHandlers::Orders
     include StripeMock::RequestHandlers::Plans
+    include StripeMock::RequestHandlers::Prices
     include StripeMock::RequestHandlers::Products
     include StripeMock::RequestHandlers::Refunds
     include StripeMock::RequestHandlers::Recipients
@@ -55,8 +57,8 @@ module StripeMock
 
     attr_reader :accounts, :balance, :balance_transactions, :bank_tokens, :charges, :coupons, :customers,
                 :disputes, :events, :invoices, :invoice_items, :orders, :payment_intents, :payment_methods,
-                :setup_intents, :plans, :recipients, :refunds, :transfers, :payouts, :subscriptions, :country_spec,
-                :subscriptions_items, :products, :tax_rates, :checkout_sessions
+                :setup_intents, :plans, :prices, :recipients, :refunds, :transfers, :payouts, :subscriptions, :country_spec,
+                :subscriptions_items, :products, :tax_rates, :checkout_sessions, :checkout_session_line_items
 
     attr_accessor :error_queue, :debug, :conversion_rate, :account_balance
 
@@ -66,7 +68,7 @@ module StripeMock
       @balance_transactions = Data.mock_balance_transactions(['txn_05RsQX2eZvKYlo2C0FRTGSSA','txn_15RsQX2eZvKYlo2C0ERTYUIA', 'txn_25RsQX2eZvKYlo2C0ZXCVBNM', 'txn_35RsQX2eZvKYlo2C0QAZXSWE', 'txn_45RsQX2eZvKYlo2C0EDCVFRT', 'txn_55RsQX2eZvKYlo2C0OIKLJUY', 'txn_65RsQX2eZvKYlo2C0ASDFGHJ', 'txn_75RsQX2eZvKYlo2C0EDCXSWQ', 'txn_85RsQX2eZvKYlo2C0UJMCDET', 'txn_95RsQX2eZvKYlo2C0EDFRYUI'])
       @bank_tokens = {}
       @card_tokens = {}
-      @customers = {}
+      @customers = { Stripe.api_key => {} }
       @charges = {}
       @payment_intents = {}
       @payment_methods = {}
@@ -79,6 +81,7 @@ module StripeMock
       @orders = {}
       @payment_methods = {}
       @plans = {}
+      @prices = {}
       @products = {}
       @recipients = {}
       @refunds = {}
@@ -89,6 +92,7 @@ module StripeMock
       @country_spec = {}
       @tax_rates = {}
       @checkout_sessions = {}
+      @checkout_session_line_items = {}
 
       @debug = false
       @error_queue = ErrorQueue.new

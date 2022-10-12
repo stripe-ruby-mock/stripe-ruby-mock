@@ -81,6 +81,10 @@ module StripeMock
         route =~ method_url
         payment_intent = assert_existence :payment_intent, $1, payment_intents[$1]
 
+        if params[:payment_method]
+          payment_intent[:payment_method] = params[:payment_method]
+        end
+
         succeeded_payment_intent(payment_intent)
       end
 
@@ -172,7 +176,8 @@ module StripeMock
         payment_intent[:charges][:data] << Data.mock_charge(
           balance_transaction: btxn,
           amount: payment_intent[:amount],
-          currency: payment_intent[:currency]
+          currency: payment_intent[:currency],
+          payment_method: payment_intent[:payment_method]
         )
 
         payment_intent

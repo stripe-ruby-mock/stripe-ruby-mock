@@ -42,6 +42,15 @@ shared_examples 'SetupIntent API' do
     }
   end
 
+  it "expands payment_method" do
+    payment_method = Stripe::PaymentMethod.create(type: "card")
+    original = Stripe::SetupIntent.create(payment_method: payment_method.id)
+
+    setup_intent = Stripe::SetupIntent.retrieve({id: original.id, expand: ["payment_method"]})
+
+    expect(setup_intent.payment_method).to eq(payment_method)
+  end
+
   it "confirms a stripe setup_intent" do
     setup_intent = Stripe::SetupIntent.create()
     confirmed_setup_intent = setup_intent.confirm()
