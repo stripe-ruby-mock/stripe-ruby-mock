@@ -11,8 +11,23 @@ module StripeMock
 
       def create_product(_route, _method_url, params, _headers)
         params[:id] ||= new_id('prod')
+
+        default_price_data_params = params.delete(:default_price_data)
+
         validate_create_product_params(params)
         products[params[:id]] = Data.mock_product(params)
+        product = products[params[:id]]
+
+        if default_price_data_params.is_a?(Hash)
+          default_price_data_params.reject! { |k, _| %i[product product_data].include?(k) }
+          default_price_data_params[:id] ||= new_id('price')
+          default_price_data_params.merge!(product: product[:id])
+          validate_create_price_params(default_price_data_params)
+          prices[default_price_data_params[:id]] = Data.mock_price(default_price_data_params)
+          product[:default_price] = default_price_data_params[:id]
+        end
+
+        product
       end
 
       def retrieve_product(route, method_url, _params, _headers)
@@ -29,7 +44,18 @@ module StripeMock
 
       def list_products(_route, _method_url, params, _headers)
         limit = params[:limit] || 10
-        Data.mock_list_object(products.values.take(limit), params)
+        products_list = products.values.take(limit)
+
+        if params[:expand] == ['data.default_price']
+          products_list.each do |product|
+            next if product[:default_price].nil?
+
+            product[:default_price] = prices[product[:default_price]]
+          end
+          params.delete(:expand)
+        end
+
+        Data.mock_list_object(products_list, params)
       end
 
       def destroy_product(route, method_url, _params, _headers)
