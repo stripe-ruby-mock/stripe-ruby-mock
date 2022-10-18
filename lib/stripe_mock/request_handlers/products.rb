@@ -46,7 +46,7 @@ module StripeMock
         limit = params[:limit] || 10
         products_list = products.values.take(limit)
 
-        if params[:expand] == ['data.default_price']
+        if params[:expand].is_a?(Array) && params[:expand].any? { |data| data.match?(/data.default_price/) }
           products_list.each do |product|
             next if product[:default_price].nil?
 
