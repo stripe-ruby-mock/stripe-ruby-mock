@@ -195,6 +195,28 @@ shared_examples 'Customer Subscriptions with plans' do
       }
     end
 
+    it "allows promotion code" do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      coupon = stripe_helper.create_coupon
+      promotion_code = Stripe::PromotionCode.create(coupon: coupon)
+
+      subscription = Stripe::Subscription.create(plan: plan.id, customer: customer.id, promotion_code: promotion_code.id)
+
+      expect(subscription.discount.coupon).to eq(coupon)
+    end
+
+    it "does not permit both coupon and promotion code" do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      expect {
+        Stripe::Subscription.create(plan: plan.id, customer: customer.id, coupon: "test", promotion_code: "test")
+      }.to raise_error { |e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.http_status).to eq(400)
+        expect(e.message).to eq("You may only specify one of these parameters: coupon, promotion_code")
+      }
+    end
+
     it "correctly sets quantity, application_fee_percent and tax_percent" do
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
 
@@ -945,6 +967,23 @@ shared_examples 'Customer Subscriptions with plans' do
       subscription.save
 
       expect(subscription.discount).to be_nil
+    end
+
+    it "throws an error when promotion code has an amount restriction" do
+      coupon = stripe_helper.create_coupon
+      promotion_code = Stripe::PromotionCode.create(
+        coupon: coupon, restrictions: {minimum_amount: 100, minimum_amount_currency: "USD"}
+      )
+      customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
+      subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+
+      subscription.promotion_code = promotion_code.id
+
+      expect { subscription.save }.to raise_error { |e|
+        expect(e).to be_a Stripe::InvalidRequestError
+        expect(e.http_status).to eq(400)
+        expect(e.message).to_not be_nil
+      }
     end
 
     it "throws an error when plan does not exist" do
