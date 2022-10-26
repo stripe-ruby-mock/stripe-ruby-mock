@@ -375,6 +375,7 @@ module StripeMock
             id: 'si_1AwFf62eZvKYlo2C9u6Dhf9',
             created: 1504035973,
             metadata: {
+              # Added for avoiding nil exception
               company_deleted: false
             },
             object: 'subscription_item',
@@ -385,6 +386,7 @@ module StripeMock
             },
             quantity: 1
           }],
+          # Added missing attribute - it does not have another page of items
           has_more: false
         },
         cancel_at_period_end: false,
