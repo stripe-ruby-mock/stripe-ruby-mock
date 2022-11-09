@@ -28,22 +28,6 @@ shared_examples 'Bank Account Token Mocking' do
     expect(bank_token).to match /^test_btok/
   end
 
-  it "assigns the generated bank account to a new recipient" do
-    bank_token = StripeMock.generate_bank_token(
-      :bank_name => "Bank Token Mocking",
-      :last4 => "7777"
-    )
-
-    recipient = Stripe::Recipient.create({
-      name: "Fred Flinstone",
-      type: "individual",
-      email: 'blah@domain.co',
-      bank_account: bank_token
-    })
-    expect(recipient.active_account.last4).to eq("7777")
-    expect(recipient.active_account.bank_name).to eq("Bank Token Mocking")
-  end
-
   it "retrieves a created token" do
     bank_token = StripeMock.generate_bank_token(
       :bank_name => "Cha-ching Banking",
