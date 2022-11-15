@@ -5,8 +5,6 @@ require 'time'
 
 require 'stripe'
 
-require 'byebug'
-
 require 'stripe_mock/version'
 require 'stripe_mock/util'
 require 'stripe_mock/error_queue'

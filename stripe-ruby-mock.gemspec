@@ -22,12 +22,11 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ['lib']
 
-  gem.add_dependency 'stripe', '~> 7.1.0'
+  gem.add_dependency 'stripe', '> 5', '<= 7.1.0'
   gem.add_dependency 'multi_json', '~> 1.0'
   gem.add_dependency 'dante', '>= 0.2.0'
 
   gem.add_development_dependency 'rspec', '~> 3.7.0'
   gem.add_development_dependency 'rubygems-tasks', '~> 0.2'
   gem.add_development_dependency 'thin', '~> 1.8.1'
-  gem.add_development_dependency "byebug", '~> 11.1.3'
 end
