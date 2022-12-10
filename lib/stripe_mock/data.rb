@@ -353,6 +353,43 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_promotion_code(params={})
+      {
+        :id => "promo_test_promotion_code",
+        :object => "promotion_code",
+        :active => true,
+        :code => "TEST",
+        :coupon => {
+          :id => "co_test_coupon",
+          :object => "coupon",
+          :amount_off => nil,
+          :created => 1670476783,
+          :currency => nil,
+          :duration => "repeating",
+          :duration_in_months => 3,
+          :livemode => false,
+          :max_redemptions => nil,
+          :metadata => {},
+          :name => "Test",
+          :percent_off => 25,
+          :redeem_by => nil,
+          :times_redeemed => 0,
+          :valid => true
+        },
+        :created => 1670476783,
+        :customer => nil,
+        :expires_at => nil,
+        :livemode => false,
+        :max_redemptions => nil,
+        :restrictions => {
+          :first_time_transaction => false,
+          :minimum_amount => nil,
+          :minimum_amount_currency => nil
+        },
+        :times_redeemed => 0
+      }.merge(params)
+    end
+
     #FIXME nested overrides would be better than hardcoding plan_id
     def self.mock_subscription(params={})
       StripeMock::Util.rmerge({
