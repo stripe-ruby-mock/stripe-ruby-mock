@@ -401,6 +401,7 @@ module StripeMock
             quantity: 1
           }]
         },
+        cancel_at: nil
         cancel_at_period_end: false,
         canceled_at: nil,
         collection_method: 'charge_automatically',
