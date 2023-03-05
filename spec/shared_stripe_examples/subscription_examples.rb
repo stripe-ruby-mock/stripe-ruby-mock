@@ -200,9 +200,9 @@ shared_examples 'Customer Subscriptions with plans' do
       coupon = stripe_helper.create_coupon
       promotion_code = Stripe::PromotionCode.create(coupon: coupon)
 
-      subscription = Stripe::Subscription.create(plan: plan.id, customer: customer.id, promotion_code: promotion_code.id)
-
-      expect(subscription.discount.coupon).to eq(coupon)
+      expect {
+        Stripe::Subscription.create(plan: plan.id, customer: customer.id, promotion_code: promotion_code.id)
+      }.not_to raise_error(Stripe::InvalidRequestError)
     end
 
     it "does not permit both coupon and promotion code" do

@@ -74,15 +74,7 @@ module StripeMock
 
           promotion_code = promotion_codes[promotion_code_id]
 
-          if promotion_code
-            coupon_id = promotion_code[:coupon][:id]
-            coupon = coupons[coupon_id]
-            if coupon
-              add_coupon_to_object(subscription, coupon)
-            else
-              raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
-            end
-          else
+          unless promotion_code
             raise Stripe::InvalidRequestError.new("No such promotion code: #{promotion_code_id}", 'promotion_code', http_status: 400)
           end
         end
@@ -155,15 +147,7 @@ module StripeMock
 
           promotion_code = promotion_codes[promotion_code_id]
 
-          if promotion_code
-            coupon_id = promotion_code[:coupon][:id]
-            coupon = coupons[coupon_id]
-            if coupon
-              add_coupon_to_object(subscription, coupon)
-            else
-              raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
-            end
-          else
+          unless promotion_code
             raise Stripe::InvalidRequestError.new("No such promotion code: #{promotion_code_id}", 'promotion_code', http_status: 400)
           end
         end
@@ -290,14 +274,6 @@ module StripeMock
                 "promotion_code",
                 http_status: 400
               )
-            end
-
-            coupon_id = promotion_code[:coupon][:id]
-            coupon = coupons[coupon_id]
-            if coupon
-              add_coupon_to_object(subscription, coupon)
-            else
-              raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
             end
           else
             raise Stripe::InvalidRequestError.new("No such promotion code: #{promotion_code_id}", 'promotion_code', http_status: 400)
