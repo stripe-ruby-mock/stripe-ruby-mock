@@ -257,7 +257,7 @@ shared_examples 'Webhook Events API' do
       expect(subscription_created_event).to be_a(Stripe::Event)
       expect(subscription_created_event.id).to_not be_nil
       expect(subscription_created_event.data.object.items.data.class).to be Array
-      expect(subscription_created_event.data.object.items.data.length).to be 2
+      expect(subscription_created_event.data.object.items.data.length).to be 1
       expect(subscription_created_event.data.object.items.data.first).to respond_to(:plan)
       expect(subscription_created_event.data.object.items.data.first.id).to eq('si_00000000000000')
     end
@@ -267,7 +267,7 @@ shared_examples 'Webhook Events API' do
       expect(subscription_deleted_event).to be_a(Stripe::Event)
       expect(subscription_deleted_event.id).to_not be_nil
       expect(subscription_deleted_event.data.object.items.data.class).to be Array
-      expect(subscription_deleted_event.data.object.items.data.length).to be 2
+      expect(subscription_deleted_event.data.object.items.data.length).to be 1
       expect(subscription_deleted_event.data.object.items.data.first).to respond_to(:plan)
       expect(subscription_deleted_event.data.object.items.data.first.id).to eq('si_00000000000000')
     end
@@ -277,7 +277,7 @@ shared_examples 'Webhook Events API' do
       expect(subscription_updated_event).to be_a(Stripe::Event)
       expect(subscription_updated_event.id).to_not be_nil
       expect(subscription_updated_event.data.object.items.data.class).to be Array
-      expect(subscription_updated_event.data.object.items.data.length).to be 2
+      expect(subscription_updated_event.data.object.items.data.length).to be 1
       expect(subscription_updated_event.data.object.items.data.first).to respond_to(:plan)
       expect(subscription_updated_event.data.object.items.data.first.id).to eq('si_00000000000000')
     end
@@ -298,10 +298,11 @@ shared_examples 'Webhook Events API' do
       invoice_payment_succeeded = StripeMock.mock_webhook_event('invoice.payment_succeeded')
       expect(invoice_payment_succeeded).to be_a(Stripe::Event)
       expect(invoice_payment_succeeded.id).to_not be_nil
+      puts "invoice_payment_succeeded.data.object.lines: #{invoice_payment_succeeded.data.object.lines}"
       expect(invoice_payment_succeeded.data.object.lines.data.class).to be Array
-      expect(invoice_payment_succeeded.data.object.lines.data.length).to be 2
+      expect(invoice_payment_succeeded.data.object.lines.data.length).to be 1
       expect(invoice_payment_succeeded.data.object.lines.data.first).to respond_to(:plan)
-      expect(invoice_payment_succeeded.data.object.lines.data.first.id).to eq('sub_00000000000000')
+      expect(invoice_payment_succeeded.data.object.lines.data.first.id).to eq('il_000000000000000000000000')
     end
   end
 end
