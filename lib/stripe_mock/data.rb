@@ -1296,7 +1296,17 @@ module StripeMock
           country: 'DE',
           fingerprint: 'FD81kbVPe7M05BMj',
           last4: params.dig(:sepa_debit, :iban)&.[](-4..) || '3000'
-        }
+        },
+        us_bank_account: {
+          account_holder_type: "individual",
+          account_type: "checking",
+          bank_name: "STRIPE TEST BANK",
+          financial_connections_account: "fca_0614042384b19afec4474940",
+          fingerprint: "7bc48d016359a45a",
+          last4: "6789",
+          networks: {"preferred"=>"ach", "supported"=>["ach"]},
+          routing_number: "110000000"
+        },
       }
 
       {
