@@ -298,7 +298,6 @@ shared_examples 'Webhook Events API' do
       invoice_payment_succeeded = StripeMock.mock_webhook_event('invoice.payment_succeeded')
       expect(invoice_payment_succeeded).to be_a(Stripe::Event)
       expect(invoice_payment_succeeded.id).to_not be_nil
-      puts "invoice_payment_succeeded.data.object.lines: #{invoice_payment_succeeded.data.object.lines}"
       expect(invoice_payment_succeeded.data.object.lines.data.class).to be Array
       expect(invoice_payment_succeeded.data.object.lines.data.length).to be 1
       expect(invoice_payment_succeeded.data.object.lines.data.first).to respond_to(:plan)
