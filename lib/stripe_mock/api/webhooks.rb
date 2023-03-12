@@ -94,6 +94,7 @@ module StripeMock
         'payment_link.created',
         'payment_link.updated',
         'payment_method.attached',
+        'payment_method.detached',
         'payout.created',
         'payout.paid',
         'payout.updated',
