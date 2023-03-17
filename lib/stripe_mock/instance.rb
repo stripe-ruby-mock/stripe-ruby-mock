@@ -60,7 +60,7 @@ module StripeMock
                 :setup_intents, :plans, :prices, :recipients, :refunds, :transfers, :payouts, :subscriptions, :country_spec,
                 :subscriptions_items, :products, :tax_rates, :checkout_sessions, :checkout_session_line_items
 
-    attr_accessor :error_queue, :debug, :conversion_rate, :account_balance
+    attr_accessor :error_queue, :debug, :conversion_rate, :account_balance, :charges
 
     def initialize
       @accounts = {}

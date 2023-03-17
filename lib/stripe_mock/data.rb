@@ -1255,7 +1255,8 @@ module StripeMock
           statement_descriptor: nil,
           status: "requires_action",
           transfer_data: nil,
-          transfer_group: nil
+          transfer_group: nil,
+          latest_charge: nil
       }.merge(params)
     end
 
