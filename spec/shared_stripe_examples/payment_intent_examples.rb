@@ -102,6 +102,18 @@ shared_examples 'PaymentIntent API' do
     expect(payment_intent.charges.data.first.payment_method).to eq("test_pm_1")
   end
 
+  it "expands latest_charge" do
+    original = Stripe::PaymentIntent.create(
+      amount: 100, currency: "usd", confirm: true
+    )
+    charge = original.charges.first
+    payment_intent = Stripe::PaymentIntent.retrieve(
+      id: original.id, expand: ['latest_charge']
+    )
+
+    expect(payment_intent.latest_charge).to eq(charge)
+  end
+
   it "confirms a stripe payment_intent" do
     payment_intent = Stripe::PaymentIntent.create(amount: 100, currency: "usd")
     confirmed_payment_intent = payment_intent.confirm()

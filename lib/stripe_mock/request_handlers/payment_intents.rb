@@ -65,6 +65,7 @@ module StripeMock
         route =~ method_url
         payment_intent_id = $1 || params[:payment_intent]
         payment_intent = assert_existence :payment_intent, payment_intent_id, payment_intents[payment_intent_id]
+        payment_intent[:latest_charge] = payment_intent[:charges][:data].first if params[:expand] == ['latest_charge']
 
         payment_intent = payment_intent.clone
         payment_intent
