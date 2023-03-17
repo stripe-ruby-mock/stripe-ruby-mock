@@ -111,7 +111,7 @@ shared_examples 'PaymentIntent API' do
       id: original.id, expand: ['latest_charge']
     )
 
-    expect(payment_intent.latest_charge).to eq(charge)
+    expect(payment_intent.latest_charge.id).to eq(charge.id)
   end
 
   it "confirms a stripe payment_intent" do
@@ -120,6 +120,14 @@ shared_examples 'PaymentIntent API' do
     expect(confirmed_payment_intent.status).to eq("succeeded")
     expect(confirmed_payment_intent.charges.data.size).to eq(1)
     expect(confirmed_payment_intent.charges.data.first.object).to eq('charge')
+  end
+
+  it "creates a charge when a stripe payment_intent is confirmed" do
+    original = Stripe::PaymentIntent.create(amount: 100, currency: "usd", confirm: true)
+    payment_intent = Stripe::PaymentIntent.retrieve({ id: original.id, expand: ['latest_charge'] })
+    charge_id = payment_intent.latest_charge.id
+
+    expect(Stripe::Charge.retrieve(charge_id).id).to eq(charge_id)
   end
 
   it "captures a stripe payment_intent" do
