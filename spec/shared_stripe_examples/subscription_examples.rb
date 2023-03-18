@@ -723,6 +723,17 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(subscription.latest_invoice.payment_intent).to be_nil
     end
 
+    it "creates payment_intent when expands latest_invoice.payment_intent" do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.payment_intent']
+      })
+
+      expect(Stripe::PaymentIntent.retrieve(subscription.latest_invoice.payment_intent.id).id).to eq(subscription.latest_invoice.payment_intent.id)
+    end
+
     it "expands latest_invoice.charge.balance_transaction" do
       customer = Stripe::Customer.create(source: gen_card_tk)
       subscription = Stripe::Subscription.create({
