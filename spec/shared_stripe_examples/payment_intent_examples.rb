@@ -92,6 +92,16 @@ shared_examples 'PaymentIntent API' do
     expect(Stripe::BalanceTransaction.retrieve(balance_txn).id).to eq(balance_txn)
   end
 
+  it "calculates balance_transaction fees" do
+    amount = 300
+    fee = 10
+    payment_intent = Stripe::PaymentIntent.create(
+      amount: amount, currency: 'usd', application_fee_amount: fee, confirm: true
+    )
+    bal_trans = Stripe::BalanceTransaction.retrieve(payment_intent.charges.data.first.balance_transaction)
+    expect(bal_trans.fee).to eq(39 + fee)
+  end
+
   it "includes the payment_method on charges" do
     payment_intent = Stripe::PaymentIntent.create(
       amount: 100, currency: "usd", confirm: true, payment_method: "test_pm_1"
@@ -100,6 +110,13 @@ shared_examples 'PaymentIntent API' do
     expect(payment_intent.charges.data.size).to eq(1)
     expect(payment_intent.charges.data.first.object).to eq("charge")
     expect(payment_intent.charges.data.first.payment_method).to eq("test_pm_1")
+  end
+
+  it "includes the fee on the charges" do
+    payment_intent = Stripe::PaymentIntent.create(
+      amount: 100, currency: "usd", confirm: true, application_fee_amount: 23
+    )
+    expect(payment_intent.charges.data.first.application_fee_amount).to eq(23)
   end
 
   it "expands latest_charge" do
@@ -122,7 +139,7 @@ shared_examples 'PaymentIntent API' do
     expect(confirmed_payment_intent.charges.data.first.object).to eq('charge')
   end
 
-  it "creates a charge when a stripe payment_intent is confirmed" do
+  it "creates a charge payment_intent is confirmed" do
     original = Stripe::PaymentIntent.create(amount: 100, currency: "usd", confirm: true)
     payment_intent = Stripe::PaymentIntent.retrieve({ id: original.id, expand: ['latest_charge'] })
     charge_id = payment_intent.latest_charge.id
