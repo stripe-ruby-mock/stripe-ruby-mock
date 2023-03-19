@@ -694,8 +694,21 @@ shared_examples 'Customer Subscriptions with plans' do
       end
     end
 
+    it "expands multiple attributes" do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.payment_intent', 'latest_invoice.charge']
+      })
+
+      expect(subscription.latest_invoice.payment_intent.status).not_to be_nil
+      expect(subscription.latest_invoice.charge.amount).not_to be_nil
+    end
+
     it 'expands latest_invoice.payment_intent' do
       customer = Stripe::Customer.create(source: gen_card_tk)
+
       subscription = Stripe::Subscription.create({
         customer: customer.id,
         plan: plan.id,

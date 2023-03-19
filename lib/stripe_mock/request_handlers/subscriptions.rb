@@ -147,7 +147,8 @@ module StripeMock
           subscription[:transfer_data][:amount_percent] ||= 100
         end
 
-        if (s = params[:expand]&.find { |s| s.start_with? 'latest_invoice' })
+        expand = params[:expand]&.join(",")
+        if expand&.start_with? 'latest_invoice'
           payment_intent = nil
           unless subscription[:status] == 'trialing'
             intent_status = subscription[:status] == 'incomplete' ? 'requires_payment_method' : 'succeeded'
@@ -156,14 +157,14 @@ module StripeMock
               amount: subscription[:plan][:amount],
               currency: subscription[:plan][:currency]
             })
-            payment_intent = s.include?('latest_invoice.payment_intent') ? intent : intent[:id]
+            payment_intent = expand.include?('latest_invoice.payment_intent') ? intent : intent[:id]
             payment_intents[intent[:id]] = intent
             balance_transaction = Data.mock_balance_transaction({
               status: "available",
               amount: subscription.dig(:plan, :amount),
               currency: subscription.dig(:plan, :currency)
             })
-            transaction = balance_transaction if s.include?('latest_invoice.charge.balance_transaction')
+            transaction = balance_transaction if expand.include?('latest_invoice.charge.balance_transaction')
             first_charge = Data.mock_charge({
               id: new_id('ch'),
               amount: subscription.dig(:plan, :amount),
@@ -171,7 +172,7 @@ module StripeMock
               balance_transaction: transaction,
             })
 
-            if s.include?('latest_invoice.charge')
+            if expand.include?('latest_invoice.charge')
               charge = first_charge
               charges[charge[:id]] = charge
             end
