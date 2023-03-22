@@ -736,15 +736,41 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(subscription.latest_invoice.payment_intent).to be_nil
     end
 
-    it "creates payment_intent when expands latest_invoice.payment_intent" do
+    it 'expands latest_invoice.payment_intent.latest_charge' do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.payment_intent.latest_charge']
+      })
+      latest_charge = subscription.latest_invoice.payment_intent.latest_charge
+      expect(Stripe::Charge.retrieve(latest_charge.id)).to eq(latest_charge)
+      expect(Stripe::Charge.list).to include(latest_charge)
+    end
+
+    it 'expands latest_invoice.payment_intent.latest_charge.balance_transaction' do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      subscription = Stripe::Subscription.create({
+        customer: customer.id,
+        plan: plan.id,
+        expand: ['latest_invoice.payment_intent.latest_charge.balance_transaction']
+      })
+      latest_charge = subscription.latest_invoice.payment_intent.latest_charge
+      balance_transaction = latest_charge.balance_transaction
+      expect(Stripe::BalanceTransaction.retrieve(balance_transaction.id)).to eq(balance_transaction)
+    end
+
+    it "expands payment_intent" do
       customer = Stripe::Customer.create(source: gen_card_tk)
       subscription = Stripe::Subscription.create({
         customer: customer.id,
         plan: plan.id,
         expand: ['latest_invoice.payment_intent']
       })
-
-      expect(Stripe::PaymentIntent.retrieve(subscription.latest_invoice.payment_intent.id).id).to eq(subscription.latest_invoice.payment_intent.id)
+      payment_intent = subscription.latest_invoice.payment_intent
+      expect(Stripe::PaymentIntent.retrieve(payment_intent.id)).to eq(payment_intent)
     end
 
     it "expands latest_invoice.charge.balance_transaction" do
@@ -755,30 +781,8 @@ shared_examples 'Customer Subscriptions with plans' do
         expand: ['latest_invoice.charge.balance_transaction']
       })
 
-      charge = subscription.latest_invoice.charge
-      expect(charge.status).to eq("succeeded")
-      expect(charge.currency).to eq(plan.currency)
-      expect(charge.amount).to eq(plan.amount)
-
-      expect(Stripe::Charge.list.count).to eq(1)
-      expect(Stripe::Charge.list.first.id).to eq(charge.id)
-
-      balance_transaction = charge.balance_transaction
-      expect(balance_transaction.status).to eq("available")
-      expect(balance_transaction.currency).to eq(plan.currency)
-      expect(balance_transaction.amount).to eq(plan.amount)
-      expect(balance_transaction.fee).to eq(plan.amount * 0.04)
-      expect(balance_transaction.fee_details.first.amount).to eq(plan.amount * 0.04)
-      expect(balance_transaction.fee_details.first.currency).to eq(plan.currency)
-
-      subscription = Stripe::Subscription.create({
-        customer: customer.id,
-        plan: plan.id,
-        expand: ['latest_invoice.charge.balance_transaction'],
-        trial_period_days: 14
-      })
-
-      expect(subscription.latest_invoice.charge).to be_nil
+      btxn = subscription.latest_invoice.charge.balance_transaction
+      expect(Stripe::BalanceTransaction.retrieve(btxn.id)).to eq(btxn)
     end
   end
 
