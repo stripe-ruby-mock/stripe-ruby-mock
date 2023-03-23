@@ -123,12 +123,11 @@ shared_examples 'PaymentIntent API' do
     original = Stripe::PaymentIntent.create(
       amount: 100, currency: "usd", confirm: true
     )
-    charge = original.charges.first
     payment_intent = Stripe::PaymentIntent.retrieve(
       id: original.id, expand: ['latest_charge']
     )
 
-    expect(payment_intent.latest_charge.id).to eq(charge.id)
+    expect(payment_intent.latest_charge.status).to eq("succeeded")
   end
 
   it "confirms a stripe payment_intent" do

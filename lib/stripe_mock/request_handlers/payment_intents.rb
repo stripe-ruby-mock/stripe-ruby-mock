@@ -67,7 +67,8 @@ module StripeMock
         payment_intent = assert_existence :payment_intent, payment_intent_id, payment_intents[payment_intent_id]
 
         payment_intent = payment_intent.clone
-        payment_intent
+
+        expand(payment_intent, params)
       end
 
       def capture_payment_intent(route, method_url, params, headers)
@@ -97,6 +98,11 @@ module StripeMock
       end
 
       private
+
+      def expand(payment_intent, params)
+        payment_intent[:latest_charge] = charges[payment_intent[:latest_charge]] if params[:expand]&.include? 'latest_charge'
+        payment_intent
+      end
 
       def ensure_payment_intent_required_params(params)
         if params[:amount].nil?
@@ -187,7 +193,7 @@ module StripeMock
         )
         charges[charge[:id]] = charge
         payment_intent[:charges][:data] << charge
-        payment_intent[:latest_charge] = charge
+        payment_intent[:latest_charge] = charge[:id]
 
         payment_intent
       end
