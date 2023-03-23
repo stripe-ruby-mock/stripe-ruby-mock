@@ -149,15 +149,14 @@ module StripeMock
 
         expand = params[:expand]&.join(",")
         if expand&.start_with? 'latest_invoice'
-          payment_intent = nil
+          intent_status = subscription[:status] == 'incomplete' ? 'requires_payment_method' : 'succeeded'
+          intent = Data.mock_payment_intent({
+            status: intent_status,
+            amount: subscription[:plan][:amount],
+            currency: subscription[:plan][:currency]
+          })
+          payment_intents[intent[:id]] = intent
           unless subscription[:status] == 'trialing'
-            intent_status = subscription[:status] == 'incomplete' ? 'requires_payment_method' : 'succeeded'
-            intent = Data.mock_payment_intent({
-              status: intent_status,
-              amount: subscription[:plan][:amount],
-              currency: subscription[:plan][:currency]
-            })
-            payment_intents[intent[:id]] = intent
             payment_intent = expand.include?('latest_invoice.payment_intent') ? intent : intent[:id]
             balance_transaction_id = new_balance_transaction("txn", {
               status: "available",
