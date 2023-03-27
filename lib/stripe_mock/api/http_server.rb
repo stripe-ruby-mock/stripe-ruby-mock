@@ -11,10 +11,10 @@ module StripeMock
     StripeMock::HttpServer::App.url = url
   end
 
-	class HttpServer
-		class App < Sinatra::Base
+  class HttpServer
+    class App < Sinatra::Base
       register Sinatra::MultiRoute
-			register Sinatra::Cors
+      register Sinatra::Cors
 
       def self.url=(url)
         @@url = url
@@ -34,7 +34,7 @@ module StripeMock
         headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type'
       end
 
-			route :get, :post, "/*" do
+      route :get, :post, "/*" do
         method = request.request_method.downcase
         url = request.path
         api_key = request.env['HTTP_AUTHORIZATION']
@@ -46,7 +46,7 @@ module StripeMock
             **resp.first.data
           }
         }.to_json
-			end
-		end
-	end
+      end
+    end
+  end
 end
