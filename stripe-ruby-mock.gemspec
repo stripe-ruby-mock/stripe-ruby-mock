@@ -25,10 +25,10 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'stripe', '> 5', '< 6'
   gem.add_dependency 'multi_json', '~> 1.0'
   gem.add_dependency 'dante', '>= 0.2.0'
-  gem.add_dependency 'capybara_discoball'
-  gem.add_dependency 'sinatra-contrib'
+  gem.add_dependency 'capybara_discoball', '~> 0.1'
+  gem 'sinatra-contrib', '~> 3.0', '>= 3.0.5'
 
   gem.add_development_dependency 'rspec', '~> 3.7.0'
   gem.add_development_dependency 'rubygems-tasks', '~> 0.2'
-  gem.add_development_dependency 'thin', '~> 1.8.1'
+  gem.add_development_dependency 'thin', '~> 1.8'
 end
