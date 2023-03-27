@@ -147,23 +147,37 @@ module StripeMock
           subscription[:transfer_data][:amount_percent] ||= 100
         end
 
-        expand = params[:expand]&.join(",")
-        if expand&.start_with? 'latest_invoice'
-          intent_status = subscription[:status] == 'incomplete' ? 'requires_payment_method' : 'succeeded'
-          intent = Data.mock_payment_intent({
-            status: intent_status,
-            amount: subscription[:plan][:amount],
-            currency: subscription[:plan][:currency]
-          })
-          payment_intents[intent[:id]] = intent
-          unless subscription[:status] == 'trialing'
-            payment_intent = expand.include?('latest_invoice.payment_intent') ? intent : intent[:id]
+        charge = nil
+        intent_status = subscription[:status] == 'incomplete' ? 'requires_payment_method' : 'succeeded'
+        invoice = Data.mock_invoice([], {})
+        invoices[invoice[:id]] = invoice
+        subscription[:latest_invoice] = invoice[:id]
+        unless subscription[:status] == 'trialing'
+          if subscription[:plan]
+            intent = Data.mock_payment_intent({
+              status: intent_status,
+              amount: subscription[:plan][:amount],
+              currency: subscription[:plan][:currency]
+            })
+            payment_intents[intent[:id]] = intent
+          else
+            # TODO - Update this to use prices
+            intent = Data.mock_payment_intent({
+              status: intent_status,
+              amount: 500,
+              currency: 'USD'
+            })
+            payment_intents[intent[:id]] = intent
+          end
+
+          invoices[invoice[:id]][:payment_intent] = intent[:id]
+
+          if intent[:status] == 'succeeded'
             balance_transaction_id = new_balance_transaction("txn", {
               status: "available",
               amount: subscription.dig(:plan, :amount),
               currency: subscription.dig(:plan, :currency)
             })
-            #balance_transactions[balance_transaction[:id]] = balance_transaction
 
             first_charge = Data.mock_charge({
               id: new_id('ch'),
@@ -171,24 +185,34 @@ module StripeMock
               currency: subscription.dig(:plan, :currency),
               balance_transaction: balance_transaction_id,
             })
-            if expand.include?("latest_invoice.payment_intent.latest_charge.balance_transaction") || expand.include?("latest_invoice.charge.balance_transaction")
-              first_charge[:balance_transaction] = balance_transactions[balance_transaction_id]
-            end
 
             charge = first_charge
             charges[charge[:id]] = charge
+            invoice[:charge] = charge[:id]
             payment_intents[intent[:id]][:latest_charge] = charge
             payment_intents[intent[:id]][:charges][:data] << charge
           end
-          invoice = Data.mock_invoice([], {
-            payment_intent: payment_intent,
-            charge: charge,
-          })
-          subscription[:latest_invoice] = invoice
         end
 
+        expand = params[:expand]&.join(",")
+        if expand&.start_with? 'latest_invoice'
+          # NOTE expand invoice
+          invoice = invoices[subscription[:latest_invoice]]
+          charge = charges[invoice[:charge]] if invoice
+          payment_intent = payment_intents[invoice[:payment_intent]] if invoice
+          balance_transaction = balance_transactions[charge[:balance_transaction]] if charge
+
+          subscription[:latest_invoice] = invoice if expand.include?("latest_invoice")
+          subscription[:latest_invoice][:payment_intent] = payment_intent if expand.include?("latest_invoice.payment_intent")
+          subscription[:latest_invoice][:charge] = charge if expand.include?("latest_invoice.charge")
+          subscription[:latest_invoice][:charge][:balance_transaction] = balance_transaction if expand.include?("latest_invoice.charge.balance_transaction")
+          subscription[:latest_invoice][:payment_intent] = expand.include?('latest_invoice.payment_intent') ? intent : intent[:id]
+          subscription[:latest_invoice][:payment_intent] = expand.include?('latest_invoice.payment_intent') ? intent : intent[:id]
+          subscription[:latest_invoice][:payment_intent][:latest_charge] = charge if expand.include?("latest_invoice.payment_intent.latest_charge")
+          subscription[:latest_invoice][:payment_intent][:latest_charge][:balance_transaction] = balance_transaction if expand.include?("latest_invoice.payment_intent.latest_charge.balance_transaction")
+        end
         subscriptions[subscription[:id]] = subscription
-        add_subscription_to_customer(customer, subscription, charge)
+        add_subscription_to_customer(customer, subscription)
 
         subscriptions[subscription[:id]]
       end
