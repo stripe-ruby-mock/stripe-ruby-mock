@@ -1231,7 +1231,7 @@ module StripeMock
               total_count: 1,
               url: "/v1/charges?payment_intent=pi_1EwXFB2eZvKYlo2CggNnFBo8"
           },
-          client_secret: "pi_1EwXFB2eZvKYlo2CggNnFBo8_secret_vOMkpqZu8ca7hxhfiO80tpT3v",
+          client_secret: "#{payment_intent_id}_secret_vOMkpqZu8ca7hxhfiO80tpT3v",
           confirmation_method: "manual",
           created: 1563208901,
           currency: currency,
