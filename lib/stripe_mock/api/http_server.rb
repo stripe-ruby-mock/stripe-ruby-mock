@@ -47,7 +47,7 @@ module StripeMock
               **resp.first.data
             #}
           }.to_json
-        rescue Stripe::CardError => e
+        rescue Stripe::CardError, Stripe::InvalidRequestError => e
           status 402
           content_type :json
           {
