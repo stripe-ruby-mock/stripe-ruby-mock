@@ -189,7 +189,7 @@ module StripeMock
             charge = first_charge
             charges[charge[:id]] = charge
             invoice[:charge] = charge[:id]
-            payment_intents[intent[:id]][:latest_charge] = charge
+            payment_intents[intent[:id]][:latest_charge] = charge[:id]
             payment_intents[intent[:id]][:charges][:data] << charge
           end
         end

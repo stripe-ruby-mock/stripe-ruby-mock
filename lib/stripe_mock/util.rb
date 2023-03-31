@@ -40,5 +40,20 @@ module StripeMock
       old_param.merge(new_param)
     end
 
+    def self.expand(collection, obj, expand_params)
+      params = expand_params.split('.').map(&:to_sym)
+      if StripeMock::Util.expandable(obj, expand_params)
+        collection[obj.dig(*params)]
+      else
+        obj.dig(*params)
+      end
+    end
+
+    def self.expandable(obj, expand_param)
+      return false unless obj.is_a?(Hash)
+      expands = expand_param.split('.').map(&:to_sym)
+
+      return obj.dig(*expands).is_a? String
+    end
   end
 end

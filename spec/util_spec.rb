@@ -118,4 +118,79 @@ describe StripeMock::Util do
       expect(result[:last4]).to eq('1111')
     end
   end
+
+  describe 'expand' do
+    context 'when the object is expandable' do
+      it 'returns a matching object from the collection' do
+        bl_txn_id = "bl_1234"
+        obj = { latest_charge: { balance_transaction: bl_txn_id } }
+        collection = { bl_txn_id => { 'status' => 'active' } }
+
+        result = described_class.expand(collection, obj, 'latest_charge.balance_transaction')
+
+        expect(result['status']).to eq('active')
+      end
+    end
+    context 'when the object is not expandable' do
+      it 'returns the existing object' do
+        bl_txn_id = "bl_1234"
+        obj = { latest_charge: { balance_transaction: { id: bl_txn_id } } }
+        collection = { bl_txn_id => { 'status' => 'active' } }
+
+        result = described_class.expand(collection, obj, 'latest_charge.balance_transaction')
+
+        expect(result).to eq(id: bl_txn_id)
+      end
+    end
+  end
+
+  describe 'expandable' do
+    context 'when invalid input' do
+      it 'must be given a hash' do
+        result = described_class.expandable('a', 'latest_charge')
+
+        expect(result).to be false
+      end
+
+      it 'the expand param must be a key in the hash' do
+        result = described_class.expandable({}, 'latest_charge')
+
+        expect(result).to be false
+      end
+    end
+
+    it 'the value of the expand param can be a string' do
+      result = described_class.expandable({ latest_charge: 'ch_1234' }, 'latest_charge')
+
+      expect(result).to be true
+    end
+
+    context 'when nested expand params' do
+      it 'the nested attribute must exist in the hash' do
+        obj = { latest_charge: { balance_transaction: { id: "bl_1234" } } }
+
+        result = described_class.expandable(obj, 'latest_charge.balance_transaction')
+
+        expect(result).to be false
+      end
+
+      it 'the value of the nested attribute must be a hash' do
+        obj = { latest_charge: { balance_transaction: "bl_1234" } }
+
+        result = described_class.expandable(obj, 'latest_charge.balance_transaction')
+
+        expect(result).to be true
+      end
+    end
+
+    context "when nested nested params" do
+      it 'the nested attributes must exist in the hash' do
+        obj = { latest_charge: { balance_transaction: { fee: "fee_1234" } } }
+
+        result = described_class.expandable(obj, 'latest_charge.balance_transaction.fee')
+
+        expect(result).to be true
+      end
+    end
+  end
 end

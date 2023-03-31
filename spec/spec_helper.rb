@@ -6,6 +6,8 @@ require 'stripe'
 require 'stripe_mock'
 require 'stripe_mock/server'
 require 'dotenv'
+require 'sinatra/base'
+require 'sinatra/cors'
 
 Dotenv.load('.env')
 
