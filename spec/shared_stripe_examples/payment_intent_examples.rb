@@ -119,6 +119,15 @@ shared_examples 'PaymentIntent API' do
     expect(payment_intent.charges.data.first.application_fee_amount).to eq(23)
   end
 
+  it "ignores expand latest_charge if no charge" do
+    original = Stripe::PaymentIntent.create(amount: 100, currency: "usd")
+    payment_intent = Stripe::PaymentIntent.retrieve(
+      id: original.id, expand: ['latest_charge.balance_transaction']
+    )
+
+    expect(payment_intent.latest_charge).to be_nil
+  end
+
   it "expands latest_charge" do
     original = Stripe::PaymentIntent.create(
       amount: 100, currency: "usd", confirm: true
@@ -128,6 +137,17 @@ shared_examples 'PaymentIntent API' do
     )
 
     expect(payment_intent.latest_charge.status).to eq("succeeded")
+  end
+
+  it "expands latest_charge.balance_transaction" do
+    original = Stripe::PaymentIntent.create(
+      amount: 100, currency: "usd", confirm: true
+    )
+    payment_intent = Stripe::PaymentIntent.retrieve(
+      id: original.id, expand: ['latest_charge.balance_transaction']
+    )
+
+    expect(payment_intent.latest_charge.balance_transaction.status).to eq("pending")
   end
 
   it "confirms a stripe payment_intent" do
