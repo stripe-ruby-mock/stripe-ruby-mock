@@ -1415,6 +1415,30 @@ shared_examples 'Customer Subscriptions with plans' do
       )
       expect(subscription.items.data[0].metadata.to_h).to eq(foo: 'bar')
     end
+
+    it "saves a description" do
+      stripe_helper.
+        create_plan(
+        :amount => 500,
+        :interval => 'month',
+        :product => product.id,
+        :currency => 'usd',
+        :id => 'Sample5'
+      )
+      customer = Stripe::Customer.create({
+        email: 'johnny@appleseed.com',
+        source: gen_card_tk
+      })
+
+      description = "A nice new subscription"
+      subscription = Stripe::Subscription.create(
+        description: description,
+        customer: customer.id,
+        items: [{plan: "Sample5", metadata: {foo: 'bar'}}],
+      )
+
+      expect(subscription.description).to eq(description)
+    end
   end
 end
 
