@@ -97,7 +97,7 @@ module StripeMock
           customer[:default_source] = new_card[:id]
         end
 
-        allowed_params = %w(customer application_fee_percent coupon items metadata plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate billing_cycle_anchor billing days_until_due idempotency_key enable_incomplete_payments cancel_at_period_end default_tax_rates payment_behavior pending_invoice_item_interval default_payment_method collection_method off_session trial_from_plan proration_behavior backdate_start_date transfer_data expand automatic_tax)
+        allowed_params = %w(customer application_fee_percent coupon items metadata description plan quantity source tax_percent trial_end trial_period_days current_period_start created prorate billing_cycle_anchor billing days_until_due idempotency_key enable_incomplete_payments cancel_at_period_end default_tax_rates payment_behavior pending_invoice_item_interval default_payment_method collection_method off_session trial_from_plan proration_behavior backdate_start_date transfer_data expand automatic_tax)
         unknown_params = params.keys - allowed_params.map(&:to_sym)
         if unknown_params.length > 0
           raise Stripe::InvalidRequestError.new("Received unknown parameter: #{unknown_params.join}", unknown_params.first.to_s, http_status: 400)
@@ -145,6 +145,10 @@ module StripeMock
           throw Stripe::InvalidRequestError.new(missing_param_message("transfer_data[destination]")) unless params[:transfer_data][:destination]
           subscription[:transfer_data] = params[:transfer_data].dup
           subscription[:transfer_data][:amount_percent] ||= 100
+        end
+
+        if params[:description]
+          subscription[:description] = params[:description]
         end
 
         charge = nil

@@ -401,7 +401,8 @@ module StripeMock
         default_payment_method: nil,
         pending_invoice_item_interval: nil,
         next_pending_invoice_item_invoice: nil,
-        latest_invoice: nil
+        latest_invoice: nil,
+        description: nil
       }, params)
     end
 
