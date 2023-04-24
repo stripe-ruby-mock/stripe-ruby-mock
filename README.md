@@ -406,6 +406,8 @@ Patches are welcome and greatly appreciated! If you're contributing to fix a pro
 be sure to write tests that illustrate the problem being fixed.
 This will help ensure that the problem remains fixed in future updates.
 
+Note: You may need to `ulimit -n 4048` before running the test suite to get all tests to pass.
+
 ## Copyright
 
 Copyright (c) 2013 Gilbert
