@@ -43,7 +43,7 @@ shared_examples 'SetupIntent API' do
   end
 
   it "expands payment_method" do
-    payment_method = Stripe::PaymentMethod.create(type: "card")
+    payment_method = Stripe::PaymentMethod.create(type: "us_bank_account", last4: "6789", bank_name: "STRIPE TEST BANK")
     original = Stripe::SetupIntent.create(payment_method: payment_method.id)
 
     setup_intent = Stripe::SetupIntent.retrieve({id: original.id, expand: ["payment_method"]})

@@ -1302,6 +1302,11 @@ module StripeMock
           country: 'DE',
           fingerprint: 'FD81kbVPe7M05BMj',
           last4: params.dig(:sepa_debit, :iban)&.[](-4..) || '3000'
+        },
+        us_bank_account: {
+          last4: "6789",
+          bank_name: "STRIPE TEST BANK",
+
         }
       }
 

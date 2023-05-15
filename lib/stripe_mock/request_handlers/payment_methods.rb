@@ -117,7 +117,7 @@ module StripeMock
       end
 
       def invalid_type?(type)
-        !%w(card ideal sepa_debit).include?(type)
+        !%w(card ideal sepa_debit us_bank_account).include?(type)
       end
     end
   end

@@ -18,6 +18,7 @@ module StripeMock
 
         ensure_payment_intent_required_params(params)
         status = case params[:amount]
+        when 3122 then 'processing'
         when 3184 then 'requires_action'
         when 3178 then 'requires_payment_method'
         when 3055 then 'requires_capture'
@@ -46,6 +47,8 @@ module StripeMock
 
         payment_intent = assert_existence :payment_intent, id, payment_intents[id]
         payment_intents[id] = Util.rmerge(payment_intent, params.select{ |k,v| ALLOWED_PARAMS.include?(k)})
+        payment_intents[id][:status] = "requires_confirmation" if params[:payment_method]
+        expand(payment_intents[id], params)
       end
 
       def get_payment_intents(route, method_url, params, headers)
@@ -101,9 +104,24 @@ module StripeMock
 
       def expand(payment_intent, params)
         return payment_intent unless params[:expand]
-        return payment_intent if payment_intent[:latest_charge].nil?
 
         expand_param = params[:expand]&.join(',')
+
+        if expand_param&.include? 'payment_method'
+          if payment_intent[:payment_method].nil?
+            payment_intent[:payment_method] = { type: "card", card: {brand: "visa", last4: "4242"} }
+          else
+            payment_intent[:payment_method] = StripeMock::Util.expand(payment_methods, payment_intent, 'payment_method')
+          end
+        end
+
+        if expand_param&.include? 'invoice'
+          payment_intent[:invoice] =
+            StripeMock::Util.expand(invoices, payment_intent, 'invoice')
+        end
+
+        return payment_intent if payment_intent[:latest_charge].nil?
+
         if expand_param&.include? 'latest_charge'
           payment_intent[:latest_charge] =
             StripeMock::Util.expand(charges, payment_intent, 'latest_charge')
@@ -111,6 +129,10 @@ module StripeMock
         if expand_param&.include? 'latest_charge.balance_transaction'
           payment_intent[:latest_charge][:balance_transaction] =
             StripeMock::Util.expand(balance_transactions, payment_intent, 'latest_charge.balance_transaction')
+        end
+        if expand_param&.include? 'latest_charge.invoice'
+          payment_intent[:latest_charge][:invoice] =
+            StripeMock::Util.expand(invoices, payment_intent, 'latest_charge.invoice')
         end
         payment_intent
       end
@@ -195,8 +217,12 @@ module StripeMock
         }
         calculate_fees(params)
         btxn = new_balance_transaction('txn', { source: payment_intent[:id], **params })
+        invoice = Data.mock_invoice([], {})
+        invoices[invoice[:id]] = invoice
+
         charge = Data.mock_charge(
           balance_transaction: btxn,
+          invoice: invoice[:id],
           amount: payment_intent[:amount],
           currency: payment_intent[:currency],
           payment_method: payment_intent[:payment_method],

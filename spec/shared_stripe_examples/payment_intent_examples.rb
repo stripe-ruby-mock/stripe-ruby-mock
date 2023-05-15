@@ -12,6 +12,16 @@ shared_examples 'PaymentIntent API' do
     expect(payment_intent.status).to eq('succeeded')
   end
 
+  it "creates a processing stripe payment_intent" do
+    payment_intent = Stripe::PaymentIntent.create(amount:  3122, currency: "usd")
+
+    expect(payment_intent.id).to match(/^test_pi/)
+    expect(payment_intent.amount).to eq(3122)
+    expect(payment_intent.currency).to eq('usd')
+    expect(payment_intent.metadata.to_hash).to eq({})
+    expect(payment_intent.status).to eq('processing')
+  end
+
   it "creates a requires_action stripe payment_intent when amount matches 3184" do
     payment_intent = Stripe::PaymentIntent.create(amount:  3184, currency: "usd")
 
@@ -36,7 +46,7 @@ shared_examples 'PaymentIntent API' do
     expect(payment_intent.last_payment_error.message).to eq('Not enough funds.')
   end
 
-  it "creates a requires_payment_method stripe payment_intent when amount matches 3055" do
+  it "creates a requires_capture stripe payment_intent when amount matches 3055" do
     payment_intent = Stripe::PaymentIntent.create(amount: 3055, currency: "usd")
 
     expect(payment_intent.id).to match(/^test_pi/)
@@ -128,6 +138,18 @@ shared_examples 'PaymentIntent API' do
     expect(payment_intent.latest_charge).to be_nil
   end
 
+  it "expands invoice" do
+    invoice = Stripe::Invoice.create
+    original = Stripe::PaymentIntent.create(
+      amount: 100, currency: "usd", invoice: invoice[:id]
+    )
+    payment_intent = Stripe::PaymentIntent.retrieve(
+      id: original.id, expand: ['invoice']
+    )
+
+    expect(payment_intent.invoice.id).to eq("test_in_1")
+  end
+
   it "expands latest_charge" do
     original = Stripe::PaymentIntent.create(
       amount: 100, currency: "usd", confirm: true
@@ -148,6 +170,71 @@ shared_examples 'PaymentIntent API' do
     )
 
     expect(payment_intent.latest_charge.balance_transaction.status).to eq("pending")
+  end
+
+  it "expands invoice" do
+    invoice = Stripe::Invoice.create
+    original = Stripe::PaymentIntent.create(
+      amount: 100, currency: "usd", invoice: invoice[:id]
+    )
+
+    payment_intent = Stripe::PaymentIntent.retrieve(
+      id: original.id, expand: ['invoice']
+    )
+
+    expect(payment_intent.invoice.id).to eq("test_in_1")
+  end
+
+  it "expands latest_charge.invoice" do
+    original = Stripe::PaymentIntent.create(
+      amount: 100, currency: "usd", confirm: true
+    )
+
+    payment_intent = Stripe::PaymentIntent.retrieve(
+      id: original.id, expand: ['latest_charge.invoice']
+    )
+
+    expect(payment_intent.latest_charge.invoice.id).to eq("in_test_invoice")
+  end
+
+  it "expands payment_method to a default card when blank" do
+    original = Stripe::PaymentIntent.create(
+      amount: 100, currency: "usd", confirm: true
+    )
+
+    payment_intent = Stripe::PaymentIntent.retrieve(
+      id: original.id, expand: ['payment_method']
+    )
+
+    expect(payment_intent.payment_method.card.last4).to eq("4242")
+  end
+
+  it "expands payment_method" do
+    payment_method = Stripe::PaymentMethod.create(type: 'us_bank_account', last4: '1776', bank_name: 'STRIPE TEST BANK')
+    original = Stripe::PaymentIntent.create(
+      amount: 100, currency: "usd", confirm: true, payment_method: payment_method.id
+    )
+
+    payment_intent = Stripe::PaymentIntent.retrieve(
+      id: original.id, expand: ['payment_method']
+    )
+
+    expect(payment_intent.payment_method.us_bank_account.last4).to eq("6789")
+    expect(payment_intent.payment_method.us_bank_account.bank_name).to eq("STRIPE TEST BANK")
+  end
+
+  it "expands payment_method on update" do
+    payment_method = Stripe::PaymentMethod.create(type: 'us_bank_account', last4: '1776', bank_name: 'STRIPE TEST BANK')
+    original = Stripe::PaymentIntent.create(
+      amount: 100, currency: "usd", confirm: true, payment_method: payment_method.id
+    )
+
+    payment_intent = Stripe::PaymentIntent.update(
+      original.id, { amount: 500, expand: ['payment_method'] }
+    )
+
+    expect(payment_intent.payment_method.us_bank_account.last4).to eq("6789")
+    expect(payment_intent.payment_method.us_bank_account.bank_name).to eq("STRIPE TEST BANK")
   end
 
   it "confirms a stripe payment_intent" do
@@ -190,6 +277,20 @@ shared_examples 'PaymentIntent API' do
     updated = Stripe::PaymentIntent.retrieve(original.id)
 
     expect(updated.amount).to eq(200)
+  end
+
+  context "when a the payment_method is updated" do
+    it "sets the status to requires_confirmation" do
+      original = Stripe::PaymentIntent.create(amount: 3178, currency: "usd")
+      payment_intent = Stripe::PaymentIntent.retrieve(original.id)
+
+      payment_intent.payment_method = 'pm_usBankAccount_success'
+      payment_intent.save
+
+      updated = Stripe::PaymentIntent.retrieve(original.id)
+
+      expect(updated.status).to eq("requires_confirmation")
+    end
   end
 
   it 'when amount is not integer', live: true do

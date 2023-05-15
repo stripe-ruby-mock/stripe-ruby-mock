@@ -127,6 +127,19 @@ shared_examples 'PaymentMethod API' do
       end
     end
 
+    context "with us bank account" do
+      let(:type) { 'us_bank_account' }
+
+      it "creates a payment method with a valid id", live: false do
+        expect(payment_method.id).to match(/^test_pm/)
+      end
+
+      it "sets the bank account details" do
+        expect(payment_method.us_bank_account.last4).to eq("6789")
+        expect(payment_method.us_bank_account.bank_name).to eq("STRIPE TEST BANK")
+      end
+    end
+
     context 'when type is invalid' do
       let(:type) { 'bank_account' }
 
