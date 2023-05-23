@@ -50,7 +50,7 @@ module StripeMock
           products_list.each do |product|
             next if product[:default_price].nil?
 
-            product[:default_price] = prices[product[:default_price]]
+            product[:default_price] = prices[product[:default_price]].dup
           end
           params.delete(:expand)
         end

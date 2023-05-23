@@ -31,8 +31,8 @@ module StripeMock
         route =~ method_url
         price = assert_existence :price, $1, prices[$1]
 
-        if params[:expand] == ['product']
-          price[:product] = products[price[:product]]
+        if params[:expand].is_a?(Array) && params[:expand].any? { |data| data.match?(/product/) }
+          price[:product] = products[price[:product]].dup
         end
 
         price
