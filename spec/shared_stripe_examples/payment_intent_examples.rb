@@ -245,6 +245,15 @@ shared_examples 'PaymentIntent API' do
     expect(confirmed_payment_intent.charges.data.first.object).to eq('charge')
   end
 
+  it "confirming a payment intent for us_bank_account sets status to processing" do
+    payment_intent = Stripe::PaymentIntent.create(amount: 100, currency: "usd")
+    payment_intent.confirm(payment_method: "pm_usBankAccount_success")
+
+    confirmed_payment_intent = Stripe::PaymentIntent.retrieve(payment_intent.id)
+    expect(confirmed_payment_intent.status).to eq("processing")
+    expect(confirmed_payment_intent.charges.data.size).to eq(0)
+  end
+
   it "creates a charge payment_intent is confirmed" do
     original = Stripe::PaymentIntent.create(amount: 100, currency: "usd", confirm: true)
     payment_intent = Stripe::PaymentIntent.retrieve({ id: original.id, expand: ['latest_charge'] })

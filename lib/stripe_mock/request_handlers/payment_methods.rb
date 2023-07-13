@@ -14,7 +14,7 @@ module StripeMock
 
       # post /v1/payment_methods
       def new_payment_method(route, method_url, params, headers)
-        id = new_id('pm')
+        id = payment_method_id(params[:type])
 
         ensure_payment_method_required_params(params)
 
@@ -103,6 +103,17 @@ module StripeMock
       end
 
       private
+
+      def payment_method_id(type)
+        case type
+        when 'card'
+          new_id('pm')
+        when 'us_bank_account'
+          'pm_usBankAccount_success'
+        else
+          new_id('pm')
+        end
+      end
 
       def ensure_payment_method_required_params(params)
         require_param(:type) if params[:type].nil?

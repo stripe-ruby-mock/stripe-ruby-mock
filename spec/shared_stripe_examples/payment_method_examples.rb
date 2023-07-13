@@ -131,7 +131,7 @@ shared_examples 'PaymentMethod API' do
       let(:type) { 'us_bank_account' }
 
       it "creates a payment method with a valid id", live: false do
-        expect(payment_method.id).to match(/^test_pm/)
+        expect(payment_method.id).to match(/^pm_usBankAccount_success/)
       end
 
       it "sets the bank account details" do
