@@ -189,7 +189,7 @@ module StripeMock
       {
         id: charge_id,
         object: "charge",
-        amount: 0,
+        amount_captured: 0,
         amount_refunded: 0,
         application_fee: nil,
         application_fee_amount: nil,
