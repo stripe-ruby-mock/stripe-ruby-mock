@@ -1254,6 +1254,7 @@ module StripeMock
           description: nil,
           invoice: nil,
           last_payment_error: nil,
+          latest_charge: params[:latest_charge] || 'ch_1fD6uiR9FAA2zc',
           livemode: false,
           metadata: {},
           next_action: { type: "use_stripe_sdk" },
