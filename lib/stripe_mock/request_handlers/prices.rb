@@ -43,6 +43,10 @@ module StripeMock
         price_data = prices.values
         validate_list_prices_params(params)
 
+        if params[:product]
+          price_data.select! { |price| price[:product] == params[:product] }
+        end
+
         if params.key?(:lookup_keys)
           price_data.select! do |price|
             params[:lookup_keys].include?(price[:lookup_key])
