@@ -402,7 +402,8 @@ module StripeMock
         pending_invoice_item_interval: nil,
         next_pending_invoice_item_invoice: nil,
         latest_invoice: nil,
-        description: nil
+        description: nil,
+        schedule: nil
       }, params)
     end
 
