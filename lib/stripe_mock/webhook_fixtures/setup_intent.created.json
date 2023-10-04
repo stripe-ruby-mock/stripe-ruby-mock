@@ -1,0 +1,51 @@
+{
+  "id": "evt_000000000000000000000000",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648321932,
+  "data": {
+    "object": {
+      "id": "seti_000000000000000000000000",
+      "object": "setup_intent",
+      "application": null,
+      "cancellation_reason": null,
+      "client_secret": "seti_000000000000000000000000_secret_0000000000000000000000000000000",
+      "created": 1648321931,
+      "customer": null,
+      "description": null,
+      "last_setup_error": null,
+      "latest_attempt": null,
+      "livemode": false,
+      "mandate": null,
+      "metadata": {
+      },
+      "next_action": null,
+      "on_behalf_of": null,
+      "payment_method": "pm_000000000000000000000000",
+      "payment_method_options": {
+        "acss_debit": {
+          "currency": "cad",
+          "mandate_options": {
+            "interval_description": "First day of every month",
+            "payment_schedule": "interval",
+            "transaction_type": "personal"
+          },
+          "verification_method": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "acss_debit"
+      ],
+      "single_use_mandate": null,
+      "status": "requires_confirmation",
+      "usage": "off_session"
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "setup_intent.created"
+}
