@@ -75,6 +75,7 @@ module StripeMock
         if payment_method[:customer].nil?
           raise Stripe::InvalidRequestError.new(
             'The payment method you provided is not attached to a customer so detachment is impossible.',
+            nil,
             http_status: 400
           )
         end
