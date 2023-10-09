@@ -413,6 +413,7 @@ module StripeMock
         id: 'in_test_invoice',
         status: 'open',
         invoice_pdf: 'pdf_url',
+        number: 'number',
         hosted_invoice_url: 'hosted_invoice_url',
         created: 1349738950,
         period_end: 1349738950,
