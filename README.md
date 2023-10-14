@@ -1,4 +1,4 @@
-# stripe-ruby-mock [![Build Status](https://travis-ci.org/stripe-ruby-mock/stripe-ruby-mock.png?branch=master)](https://travis-ci.org/stripe-ruby-mock/stripe-ruby-mock) [![Gitter chat](https://badges.gitter.im/rebelidealist/stripe-ruby-mock.png)](https://gitter.im/rebelidealist/stripe-ruby-mock)
+# stripe-ruby-mock [![Tests](https://github.com/stripe-ruby-mock/stripe-ruby-mock/actions/workflows/rspec_tests.yml/badge.svg)](https://github.com/stripe-ruby-mock/stripe-ruby-mock/actions/workflows/rspec_tests.yml)
 
 * Homepage: https://github.com/stripe-ruby-mock/stripe-ruby-mock
 * Issues: https://github.com/stripe-ruby-mock/stripe-ruby-mock/issues
@@ -29,7 +29,7 @@ version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/strip
 
 ### Requirements
 
-* ruby >= 2.4.0
+* ruby >= 2.6.0
 * stripe >= 5.0.0
 
 ### Specifications
