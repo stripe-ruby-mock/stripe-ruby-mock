@@ -1259,9 +1259,10 @@ module StripeMock
       payment_method_id = params[:id] || 'pm_1ExEuFL2DI6wht39WNJgbybl'
 
       type = params[:type].to_sym
+      last4 = params.dig(:card, :number)
       data = {
         card: {
-          brand: case params.dig(:card, :number)&.to_s
+          brand: case last4&.to_s
           when /^4/, nil
             'visa'
           when /^5[1-5]/
@@ -1280,7 +1281,7 @@ module StripeMock
           fingerprint: 'Hr3Ly5z5IYxsokWA',
           funding: 'credit',
           generated_from: nil,
-          last4: params.dig(:card, :number)&.[](-4..) || '3155',
+          last4: last4.nil? ? '3155' : last4.to_s[-4..],
           three_d_secure_usage: { supported: true },
           wallet: nil
         },
