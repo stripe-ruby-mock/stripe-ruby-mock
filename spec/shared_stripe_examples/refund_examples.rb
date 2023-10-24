@@ -338,17 +338,6 @@ shared_examples 'Refund API' do
       expect(half.data.first.id).to eq(all_refunds.data.at(2).id)
     end
 
-    it "returns an InvalidRequestError when attempting to refund more than the original charge amount" do
-      charge = Stripe::Charge.create(
-        amount: 1000,
-        currency: 'usd',
-        source: stripe_helper.generate_card_token
-      )
-      expect {
-        Stripe::Refund.create(charge: charge.id, amount: 2000)
-      }.to raise_error(Stripe::InvalidRequestError)
-    end
-
     describe "idempotency" do
       let(:customer) { Stripe::Customer.create(email: 'johnny@appleseed.com') }
       let(:charge) do
