@@ -657,6 +657,44 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_promotion_code(params={})
+      {
+        id: "mock_promo_abc123",
+        object: "promotion_code",
+        active: true,
+        code: "TESTCODE",
+        coupon: {
+          id: "mock_coupon_abc123",
+          object: "coupon",
+          amount_off: nil,
+          created: 1665773498,
+          currency: "usd",
+          duration: "repeating",
+          duration_in_months: 1,
+          livemode: false,
+          max_redemptions: nil,
+          metadata: {},
+          name: "Mock Coupon",
+          percent_off: 10.0,
+          redeem_by: nil,
+          times_redeemed: 0,
+          valid: true
+        },
+        created: 1665773499,
+        customer: nil,
+        expires_at: nil,
+        livemode: false,
+        max_redemptions: nil,
+        metadata: {},
+        restrictions: {
+          first_time_transaction: false,
+          minimum_amount: nil,
+          minimum_amount_currency: nil
+        },
+        times_redeemed: 0
+      }.merge(params)
+    end
+
     def self.mock_recipient(cards, params={})
       rp_id = params[:id] || "test_rp_default"
       cards.each {|card| card[:recipient] = rp_id}
