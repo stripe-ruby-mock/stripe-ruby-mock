@@ -1338,6 +1338,38 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(list.data).to be_empty
       expect(list.data.length).to eq(0)
     end
+
+    it "filters out subscriptions based on their current_period", live: true do
+      price = stripe_helper.create_price(recurring: { interval: 'month' })
+      price2 = stripe_helper.create_price(recurring: { interval: 'year' })
+
+      subscription1 = Stripe::Subscription.create(
+        customer: Stripe::Customer.create(source: gen_card_tk).id,
+        items: [{ price: price.id, quantity: 1 }]
+      )
+      subscription2 = Stripe::Subscription.create(
+        customer: Stripe::Customer.create(source: gen_card_tk).id,
+        items: [{ price: price2.id, quantity: 1 }]
+      )
+
+      list = Stripe::Subscription.list({ current_period_end: { gt: subscription1.current_period_end }})
+      expect(list.data).to contain_exactly(subscription2)
+
+      list = Stripe::Subscription.list({ current_period_end: { gte: subscription1.current_period_end }})
+      expect(list.data).to contain_exactly(subscription1, subscription2)
+
+      list = Stripe::Subscription.list({ current_period_end: { lt: subscription1.current_period_end }})
+      expect(list.data).to be_empty
+
+      list = Stripe::Subscription.list({ current_period_end: { lte: subscription1.current_period_end }})
+      expect(list.data).to contain_exactly(subscription1)
+
+      list = Stripe::Subscription.list({ current_period_start: subscription1.current_period_start })
+      expect(list.data).to contain_exactly(subscription1, subscription2)
+
+      list = Stripe::Subscription.list({ current_period_end: subscription2.current_period_end })
+      expect(list.data).to contain_exactly(subscription2)
+    end
   end
 
   describe "metadata" do
