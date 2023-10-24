@@ -14,6 +14,11 @@ shared_examples 'Invoice API' do
       expect(data[invoice.id]).to_not be_nil
       expect(data[invoice.id][:id]).to eq(invoice.id)
     end
+
+    it "supports invoice number" do
+      original = Stripe::Invoice.create
+      expect(original.number).to be
+    end
   end
 
   context "retrieving an invoice" do
