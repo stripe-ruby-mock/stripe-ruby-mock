@@ -1,0 +1,46 @@
+{
+  "id": "evt_000000000000000000000000",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648320046,
+  "data": {
+    "object": {
+      "id": "po_000000000000000000000000",
+      "object": "payout",
+      "amount": 1100,
+      "arrival_date": 1648425600,
+      "automatic": false,
+      "balance_transaction": "txn_000000000000000000000000",
+      "created": 1648320044,
+      "currency": "usd",
+      "description": "(created by Stripe CLI)",
+      "destination": "ba_000000000000000000000000",
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "livemode": false,
+      "metadata": {
+        "foo": "bar"
+      },
+      "method": "standard",
+      "original_payout": null,
+      "reversed_by": null,
+      "source_type": "card",
+      "statement_descriptor": null,
+      "status": "paid",
+      "type": "bank_account"
+    },
+    "previous_attributes": {
+      "metadata": {
+        "foo": null
+      }
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": "0d30bd53-9777-49de-8893-882fd2914757"
+  },
+  "type": "payout.updated"
+}

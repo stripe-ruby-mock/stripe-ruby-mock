@@ -29,10 +29,6 @@ module StripeMock
           raise Stripe::InvalidRequestError.new(missing_param_message(k), k) if params[k].nil?
         end
 
-        if !%w[good service].include?(params[:type])
-          raise Stripe::InvalidRequestError.new("Invalid type: must be one of good or service", :type)
-        end
-
         if products[ params[:id] ]
           raise Stripe::InvalidRequestError.new(already_exists_message(Stripe::Product), :id)
         end
@@ -110,9 +106,42 @@ module StripeMock
 
       end
 
+      def validate_create_price_params(params)
+        price_id = params[:id].to_s
+
+        require_param(:currency) unless params[:currency]
+        unless params[:product] || params[:product_data]
+          raise Stripe::InvalidRequestError("Requires product or product_data")
+        end
+
+        product_id = params[:product] || create_product(nil, nil, params[:product_data], nil).id
+
+        if prices[price_id]
+          message = already_exists_message(Stripe::Price)
+          raise Stripe::InvalidRequestError.new(message, :id)
+        end
+
+        unless products[product_id]
+          message = not_found_message(Stripe::Product, product_id)
+          raise Stripe::InvalidRequestError.new(message, :product)
+        end
+
+        unless SUPPORTED_CURRENCIES.include?(params[:currency])
+          message = invalid_currency_message(params[:currency])
+          raise Stripe::InvalidRequestError.new(message, :currency)
+        end
+      end
+
+      def validate_list_prices_params(params)
+        if params[:lookup_keys] && !params[:lookup_keys].is_a?(Array)
+          raise Stripe::InvalidRequestError.new('Invalid array', :lookup_keys)
+        end
+      end
+
       def require_param(param_name)
         raise Stripe::InvalidRequestError.new("Missing required param: #{param_name}.", param_name.to_s, http_status: 400)
       end
+
     end
   end
 end

@@ -6,7 +6,7 @@ module StripeMock
       end
 
       def create_ephemeral_key(route, method_url, params, headers)
-        Data.mock_ephemeral_key(params)
+        Data.mock_ephemeral_key(**params)
       end
     end
   end

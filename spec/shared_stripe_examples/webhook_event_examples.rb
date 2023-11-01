@@ -203,6 +203,52 @@ shared_examples 'Webhook Events API' do
       expect(events.map &:type).to include('invoiceitem.created', 'invoice.created', 'coupon.created')
     end
 
+    it "retrieves events with a created timestamp" do
+      timestamp = Time.now.to_i - 7200
+      customer_created_event = StripeMock.mock_webhook_event('customer.created', created: Time.now.to_i - 14_400)
+      plan_created_event = StripeMock.mock_webhook_event('plan.created', created: Time.now.to_i - 10_800)
+      coupon_created_event = StripeMock.mock_webhook_event('coupon.created', created: timestamp)
+      invoice_created_event = StripeMock.mock_webhook_event('invoice.created', created: Time.now.to_i - 3600)
+      invoice_item_created_event = StripeMock.mock_webhook_event('invoiceitem.created')
+
+      events = Stripe::Event.list(created: timestamp)
+      expect(events.count).to eq(1)
+      expect(events.map &:id).to match_array([coupon_created_event.id])
+      expect(events.map &:type).to match_array(['coupon.created'])
+
+      events = Stripe::Event.list(created: timestamp.to_s)
+      expect(events.count).to eq(1)
+      expect(events.map &:id).to match_array([coupon_created_event.id])
+      expect(events.map &:type).to match_array(['coupon.created'])
+    end
+
+    it "retrieves events with a created filter" do
+      timestamp1 = Time.now.to_i - 3600
+      timestamp2 = Time.now.to_i - 7200
+      timestamp3 = Time.now.to_i - 10_800
+      timestamp4 = Time.now.to_i - 14_400
+      customer_created_event = StripeMock.mock_webhook_event('customer.created', created: timestamp4)
+      plan_created_event = StripeMock.mock_webhook_event('plan.created', created: timestamp3)
+      coupon_created_event = StripeMock.mock_webhook_event('coupon.created', created: timestamp2)
+      invoice_created_event = StripeMock.mock_webhook_event('invoice.created', created: timestamp1)
+      invoice_item_created_event = StripeMock.mock_webhook_event('invoiceitem.created')
+
+      events = Stripe::Event.list(created: {gte: timestamp2, lte: timestamp1})
+      expect(events.count).to eq(2)
+      expect(events.map &:id).to match_array([coupon_created_event.id, invoice_created_event.id])
+      expect(events.map &:type).to match_array(['coupon.created', 'invoice.created'])
+
+      events = Stripe::Event.list(created: {gt: timestamp3})
+      expect(events.count).to eq(3)
+      expect(events.map &:id).to match_array([coupon_created_event.id, invoice_created_event.id, invoice_item_created_event.id])
+      expect(events.map &:type).to match_array(['coupon.created', 'invoice.created', 'invoiceitem.created'])
+
+      events = Stripe::Event.list(created: {lt: timestamp3.to_s})
+      expect(events.count).to eq(1)
+      expect(events.map &:id).to match_array([customer_created_event.id])
+      expect(events.map &:type).to match_array(['customer.created'])
+    end
+
   end
 
   describe 'Subscription events' do
@@ -211,7 +257,7 @@ shared_examples 'Webhook Events API' do
       expect(subscription_created_event).to be_a(Stripe::Event)
       expect(subscription_created_event.id).to_not be_nil
       expect(subscription_created_event.data.object.items.data.class).to be Array
-      expect(subscription_created_event.data.object.items.data.length).to be 2
+      expect(subscription_created_event.data.object.items.data.length).to be 1
       expect(subscription_created_event.data.object.items.data.first).to respond_to(:plan)
       expect(subscription_created_event.data.object.items.data.first.id).to eq('si_00000000000000')
     end
@@ -221,7 +267,7 @@ shared_examples 'Webhook Events API' do
       expect(subscription_deleted_event).to be_a(Stripe::Event)
       expect(subscription_deleted_event.id).to_not be_nil
       expect(subscription_deleted_event.data.object.items.data.class).to be Array
-      expect(subscription_deleted_event.data.object.items.data.length).to be 2
+      expect(subscription_deleted_event.data.object.items.data.length).to be 1
       expect(subscription_deleted_event.data.object.items.data.first).to respond_to(:plan)
       expect(subscription_deleted_event.data.object.items.data.first.id).to eq('si_00000000000000')
     end
@@ -231,7 +277,7 @@ shared_examples 'Webhook Events API' do
       expect(subscription_updated_event).to be_a(Stripe::Event)
       expect(subscription_updated_event.id).to_not be_nil
       expect(subscription_updated_event.data.object.items.data.class).to be Array
-      expect(subscription_updated_event.data.object.items.data.length).to be 2
+      expect(subscription_updated_event.data.object.items.data.length).to be 1
       expect(subscription_updated_event.data.object.items.data.first).to respond_to(:plan)
       expect(subscription_updated_event.data.object.items.data.first.id).to eq('si_00000000000000')
     end
@@ -253,9 +299,9 @@ shared_examples 'Webhook Events API' do
       expect(invoice_payment_succeeded).to be_a(Stripe::Event)
       expect(invoice_payment_succeeded.id).to_not be_nil
       expect(invoice_payment_succeeded.data.object.lines.data.class).to be Array
-      expect(invoice_payment_succeeded.data.object.lines.data.length).to be 2
+      expect(invoice_payment_succeeded.data.object.lines.data.length).to be 1
       expect(invoice_payment_succeeded.data.object.lines.data.first).to respond_to(:plan)
-      expect(invoice_payment_succeeded.data.object.lines.data.first.id).to eq('sub_00000000000000')
+      expect(invoice_payment_succeeded.data.object.lines.data.first.id).to eq('il_000000000000000000000000')
     end
   end
 end

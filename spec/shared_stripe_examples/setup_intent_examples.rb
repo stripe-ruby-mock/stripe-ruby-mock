@@ -10,6 +10,14 @@ shared_examples 'SetupIntent API' do
     expect(setup_intent.status).to eq('requires_payment_method')
   end
 
+  it 'creates a stripe setup intent with payment method' do
+    setup_intent = Stripe::SetupIntent.create(payment_method: 'random')
+
+    expect(setup_intent.id).to match(/^test_si/)
+    expect(setup_intent.metadata.to_hash).to eq({})
+    expect(setup_intent.status).to eq('requires_action')
+  end
+
   describe "listing setup_intent" do
     before do
       3.times do
@@ -40,6 +48,15 @@ shared_examples 'SetupIntent API' do
       expect(e.param).to eq('setup_intent')
       expect(e.http_status).to eq(404)
     }
+  end
+
+  it "expands payment_method" do
+    payment_method = Stripe::PaymentMethod.create(type: "card")
+    original = Stripe::SetupIntent.create(payment_method: payment_method.id)
+
+    setup_intent = Stripe::SetupIntent.retrieve({id: original.id, expand: ["payment_method"]})
+
+    expect(setup_intent.payment_method).to eq(payment_method)
   end
 
   it "confirms a stripe setup_intent" do

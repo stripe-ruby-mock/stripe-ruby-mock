@@ -35,8 +35,8 @@ describe StripeMock do
     StripeMock.stop
     StripeMock.start
 
-    expect(StripeMock.instance.customers[:x]).to be_nil
-    expect(StripeMock.instance.customers.keys.length).to eq(0)
+    expect(StripeMock.instance.customers[''][:x]).to be_nil
+    expect(StripeMock.instance.customers[''].keys.length).to eq(0)
     StripeMock.stop
   end
 

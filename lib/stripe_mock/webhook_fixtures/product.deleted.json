@@ -1,34 +1,40 @@
 {
-  "created": 1326853478,
-  "livemode": false,
-  "id": "evt_00000000000000",
-  "type": "product.deleted",
+  "id": "evt_000000000000000000000000",
   "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648320062,
   "data": {
     "object": {
       "id": "prod_00000000000000",
       "object": "product",
-      "active": true,
+      "active": false,
       "attributes": [
+
       ],
-      "caption": null,
-      "created": 1558795883,
-      "deactivate_on": [
-      ],
-      "description": null,
+      "created": 1648320060,
+      "description": "(created by Stripe CLI)t",
       "images": [
+
       ],
       "livemode": false,
       "metadata": {
       },
-      "name": "Test Product",
+      "name": "myproduct",
       "package_dimensions": null,
       "shippable": null,
       "statement_descriptor": null,
+      "tax_code": null,
       "type": "service",
       "unit_label": null,
-      "updated": 1558795883,
+      "updated": 1648320062,
       "url": null
     }
-  }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": null
+  },
+  "type": "product.deleted"
 }

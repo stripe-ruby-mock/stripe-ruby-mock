@@ -1,0 +1,53 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "checkout.session.completed",
+  "object": "event",
+  "data": {
+    "object": {
+      "id": "cs_00000000000000",
+      "object": "checkout.session",
+      "allow_promotion_codes": null,
+      "amount_subtotal": 25000,
+      "amount_total": 25000,
+      "automatic_tax": {
+        "enabled": false,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "cancel_url": "https://example.com/cancel",
+      "client_reference_id": null,
+      "currency": "usd",
+      "customer": "cus_00000000000000",
+      "customer_details": {
+        "email": "example@example.com",
+        "tax_exempt": "none",
+        "tax_ids": []
+      },
+      "customer_email": null,
+      "livemode": false,
+      "locale": null,
+      "metadata": {},
+      "mode": "payment",
+      "payment_intent": "pi_00000000000000",
+      "payment_method_options": {},
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "paid",
+      "setup_intent": null,
+      "shipping": null,
+      "shipping_address_collection": null,
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://example.com/success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "url": null
+    }
+  }
+}
