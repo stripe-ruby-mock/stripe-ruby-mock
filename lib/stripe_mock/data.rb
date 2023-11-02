@@ -456,7 +456,7 @@ module StripeMock
       }.merge(params)
       if invoice[:discount]
         invoice[:total] = [0, invoice[:subtotal] - invoice[:discount][:coupon][:amount_off]].max if invoice[:discount][:coupon][:amount_off]
-        invoice[:total] = invoice[:subtotal] * invoice[:discount][:coupon][:percent_off] / 100 if invoice[:discount][:coupon][:percent_off]
+        invoice[:total] = invoice[:subtotal] - (invoice[:subtotal] * invoice[:discount][:coupon][:percent_off] / 100) if invoice[:discount][:coupon][:percent_off]
       else
         invoice[:total] = invoice[:subtotal]
       end
