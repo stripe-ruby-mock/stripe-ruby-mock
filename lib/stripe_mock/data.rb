@@ -491,7 +491,8 @@ module StripeMock
         subscription: nil,
         plan: nil,
         description: "Test invoice item",
-        metadata: {}
+        metadata: {},
+        price: Data.mock_price()
       }.merge(params)
     end
 
