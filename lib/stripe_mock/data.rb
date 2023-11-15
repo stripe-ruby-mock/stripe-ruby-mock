@@ -461,6 +461,8 @@ module StripeMock
       else
         invoice[:total] = invoice[:subtotal]
       end
+      invoice[:total_excluding_tax] = invoice[:total] - invoice[:tax]
+      invoice[:subtotal_excluding_tax] = invoice[:subtotal] - invoice[:tax]
       due = invoice[:total] + invoice[:starting_balance]
       invoice[:amount_due] = due < 0 ? 0 : due
       invoice[:ending_balance] = invoice[:starting_balance] + invoice[:total] if invoice[:amount_due] == 0
