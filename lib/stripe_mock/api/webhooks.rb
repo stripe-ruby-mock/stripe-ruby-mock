@@ -119,6 +119,8 @@ module StripeMock
         'subscription_schedule.created',
         'subscription_schedule.released',
         'subscription_schedule.updated',
+        'tax_rate.created',
+        'tax_rate.updated',
         'transfer.created',
         'transfer.failed',
         'transfer.paid',
