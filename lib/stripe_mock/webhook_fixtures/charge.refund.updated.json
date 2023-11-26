@@ -1,0 +1,35 @@
+{
+  "id": "evt_000000000000000000000000",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648319945,
+  "data": {
+    "object": {
+      "id": "re_000000000000000000000000",
+      "object": "refund",
+      "amount": 100,
+      "balance_transaction": "txn_000000000000000000000000",
+      "charge": "ch_000000000000000000000000",
+      "created": 1648319945,
+      "currency": "usd",
+      "metadata": {
+        "order_id": "6735"
+      },
+      "payment_intent": null,
+      "reason": null,
+      "receipt_number": null,
+      "source_transfer_reversal": null,
+      "status": "succeeded",
+      "transfer_reversal": null
+    },
+    "previous_attributes": {
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": "38ee50ca-b664-4611-a846-9eaed51bec07"
+  },
+  "type": "charge.refund.updated"
+}

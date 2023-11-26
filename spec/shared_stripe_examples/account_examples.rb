@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 shared_examples 'Account API' do
-  describe 'retrive accounts' do
+  describe 'retrieve accounts' do
     it 'retrieves a stripe account', live: true do
       account = Stripe::Account.retrieve
 
@@ -83,6 +83,14 @@ shared_examples 'Account API' do
           account.save
         }.to raise_error Stripe::InvalidRequestError, error_message
       end
+    end
+  end
+
+  describe 'delete account' do
+    it 'deletes a stripe account' do
+      account = Stripe::Account.create(email: 'test@test.com')
+      account = account.delete
+      expect(account.deleted).to eq(true)
     end
   end
 
