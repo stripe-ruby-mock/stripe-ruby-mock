@@ -1,0 +1,32 @@
+{
+  "id": "evt_000000000000000000000000",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1700752531,
+  "data": {
+    "object": {
+      "id": "txr_00000000000000",
+      "object": "tax_rate",
+      "active": true,
+      "country": "DE",
+      "created": 1700750289,
+      "description": "VAT Germany",
+      "display_name": "VAT",
+      "effective_percentage": null,
+      "inclusive": false,
+      "jurisdiction": "DE",
+      "livemode": false,
+      "metadata": {},
+      "percentage": 16.0,
+      "state": null,
+      "tax_type": "vat"
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": "cd3e4fc0-9d4c-42fd-a818-1b9789537ce9"
+  },
+  "type": "tax_rate.created"
+}

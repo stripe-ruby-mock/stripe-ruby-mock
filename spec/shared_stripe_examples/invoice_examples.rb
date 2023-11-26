@@ -14,6 +14,11 @@ shared_examples 'Invoice API' do
       expect(data[invoice.id]).to_not be_nil
       expect(data[invoice.id][:id]).to eq(invoice.id)
     end
+
+    it "supports invoice number" do
+      original = Stripe::Invoice.create
+      expect(original.number).to be
+    end
   end
 
   context "retrieving an invoice" do
@@ -83,10 +88,26 @@ shared_examples 'Invoice API' do
       @invoice = @invoice.pay
       expect(@invoice.attempted).to eq(true)
       expect(@invoice.paid).to eq(true)
+      expect(@invoice.status).to eq("paid")
     end
 
     it 'creates a new charge object' do
       expect{ @invoice.pay }.to change { Stripe::Charge.list.data.count }.by 1
+    end
+
+    it 'should work with Stripe::Invoice.pay(invoice_id)' do
+      expect(@invoice.paid).to_not eq(true)
+
+      expect {
+        Stripe::Invoice.pay(@invoice.id)
+      }.to change { Stripe::Charge.list.data.count }.by 1
+
+      @invoice = Stripe::Invoice.retrieve(id: @invoice.id)
+      expect(@invoice).to_not be_nil
+
+      expect(@invoice.attempted).to eq(true)
+      expect(@invoice.paid).to eq(true)
+      expect(@invoice.status).to eq("paid")
     end
 
     it 'sets the charge attribute' do
