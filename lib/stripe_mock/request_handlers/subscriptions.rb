@@ -193,7 +193,8 @@ module StripeMock
         end
 
         if params[:customer]
-          subs = subs.filter {|subscription| subscription[:customer] == params[:customer]}
+          customer_id = params[:customer].is_a?(Stripe::Customer) ? params[:customer][:id] : params[:customer].to_s
+          subs = subs.filter {|subscription| subscription[:customer] == customer_id}
         end
 
         Data.mock_list_object(subs, params)
