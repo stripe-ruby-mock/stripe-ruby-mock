@@ -192,6 +192,10 @@ module StripeMock
           subs = subs.filter {|subscription| subscription[:status] == params[:status]}
         end
 
+        if params[:customer]
+          subs = subs.filter {|subscription| subscription[:customer] == params[:customer]}
+        end
+
         Data.mock_list_object(subs, params)
       end
 
