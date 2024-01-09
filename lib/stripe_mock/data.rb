@@ -403,7 +403,8 @@ module StripeMock
         default_source: nil,
         pending_invoice_item_interval: nil,
         next_pending_invoice_item_invoice: nil,
-        latest_invoice: nil
+        latest_invoice: nil,
+        schedule: nil
       }, params)
     end
 
@@ -453,11 +454,13 @@ module StripeMock
         next_payment_attempt: 1349825350,
         charge: nil,
         discount: nil,
+        total_discount_amounts: [],
         subscription: nil
       }.merge(params)
       if invoice[:discount]
         invoice[:total] = [0, invoice[:subtotal] - invoice[:discount][:coupon][:amount_off]].max if invoice[:discount][:coupon][:amount_off]
         invoice[:total] = invoice[:subtotal] - (invoice[:subtotal] * invoice[:discount][:coupon][:percent_off] / 100) if invoice[:discount][:coupon][:percent_off]
+        invoice[:total_discount_amounts] << [{ amount: invoice[:subtotal] - invoice[:total], discount: invoice[:discount] }]
       else
         invoice[:total] = invoice[:subtotal]
       end
@@ -1392,6 +1395,110 @@ module StripeMock
         subscription: nil,
         success_url: 'https://example.com/success'
       }.merge(params)
+    end
+
+    def self.mock_subscription_schedule(params={})
+      id = params[:id].presence || 'sub_sched_000000000000000000000000'
+      price_id = params[:price_id].presence || 'price_000000000000000000000000'
+
+      StripeMock::Util.rmerge({
+        id: id,
+        canceled_at: nil,
+        completed_at: nil,
+        created: 1648320096,
+        current_phase: {
+          end_date: 1650998496,
+          start_date: 1648320096,
+        },
+        customer: 'cus_00000000000000',
+        default_settings: {
+          application_fee_percent: nil,
+          automatic_tax: {
+            enabled: false
+          },
+          billing_cycle_anchor: 'automatic',
+          billing_thresholds: nil,
+          collection_method: 'charge_automatically',
+          default_payment_method: nil,
+          default_source: nil,
+          invoice_settings: nil,
+          transfer_data: nil
+        },
+        end_behavior: 'release',
+        livemode: false,
+        metadata: {
+        },
+        phases: [
+          {
+            add_invoice_items: [
+
+            ],
+            application_fee_percent: nil,
+            billing_cycle_anchor: nil,
+            billing_thresholds: nil,
+            collection_method: nil,
+            coupon: nil,
+            default_payment_method: nil,
+            default_tax_rates: [
+
+            ],
+            end_date: 1650998496,
+            invoice_settings: nil,
+            items: [
+              {
+                billing_thresholds: nil,
+                plan: 'price_000000000000000000000000',
+                price: 'price_000000000000000000000000',
+                quantity: 1,
+                tax_rates: [
+
+                ]
+              }
+            ],
+            proration_behavior: 'create_prorations',
+            start_date: 1648320096,
+            transfer_data: nil,
+            trial_end: nil
+          },
+          {
+            add_invoice_items: [
+
+            ],
+            application_fee_percent: nil,
+            billing_cycle_anchor: nil,
+            billing_thresholds: nil,
+            collection_method: nil,
+            coupon: nil,
+            default_payment_method: nil,
+            default_tax_rates: [
+
+            ],
+            end_date: 1653590496,
+            invoice_settings: nil,
+            items: [
+              {
+                billing_thresholds: nil,
+                plan: price_id,
+                price: price_id,
+                quantity: 2,
+                tax_rates: [
+
+                ]
+              }
+            ],
+            proration_behavior: 'create_prorations',
+            start_date: 1650998496,
+            transfer_data: nil,
+            trial_end: nil
+          }
+        ],
+        released_at: nil,
+        released_subscription: nil,
+        renewal_interval: nil,
+        status: 'active',
+        subscription: Data.mock_subscription,
+        test_clock: nil
+      }, params)
     end
   end
 end
