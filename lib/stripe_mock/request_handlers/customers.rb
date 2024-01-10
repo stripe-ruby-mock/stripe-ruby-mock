@@ -61,7 +61,7 @@ module StripeMock
       def update_customer(route, method_url, params, headers)
         stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
-        cus = assert_existence :customer, $1, customers[stripe_account][$1]
+        cus = assert_existence :customer, $1, customers.dig(stripe_account, $1)
 
         # get existing and pending metadata
         metadata = cus.delete(:metadata) || {}
@@ -112,10 +112,10 @@ module StripeMock
       def delete_customer(route, method_url, params, headers)
         stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
-        assert_existence :customer, $1, customers[stripe_account][$1]
+        assert_existence :customer, $1, customers.dig(stripe_account, $1)
 
         customers[stripe_account][$1] = {
-          id: customers[stripe_account][$1][:id],
+          id: customers.dig(stripe_account, $1)[:id],
           deleted: true
         }
       end
@@ -123,7 +123,7 @@ module StripeMock
       def get_customer(route, method_url, params, headers)
         stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
-        customer = assert_existence :customer, $1, customers[stripe_account][$1]
+        customer = assert_existence :customer, $1, customers.dig(stripe_account, $1)
 
         customer = customer.clone
         if params[:expand] == ['default_source'] && customer[:sources][:data]
@@ -143,7 +143,7 @@ module StripeMock
       def delete_customer_discount(route, method_url, params, headers)
         stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
-        cus = assert_existence :customer, $1, customers[stripe_account][$1]
+        cus = assert_existence :customer, $1, customers.dig(stripe_account, $1)
 
         cus[:discount] = nil
 
