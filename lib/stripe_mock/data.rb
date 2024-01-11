@@ -1403,6 +1403,7 @@ module StripeMock
 
       StripeMock::Util.rmerge({
         id: id,
+        object: 'subscription_schedule',
         canceled_at: nil,
         completed_at: nil,
         created: 1648320096,
