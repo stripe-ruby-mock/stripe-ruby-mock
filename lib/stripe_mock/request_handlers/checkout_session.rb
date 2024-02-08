@@ -11,11 +11,11 @@ module StripeMock
 
         def new_session(route, method_url, params, headers)
           id = params[:id] || new_id('cs')
+          embedded = params[:ui_mode] == "embedded"
 
-          # only in embedded mode:
-          return_url = params[:return_url]
-
-          unless return_url&.present?
+          if embedded
+            require_param(:return_url) if params[:return_url].nil? || params[:return_url].empty?
+          else
             [:cancel_url, :success_url].each do |p|
               require_param(p) if params[p].nil? || params[p].empty?
             end
@@ -132,7 +132,7 @@ module StripeMock
             url: URI.join(StripeMock.checkout_base, id).to_s
           }
 
-          if return_url.present?
+          if embedded
             session.merge!(
               client_secret: "cs_000000000000000000000000_secret_0000000000000000000000000",
               return_url: params[:return_url]
