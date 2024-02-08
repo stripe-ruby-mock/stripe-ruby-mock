@@ -53,7 +53,7 @@ module StripeMock
           if line_items
             amount = 0
 
-            line_items.each do |line_item| 
+            line_items.each do |line_item|
               price = prices[line_item[:price]]
 
               if price.nil?
@@ -133,7 +133,10 @@ module StripeMock
           }
 
           if return_url.present?
-            session.merge!(client_secret: "cs_000000000000000000000000_secret_0000000000000000000000000")
+            session.merge!(
+              client_secret: "cs_000000000000000000000000_secret_0000000000000000000000000",
+              return_url: params[:return_url]
+            )
           else
             session.merge!(
               cancel_url: params[:cancel_url],
