@@ -1,5 +1,27 @@
 ### Unreleased
 
+- [#693](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/693) gemspec: add change,issue,source_code URL by [@mtmail](https://github.com/mtmail) 
+- [#700](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/700) update the balance API to respond with instant_available by [@iamnader](https://github.com/iamnader) 
+- [#687](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/687) Add PaymentIntent Webhooks by [@klaustopher](https://github.com/klaustopher) 
+- [#708](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/708) Implement Stripe::Checkout::Session.retrieve by [@coorasse](https://github.com/coorasse) 
+- [#711](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/711) Adding account link mock by [@amenon](https://github.com/amenon) 
+- [#715](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/715) Added application_fee_amount to mock charge object by [@espen](https://github.com/espen) 
+- [#694](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/694) Introduce ideal and sepa_debit types for PaymentMethod by [@mnin](https://github.com/mnin) 
+- [#720](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/720) Add additional parameters by [@rpietraszko](https://github.com/rpietraszko)  
+- [#695](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/695) Add `has_more` attribute to all ListObject instances by [@gbp](https://github.com/gbp) 
+- [#727](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/727) Fix List initialize error with deleted records by [@jmulieri](https://github.com/jmulieri) 
+- [#739](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/739) Add data to account links by [@dudyn5ky1](https://github.com/dudyn5ky1)
+- [#756](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/756) Added #715 PR to changelog by [@espen](https://github.com/espen) 
+- [#759](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/759) Adding express dashboard login link mock by [@rohitbegani](https://github.com/rohitbegani) 
+- [#747](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/747) Fix ruby 2.7 deprecation warnings by [@coding-chimp](https://github.com/coding-chimp) 
+- [#762](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/762) Support Stripe Connect by adding stripe_account header namespace for customers by [@csalvato](https://github.com/csalvato) 
+- [#758](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/758) Create price by [@jamesprior](https://github.com/jamesprior) 
+- [#730](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/730) support on price api by [@hidenba](https://github.com/hidenba) 
+- [#764](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/764) Fixes erroneous error message when fetching upcoming invoices. by [@csalvato](https://github.com/csalvato) 
+- [#765](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/765) Properly set the status of a trialing subscription by [@csalvato](https://github.com/csalvato) 
+- [#755](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/755) Add allowed params to subscriptions by [@dominikdarnel](https://github.com/dominikdarnel) 
+- [#709](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/709) Remove unnecessary check on customer's currency by [@coorasse](https://github.com/coorasse) 
+
 - [#806](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/806) - Remove `payment_method_types` from required arguments for `Stripe::Checkout::Session`
 - [#806](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/806) - Raise more helpful exception when Stripe::Price cannot be found within a `Stripe::Checkout::Session` `line_items` argument.
 
