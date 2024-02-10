@@ -218,4 +218,66 @@ shared_examples 'PaymentIntent API' do
       expect(e.http_status).to eq(400)
     }
   end
+
+  context "search" do
+    # the Search API requires about a minute between writes and reads, so add sleeps accordingly when running live
+    it "searches payment intents for exact matches", :aggregate_failures do
+      response = Stripe::PaymentIntent.search({query: 'currency:"usd"'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(0)
+
+      customer = Stripe::Customer.create(email: 'johnny@appleseed.com', source: stripe_helper.generate_card_token)
+      one = Stripe::PaymentIntent.create(
+        amount: 100,
+        customer: customer.id,
+        currency: 'usd',
+        metadata: {key: 'uno'},
+      )
+      two = Stripe::PaymentIntent.create(
+        amount: 3184, # status: requires_action
+        customer: customer.id,
+        currency: 'gbp',
+        metadata: {key: 'dos'},
+      )
+
+      response = Stripe::PaymentIntent.search({query: 'amount:100'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::PaymentIntent.search({query: 'currency:"gbp"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::PaymentIntent.search({query: %(customer:"#{customer.id}")}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id, two.id])
+
+      response = Stripe::PaymentIntent.search({query: 'status:"requires_action"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::PaymentIntent.search({query: 'metadata["key"]:"uno"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+    end
+
+    it "respects limit", :aggregate_failures do
+      11.times do
+        Stripe::PaymentIntent.create(amount: 100, currency: 'usd')
+      end
+
+      response = Stripe::PaymentIntent.search({query: 'amount:100'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(10)
+      response = Stripe::PaymentIntent.search({query: 'amount:100', limit: 1}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(1)
+    end
+
+    it "reports search errors", :aggregate_failures do
+      expect {
+        Stripe::PaymentIntent.search({limit: 1}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Missing required param: query./)
+
+      expect {
+        Stripe::PaymentIntent.search({query: 'asdf'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /We were unable to parse your search query./)
+
+      expect {
+        Stripe::PaymentIntent.search({query: 'foo:"bar"'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Field `foo` is an unsupported search field for resource `payment_intents`./)
+    end
+  end
 end

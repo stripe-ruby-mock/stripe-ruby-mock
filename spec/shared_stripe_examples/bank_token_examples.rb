@@ -54,5 +54,4 @@ shared_examples 'Bank Account Token Mocking' do
     expect(token.bank_account.last4).to eq("3939")
     expect(token.bank_account.bank_name).to eq("Cha-ching Banking")
   end
-
 end
