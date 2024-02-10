@@ -1440,7 +1440,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(email: 'johnny@appleseed.com', source: gen_card_tk)
       one = Stripe::Subscription.create(customer: customer.id, items: [{plan: "Sample5"}], metadata: {key: 'uno'})
       two = Stripe::Subscription.create(customer: customer.id, items: [{plan: "Sample5"}], metadata: {key: 'dos'})
-      Stripe::Subscription.delete(two.id)
+      Stripe::Subscription.cancel(two.id)
 
       response = Stripe::Subscription.search({query: 'status:"active"'}, stripe_version: '2020-08-27')
       expect(response.data.map(&:id)).to match_array([one.id])
