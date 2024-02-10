@@ -687,7 +687,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
 
       sub = Stripe::Subscription.create({ items: { '0' => { plan: 'silver' } }, customer: customer.id })
-      sub.delete(at_period_end: true)
+      sub.cancel(at_period_end: true)
 
       expect(sub.cancel_at_period_end).to be_truthy
       expect(sub.save).to be_truthy
@@ -752,7 +752,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
 
       subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
-      subscription.delete
+      subscription.cancel
 
       expect { subscription.save }.to raise_error { |e|
         expect(e).to be_a(Stripe::InvalidRequestError)
@@ -765,7 +765,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
 
       sub = Stripe::Subscription.create({ items: [ { plan: plan.id } ], customer: customer.id })
-      sub.delete(at_period_end: true)
+      sub.cancel(at_period_end: true)
 
       expect(sub.cancel_at_period_end).to be_truthy
       expect(sub.save).to be_truthy
@@ -1180,7 +1180,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
 
       sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
-      result = sub.delete
+      result = sub.cancel
 
       expect(result.status).to eq('canceled')
       expect(result.cancel_at_period_end).to eq false
@@ -1247,7 +1247,7 @@ shared_examples 'Customer Subscriptions with plans' do
     customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: "trial")
 
     sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
-    result = sub.delete(at_period_end: true)
+    result = sub.cancel(at_period_end: true)
 
     expect(result.status).to eq('trialing')
 
@@ -1331,7 +1331,7 @@ shared_examples 'Customer Subscriptions with plans' do
     it "does not include canceled subscriptions by default" do
       customer = Stripe::Customer.create(source: gen_card_tk)
       subscription = Stripe::Subscription.create({ plan: plan.id, customer: customer.id })
-      subscription.delete
+      subscription.cancel
 
       list = Stripe::Subscription.list({customer: customer.id})
 
