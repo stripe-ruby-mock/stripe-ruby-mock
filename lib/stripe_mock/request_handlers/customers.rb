@@ -5,9 +5,10 @@ module StripeMock
       def Customers.included(klass)
         klass.add_handler 'post /v1/customers',                     :new_customer
         klass.add_handler 'post /v1/customers/([^/]*)',             :update_customer
-        klass.add_handler 'get /v1/customers/([^/]*)',              :get_customer
+        klass.add_handler 'get /v1/customers/((?!search)[^/]*)',    :get_customer
         klass.add_handler 'delete /v1/customers/([^/]*)',           :delete_customer
         klass.add_handler 'get /v1/customers',                      :list_customers
+        klass.add_handler 'get /v1/customers/search',               :search_customers
         klass.add_handler 'delete /v1/customers/([^/]*)/discount',  :delete_customer_discount
       end
 
@@ -138,6 +139,16 @@ module StripeMock
       def list_customers(route, method_url, params, headers)
         stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         Data.mock_list_object(customers[stripe_account]&.values, params)
+      end
+
+      SEARCH_FIELDS = ["email", "name", "phone"].freeze
+      def search_customers(route, method_url, params, headers)
+        require_param(:query) unless params[:query]
+
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
+        all_customers = customers[stripe_account]&.values
+        results = search_results(all_customers, params[:query], fields: SEARCH_FIELDS, resource_name: "customers")
+        Data.mock_list_object(results, params)
       end
 
       def delete_customer_discount(route, method_url, params, headers)

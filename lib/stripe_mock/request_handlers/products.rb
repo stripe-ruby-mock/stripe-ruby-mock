@@ -2,11 +2,12 @@ module StripeMock
   module RequestHandlers
     module Products
       def self.included(base)
-        base.add_handler 'post /v1/products',        :create_product
-        base.add_handler 'get /v1/products/(.*)',    :retrieve_product
-        base.add_handler 'post /v1/products/(.*)',   :update_product
-        base.add_handler 'get /v1/products',         :list_products
-        base.add_handler 'delete /v1/products/(.*)', :destroy_product
+        base.add_handler 'post /v1/products',               :create_product
+        base.add_handler 'get /v1/products/((?!search).*)', :retrieve_product
+        base.add_handler 'get /v1/products/search',         :search_products
+        base.add_handler 'post /v1/products/(.*)',          :update_product
+        base.add_handler 'get /v1/products',                :list_products
+        base.add_handler 'delete /v1/products/(.*)',        :destroy_product
       end
 
       def create_product(_route, _method_url, params, _headers)
@@ -30,6 +31,14 @@ module StripeMock
       def list_products(_route, _method_url, params, _headers)
         limit = params[:limit] || 10
         Data.mock_list_object(products.values.take(limit), params)
+      end
+
+      SEARCH_FIELDS = ["active", "description", "name", "shippable", "url"].freeze
+      def search_products(route, method_url, params, headers)
+        require_param(:query) unless params[:query]
+
+        results = search_results(products.values, params[:query], fields: SEARCH_FIELDS, resource_name: "products")
+        Data.mock_list_object(results, params)
       end
 
       def destroy_product(route, method_url, _params, _headers)
