@@ -28,7 +28,7 @@ shared_examples 'Bank Account Token Mocking' do
     expect(bank_token).to match /^test_btok/
   end
 
-  it "assigns the generated bank account to a new recipient" do
+  it "assigns the generated bank account to a new recipient", skip: 'Stripe has deprecated Recipients' do
     bank_token = StripeMock.generate_bank_token(
       :bank_name => "Bank Token Mocking",
       :last4 => "7777"
