@@ -216,6 +216,7 @@ module StripeMock
         },
         receipt_email: nil,
         receipt_number: nil,
+        receipt_url: nil,
         refunded: false,
         shipping: {},
         statement_descriptor: "Charge #{charge_id}",
@@ -276,7 +277,8 @@ module StripeMock
         charge: "ch_4fWhYjzQ23UFWT",
         receipt_number: nil,
         status: "succeeded",
-        reason: "requested_by_customer"
+        reason: "requested_by_customer",
+        receipt_url: nil
       }.merge(params)
     end
 
@@ -386,7 +388,7 @@ module StripeMock
         canceled_at: nil,
         collection_method: 'charge_automatically',
         ended_at: nil,
-        start: 1308595038,
+        start_date: 1308595038,
         object: 'subscription',
         trial_start: 1308595038,
         trial_end: 1308681468,
@@ -448,7 +450,8 @@ module StripeMock
         next_payment_attempt: 1349825350,
         charge: nil,
         discount: nil,
-        subscription: nil
+        subscription: nil,
+        number: "6C41730-0001"
       }.merge(params)
       if invoice[:discount]
         invoice[:total] = [0, invoice[:subtotal] - invoice[:discount][:coupon][:amount_off]].max if invoice[:discount][:coupon][:amount_off]
@@ -652,6 +655,44 @@ module StripeMock
         unit_label: "my_unit",
         updated: 1537939442,
         url: nil
+      }.merge(params)
+    end
+
+    def self.mock_promotion_code(params={})
+      {
+        id: "mock_promo_abc123",
+        object: "promotion_code",
+        active: true,
+        code: "TESTCODE",
+        coupon: {
+          id: "mock_coupon_abc123",
+          object: "coupon",
+          amount_off: nil,
+          created: 1665773498,
+          currency: "usd",
+          duration: "repeating",
+          duration_in_months: 1,
+          livemode: false,
+          max_redemptions: nil,
+          metadata: {},
+          name: "Mock Coupon",
+          percent_off: 10.0,
+          redeem_by: nil,
+          times_redeemed: 0,
+          valid: true
+        },
+        created: 1665773499,
+        customer: nil,
+        expires_at: nil,
+        livemode: false,
+        max_redemptions: nil,
+        metadata: {},
+        restrictions: {
+          first_time_transaction: false,
+          minimum_amount: nil,
+          minimum_amount_currency: nil
+        },
+        times_redeemed: 0
       }.merge(params)
     end
 
@@ -1257,9 +1298,10 @@ module StripeMock
       payment_method_id = params[:id] || 'pm_1ExEuFL2DI6wht39WNJgbybl'
 
       type = params[:type].to_sym
+      last4 = params.dig(:card, :number)
       data = {
         card: {
-          brand: case params.dig(:card, :number)&.to_s
+          brand: case last4&.to_s
           when /^4/, nil
             'visa'
           when /^5[1-5]/
@@ -1278,7 +1320,7 @@ module StripeMock
           fingerprint: 'Hr3Ly5z5IYxsokWA',
           funding: 'credit',
           generated_from: nil,
-          last4: params.dig(:card, :number)&.[](-4..) || '3155',
+          last4: last4.nil? ? '3155' : last4.to_s[-4..],
           three_d_secure_usage: { supported: true },
           wallet: nil
         },

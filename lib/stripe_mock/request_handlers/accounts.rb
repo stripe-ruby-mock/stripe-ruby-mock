@@ -4,12 +4,13 @@ module StripeMock
       VALID_START_YEAR = 2009
 
       def Accounts.included(klass)
-        klass.add_handler 'post /v1/accounts',      :new_account
-        klass.add_handler 'get /v1/account',        :get_account
-        klass.add_handler 'get /v1/accounts/(.*)',  :get_account
-        klass.add_handler 'post /v1/accounts/(.*)', :update_account
-        klass.add_handler 'get /v1/accounts',       :list_accounts
-        klass.add_handler 'post /oauth/deauthorize',:deauthorize
+        klass.add_handler 'post /v1/accounts',        :new_account
+        klass.add_handler 'get /v1/account',          :get_account
+        klass.add_handler 'get /v1/accounts/(.*)',    :get_account
+        klass.add_handler 'post /v1/accounts/(.*)',   :update_account
+        klass.add_handler 'get /v1/accounts',         :list_accounts
+        klass.add_handler 'post /oauth/deauthorize',  :deauthorize
+        klass.add_handler 'delete /v1/accounts/(.*)', :delete_account
       end
 
       def new_account(route, method_url, params, headers)
@@ -46,6 +47,16 @@ module StripeMock
         init_account
         route =~ method_url
         Stripe::StripeObject.construct_from(:stripe_user_id => params[:stripe_user_id])
+      end
+
+      def delete_account(route, method_url, params, headers)
+        init_account
+        route =~ method_url
+        assert_existence :account, $1, accounts[$1]
+        accounts[$1] = {
+          id: accounts[$1][:id],
+          deleted: true
+        }
       end
 
       private
