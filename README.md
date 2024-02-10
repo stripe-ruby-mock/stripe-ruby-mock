@@ -29,7 +29,7 @@ version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/strip
 
 ### Requirements
 
-* ruby >= 2.6.0
+* ruby >= 2.7.0
 * stripe >= 5.0.0
 
 ### Specifications
