@@ -128,6 +128,7 @@ module StripeMock
             total_details: nil,
             url: URI.join(StripeMock.checkout_base, id).to_s,
             ui_mode: params[:ui_mode],
+            client_secret: nil,
           }
         end
 
