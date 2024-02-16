@@ -126,7 +126,8 @@ module StripeMock
             subscription: nil,
             success_url: params[:success_url],
             total_details: nil,
-            url: URI.join(StripeMock.checkout_base, id).to_s
+            url: URI.join(StripeMock.checkout_base, id).to_s,
+            ui_mode: params[:ui_mode],
           }
         end
 
