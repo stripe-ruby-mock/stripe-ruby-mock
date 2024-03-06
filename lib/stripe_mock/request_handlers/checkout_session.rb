@@ -11,9 +11,14 @@ module StripeMock
 
         def new_session(route, method_url, params, headers)
           id = params[:id] || new_id('cs')
+          embedded = params[:ui_mode] == "embedded"
 
-          [:cancel_url, :success_url].each do |p|
-            require_param(p) if params[p].nil? || params[p].empty?
+          if embedded
+            require_param(:return_url) if params[:return_url].nil? || params[:return_url].empty?
+          else
+            [:cancel_url, :success_url].each do |p|
+              require_param(p) if params[p].nil? || params[p].empty?
+            end
           end
 
           line_items = nil
@@ -48,7 +53,7 @@ module StripeMock
           if line_items
             amount = 0
 
-            line_items.each do |line_item| 
+            line_items.each do |line_item|
               price = prices[line_item[:price]]
 
               if price.nil?
@@ -94,7 +99,7 @@ module StripeMock
             throw Stripe::InvalidRequestError.new("Invalid mode: must be one of payment, setup, or subscription", :mode, http_status: 400)
           end
 
-          checkout_sessions[id] = {
+          session = {
             id: id,
             object: "checkout.session",
             allow_promotion_codes: nil,
@@ -105,7 +110,6 @@ module StripeMock
               status: nil
             },
             billing_address_collection: nil,
-            cancel_url: params[:cancel_url],
             client_reference_id: nil,
             currency: currency,
             customer: params[:customer],
@@ -124,10 +128,23 @@ module StripeMock
             shipping_address_collection: nil,
             submit_type: nil,
             subscription: nil,
-            success_url: params[:success_url],
             total_details: nil,
             url: URI.join(StripeMock.checkout_base, id).to_s
           }
+
+          if embedded
+            session.merge!(
+              client_secret: "cs_000000000000000000000000_secret_0000000000000000000000000",
+              return_url: params[:return_url]
+            )
+          else
+            session.merge!(
+              cancel_url: params[:cancel_url],
+              success_url: params[:success_url]
+            )
+          end
+
+          checkout_sessions[id] = session
         end
 
         def list_checkout_sessions(route, method_url, params, headers)
