@@ -56,24 +56,6 @@ module StripeMock
           params.merge!({status: 'trialing', current_period_end: end_time, trial_start: start_time, trial_end: end_time, billing_cycle_anchor: options[:billing_cycle_anchor] || created_time})
         end
 
-        # Support updating subscription with multiple plan items
-        items = options[:items] || []
-        items = items.values if items.respond_to?(:values)
-        if items.any?
-          items_data = []
-          items.each do |item|
-            quantity = item[:quantity] || 1
-            items_data.push(Data.mock_subscription_item(plan: plan, quantity: quantity, created: Time.now.utc.to_i))
-          end
-          params[:items] = Data.mock_list_object(items_data)
-          if items_data.size == 1
-            params.merge!(:plan => items_data[0][:plan], :quantity => items_data[0][:quantity])
-          elsif items_data.size > 1
-            params.delete(:plan)
-            params.delete(:quantity)
-          end
-        end
-
         params
       end
 
