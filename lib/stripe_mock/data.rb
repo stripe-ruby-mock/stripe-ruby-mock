@@ -374,10 +374,7 @@ module StripeMock
           data: [{
             id: 'si_1AwFf62eZvKYlo2C9u6Dhf9',
             created: 1504035973,
-            metadata: {
-              # Added for avoiding nil exception
-              company_deleted: false
-            },
+            metadata: {},
             object: 'subscription_item',
             plan: {
               amount: 999,
