@@ -125,6 +125,19 @@ module StripeMock
         end
         total
       end
+
+      def filter_by_timestamp(subscriptions, field:, value:)
+        if value.is_a?(Hash)
+          operator_mapping = { gt: :>, gte: :>=, lt: :<, lte: :<= }
+          subscriptions.filter do |sub|
+            sub[field].public_send(operator_mapping[value.keys[0]], value.values[0])
+          end
+        else
+          subscriptions.filter do |sub|
+            sub[field] == value
+          end
+        end
+      end
     end
   end
 end

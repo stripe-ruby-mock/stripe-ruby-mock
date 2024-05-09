@@ -85,6 +85,74 @@ shared_examples "Product API" do
     expect(all.count).to eq(100)
   end
 
+  context "searching products" do
+    # the Search API requires about a minute between writes and reads, so add sleeps accordingly when running live
+    it "searches products for exact matches", :aggregate_failures do
+      response = Stripe::Product.search({query: 'name:"one"'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(0)
+
+      one = stripe_helper.create_product(
+        id: "product_1",
+        name: "one",
+        description: "un",
+        shippable: true,
+        url: "http://example.com/one",
+        metadata: {key: "uno"},
+      )
+      two = stripe_helper.create_product(
+        id: "product_2",
+        name: "two",
+        active: false,
+        description: "deux",
+        url: "http://example.com/two",
+        metadata: {key: "dos"},
+      )
+
+      response = Stripe::Product.search({query: 'active:"true"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Product.search({query: 'description:"deux"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Product.search({query: 'name:"one"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Product.search({query: 'shippable:"true"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Product.search({query: 'url:"http://example.com/two"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Product.search({query: 'metadata["key"]:"uno"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+    end
+
+    it "respects limit", :aggregate_failures do
+      11.times do |i|
+        stripe_helper.create_product(id: "product_#{i}", name: "Product #{i}")
+      end
+
+      response = Stripe::Product.search({query: 'active:"true"'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(10)
+      response = Stripe::Product.search({query: 'active:"true"', limit: 1}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(1)
+    end
+
+    it "reports search errors", :aggregate_failures do
+      expect {
+        Stripe::Product.search({limit: 1}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Missing required param: query./)
+
+      expect {
+        Stripe::Product.search({query: 'asdf'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /We were unable to parse your search query./)
+
+      expect {
+        Stripe::Product.search({query: 'foo:"bar"'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Field `foo` is an unsupported search field for resource `products`./)
+    end
+  end
+
   describe "Validation", :live => true do
     include_context "stripe validator"
     let(:params) { stripe_helper.create_product_params }
