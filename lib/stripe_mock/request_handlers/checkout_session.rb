@@ -106,7 +106,7 @@ module StripeMock
             },
             billing_address_collection: nil,
             cancel_url: params[:cancel_url],
-            client_reference_id: nil,
+            client_reference_id: params[:client_reference_id]&.to_s,
             currency: currency,
             customer: params[:customer],
             customer_details: nil,
