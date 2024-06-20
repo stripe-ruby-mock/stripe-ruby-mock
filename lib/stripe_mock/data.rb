@@ -488,6 +488,7 @@ module StripeMock
         quantity: nil,
         subscription: nil,
         plan: nil,
+        price: params[:price] || params[:plan],
         description: "Test invoice item",
         metadata: {}
       }.merge(params)

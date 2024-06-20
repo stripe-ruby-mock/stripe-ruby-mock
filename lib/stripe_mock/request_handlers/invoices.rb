@@ -14,7 +14,7 @@ module StripeMock
 
       def new_invoice(route, method_url, params, headers)
         id = new_id('in')
-        invoice_item = Data.mock_line_item()
+        invoice_item = Data.mock_line_item(plan: params[:subscription]&.plan)
         invoices[id] = Data.mock_invoice([invoice_item], params.merge(:id => id))
       end
 
@@ -164,6 +164,7 @@ module StripeMock
           id: subscription[:id],
           type: "subscription",
           plan: subscription[:plan],
+          price: subscription[:plan],
           amount: subscription[:status] == 'trialing' ? 0 : subscription[:plan][:amount] * subscription[:quantity],
           discountable: true,
           quantity: subscription[:quantity],
