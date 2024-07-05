@@ -164,7 +164,7 @@ module StripeMock
           id: subscription[:id],
           type: "subscription",
           plan: subscription[:plan],
-          amount: subscription[:status] == 'trialing' ? 0 : subscription[:plan][:amount] * subscription[:quantity],
+          amount: subscription[:status] == 'trialing' ? 0 : subscription[:plan][:unit_amount] * subscription[:quantity],
           discountable: true,
           quantity: subscription[:quantity],
           period: {
