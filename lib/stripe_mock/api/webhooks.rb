@@ -4,7 +4,7 @@ module StripeMock
 
     fixture_file = File.join(@webhook_fixture_path, "#{type}.json")
 
-    unless File.exists?(fixture_file)
+    unless File.exist?(fixture_file)
       unless Webhooks.event_list.include?(type)
         raise UnsupportedRequestError.new "Unsupported webhook event `#{type}` (Searched in #{@webhook_fixture_path})"
       end
@@ -15,7 +15,7 @@ module StripeMock
 
     json = Stripe::Util.symbolize_names(json)
     params = Stripe::Util.symbolize_names(params)
-    json[:account] = params.delete(:account) if params.key?(:account)
+    json[:account] = params.delete(:account)
     json[:data][:object] = Util.rmerge(json[:data][:object], params)
     json.delete(:id)
     json[:created] = params[:created] || Time.now.to_i
