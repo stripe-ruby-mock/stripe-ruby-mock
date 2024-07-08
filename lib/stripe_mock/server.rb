@@ -16,9 +16,9 @@ module StripeMock
       self.clear_data
     end
 
-    def mock_request(*args)
+    def mock_request(*args, **kwargs)
       begin
-        @instance.mock_request(*args)
+        @instance.mock_request(*args, **kwargs)
       rescue Stripe::InvalidRequestError => e
         {
           :error_raised => 'invalid_request',

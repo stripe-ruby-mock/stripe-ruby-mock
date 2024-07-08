@@ -11,6 +11,12 @@ module StripeMock
 
       def new_price(route, method_url, params, headers)
         params[:id] ||= new_id('price')
+
+        if params[:product_data]
+          params[:product] = create_product(nil, nil, params[:product_data], nil)[:id] unless params[:product]
+          params.delete(:product_data)
+        end
+
         validate_create_price_params(params)
         prices[ params[:id] ] = Data.mock_price(params)
       end
@@ -34,6 +40,18 @@ module StripeMock
         if params.key?(:lookup_keys)
           price_data.select! do |price|
             params[:lookup_keys].include?(price[:lookup_key])
+          end
+        end
+
+        if params.key?(:currency)
+          price_data.select! do |price|
+            params[:currency] == price[:currency]
+          end
+        end
+
+        if params.key?(:product)
+          price_data.select! do |price|
+            params[:product] == price[:product]
           end
         end
 

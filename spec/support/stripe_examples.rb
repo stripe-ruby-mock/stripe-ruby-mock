@@ -24,6 +24,7 @@ def it_behaves_like_stripe(&block)
   it_behaves_like 'Plan API', &block
   it_behaves_like 'Price API', &block
   it_behaves_like 'Product API', &block
+  it_behaves_like 'PromotionCode API', &block
   it_behaves_like 'Recipient API', &block
   it_behaves_like 'Refund API', &block
   it_behaves_like 'Transfer API', &block
@@ -39,10 +40,11 @@ def it_behaves_like_stripe(&block)
   it_behaves_like 'Country Spec API', &block
   it_behaves_like 'EphemeralKey API', &block
   it_behaves_like 'TaxRate API', &block
-  it_behaves_like 'Checkout API', &block
+  it_behaves_like 'Checkout Session API', &block
 
   # Integration tests
   it_behaves_like 'Multiple Customer Cards'
   it_behaves_like 'Charging with Tokens'
   it_behaves_like 'Card Error Prep'
+  it_behaves_like 'Completing Checkout Sessions'
 end

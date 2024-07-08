@@ -1,20 +1,37 @@
 {
-  "created": 1326853478,
-  "livemode": false,
-  "id": "evt_00000000000000",
-  "type": "plan.created",
+  "id": "evt_000000000000000000000000",
   "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648320109,
   "data": {
     "object": {
-      "interval": "month",
-      "product": "pr_00000000000000",
-      "amount": 100,
-      "currency": "usd",
-      "id": "fkx0AFo_00000000000000",
+      "id": "price_000000000000000000000000",
       "object": "plan",
-      "livemode": false,
+      "active": true,
+      "aggregate_usage": null,
+      "amount": 1500,
+      "amount_decimal": "1500",
+      "billing_scheme": "per_unit",
+      "created": 1648320109,
+      "currency": "usd",
+      "interval": "month",
       "interval_count": 1,
-      "trial_period_days": null
+      "livemode": false,
+      "metadata": {
+      },
+      "nickname": null,
+      "product": "prod_00000000000000",
+      "tiers_mode": null,
+      "transform_usage": null,
+      "trial_period_days": null,
+      "usage_type": "licensed"
     }
-  }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": "64c22132-7234-47d6-a803-4e34ac0e883b"
+  },
+  "type": "plan.created"
 }

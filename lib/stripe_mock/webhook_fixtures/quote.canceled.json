@@ -1,0 +1,92 @@
+{
+  "id": "evt_000000000000000000000000",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648320077,
+  "data": {
+    "object": {
+      "id": "qt_000000000000000000000000",
+      "object": "quote",
+      "amount_subtotal": 15000,
+      "amount_total": 15000,
+      "application_fee_amount": null,
+      "application_fee_percent": null,
+      "automatic_tax": {
+        "enabled": false,
+        "status": null
+      },
+      "collection_method": "charge_automatically",
+      "computed": {
+        "recurring": {
+          "amount_subtotal": 15000,
+          "amount_total": 15000,
+          "interval": "month",
+          "interval_count": 1,
+          "total_details": {
+            "amount_discount": 0,
+            "amount_shipping": 0,
+            "amount_tax": 0
+          }
+        },
+        "upfront": {
+          "amount_subtotal": 15000,
+          "amount_total": 15000,
+          "total_details": {
+            "amount_discount": 0,
+            "amount_shipping": 0,
+            "amount_tax": 0
+          }
+        }
+      },
+      "created": 1648320076,
+      "currency": "usd",
+      "customer": "cus_00000000000000",
+      "default_tax_rates": [
+
+      ],
+      "description": "(created by Stripe CLI)",
+      "discounts": [
+
+      ],
+      "expires_at": 1650912076,
+      "footer": null,
+      "from_quote": null,
+      "header": null,
+      "invoice": null,
+      "invoice_settings": {
+        "days_until_due": null
+      },
+      "livemode": false,
+      "metadata": {
+      },
+      "number": null,
+      "on_behalf_of": null,
+      "status": "canceled",
+      "status_transitions": {
+        "accepted_at": null,
+        "canceled_at": 1648320077,
+        "finalized_at": null
+      },
+      "subscription": null,
+      "subscription_data": {
+        "effective_date": null,
+        "trial_period_days": null
+      },
+      "subscription_schedule": null,
+      "test_clock": null,
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "transfer_data": null
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": "81d553e8-c88c-4a3e-9572-24da02fd83c0"
+  },
+  "type": "quote.canceled"
+}

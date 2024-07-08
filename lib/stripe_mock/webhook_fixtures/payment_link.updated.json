@@ -1,0 +1,50 @@
+{
+  "id": "evt_000000000000000000000000",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648320038,
+  "data": {
+    "object": {
+      "id": "plink_000000000000000000000000",
+      "object": "payment_link",
+      "active": true,
+      "after_completion": {
+        "hosted_confirmation": {
+          "custom_message": null
+        },
+        "type": "hosted_confirmation"
+      },
+      "allow_promotion_codes": true,
+      "application_fee_amount": null,
+      "application_fee_percent": null,
+      "automatic_tax": {
+        "enabled": false
+      },
+      "billing_address_collection": "auto",
+      "livemode": false,
+      "metadata": {
+      },
+      "on_behalf_of": null,
+      "payment_method_types": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "shipping_address_collection": null,
+      "subscription_data": {
+        "trial_period_days": null
+      },
+      "transfer_data": null,
+      "url": "https://buy.stripe.com/test_000000000000000000"
+    },
+    "previous_attributes": {
+      "allow_promotion_codes": false
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": "81dafec6-4d31-4bc8-b45b-0ab21772c793"
+  },
+  "type": "payment_link.updated"
+}
