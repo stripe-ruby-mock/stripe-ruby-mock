@@ -54,9 +54,7 @@ module StripeMock
         # Note: needs updating for subscriptions with multiple plans
         verify_card_present(customer, subscription_plans.first, subscription, params)
 
-        if params[:coupon]
-          coupon_id = params[:coupon]
-
+        if (coupon_id = params[:coupon] || params.dig(:discounts, 0, :coupon)).present?
           # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
@@ -113,9 +111,7 @@ module StripeMock
         # Note: needs updating for subscriptions with multiple plans
         verify_card_present(customer, subscription_plans.first, subscription, params)
 
-        if params[:coupon]
-          coupon_id = params[:coupon]
-
+        if (coupon_id = params[:coupon] || params.dig(:discounts, 0, :coupon)).present?
           # assert_existence returns 404 error code but Stripe returns 400
           # coupon = assert_existence :coupon, coupon_id, coupons[coupon_id]
 
