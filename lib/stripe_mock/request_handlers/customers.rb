@@ -10,6 +10,7 @@ module StripeMock
         klass.add_handler 'get /v1/customers',                      :list_customers
         klass.add_handler 'get /v1/customers/search',               :search_customers
         klass.add_handler 'delete /v1/customers/([^/]*)/discount',  :delete_customer_discount
+        klass.add_handler 'post /v1/customers/([^/]*)/balance_transactions', :create_balance_transaction
       end
 
       def new_customer(route, method_url, params, headers)
@@ -159,6 +160,28 @@ module StripeMock
         cus[:discount] = nil
 
         cus
+      end
+
+      def create_balance_transaction(route, method_url, params, headers)
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
+        route =~ method_url
+        customer_id = $1
+        customer = assert_existence :customer, customer_id, customers[stripe_account][customer_id]
+
+        balance_transaction = {
+          id: new_id('cbtxn'),
+          object: 'customer_balance_transaction',
+          amount: params[:amount],
+          currency: params[:currency],
+          description: params[:description],
+          metadata: params[:metadata] || {},
+          created: Time.now.to_i
+        }
+
+        customer[:balance_transactions] ||= []
+        customer[:balance_transactions] << balance_transaction
+
+        balance_transaction
       end
 
       private

@@ -386,6 +386,8 @@ module StripeMock
           }]
         },
         cancel_at_period_end: false,
+        cancel_at: nil,
+        cancellation_details: nil,
         canceled_at: nil,
         collection_method: 'charge_automatically',
         ended_at: nil,
@@ -1359,6 +1361,7 @@ module StripeMock
           phone: nil
         },
         customer: params[:customer] || nil,
+        created: 1565290521,
         metadata: {
           order_id: '123456789'
         }

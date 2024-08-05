@@ -111,7 +111,7 @@ module StripeMock
           :charge => charge[:id],
         )
 
-        recurring_items = invoices[$1][:lines][:data].select { |item| item[:price] && get_price(nil, nil, { price: item[:price] }, nil) }
+        recurring_items = invoices[$1][:lines][:data].select { |item| item[:price] && get_price(nil, nil, { price: item[:price] }, nil)[:recurring].present? }
         if recurring_items.any?
           invoices[$1][:subscription] = create_subscription(nil, nil, { customer: invoices[$1][:customer], items: recurring_items.map { |item| { price: item[:price], quantity: item[:quantity] } } }, {})[:id]
         end
