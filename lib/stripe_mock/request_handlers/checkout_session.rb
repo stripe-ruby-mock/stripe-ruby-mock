@@ -7,6 +7,7 @@ module StripeMock
           klass.add_handler 'get /v1/checkout/sessions', :list_checkout_sessions
           klass.add_handler 'get /v1/checkout/sessions/([^/]*)', :get_checkout_session
           klass.add_handler 'get /v1/checkout/sessions/([^/]*)/line_items', :list_line_items
+          klass.add_handler 'post /v1/checkout/sessions/([^/]*)/expire', :expire_session
         end
 
         def new_session(route, method_url, params, headers)
@@ -14,7 +15,9 @@ module StripeMock
 
           [:cancel_url, :success_url].each do |p|
             require_param(p) if params[p].nil? || params[p].empty?
-          end
+          end if params[:ui_mode] != 'embedded'
+
+          require_param(:return_url) if params[:ui_mode] == 'embedded' && params[:return_url].blank?
 
           line_items = nil
           if params[:line_items]
@@ -119,6 +122,7 @@ module StripeMock
             payment_method_options: params[:payment_method_options],
             payment_method_types: params[:payment_method_types],
             payment_status: payment_status,
+            status: "open",
             setup_intent: setup_intent,
             shipping: nil,
             shipping_address_collection: nil,
@@ -126,6 +130,7 @@ module StripeMock
             subscription: nil,
             success_url: params[:success_url],
             total_details: nil,
+            client_secret: 'cs_test_secret',
             url: URI.join(StripeMock.checkout_base, id).to_s
           }
         end
@@ -172,6 +177,19 @@ module StripeMock
           else
             throw Stripe::InvalidRequestError("Only payment and subscription sessions have line items")
           end
+        end
+
+        def expire_session(route, method_url, params, headers)
+          route =~ method_url
+          session_id = $1
+          session = assert_existence :checkout_session, session_id, checkout_sessions[session_id]
+
+          if session[:status] != "open"
+            raise Stripe::InvalidRequestError.new("Session is not in an expireable state", :status, http_status: 400)
+          end
+
+          session[:status] = "expired"
+          session
         end
       end
     end

@@ -195,8 +195,9 @@ module StripeMock
 
       def retrieve_subscription(route, method_url, params, headers)
         route =~ method_url
+        subscription_id = $1 || params[:subscription]
 
-        assert_existence :subscription, $1, subscriptions[$1]
+        assert_existence :subscription, subscription_id, subscriptions[subscription_id]
       end
 
       def retrieve_subscriptions(route, method_url, params, headers)

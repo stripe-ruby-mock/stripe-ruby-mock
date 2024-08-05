@@ -9,14 +9,18 @@ module StripeMock
         klass.add_handler 'get /v1/invoices/((?!search).*)', :get_invoice
         klass.add_handler 'get /v1/invoices/search',         :search_invoices
         klass.add_handler 'get /v1/invoices',                :list_invoices
-        klass.add_handler 'post /v1/invoices/(.*)/pay',      :pay_invoice
-        klass.add_handler 'post /v1/invoices/(.*)',          :update_invoice
+        klass.add_handler 'post /v1/invoices/([^\/]*)',          :update_invoice
+        klass.add_handler 'post /v1/invoices/([^\/]*)/pay',      :pay_invoice
+        klass.add_handler 'post /v1/invoices/([^\/]*)/add_lines', :add_lines
+        klass.add_handler 'post /v1/invoices/([^\/]*)/finalize', :finalize_invoice
       end
 
       def new_invoice(route, method_url, params, headers)
         id = new_id('in')
         invoice_item = Data.mock_line_item()
         invoices[id] = Data.mock_invoice([invoice_item], params.merge(:id => id))
+
+        return_invoice(invoices[id], params)
       end
 
       def update_invoice(route, method_url, params, headers)
@@ -24,6 +28,8 @@ module StripeMock
         params.delete(:lines) if params[:lines]
         assert_existence :invoice, $1, invoices[$1]
         invoices[$1].merge!(params)
+
+        return_invoice(invoices[$1], params)
       end
 
       SEARCH_FIELDS = ["currency", "customer", "number", "receipt_number", "subscription", "total"].freeze
@@ -50,6 +56,42 @@ module StripeMock
       def get_invoice(route, method_url, params, headers)
         route =~ method_url
         assert_existence :invoice, $1, invoices[$1]
+
+        return_invoice(invoices[$1], params)
+      end
+
+      def add_lines(route, method_url, params, headers)
+        route =~ method_url
+        assert_existence :invoice, $1, invoices[$1]
+
+        raise Stripe::InvalidRequestError.new('Invoice is not a draft', nil, http_status: 400) unless invoices[$1][:status] == 'draft'
+
+        params[:lines].each do |line|
+          line_item = Data.mock_line_item(line)
+          invoices[$1][:lines][:data] << line_item
+        end
+
+        return_invoice(invoices[$1], params)
+      end
+
+      def finalize_invoice(route, method_url, params, headers)
+        route =~ method_url
+        assert_existence :invoice, $1, invoices[$1]
+
+        invoice = invoices[$1]
+        raise Stripe::InvalidRequestError.new('Invoice is not a draft', nil, http_status: 400) unless invoice[:status] == 'draft'
+
+        invoice[:status] = 'open'
+
+        # Attach payment intent to the invoice
+        payment_intent = new_payment_intent(nil, nil, {
+          amount: invoice[:amount_due],
+          currency: invoice[:currency],
+          customer: invoice[:customer]
+        }, nil)[:id]
+        invoice[:payment_intent] = payment_intent
+
+        return_invoice(invoice, params)
       end
 
       def get_invoice_line_items(route, method_url, params, headers)
@@ -68,6 +110,13 @@ module StripeMock
           :attempted => true,
           :charge => charge[:id],
         )
+
+        recurring_items = invoices[$1][:lines][:data].select { |item| item[:price] && get_price(nil, nil, { price: item[:price] }, nil) }
+        if recurring_items.any?
+          invoices[$1][:subscription] = create_subscription(nil, nil, { customer: invoices[$1][:customer], items: recurring_items.map { |item| { price: item[:price], quantity: item[:quantity] } } }, {})[:id]
+        end
+
+        return_invoice(invoices[$1], params)
       end
 
       def upcoming_invoice(route, method_url, params, headers = {})
@@ -167,6 +216,27 @@ module StripeMock
       end
 
       private
+
+      def return_invoice(invoice, params)
+        inv = invoice.clone
+
+        if params[:expand].present?
+          [params[:expand]].flatten.each do |field|
+            case field
+            when 'customer'
+              inv[:customer] = get_customer(nil, nil, {customer: inv[:customer]}, nil) if inv[:customer].present?
+            when 'charge'
+              inv[:charge] = get_charge(nil, nil, {charge: inv[:charge]}, nil) if inv[:charge].present?
+            when 'subscription'
+              inv[:subscription] = retrieve_subscription(nil, nil, {subscription: inv[:subscription]}, nil) if inv[:subscription].present?
+            when 'payment_intent'
+              inv[:payment_intent] = get_payment_intent(nil, nil, {payment_intent: inv[:payment_intent]}, nil) if inv[:payment_intent].present?
+            end
+          end
+        end
+
+        inv
+      end
 
       def get_mock_subscription_line_item(subscription)
         Data.mock_line_item(
