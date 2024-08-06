@@ -1,5 +1,11 @@
 ### Unreleased
 
+- [#830](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/830) Implement search API by [@adamstegman](https://github.com/adamstegman)
+- [#848](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/848) Extending runtime dependency on Stripe gem from version 5 through 11 by [@smakani](https://github.com/smakani)
+- [#893](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/893) Adds support for stripe-ruby v10 by [@fabianoarruda](https://github.com/fabianoarruda)
+
+
+### 3.1.0 (2024-01-03)
 - [#693](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/693) gemspec: add change,issue,source_code URL by [@mtmail](https://github.com/mtmail) 
 - [#700](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/700) update the balance API to respond with instant_available by [@iamnader](https://github.com/iamnader) 
 - [#687](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/687) Add PaymentIntent Webhooks by [@klaustopher](https://github.com/klaustopher) 
