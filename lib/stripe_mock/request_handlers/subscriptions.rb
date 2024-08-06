@@ -167,7 +167,7 @@ module StripeMock
         end
 
         if params[:transfer_data] && !params[:transfer_data].empty?
-          throw Stripe::InvalidRequestError.new(missing_param_message("transfer_data[destination]")) unless params[:transfer_data][:destination]
+          raise Stripe::InvalidRequestError.new(missing_param_message("transfer_data[destination]")) unless params[:transfer_data][:destination]
           subscription[:transfer_data] = params[:transfer_data].dup
           subscription[:transfer_data][:amount_percent] ||= 100
         end

@@ -1,5 +1,7 @@
 ### Unreleased
 
+### 4.0.0 (2024-08-07)
+- [#905](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/905) Allow Stripe SDK v11 by [@stevenharman ](https://github.com/stevenharman)
 - [#830](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/830) Implement search API by [@adamstegman](https://github.com/adamstegman)
 - [#848](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/848) Extending runtime dependency on Stripe gem from version 5 through 11 by [@smakani](https://github.com/smakani)
 - [#893](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/893) Adds support for stripe-ruby v10 by [@fabianoarruda](https://github.com/fabianoarruda)
