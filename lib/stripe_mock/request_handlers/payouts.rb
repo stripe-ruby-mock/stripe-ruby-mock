@@ -4,6 +4,7 @@ module StripeMock
 
       def Payouts.included(klass)
         klass.add_handler 'post /v1/payouts',            :new_payout
+        klass.add_handler 'post /v1/payouts/(.*)',       :update_payout
         klass.add_handler 'get /v1/payouts',             :list_payouts
         klass.add_handler 'get /v1/payouts/(.*)',        :get_payout
       end
@@ -16,6 +17,12 @@ module StripeMock
         end
 
         payouts[id] = Data.mock_payout(params.merge :id => id)
+      end
+
+      def update_payout(route, method_url, params, headers)
+        route =~ method_url
+        assert_existence :payout, $1, payouts[$1]
+        payouts[$1].merge!(params)
       end
 
       def list_payouts(route, method_url, params, headers)

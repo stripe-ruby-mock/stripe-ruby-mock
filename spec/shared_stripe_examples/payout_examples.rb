@@ -37,6 +37,18 @@ shared_examples 'Payout API' do
     expect(payout.metadata.to_hash).to eq(original.metadata.to_hash)
   end
 
+  it "updates a stripe payout" do
+    original = Stripe::Payout.create(amount:  "100", currency: "usd")
+    payout = Stripe::Payout.retrieve(original.id)
+
+    expect(payout.id).to eq(original.id)
+
+    payout.amount = 1337
+    payout.save
+    payout = Stripe::Payout.retrieve(original.id)
+    expect(payout.amount).to eq(1337)
+  end
+
   it "cannot retrieve a payout that doesn't exist" do
     expect { Stripe::Payout.retrieve('nope') }.to raise_error {|e|
       expect(e).to be_a Stripe::InvalidRequestError
