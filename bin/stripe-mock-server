@@ -11,6 +11,7 @@ opts = Trollop::options do
   opt :server, "Server to use", :type => :string, :default => 'thin'
   opt :debug, "Request and response output", :default => true
   opt :pid_path, "Location to put server pid file", :type => :string, :default => './stripe-mock-server.pid'
+  opt :require, "Extra path to require when loading the server; can be specified multiple times", :type => :string, :multi => true
 end
 
 require 'stripe_mock'
