@@ -144,20 +144,18 @@ module StripeMock
           subscription[:transfer_data][:amount_percent] ||= 100
         end
 
-        if (s = params[:expand]&.find { |s| s.start_with? 'latest_invoice' })
-          payment_intent = nil
-          unless subscription[:status] == 'trialing'
-            intent_status = subscription[:status] == 'incomplete' ? 'requires_payment_method' : 'succeeded'
-            intent = Data.mock_payment_intent({
-              status: intent_status,
-              amount: subscription[:plan][:amount],
-              currency: subscription[:plan][:currency]
-            })
-            payment_intent = s.include?('latest_invoice.payment_intent') ? intent : intent.id
-          end
-          invoice = Data.mock_invoice([], { payment_intent: payment_intent })
-          subscription[:latest_invoice] = invoice
+        payment_intent = nil
+        unless subscription[:status] == 'trialing'
+          intent_status = subscription[:status] == 'incomplete' ? 'requires_payment_method' : 'succeeded'
+          intent = Data.mock_payment_intent({
+            status: intent_status,
+            amount: subscription[:plan][:amount],
+            currency: subscription[:plan][:currency]
+          })
+          payment_intent = intent
         end
+        invoice = Data.mock_invoice([], { payment_intent: payment_intent })
+        subscription[:latest_invoice] = invoice
 
         subscriptions[subscription[:id]] = subscription
         add_subscription_to_customer(customer, subscription)
