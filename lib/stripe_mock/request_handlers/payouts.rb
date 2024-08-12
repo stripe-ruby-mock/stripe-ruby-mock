@@ -10,13 +10,13 @@ module StripeMock
       end
 
       def new_payout(route, method_url, params, headers)
-        id = new_id('po')
+        params[:id] ||= new_id("po")
 
         unless params[:amount].is_a?(Integer) || (params[:amount].is_a?(String) && /^\d+$/.match(params[:amount]))
           raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', http_status: 400)
         end
 
-        payouts[id] = Data.mock_payout(params.merge :id => id)
+        payouts[params[:id]] = Data.mock_payout(params.merge :id => params[:id])
       end
 
       def update_payout(route, method_url, params, headers)
