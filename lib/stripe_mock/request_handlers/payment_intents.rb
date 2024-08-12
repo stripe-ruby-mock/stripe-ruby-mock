@@ -193,7 +193,7 @@ module StripeMock
           payment_method: payment_intent[:payment_method]
         )
 
-        payment_intent[:charges][:data] << charges[charge_id].clone
+        payment_intent[:latest_charge] = charge_id
 
         payment_intent
       end
