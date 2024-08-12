@@ -12,7 +12,7 @@ module StripeMock
       def new_payout(route, method_url, params, headers)
         params[:id] ||= new_id("po")
 
-        unless params[:amount].is_a?(Integer) || (params[:amount].is_a?(String) && /^\d+$/.match(params[:amount]))
+        unless (params[:amount].is_a?(Integer) && params[:amount].positive?) || (params[:amount].is_a?(String) && /^\d+$/.match(params[:amount]))
           raise Stripe::InvalidRequestError.new("Invalid integer: #{params[:amount]}", 'amount', http_status: 400)
         end
 
