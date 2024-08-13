@@ -11,6 +11,14 @@ module StripeMock
         display_name: "Stripe.com",
         timezone: "US/Pacific",
         details_submitted: false,
+        capabilities: {
+          bank_transfer_payments: "active",
+          card_payments: "active",
+          ideal_payments: "active",
+          sepa_bank_transfer_payments: "active",
+          sepa_debit_payments:"active",
+          transfers:"active"
+        },
         charges_enabled: false,
         payouts_enabled: false,
         currencies_supported: [
