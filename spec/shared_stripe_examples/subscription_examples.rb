@@ -687,7 +687,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
 
       sub = Stripe::Subscription.create({ items: { '0' => { plan: 'silver' } }, customer: customer.id })
-      sub.delete(at_period_end: true)
+      sub.cancel(at_period_end: true)
 
       expect(sub.cancel_at_period_end).to be_truthy
       expect(sub.save).to be_truthy
@@ -752,7 +752,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
 
       subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
-      subscription.delete
+      subscription.cancel
 
       expect { subscription.save }.to raise_error { |e|
         expect(e).to be_a(Stripe::InvalidRequestError)
@@ -765,7 +765,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
 
       sub = Stripe::Subscription.create({ items: [ { plan: plan.id } ], customer: customer.id })
-      sub.delete(at_period_end: true)
+      sub.cancel(at_period_end: true)
 
       expect(sub.cancel_at_period_end).to be_truthy
       expect(sub.save).to be_truthy
@@ -1180,7 +1180,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
 
       sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
-      result = sub.delete
+      result = sub.cancel
 
       expect(result.status).to eq('canceled')
       expect(result.cancel_at_period_end).to eq false
@@ -1247,7 +1247,7 @@ shared_examples 'Customer Subscriptions with plans' do
     customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: "trial")
 
     sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
-    result = sub.delete(at_period_end: true)
+    result = sub.cancel(at_period_end: true)
 
     expect(result.status).to eq('trialing')
 
@@ -1331,7 +1331,7 @@ shared_examples 'Customer Subscriptions with plans' do
     it "does not include canceled subscriptions by default" do
       customer = Stripe::Customer.create(source: gen_card_tk)
       subscription = Stripe::Subscription.create({ plan: plan.id, customer: customer.id })
-      subscription.delete
+      subscription.cancel
 
       list = Stripe::Subscription.list({customer: customer.id})
 
@@ -1421,6 +1421,65 @@ shared_examples 'Customer Subscriptions with plans' do
         items: [{plan: "Sample5", metadata: {foo: 'bar'}}],
       )
       expect(subscription.items.data[0].metadata.to_h).to eq(foo: 'bar')
+    end
+  end
+
+  context "search" do
+    # the Search API requires about a minute between writes and reads, so add sleeps accordingly when running live
+    it "searches subscriptions for exact matches", :aggregate_failures do
+      response = Stripe::Subscription.search({query: 'status:"active"'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(0)
+
+      stripe_helper.create_plan(
+        amount: 500,
+        interval: 'month',
+        product: product.id,
+        currency: 'usd',
+        id: 'Sample5'
+      )
+      customer = Stripe::Customer.create(email: 'johnny@appleseed.com', source: gen_card_tk)
+      one = Stripe::Subscription.create(customer: customer.id, items: [{plan: "Sample5"}], metadata: {key: 'uno'})
+      two = Stripe::Subscription.create(customer: customer.id, items: [{plan: "Sample5"}], metadata: {key: 'dos'})
+      Stripe::Subscription.cancel(two.id)
+
+      response = Stripe::Subscription.search({query: 'status:"active"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Subscription.search({query: 'metadata["key"]:"dos"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+    end
+
+    it "respects limit", :aggregate_failures do
+      stripe_helper.create_plan(
+        amount: 500,
+        interval: 'month',
+        product: product.id,
+        currency: 'usd',
+        id: 'Sample5'
+      )
+      customer = Stripe::Customer.create(email: 'johnny@appleseed.com', source: gen_card_tk)
+      11.times do
+        Stripe::Subscription.create(customer: customer.id, items: [{plan: "Sample5"}])
+      end
+
+      response = Stripe::Subscription.search({query: 'status:"active"'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(10)
+      response = Stripe::Subscription.search({query: 'status:"active"', limit: 1}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(1)
+    end
+
+    it "reports search errors", :aggregate_failures do
+      expect {
+        Stripe::Subscription.search({limit: 1}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Missing required param: query./)
+
+      expect {
+        Stripe::Subscription.search({query: 'asdf'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /We were unable to parse your search query./)
+
+      expect {
+        Stripe::Subscription.search({query: 'foo:"bar"'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Field `foo` is an unsupported search field for resource `subscriptions`./)
     end
   end
 end

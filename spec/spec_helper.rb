@@ -1,6 +1,6 @@
 require 'set'
 
-gem 'rspec', '~> 3.1'
+gem 'rspec', '~> 3.13'
 require 'rspec'
 require 'stripe'
 require 'stripe_mock'
