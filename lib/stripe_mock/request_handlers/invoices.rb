@@ -77,6 +77,9 @@ module StripeMock
         raise Stripe::InvalidRequestError.new('When previewing changes to a subscription, you must specify either `subscription` or `subscription_items`', nil, http_status: 400) if !params[:subscription_proration_date].nil? && params[:subscription].nil? && params[:subscription_plan].nil?
         raise Stripe::InvalidRequestError.new('Cannot specify proration date without specifying a subscription', nil, http_status: 400) if !params[:subscription_proration_date].nil? && params[:subscription].nil?
 
+        if params[:subscription] && params[:customer].nil?
+          params[:customer] = subscriptions[params[:subscription]][:customer]
+        end
         customer = customers[stripe_account][params[:customer]]
         assert_existence :customer, params[:customer], customer
 
@@ -114,8 +117,9 @@ module StripeMock
         invoice_lines = []
 
         if prorating
+          plan_amount = subscription[:plan][:amount] || subscription[:plan][:unit_amount]
           unused_amount = (
-            subscription[:plan][:amount].to_f *
+            plan_amount.to_f *
               subscription[:quantity] *
               (subscription[:current_period_end] - subscription_proration_date.to_i) / (subscription[:current_period_end] - subscription[:current_period_start])
             ).ceil
@@ -169,11 +173,13 @@ module StripeMock
       private
 
       def get_mock_subscription_line_item(subscription)
+        plan_amount = subscription[:plan][:amount] || subscription[:plan][:unit_amount]
+
         Data.mock_line_item(
           id: subscription[:id],
           type: "subscription",
           plan: subscription[:plan],
-          amount: subscription[:status] == 'trialing' ? 0 : subscription[:plan][:amount] * subscription[:quantity],
+          amount: subscription[:status] == 'trialing' ? 0 : plan_amount * subscription[:quantity],
           discountable: true,
           quantity: subscription[:quantity],
           period: {
