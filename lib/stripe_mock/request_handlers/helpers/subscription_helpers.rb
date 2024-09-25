@@ -54,6 +54,8 @@ module StripeMock
           params.merge!(cancel_at_period_end: true, canceled_at: now, cancel_at: params[:current_period_end])
         elsif options[:cancel_at_period_end] == false
           params.merge!(cancel_at_period_end: false, canceled_at: nil)
+        elsif options[:cancel_at].present?
+          params.merge!(cancel_at_period_end: false, canceled_at: now, cancel_at: options[:cancel_at])
         end
 
         params
