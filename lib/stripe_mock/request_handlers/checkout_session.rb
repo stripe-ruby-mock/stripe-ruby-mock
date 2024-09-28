@@ -7,6 +7,11 @@ module StripeMock
           klass.add_handler 'get /v1/checkout/sessions', :list_checkout_sessions
           klass.add_handler 'get /v1/checkout/sessions/([^/]*)', :get_checkout_session
           klass.add_handler 'get /v1/checkout/sessions/([^/]*)/line_items', :list_line_items
+          klass.add_handler 'post /v1/checkout/sessions/([^/]*)/expire', :expire
+        end
+
+        def expire(route, method_url, params, headers)
+          pp "session expired"
         end
 
         def new_session(route, method_url, params, headers)
