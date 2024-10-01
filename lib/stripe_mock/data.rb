@@ -382,7 +382,8 @@ module StripeMock
               currency: StripeMock.default_currency
             },
             quantity: 1
-          }]
+          }],
+          has_more: false
         },
         cancel_at_period_end: false,
         canceled_at: nil,
