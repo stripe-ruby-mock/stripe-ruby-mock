@@ -134,6 +134,8 @@ module StripeMock
             setup_intent: setup_intent,
             shipping: nil,
             shipping_address_collection: nil,
+            statement_descriptor: params[:statement_descriptor],
+            statement_descriptor_suffix: params[:statement_descriptor_suffix],
             submit_type: nil,
             subscription: nil,
             total_details: nil,
