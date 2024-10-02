@@ -7,13 +7,23 @@ module StripeMock
           klass.add_handler 'get /v1/checkout/sessions', :list_checkout_sessions
           klass.add_handler 'get /v1/checkout/sessions/([^/]*)', :get_checkout_session
           klass.add_handler 'get /v1/checkout/sessions/([^/]*)/line_items', :list_line_items
+          klass.add_handler 'post /v1/checkout/sessions/([^/]*)/expire', :expire
+        end
+
+        def expire(route, method_url, params, headers)
+          pp "session expired"
         end
 
         def new_session(route, method_url, params, headers)
           id = params[:id] || new_id('cs')
+          embedded = params[:ui_mode] == "embedded"
 
-          [:cancel_url, :success_url].each do |p|
-            require_param(p) if params[p].nil? || params[p].empty?
+          if embedded
+            require_param(:return_url) if params[:return_url].nil? || params[:return_url].empty?
+          else
+            [:cancel_url, :success_url].each do |p|
+              require_param(p) if params[p].nil? || params[p].empty?
+            end
           end
 
           line_items = nil
@@ -97,7 +107,7 @@ module StripeMock
             raise Stripe::InvalidRequestError.new("Invalid mode: must be one of payment, setup, or subscription", :mode, http_status: 400)
           end
 
-          checkout_sessions[id] = {
+          session = {
             id: id,
             object: "checkout.session",
             allow_promotion_codes: nil,
@@ -108,7 +118,6 @@ module StripeMock
               status: nil
             },
             billing_address_collection: nil,
-            cancel_url: params[:cancel_url],
             client_reference_id: nil,
             currency: currency,
             customer: params[:customer],
@@ -125,12 +134,27 @@ module StripeMock
             setup_intent: setup_intent,
             shipping: nil,
             shipping_address_collection: nil,
+            statement_descriptor: params[:statement_descriptor],
+            statement_descriptor_suffix: params[:statement_descriptor_suffix],
             submit_type: nil,
             subscription: nil,
-            success_url: params[:success_url],
             total_details: nil,
             url: URI.join(StripeMock.checkout_base, id).to_s
           }
+
+          if embedded
+            session.merge!(
+              client_secret: "cs_000000000000000000000000_secret_0000000000000000000000000",
+              return_url: params[:return_url]
+            )
+          else
+            session.merge!(
+              cancel_url: params[:cancel_url],
+              success_url: params[:success_url]
+            )
+          end
+
+          checkout_sessions[id] = session
         end
 
         def list_checkout_sessions(route, method_url, params, headers)

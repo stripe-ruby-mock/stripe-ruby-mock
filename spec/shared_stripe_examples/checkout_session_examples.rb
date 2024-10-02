@@ -1,13 +1,16 @@
 require "spec_helper"
 
 shared_examples "Checkout Session API" do
+  let(:line_items) do
+    [{
+       name: "T-shirt",
+       quantity: 2,
+       amount: 500,
+       currency: "usd",
+     }]
+  end
+
   it "creates PaymentIntent with payment mode" do
-    line_items = [{
-      name: "T-shirt",
-      quantity: 2,
-      amount: 500,
-      currency: "usd",
-    }]
     session = Stripe::Checkout::Session.create(
       payment_method_types: ["card"],
       line_items: line_items,
@@ -94,6 +97,22 @@ shared_examples "Checkout Session API" do
       checkout_session = Stripe::Checkout::Session.retrieve(id: initial_session.id, expand: ["setup_intent"])
 
       expect(checkout_session.setup_intent).to be_a_kind_of(Stripe::SetupIntent)
+    end
+  end
+
+  context "ui mode" do
+    let(:return_url) { "https://stripe.com" }
+
+    it "requires return_url" do
+      expect do
+        Stripe::Checkout::Session.create
+      end.to raise_error(Stripe::InvalidRequestError, "Missing required param: :return_url.")
+    end
+
+    it "creates a checkout session with client_secret, return_url" do
+      session = Stripe::Checkout::Session.create(line_items: line_items, return_url: return_url)
+      expect(session.client_secret).to eq("cs_000000000000000000000000_secret_0000000000000000000000000")
+      expect(session.return_url).to eq(return_url)
     end
   end
 end

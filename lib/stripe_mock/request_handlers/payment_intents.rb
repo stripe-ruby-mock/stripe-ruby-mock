@@ -1,7 +1,7 @@
 module StripeMock
   module RequestHandlers
     module PaymentIntents
-      ALLOWED_PARAMS = [:description, :metadata, :receipt_email, :shipping, :destination, :payment_method, :payment_method_types, :setup_future_usage, :transfer_data, :amount, :currency]
+      ALLOWED_PARAMS = [:description, :metadata, :receipt_email, :shipping, :destination, :payment_method, :payment_method_types, :setup_future_usage, :transfer_data, :amount, :currency, :statement_descriptor_suffix]
 
       def PaymentIntents.included(klass)
         klass.add_handler 'post /v1/payment_intents',               :new_payment_intent
@@ -26,11 +26,13 @@ module StripeMock
           'succeeded'
         end
         last_payment_error = params[:amount] == 3178 ? last_payment_error_generator(code: 'card_declined', decline_code: 'insufficient_funds', message: 'Not enough funds.') : nil
+        statement_descriptor_suffix = params[:statement_descriptor_suffix]
         payment_intents[id] = Data.mock_payment_intent(
           params.merge(
             id: id,
             status: status,
-            last_payment_error: last_payment_error
+            last_payment_error: last_payment_error,
+            statement_descriptor_suffix: statement_descriptor_suffix
           )
         )
 
