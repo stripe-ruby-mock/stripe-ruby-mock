@@ -25,6 +25,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'stripe', '> 5', '< 13'
   gem.add_dependency 'multi_json', '~> 1.0'
   gem.add_dependency 'dante', '>= 0.2.0'
+  gem.add_dependency 'drb', '>= 2.0.4', '< 3'
 
   gem.add_development_dependency 'rspec', '~> 3.13.0'
   gem.add_development_dependency 'thin', '~> 1.8.1'
