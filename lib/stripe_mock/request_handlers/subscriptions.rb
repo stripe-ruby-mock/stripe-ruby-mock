@@ -5,8 +5,9 @@ module StripeMock
       def Subscriptions.included(klass)
         klass.add_handler 'get /v1/subscriptions', :retrieve_subscriptions
         klass.add_handler 'post /v1/subscriptions', :create_subscription
-        klass.add_handler 'get /v1/subscriptions/(.*)', :retrieve_subscription
+        klass.add_handler 'get /v1/subscriptions/((?!search).*)', :retrieve_subscription
         klass.add_handler 'post /v1/subscriptions/(.*)', :update_subscription
+        klass.add_handler 'get /v1/subscriptions/search', :search_subscriptions
         klass.add_handler 'delete /v1/subscriptions/(.*)', :cancel_subscription
 
         klass.add_handler 'post /v1/customers/(.*)/subscription(?:s)?', :create_customer_subscription
@@ -166,7 +167,7 @@ module StripeMock
         end
 
         if params[:transfer_data] && !params[:transfer_data].empty?
-          throw Stripe::InvalidRequestError.new(missing_param_message("transfer_data[destination]")) unless params[:transfer_data][:destination]
+          raise Stripe::InvalidRequestError.new(missing_param_message("transfer_data[destination]")) unless params[:transfer_data][:destination]
           subscription[:transfer_data] = params[:transfer_data].dup
           subscription[:transfer_data][:amount_percent] ||= 100
         end
@@ -341,6 +342,14 @@ module StripeMock
         end
 
         subscription
+      end
+
+      SEARCH_FIELDS = ["status"].freeze
+      def search_subscriptions(route, method_url, params, headers)
+        require_param(:query) unless params[:query]
+
+        results = search_results(subscriptions.values, params[:query], fields: SEARCH_FIELDS, resource_name: "subscriptions")
+        Data.mock_list_object(results, params)
       end
 
       private

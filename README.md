@@ -12,7 +12,7 @@ This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 3.0.1', :require => 'stripe_mock'
+    gem 'stripe-ruby-mock', :require => 'stripe_mock'
 
 ## !!! Important
 
@@ -29,8 +29,8 @@ version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/strip
 
 ### Requirements
 
-* ruby >= 2.6.0
-* stripe >= 5.0.0
+* ruby >= 2.7.0
+* stripe > 5 & < 11
 
 ### Specifications
 

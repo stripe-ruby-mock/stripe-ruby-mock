@@ -396,7 +396,8 @@ module StripeMock
               currency: StripeMock.default_currency
             },
             quantity: 1
-          }]
+          }],
+          has_more: false
         },
         cancel_at_period_end: false,
         canceled_at: nil,
@@ -415,7 +416,12 @@ module StripeMock
         default_payment_method: nil,
         pending_invoice_item_interval: nil,
         next_pending_invoice_item_invoice: nil,
-        latest_invoice: nil
+        pending_setup_intent: nil,
+        latest_invoice: nil,
+        application_fee_percent: nil,
+        cancel_at: nil,
+        end_at: nil,
+        pause_collection: nil
       }, params)
     end
 
@@ -1235,7 +1241,8 @@ module StripeMock
           statement_descriptor: nil,
           trial_period_days: nil
         },
-        quantity: 2
+        quantity: 2,
+        price: mock_price
       }.merge(params)
     end
 
@@ -1350,7 +1357,17 @@ module StripeMock
           country: 'DE',
           fingerprint: 'FD81kbVPe7M05BMj',
           last4: params.dig(:sepa_debit, :iban)&.[](-4..) || '3000'
-        }
+        },
+        us_bank_account: {
+          account_holder_type: "individual",
+          account_type: "checking",
+          bank_name: "STRIPE TEST BANK",
+          financial_connections_account: "fca_0614042384b19afec4474940",
+          fingerprint: "7bc48d016359a45a",
+          last4: "6789",
+          networks: {"preferred"=>"ach", "supported"=>["ach"]},
+          routing_number: "110000000"
+        },
       }
 
       {
