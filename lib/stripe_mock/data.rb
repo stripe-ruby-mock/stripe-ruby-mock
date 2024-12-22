@@ -487,6 +487,7 @@ module StripeMock
         amount: 1000,
         currency: currency,
         discountable: false,
+        discount_amounts: [],
         proration: false,
         period: {
           start: 1349738920,
