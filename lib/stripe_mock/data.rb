@@ -462,7 +462,8 @@ module StripeMock
         charge: nil,
         discount: nil,
         subscription: nil,
-        number: "6C41730-0001"
+        number: "6C41730-0001",
+        total_discount_amounts: []
       }.merge(params)
       if invoice[:discount]
         invoice[:total] = [0, invoice[:subtotal] - invoice[:discount][:coupon][:amount_off]].max if invoice[:discount][:coupon][:amount_off]
