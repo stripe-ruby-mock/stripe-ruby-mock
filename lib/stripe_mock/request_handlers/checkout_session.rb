@@ -19,9 +19,12 @@ module StripeMock
           line_items = nil
           if params[:line_items]
             line_items = params[:line_items].each_with_index.map do |line_item, i|
-              throw Stripe::InvalidRequestError("Quantity is required. Add `quantity` to `line_items[#{i}]`") unless line_item[:quantity]
+              unless line_item[:quantity]
+                raise Stripe::InvalidRequestError.new("Quantity is required. Add `quantity` to `line_items[#{i}]`", :line_items)
+              end
+
               unless line_item[:price] || line_item[:price_data] || (line_item[:amount] && line_item[:currency] && line_item[:name])
-                throw Stripe::InvalidRequestError("Price or amount and currency is required. Add `price`, `price_data`, or `amount`, `currency` and `name` to `line_items[#{i}]`")
+                raise Stripe::InvalidRequestError.new("Price or amount and currency is required. Add `price`, `price_data`, or `amount`, `currency` and `name` to `line_items[#{i}]`", :line_items)
               end
               {
                 id: new_id("li"),
@@ -48,11 +51,11 @@ module StripeMock
           if line_items
             amount = 0
 
-            line_items.each do |line_item| 
+            line_items.each do |line_item|
               price = prices[line_item[:price]]
 
               if price.nil?
-                raise StripeMock::StripeMockError.new("Price not found for ID: #{line_item[:price]}")
+                raise StripeMock::StripeMockError.new("Price not found for ID: #{line_item[:price]}", :line_items)
               end
 
               amount += (price[:unit_amount] * line_item[:quantity])
@@ -78,7 +81,7 @@ module StripeMock
             checkout_session_line_items[id] = line_items
           when "setup"
             if !params[:line_items].nil? && !params[:line_items].empty?
-              throw Stripe::InvalidRequestError.new("You cannot pass `line_items` in `setup` mode", :line_items, http_status: 400)
+              raise Stripe::InvalidRequestError.new("You cannot pass `line_items` in `setup` mode", :line_items, http_status: 400)
             end
             setup_intent = new_setup_intent(nil, nil, {
               customer: params[:customer],
@@ -91,7 +94,7 @@ module StripeMock
             require_param(:line_items) if params[:line_items].nil? || params[:line_items].empty?
             checkout_session_line_items[id] = line_items
           else
-            throw Stripe::InvalidRequestError.new("Invalid mode: must be one of payment, setup, or subscription", :mode, http_status: 400)
+            raise Stripe::InvalidRequestError.new("Invalid mode: must be one of payment, setup, or subscription", :mode, http_status: 400)
           end
 
           checkout_sessions[id] = {
@@ -156,7 +159,7 @@ module StripeMock
               price = prices[line_item[:price]].clone
 
               if price.nil?
-                raise StripeMock::StripeMockError.new("Price not found for ID: #{line_item[:price]}")
+                raise StripeMock::StripeMockError.new("Price not found for ID: #{line_item[:price]}", :line_items)
               end
 
               {
@@ -170,7 +173,7 @@ module StripeMock
               }
             end
           else
-            throw Stripe::InvalidRequestError("Only payment and subscription sessions have line items")
+            raise Stripe::InvalidRequestError.new("Only payment and subscription sessions have line items", :line_items)
           end
         end
       end

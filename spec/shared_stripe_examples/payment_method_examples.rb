@@ -450,5 +450,15 @@ shared_examples 'PaymentMethod API' do
         end.to raise_error(Stripe::InvalidRequestError)
       end
     end
+
+    context 'with us_bank_account' do
+      let(:payment_method) do
+        Stripe::PaymentMethod.create(type: 'us_bank_account')
+      end
+
+      it 'works' do
+        expect(payment_method.type).to eq('us_bank_account')
+      end
+    end
   end
 end

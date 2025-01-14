@@ -54,7 +54,7 @@ module StripeMock
           params.merge!(cancel_at_period_end: true, canceled_at: now, cancel_at: params[:current_period_end])
         elsif options[:cancel_at_period_end] == false
           params.merge!(cancel_at_period_end: false, canceled_at: nil)
-        elsif options[:cancel_at].present?
+        elsif !options[:cancel_at].nil?
           params.merge!(cancel_at_period_end: false, canceled_at: now, cancel_at: options[:cancel_at])
         end
 
@@ -126,6 +126,19 @@ module StripeMock
           total += quantity * amount
         end
         total
+      end
+
+      def filter_by_timestamp(subscriptions, field:, value:)
+        if value.is_a?(Hash)
+          operator_mapping = { gt: :>, gte: :>=, lt: :<, lte: :<= }
+          subscriptions.filter do |sub|
+            sub[field].public_send(operator_mapping[value.keys[0]], value.values[0])
+          end
+        else
+          subscriptions.filter do |sub|
+            sub[field] == value
+          end
+        end
       end
     end
   end

@@ -34,10 +34,15 @@ module StripeMock
 
           ]
         },
-        verification: {
-          fields_needed: [],
-          due_by: nil,
-          contacted: false
+        requirements: {
+          alternatives: [],
+          current_deadline: nil,
+          currently_due: [],
+          disabled_reason: nil,
+          errors: [],
+          eventually_due: [],
+          past_due: [],
+          pending_verification: []
         },
         transfer_schedule: {
           delay_days: 7,
@@ -382,9 +387,9 @@ module StripeMock
               currency: StripeMock.default_currency
             },
             quantity: 1
-          }]
+          }],
+          has_more: false
         },
-        cancel_at: nil,
         cancel_at_period_end: false,
         canceled_at: nil,
         collection_method: 'charge_automatically',
@@ -403,8 +408,13 @@ module StripeMock
         default_source: nil,
         pending_invoice_item_interval: nil,
         next_pending_invoice_item_invoice: nil,
+        pending_setup_intent: nil,
         latest_invoice: nil,
         schedule: nil,
+        application_fee_percent: nil,
+        cancel_at: nil,
+        end_at: nil,
+        pause_collection: nil,
         cancellation_details: {},
       }, params)
     end
@@ -417,7 +427,6 @@ module StripeMock
         id: 'in_test_invoice',
         status: 'open',
         invoice_pdf: 'pdf_url',
-        number: 'number',
         hosted_invoice_url: 'hosted_invoice_url',
         created: 1349738950,
         period_end: 1349738950,
@@ -456,7 +465,8 @@ module StripeMock
         charge: nil,
         discount: nil,
         total_discount_amounts: [],
-        subscription: nil
+        subscription: nil,
+        number: "6C41730-0001"
       }.merge(params)
       if invoice[:discount]
         invoice[:total] = [0, invoice[:subtotal] - invoice[:discount][:coupon][:amount_off]].max if invoice[:discount][:coupon][:amount_off]
@@ -665,6 +675,44 @@ module StripeMock
         unit_label: "my_unit",
         updated: 1537939442,
         url: nil
+      }.merge(params)
+    end
+
+    def self.mock_promotion_code(params={})
+      {
+        id: "mock_promo_abc123",
+        object: "promotion_code",
+        active: true,
+        code: "TESTCODE",
+        coupon: {
+          id: "mock_coupon_abc123",
+          object: "coupon",
+          amount_off: nil,
+          created: 1665773498,
+          currency: "usd",
+          duration: "repeating",
+          duration_in_months: 1,
+          livemode: false,
+          max_redemptions: nil,
+          metadata: {},
+          name: "Mock Coupon",
+          percent_off: 10.0,
+          redeem_by: nil,
+          times_redeemed: 0,
+          valid: true
+        },
+        created: 1665773499,
+        customer: nil,
+        expires_at: nil,
+        livemode: false,
+        max_redemptions: nil,
+        metadata: {},
+        restrictions: {
+          first_time_transaction: false,
+          minimum_amount: nil,
+          minimum_amount_currency: nil
+        },
+        times_redeemed: 0
       }.merge(params)
     end
 
@@ -1193,8 +1241,8 @@ module StripeMock
           statement_descriptor: nil,
           trial_period_days: nil
         },
-        price: mock_price,
-        quantity: 2
+        quantity: 2,
+        price: mock_price
       }.merge(params)
     end
 
@@ -1271,9 +1319,10 @@ module StripeMock
       payment_method_id = params[:id] || 'pm_1ExEuFL2DI6wht39WNJgbybl'
 
       type = params[:type].to_sym
+      last4 = params.dig(:card, :number)
       data = {
         card: {
-          brand: case params.dig(:card, :number)&.to_s
+          brand: case last4&.to_s
           when /^4/, nil
             'visa'
           when /^5[1-5]/
@@ -1292,7 +1341,7 @@ module StripeMock
           fingerprint: 'Hr3Ly5z5IYxsokWA',
           funding: 'credit',
           generated_from: nil,
-          last4: params.dig(:card, :number)&.[](-4..) || '3155',
+          last4: last4.nil? ? '3155' : last4.to_s[-4..],
           three_d_secure_usage: { supported: true },
           wallet: nil
         },
@@ -1308,7 +1357,17 @@ module StripeMock
           country: 'DE',
           fingerprint: 'FD81kbVPe7M05BMj',
           last4: params.dig(:sepa_debit, :iban)&.[](-4..) || '3000'
-        }
+        },
+        us_bank_account: {
+          account_holder_type: "individual",
+          account_type: "checking",
+          bank_name: "STRIPE TEST BANK",
+          financial_connections_account: "fca_0614042384b19afec4474940",
+          fingerprint: "7bc48d016359a45a",
+          last4: "6789",
+          networks: {"preferred"=>"ach", "supported"=>["ach"]},
+          routing_number: "110000000"
+        },
       }
 
       {

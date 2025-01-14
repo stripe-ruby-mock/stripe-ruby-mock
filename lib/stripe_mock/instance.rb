@@ -45,6 +45,7 @@ module StripeMock
     include StripeMock::RequestHandlers::Plans
     include StripeMock::RequestHandlers::Prices
     include StripeMock::RequestHandlers::Products
+    include StripeMock::RequestHandlers::PromotionCodes
     include StripeMock::RequestHandlers::Refunds
     include StripeMock::RequestHandlers::Recipients
     include StripeMock::RequestHandlers::Transfers
@@ -58,9 +59,9 @@ module StripeMock
 
     attr_reader :accounts, :balance, :balance_transactions, :bank_tokens, :charges, :coupons, :customers,
                 :disputes, :events, :invoices, :invoice_items, :orders, :payment_intents, :payment_methods,
-                :setup_intents, :plans, :prices, :recipients, :refunds, :transfers, :payouts, :subscriptions, :country_spec,
-                :subscriptions_items, :products, :tax_rates, :checkout_sessions, :checkout_session_line_items,
-                :subscriptions_schedules
+                :setup_intents, :plans, :prices, :promotion_codes, :recipients, :refunds, :transfers, :payouts,
+                :subscriptions, :country_spec, :subscriptions_items, :products, :tax_rates, :checkout_sessions,
+                :checkout_session_line_items, :subscriptions_schedules
 
     attr_accessor :error_queue, :debug, :conversion_rate, :account_balance
 
@@ -85,6 +86,7 @@ module StripeMock
       @plans = {}
       @prices = {}
       @products = {}
+      @promotion_codes = {}
       @recipients = {}
       @refunds = {}
       @transfers = {}
@@ -109,7 +111,7 @@ module StripeMock
       @base_strategy = TestStrategies::Base.new
     end
 
-    def mock_request(method, url, api_key: nil, api_base: nil, params: {}, headers: {})
+    def mock_request(method, url, api_key: nil, api_base: nil, usage: [], params: {}, headers: {})
       return {} if method == :xtest
 
       api_key ||= (Stripe.api_key || DUMMY_API_KEY)

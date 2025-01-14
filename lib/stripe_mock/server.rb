@@ -3,10 +3,16 @@ require 'drb/drb'
 module StripeMock
   class Server
     def self.start_new(opts)
-      puts "Starting StripeMock server on port #{opts[:port] || 4999}"
+      host = opts.fetch(:host, "0.0.0.0")
+      port = opts.fetch(:port, 4999)
+      extra_requires = opts.fetch(:require, [])
 
-      host = opts.fetch :host,'0.0.0.0'
-      port = opts.fetch :port, 4999
+      extra_requires.each do |path|
+        puts "Requiring additional path: #{path}"
+        require(path)
+      end
+
+      puts "Starting StripeMock server on port #{port}"
 
       DRb.start_service "druby://#{host}:#{port}", Server.new
       DRb.thread.join
@@ -88,6 +94,5 @@ module StripeMock
     def upsert_stripe_object(object, attributes)
       @instance.upsert_stripe_object(object, attributes)
     end
-
   end
 end
