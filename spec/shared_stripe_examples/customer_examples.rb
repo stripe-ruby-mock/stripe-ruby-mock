@@ -290,20 +290,18 @@ shared_examples 'Customer API' do
   end
 
   it "stores a created stripe customer in memory" do
-    customer = Stripe::Customer.create({
-      email: 'johnny@appleseed.com',
-      source: gen_card_tk
-    })
-    customer2 = Stripe::Customer.create({
-      email: 'bob@bobbers.com',
-      source: gen_card_tk
-    })
+    customer = Stripe::Customer.create(email: 'johnny@appleseed.com')
+    customer2 = Stripe::Customer.create(email: 'bob@bobbers.com')
     data = test_data_source(:customers)
-    expect(data[customer.id]).to_not be_nil
-    expect(data[customer.id][:email]).to eq('johnny@appleseed.com')
+    list = data[data.keys.first]
 
-    expect(data[customer2.id]).to_not be_nil
-    expect(data[customer2.id][:email]).to eq('bob@bobbers.com')
+    customer_hash = list[customer.id.to_sym] || list[customer.id]
+    expect(customer_hash).to_not be_nil
+    expect(customer_hash[:email]).to eq('johnny@appleseed.com')
+
+    customer2_hash = list[customer2.id.to_sym] || list[customer2.id]
+    expect(customer2_hash).to_not be_nil
+    expect(customer2_hash[:email]).to eq('bob@bobbers.com')
   end
 
   it "retrieves a stripe customer" do
@@ -348,7 +346,63 @@ shared_examples 'Customer API' do
 
     all = Stripe::Customer.list
     expect(all.count).to eq(2)
-    expect(all.map &:email).to include('one@one.com', 'two@two.com')
+    expect(all.data.map &:email).to include('one@one.com', 'two@two.com')
+  end
+
+  context "search" do
+    # the Search API requires about a minute between writes and reads, so add sleeps accordingly when running live
+    it "searches customers for exact matches", :aggregate_failures do
+      response = Stripe::Customer.search({query: 'email:"one@one.com"'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(0)
+
+      one = Stripe::Customer.create(email: 'one@one.com', name: 'one', phone: '1111111111', metadata: {key: 'uno'})
+      two = Stripe::Customer.create(email: 'two@two.com', name: 'two', phone: '2222222222', metadata: {key: 'dos'})
+
+      response = Stripe::Customer.search({query: 'email:"one@one.com"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Customer.search({query: 'name:"two"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Customer.search({query: 'phone:"2222222222"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Customer.search({query: 'metadata["key"]:"uno"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+    end
+
+    it "respects limit", :aggregate_failures do
+      one = Stripe::Customer.create(email: 'one@one.com', name: 'one')
+      two = Stripe::Customer.create(email: 'two@two.com', name: 'one')
+      three = Stripe::Customer.create(email: 'three@three.com', name: 'one')
+      four = Stripe::Customer.create(email: 'four@four.com', name: 'one')
+      five = Stripe::Customer.create(email: 'five@five.com', name: 'one')
+      six = Stripe::Customer.create(email: 'six@six.com', name: 'one')
+      seven = Stripe::Customer.create(email: 'seven@seven.com', name: 'one')
+      eight = Stripe::Customer.create(email: 'eight@eight.com', name: 'one')
+      nine = Stripe::Customer.create(email: 'nine@nine.com', name: 'one')
+      ten = Stripe::Customer.create(email: 'ten@ten.com', name: 'one')
+      eleven = Stripe::Customer.create(email: 'eleven@eleven.com', name: 'one')
+
+      response = Stripe::Customer.search({query: 'name:"one"'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(10)
+      response = Stripe::Customer.search({query: 'name:"one"', limit: 1}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(1)
+    end
+
+    it "reports search errors", :aggregate_failures do
+      expect {
+        Stripe::Customer.search({limit: 1}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Missing required param: query./)
+
+      expect {
+        Stripe::Customer.search({query: 'asdf'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /We were unable to parse your search query./)
+
+      expect {
+        Stripe::Customer.search({query: 'foo:"bar"'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Field `foo` is an unsupported search field for resource `customers`./)
+    end
   end
 
   it "updates a stripe customer" do

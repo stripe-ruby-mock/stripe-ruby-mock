@@ -24,6 +24,8 @@ module StripeMock
     include StripeMock::RequestHandlers::PaymentMethods
     include StripeMock::RequestHandlers::SetupIntents
     include StripeMock::RequestHandlers::ExternalAccounts
+    include StripeMock::RequestHandlers::AccountLinks
+    include StripeMock::RequestHandlers::ExpressLoginLinks
     include StripeMock::RequestHandlers::Accounts
     include StripeMock::RequestHandlers::Balance
     include StripeMock::RequestHandlers::BalanceTransactions
@@ -40,8 +42,9 @@ module StripeMock
     include StripeMock::RequestHandlers::InvoiceItems
     include StripeMock::RequestHandlers::Orders
     include StripeMock::RequestHandlers::Plans
+    include StripeMock::RequestHandlers::Prices
     include StripeMock::RequestHandlers::Products
-    include StripeMock::RequestHandlers::SKUs
+    include StripeMock::RequestHandlers::PromotionCodes
     include StripeMock::RequestHandlers::Refunds
     include StripeMock::RequestHandlers::Recipients
     include StripeMock::RequestHandlers::Transfers
@@ -51,11 +54,13 @@ module StripeMock
     include StripeMock::RequestHandlers::EphemeralKey
     include StripeMock::RequestHandlers::TaxRates
     include StripeMock::RequestHandlers::Checkout
+    include StripeMock::RequestHandlers::Checkout::Session
 
     attr_reader :accounts, :balance, :balance_transactions, :bank_tokens, :charges, :coupons, :customers,
                 :disputes, :events, :invoices, :invoice_items, :orders, :payment_intents, :payment_methods,
-                :setup_intents, :plans, :recipients, :refunds, :transfers, :payouts, :subscriptions, :country_spec,
-                :subscriptions_items, :products, :skus, :tax_rates, :checkout_sessions
+                :setup_intents, :plans, :prices, :promotion_codes, :recipients, :refunds, :transfers, :payouts,
+                :subscriptions, :country_spec, :subscriptions_items, :products, :tax_rates, :checkout_sessions,
+                :checkout_session_line_items
 
     attr_accessor :error_queue, :debug, :conversion_rate, :account_balance
 
@@ -66,7 +71,7 @@ module StripeMock
       @bank_tokens = {}
       @ach_credit_transfer_tokens = {}
       @card_tokens = {}
-      @customers = {}
+      @customers = { Stripe.api_key => {} }
       @charges = {}
       @payment_intents = {}
       @payment_methods = {}
@@ -78,8 +83,9 @@ module StripeMock
       @invoice_items = {}
       @orders = {}
       @plans = {}
+      @prices = {}
       @products = {}
-      @skus = {}
+      @promotion_codes = {}
       @recipients = {}
       @refunds = {}
       @transfers = {}
@@ -89,6 +95,7 @@ module StripeMock
       @country_spec = {}
       @tax_rates = {}
       @checkout_sessions = {}
+      @checkout_session_line_items = {}
 
       @debug = false
       @error_queue = ErrorQueue.new
@@ -102,7 +109,7 @@ module StripeMock
       @base_strategy = TestStrategies::Base.new
     end
 
-    def mock_request(method, url, api_key: nil, api_base: nil, params: {}, headers: {})
+    def mock_request(method, url, api_key: nil, api_base: nil, usage: [], params: {}, headers: {})
       return {} if method == :xtest
 
       api_key ||= (Stripe.api_key || DUMMY_API_KEY)

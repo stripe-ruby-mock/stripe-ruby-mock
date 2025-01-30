@@ -1,69 +1,164 @@
 {
-  "created": 1326853478,
-  "livemode": false,
-  "id": "evt_00000000000000",
-  "type": "charge.refunded",
+  "id": "evt_000000000000000000000000",
   "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1648319949,
   "data": {
     "object": {
-      "id": "ch_00000000000000",
+      "id": "ch_000000000000000000000000",
       "object": "charge",
-      "created": 1380933505,
-      "livemode": false,
-      "paid": true,
-      "amount": 1000,
-      "currency": "usd",
-      "refunded": true,
-      "source": {
-        "id": "cc_00000000000000",
-        "object": "card",
-        "last4": "4242",
-        "type": "Visa",
-        "brand": "Visa",
-        "funding": "credit",
-        "exp_month": 12,
-        "exp_year": 2013,
-        "fingerprint": "wXWJT135mEK107G8",
-        "customer": "cus_00000000000000",
-        "country": "US",
-        "name": "Actual Nothing",
-        "address_line1": null,
-        "address_line2": null,
-        "address_city": null,
-        "address_state": null,
-        "address_zip": null,
-        "address_country": null,
-        "cvc_check": null,
-        "address_line1_check": null,
-        "address_zip_check": null
+      "amount": 100,
+      "amount_captured": 100,
+      "amount_refunded": 100,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": "txn_000000000000000000000000",
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": null,
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": null,
+        "name": null,
+        "phone": null
       },
+      "calculated_statement_descriptor": "EXAMPLECOMPANY",
       "captured": true,
-      "refunds": {
-        "object": "list",
-        "total_count": 1,
-        "has_more": false,
-        "data": [
-          {
-            "amount": 1000,
-            "currency": "usd",
-            "created": 1381080103,
-            "object": "refund",
-            "balance_transaction": "txn_2hkjgg43ucu7K1",
-            "id": "re_00000000000000"
-          }
-        ]
-      },
-      "balance_transaction": "txn_00000000000000",
-      "failure_message": null,
-      "failure_code": null,
-      "amount_refunded": 1000,
-      "customer": "cus_00000000000000",
-      "invoice": "in_00000000000000",
-      "description": null,
+      "created": 1648319947,
+      "currency": "usd",
+      "customer": null,
+      "description": "(created by Stripe CLI)",
+      "destination": null,
       "dispute": null,
+      "disputed": false,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {
+      },
+      "invoice": null,
+      "livemode": false,
       "metadata": {
       },
-      "fee": 0
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 52,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": null,
+      "payment_method": "card_000000000000000000000000",
+      "payment_method_details": {
+        "card": {
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": null
+          },
+          "country": "US",
+          "exp_month": 3,
+          "exp_year": 2023,
+          "fingerprint": "ZoVSX2dK5igWt2SB",
+          "funding": "credit",
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "network": "visa",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/acct_0000000000000000/ch_000000000000000000000000/rcpt_0000000000000000000000000000000",
+      "refunded": true,
+      "refunds": {
+        "object": "list",
+        "data": [
+          {
+            "id": "re_000000000000000000000000",
+            "object": "refund",
+            "amount": 100,
+            "balance_transaction": "txn_000000000000000000000000",
+            "charge": "ch_000000000000000000000000",
+            "created": 1648319949,
+            "currency": "usd",
+            "metadata": {
+            },
+            "payment_intent": null,
+            "reason": null,
+            "receipt_number": null,
+            "source_transfer_reversal": null,
+            "status": "succeeded",
+            "transfer_reversal": null
+          }
+        ],
+        "has_more": false,
+        "total_count": 1,
+        "url": "/v1/charges/ch_000000000000000000000000/refunds"
+      },
+      "review": null,
+      "shipping": null,
+      "source": {
+        "id": "card_000000000000000000000000",
+        "object": "card",
+        "address_city": null,
+        "address_country": null,
+        "address_line1": null,
+        "address_line1_check": null,
+        "address_line2": null,
+        "address_state": null,
+        "address_zip": null,
+        "address_zip_check": null,
+        "brand": "Visa",
+        "country": "US",
+        "customer": null,
+        "cvc_check": null,
+        "dynamic_last4": null,
+        "exp_month": 3,
+        "exp_year": 2023,
+        "fingerprint": "ZoVSX2dK5igWt2SB",
+        "funding": "credit",
+        "last4": "4242",
+        "metadata": {
+        },
+        "name": null,
+        "tokenization_method": null
+      },
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    },
+    "previous_attributes": {
+      "amount_refunded": 0,
+      "refunded": false,
+      "refunds": {
+        "data": [
+
+        ],
+        "total_count": 0
+      }
     }
-  }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": "req_00000000000000",
+    "idempotency_key": "86a8299a-3f47-4aec-8cb4-298bbc8bc050"
+  },
+  "type": "charge.refunded"
 }
