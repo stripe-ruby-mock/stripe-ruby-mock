@@ -56,7 +56,7 @@ module StripeMock
           add_coupon_to_object(customers[stripe_account][params[:id]], coupon)
         end
 
-        customer = customers[params[:id]]
+        customer = customers[stripe_account][params[:id]]
         expand_params(customer, params)
       end
 
