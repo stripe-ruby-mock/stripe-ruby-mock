@@ -426,7 +426,7 @@ module StripeMock
       end
 
       def subscription_payment_intent(invoice)
-        new_payment_intent(nil, nil, { payment_method: customers[invoice[:customer]][:invoice_settings][:default_payment_method], customer: invoice[:customer], amount: invoice[:amount_due], currency: invoice[:currency], invoice: invoice[:id], confirm: true }, nil)
+        new_payment_intent(nil, nil, { payment_method: customers[Stripe.api_key][invoice[:customer]][:invoice_settings][:default_payment_method], customer: invoice[:customer], amount: invoice[:amount_due], currency: invoice[:currency], invoice: invoice[:id], confirm: true }, nil)
       end
 
       def verify_active_status(subscription)

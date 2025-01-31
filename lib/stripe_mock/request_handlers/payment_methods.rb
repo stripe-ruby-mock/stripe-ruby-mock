@@ -44,7 +44,7 @@ module StripeMock
         params[:limit] ||= 10
 
         result = payment_methods.clone
-        sources = retrieve_object_cards(:customers, params[:customer], @customers)[:data]
+        sources = retrieve_object_cards(:customers, params[:customer], @customers[Stripe.api_key])[:data]
 
         if params[:customer]
           result.delete_if { |_k, v| v[:customer] != params[:customer] }

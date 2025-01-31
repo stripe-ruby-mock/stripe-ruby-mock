@@ -140,7 +140,7 @@ module StripeMock
         payment_method = @payment_methods[payment_intent[:payment_method]]
         last4 = payment_method[:card][:last4] if payment_method.present?
 
-        customer = @customers[payment_intent[:customer]]
+        customer = @customers[Stripe.api_key][payment_intent[:customer]]
         last4 ||= customer[:sources][:data].last[:last4]
         if customer.present? && customer[:default_source]
           default_card = customer[:sources][:data].find {|source| source[:id] == customer[:default_source]}
@@ -151,7 +151,7 @@ module StripeMock
       end
 
       def status(params)
-        customer = @customers[params[:customer]]
+        customer = @customers[Stripe.api_key][params[:customer]]
 
         if params[:payment_method].blank? && customer.present? && customer[:default_source].blank?
           'requires_payment_method'

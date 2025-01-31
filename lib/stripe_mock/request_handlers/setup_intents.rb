@@ -29,10 +29,10 @@ module StripeMock
 
         if params.present?
           if params[:payment_method_data].present? && params[:customer].present?
-            add_source_to(:customer, params[:customer], {source: params[:payment_method_data][:card][:token]}, @customers)
+            add_source_to(:customer, params[:customer], {source: params[:payment_method_data][:card][:token]}, @customers[Stripe.api_key])
             params[:status] = 'succeeded' # Defaults to succeeded for non-3d-secure cards. Add functionality to detect 3d-secure card and update the status to requires_action accordingly.
           elsif params[:payment_method].present? && params[:customer].present? # When payment method being passed is a card_id
-            customer = assert_existence :customer, params[:customer], @customers[params[:customer]]
+            customer = assert_existence :customer, params[:customer], @customers[Stripe.api_key][params[:customer]]
             if has_card?(customer, params[:payment_method]).present?
               params[:status] = 'succeeded'
             end

@@ -225,7 +225,7 @@ module StripeMock
       end
 
       def invoice_payment_intent(invoice)
-        new_payment_intent(nil, nil, { payment_method: customers[invoice[:customer]][:invoice_settings][:default_payment_method], customer: invoice[:customer], amount: invoice[:amount_due], invoice: invoice[:id], currency: StripeMock.default_currency }, nil)
+        new_payment_intent(nil, nil, { payment_method: customers[Stripe.api_key][invoice[:customer]][:invoice_settings][:default_payment_method], customer: invoice[:customer], amount: invoice[:amount_due], invoice: invoice[:id], currency: StripeMock.default_currency }, nil)
       end
     end
   end
