@@ -56,7 +56,8 @@ module StripeMock
           add_coupon_to_object(customers[stripe_account][params[:id]], coupon)
         end
 
-        customers[stripe_account][params[:id]]
+        customer = customers[stripe_account][params[:id]]
+        expand_params(customer, params)
       end
 
       def update_customer(route, method_url, params, headers)
@@ -71,6 +72,7 @@ module StripeMock
         # Delete those params if their value is nil. Workaround of the problematic way Stripe serialize objects
         params.delete(:sources) if params[:sources] && params[:sources][:data].nil?
         params.delete(:subscriptions) if params[:subscriptions] && params[:subscriptions][:data].nil?
+        params.delete(:invoice_settings) if params[:invoice_settings] && params[:invoice_settings] == {} # There should be blank? check
         # Delete those params if their values aren't valid. Workaround of the problematic way Stripe serialize objects
         if params[:sources] && !params[:sources][:data].nil?
           params.delete(:sources) unless params[:sources][:data].any?{ |v| !!v[:type]}
@@ -107,7 +109,7 @@ module StripeMock
           end
         end
 
-        cus
+        expand_params(cus, params)
       end
 
       def delete_customer(route, method_url, params, headers)
@@ -133,7 +135,7 @@ module StripeMock
           end
         end
 
-        customer
+        expand_params(customer, params)
       end
 
       def list_customers(route, method_url, params, headers)
@@ -154,11 +156,26 @@ module StripeMock
       def delete_customer_discount(route, method_url, params, headers)
         stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
-        cus = assert_existence :customer, $1, customers[stripe_account][$1]
+        customer = assert_existence :customer, $1, customers[stripe_account][$1]
 
-        cus[:discount] = nil
+        customer[:discount] = nil
 
-        cus
+        expand_params(customer, params)
+      end
+
+      private
+
+      def expand_params(customer, params)
+        # See: https://stripe.com/docs/upgrades#2020-08-27
+        # Some customer attributes are no longer included by default (they can be requested via `expand`)
+        return unless Stripe.api_version && Stripe.api_version >= '2020-08-27'
+
+        # Ensure we don't mutate the stored customer object, only the object the API is returning
+        customer.clone.tap do |cloned_customer|
+          cloned_customer.delete(:subscriptions) unless params[:expand]&.include?('subscriptions')
+          cloned_customer.delete(:sources) unless params[:expand]&.include?('sources')
+          cloned_customer.delete(:tax_ids) unless params[:expand]&.include?('tax_ids')
+        end
       end
     end
   end

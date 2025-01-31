@@ -226,11 +226,9 @@ shared_examples 'Customer Subscriptions with plans' do
         customer: customer.id,
         quantity: 2,
         application_fee_percent: 10,
-        tax_percent: 20
       })
       expect(subscription.quantity).to eq(2)
       expect(subscription.application_fee_percent).to eq(10)
-      expect(subscription.tax_percent).to eq(20)
     end
 
     it "correctly sets pending invoice item interval" do

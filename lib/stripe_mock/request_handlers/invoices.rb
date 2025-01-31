@@ -10,13 +10,33 @@ module StripeMock
         klass.add_handler 'get /v1/invoices/search',         :search_invoices
         klass.add_handler 'get /v1/invoices',                :list_invoices
         klass.add_handler 'post /v1/invoices/(.*)/pay',      :pay_invoice
+        klass.add_handler 'post /v1/invoices/(.*)/finalize', :finalize_invoice
         klass.add_handler 'post /v1/invoices/(.*)',          :update_invoice
       end
 
       def new_invoice(route, method_url, params, headers)
         id = new_id('in')
-        invoice_item = Data.mock_line_item()
-        invoices[id] = Data.mock_invoice([invoice_item], params.merge(:id => id))
+        line_item_params = {}
+        invoice_params = {}
+
+        if params[:subscription]
+          subscription = @subscriptions[params[:subscription]]
+          amount = (params[:amount] || subscription[:plan][:amount])
+
+          line_item_params = {subscription: subscription[:id], amount: amount, plan: subscription[:plan][:id]}
+          invoice_params = {subscription: subscription[:id], amount_due: amount, customer: params[:customer]}
+        end
+
+        invoice_item = Data.mock_line_item(line_item_params)
+        invoices[id] = Data.mock_invoice([invoice_item], params.merge(:id => id).merge(invoice_params))
+      end
+
+      def finalize_invoice(route, method_url, params, headers)
+        route =~ method_url
+        assert_existence :invoice, $1, invoices[$1]
+        # check status it should works only for draft
+        payment_intent = invoice_payment_intent(invoices[$1])
+        invoices[$1].merge!(paid: payment_intent[:status] == 'succeeded', payment_intent: payment_intent[:id])
       end
 
       def update_invoice(route, method_url, params, headers)
@@ -35,6 +55,8 @@ module StripeMock
       end
 
       def list_invoices(route, method_url, params, headers)
+        raise Stripe::InvalidRequestError.new('Received unknown parameter: date', nil, http_status: 400) if params[:date]
+
         params[:offset] ||= 0
         params[:limit] ||= 10
 
@@ -42,6 +64,10 @@ module StripeMock
 
         if params[:customer]
           result.delete_if { |k,v| v[:customer] != params[:customer] }
+        end
+
+        if params[:subscription]
+          result.delete_if { |k,v| v[:subscription] != params[:subscription] }
         end
 
         Data.mock_list_object(result.values, params)
@@ -198,6 +224,9 @@ module StripeMock
         end
       end
 
+      def invoice_payment_intent(invoice)
+        new_payment_intent(nil, nil, { payment_method: customers[Stripe.api_key][invoice[:customer]][:invoice_settings][:default_payment_method], customer: invoice[:customer], amount: invoice[:amount_due], invoice: invoice[:id], currency: StripeMock.default_currency }, nil)
+      end
     end
   end
 end

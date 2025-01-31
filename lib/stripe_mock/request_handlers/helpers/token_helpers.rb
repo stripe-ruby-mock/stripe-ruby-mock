@@ -23,6 +23,14 @@ module StripeMock
           @bank_tokens.delete(token)
         end
       end
+      
+      def get_ach_credit_transfer_by_token(token)
+        if token.nil? || @ach_credit_transfer_tokens[token].nil?
+          Data.mock_ach_credit_transfer
+        else
+          @ach_credit_transfer_tokens.delete(token)
+        end
+      end
 
       def get_card_by_token(token)
         if token.nil? || @card_tokens[token].nil?

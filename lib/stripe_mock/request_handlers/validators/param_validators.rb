@@ -22,7 +22,6 @@ module StripeMock
       # ProductValidator
       #
 
-
       def validate_create_product_params(params)
         params[:id] = params[:id].to_s
         @base_strategy.create_product_params.keys.reject{ |k,_| k == :id }.each do |k|
@@ -67,7 +66,6 @@ module StripeMock
 
       def validate_create_plan_params(params)
         plan_id = params[:id].to_s
-        product_id = params[:product]
 
         @base_strategy.create_plan_params.keys.each do |attr_name|
           message =
@@ -84,9 +82,18 @@ module StripeMock
           raise Stripe::InvalidRequestError.new(message, :id)
         end
 
-        unless products[product_id]
-          message = not_found_message(Stripe::Product, product_id)
-          raise Stripe::InvalidRequestError.new(message, :product)
+        # Copied approach from https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/731
+        if params[:product].is_a?(Hash)
+          product_id = params[:product][:id] ||= new_id('prod')
+          products[product_id] = Data.mock_product(params[:product])
+          params[:product] = product_id
+        else
+          product_id = params[:product]
+
+          unless products[product_id]
+            message = not_found_message(Stripe::Product, product_id)
+            raise Stripe::InvalidRequestError.new(message, :product)
+          end
         end
 
         unless SUPPORTED_PLAN_INTERVALS.include?(params[:interval])
@@ -104,6 +111,34 @@ module StripeMock
           raise Stripe::InvalidRequestError.new(message, :amount)
         end
 
+        # Some plan attributes have moved into Product:
+        # - name
+        # - statement_descriptor
+        #
+        # See: https://stripe.com/docs/upgrades#2018-02-05
+        if Stripe.api_version && Stripe.api_version >= '2018-02-05'
+          raise Stripe::InvalidRequestError.new('Received unknown parameter: :name', :name) if params.key? :name
+          raise Stripe::InvalidRequestError.new('Received unknown parameter: :statement_descriptor', :statement_descriptor) if params.key? :statement_descriptor
+        end
+      end
+
+      def validate_subscription_cancel!(params)
+        raise Stripe::InvalidRequestError.new('Received unknown parameter: :at_period_end', :at_period_end) if params.key? :at_period_end
+      end
+
+      def validate_create_sku_params(params)
+        @base_strategy.create_sku_params.keys.each do |name|
+          message = "Missing required param: #{name}."
+          raise Stripe::InvalidRequestError.new(message, name) if params[name].nil?
+        end
+
+        if skus[ params[:id] ]
+          raise Stripe::InvalidRequestError.new("SKU already exists.", :id)
+        end
+
+        unless %w(finite bucket infinite).include? params[:inventory][:type]
+          raise Stripe::InvalidRequestError.new("Invalid inventory type: must be one of finite, infinite, or bucket", :type)
+        end
       end
 
       def validate_create_price_params(params)

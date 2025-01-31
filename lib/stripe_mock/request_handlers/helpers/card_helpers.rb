@@ -17,6 +17,12 @@ module StripeMock
         card
       end
 
+      def has_card?(object, card_id, class_name='Customer')
+        cards = object[:cards] || object[:sources] || object[:external_accounts]
+        card = cards[:data].find{|cc| cc[:id] == card_id }
+        card.present?
+      end
+
       def add_source_to_object(type, source, object, replace_current=false)
         source[type] = object[:id]
         sources = object[:sources]
@@ -88,6 +94,8 @@ module StripeMock
         source =
           if params[:card]
             card_from_params(params[:card])
+          elsif params[:ach_credit_transfer]
+            get_ach_credit_transfer_by_token(params[:ach_credit_transfer])
           elsif params[:bank_account]
             get_bank_by_token(params[:bank_account])
           else
