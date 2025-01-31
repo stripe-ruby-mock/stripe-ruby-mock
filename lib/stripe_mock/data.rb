@@ -1381,6 +1381,7 @@ module StripeMock
 
       params = {
         id: source[:id],
+        type: "card",
         card: source, customer: source[:customer], metadata: source[:metadata],
         billing_details: {
           address: {city: source[:address_city], country: source[:country], line1: source[:address_line1], line2: source[:address_line2], postal_code: source[:address_zip], state: source[:address_state]},
