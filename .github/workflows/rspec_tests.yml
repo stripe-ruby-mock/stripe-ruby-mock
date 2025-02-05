@@ -23,8 +23,7 @@ jobs:
       matrix:
         ruby: ['2.7', '3.0', '3.2']
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
     - name: Install Ruby and gems
       # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
       # change this to (see https://github.com/ruby/setup-ruby#versioning):
@@ -34,6 +33,5 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-    - uses: actions/checkout@v3
     - name: Run tests
       run: bundle exec rspec
