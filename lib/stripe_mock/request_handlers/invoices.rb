@@ -46,6 +46,15 @@ module StripeMock
 
         result.delete_if { |_k, v| v[:status] != params[:status] } if params[:status]
 
+        if params[:expand].is_a?(Array) && params[:expand].any? { |data| data.match?(/data.charge/) }
+          result.values.each do |invoice|
+            next if invoice[:charge].nil?
+
+            invoice[:charge] = charges[invoice[:charge]].dup
+          end
+          params.delete(:expand)
+        end
+
         Data.mock_list_object(result.values, params)
       end
 
