@@ -12,9 +12,7 @@ module StripeMock
         def new_session(route, method_url, params, headers)
           id = params[:id] || new_id('cs')
 
-          [:cancel_url, :success_url].each do |p|
-            require_param(p) if params[p].nil? || params[p].empty?
-          end
+          require_param(:success_url) if params[:success_url].nil? || params[:success_url].empty?
 
           line_items = nil
           if params[:line_items]
