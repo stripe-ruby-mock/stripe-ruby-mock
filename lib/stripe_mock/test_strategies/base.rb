@@ -121,7 +121,6 @@ module StripeMock
             amount: 500,
             currency: 'usd',
           }],
-          cancel_url: "https://example.com/cancel",
           success_url: "https://example.com/success",
         }.merge(params)
       end
