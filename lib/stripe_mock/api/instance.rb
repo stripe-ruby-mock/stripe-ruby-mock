@@ -2,12 +2,12 @@ module StripeMock
 
   @state = 'ready'
   @instance = nil
-  @original_execute_request_method = Stripe::StripeClient.instance_method(:execute_request)
+  @original_execute_request_method = Compat.client.instance_method(:execute_request)
 
   def self.start
     return false if @state == 'live'
     @instance = instance = Instance.new
-    Stripe::StripeClient.send(:define_method, :execute_request) { |*args, **keyword_args| instance.mock_request(*args, **keyword_args) }
+    Compat.client.send(:define_method, :execute_request) { |*args, **keyword_args| instance.mock_request(*args, **keyword_args) }
     @state = 'local'
   end
 
@@ -29,7 +29,7 @@ module StripeMock
   end
 
   def self.restore_stripe_execute_request_method
-    Stripe::StripeClient.send(:define_method, :execute_request, @original_execute_request_method)
+    Compat.client.send(:define_method, :execute_request, @original_execute_request_method)
   end
 
   def self.instance; @instance; end

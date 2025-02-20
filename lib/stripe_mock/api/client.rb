@@ -8,7 +8,7 @@ module StripeMock
     return false if @state == 'live'
     return @client unless @client.nil?
 
-    Stripe::StripeClient.send(:define_method, :execute_request) { |*args, **keyword_args| StripeMock.redirect_to_mock_server(*args, **keyword_args) }
+    Compat.client.send(:define_method, :execute_request) { |*args, **keyword_args| StripeMock.redirect_to_mock_server(*args, **keyword_args) }
     @client = StripeMock::Client.new(port)
     @state = 'remote'
     @client
