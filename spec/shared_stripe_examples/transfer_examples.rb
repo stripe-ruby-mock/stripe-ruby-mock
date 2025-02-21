@@ -98,10 +98,17 @@ shared_examples 'Transfer API' do
   end
 
   it "cancels a stripe transfer" do
-    original = Stripe::Transfer.create(amount:  "100", currency: "usd")
-    res, api_key = Compat.client.active_client.execute_request(:post, "/v1/transfers/#{original.id}/cancel", api_key: 'api_key')
+    if StripeMock::Compat.legacy?
+      original = Stripe::Transfer.create(amount:  "100", currency: "usd")
+      res, api_key = Stripe::StripeClient.active_client.execute_request(:post, "/v1/transfers/#{original.id}/cancel", api_key: 'api_key')
 
-    expect(res.data[:status]).to eq("canceled")
+      expect(res.data[:status]).to eq("canceled")
+    else
+      original = Stripe::Transfer.create(amount:  "100", currency: "usd")
+      res, api_key = Stripe::APIRequestor.active_requestor.execute_request(:post, "/v1/transfers/#{original.id}/cancel", :api)
+
+      expect(res.status).to eq("canceled")
+    end
   end
 
   it "cannot retrieve a transfer that doesn't exist" do

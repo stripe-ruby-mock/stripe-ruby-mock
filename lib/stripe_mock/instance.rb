@@ -111,7 +111,23 @@ module StripeMock
       @base_strategy = TestStrategies::Base.new
     end
 
-    def mock_request(method, url, api_key: nil, api_base: nil, usage: [], params: {}, headers: {})
+    def mock_request(*args, **kwargs)
+      if args.length == 2 && kwargs.key?(:api_key) # Legacy signature
+        method, url = args
+        api_key = kwargs[:api_key]
+        params = kwargs[:params] || {}
+        headers = kwargs[:headers] || {}
+      elsif args.length == 6 # New signature
+        method, url, base_address, params, opts, usage = args
+        client = Compat.client.new
+        config = client.send(:config)
+        opts = Stripe::RequestOptions.merge_config_and_opts(config, opts)
+        headers = client.send(:request_headers, method, Stripe::Util.get_api_mode(url), opts)
+        headers = headers.transform_keys { |key| Util.snake_case(key).to_sym }
+      else
+        raise ArgumentError, "Invalid arguments for mock_request"
+      end
+
       return {} if method == :xtest
 
       api_key ||= (Stripe.api_key || DUMMY_API_KEY)
@@ -134,12 +150,21 @@ module StripeMock
         else
           res = self.send(handler[:name], handler[:route], method_url, params, headers)
           puts "           [res]  #{res}" if @debug == true
-          [to_faraday_hash(res), api_key]
+
+          if Compat.legacy?
+            [to_faraday_hash(res), api_key]
+          else
+            [to_net_http(res, headers), {api_key:}]
+          end
         end
       else
         puts "[StripeMock] Warning : Unrecognized endpoint + method : [#{method} #{url}]"
         puts "[StripeMock] params: #{params}" unless params.empty?
-        [{}, api_key]
+        if Compat.legacy?
+          [{}, api_key]
+        else
+          [{}, {api_key:}]
+        end
       end
     end
 
@@ -223,6 +248,22 @@ module StripeMock
       response = Struct.new(:data)
       response.new(hash)
     end
+
+    def to_net_http(hash, headers)
+      headers = headers.slice(*%w[request-id stripe-account-id stripe-version stripe-version-stabl idempotency-key content-type])
+      fake_net_http_response(code: "200", message: "OK", body: hash.to_json, headers: headers)
+    end
+
+    def fake_net_http_response(code: "200", message: "OK", body: "{}", headers: {})
+      response_class = Net::HTTPResponse::CODE_TO_OBJ[code]
+      response = response_class.new("1.1", code, message)
+      headers.each { |k, v| response[k] = v }
+      response.instance_variable_set(:@body, body)
+      response.instance_variable_set(:@read, true)
+
+      response
+    end
+
 
     def calculate_fees(params)
       application_fee = params[:application_fee] || 0
