@@ -154,7 +154,7 @@ module StripeMock
           if Compat.legacy?
             [to_faraday_hash(res), api_key]
           else
-            [to_net_http(res, headers), {api_key:}]
+            [to_net_http(res, headers), opts]
           end
         end
       else
@@ -163,7 +163,7 @@ module StripeMock
         if Compat.legacy?
           [{}, api_key]
         else
-          [{}, {api_key:}]
+          [{}, opts]
         end
       end
     end

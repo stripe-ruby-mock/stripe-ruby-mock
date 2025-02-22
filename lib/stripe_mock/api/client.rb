@@ -32,15 +32,8 @@ module StripeMock
   def self.redirect_to_mock_server(*args, **kwargs)
     if args.length == 2 && kwargs.key?(:api_key) # Legacy signature
       method, url = args
-      api_key = kwargs[:api_key]
-      params = kwargs[:params] || {}
-      headers = kwargs[:headers] || {}
     elsif args.length == 6 # New signature
-      method, url, base_address, params, opts, usage = args
-      config = Compat.client.new.send(:config)
-      opts = Stripe::RequestOptions.merge_config_and_opts(config, opts)
-      headers = Compat.client.new.send(:request_headers, method, Stripe::Util.get_api_mode(url), opts)
-      headers = headers.transform_keys { |key| Util.snake_case(key).to_sym }
+      method, url, _base_address, _params, _opts, _usage = args
     else
       raise ArgumentError, "Invalid arguments for mock_request"
     end
