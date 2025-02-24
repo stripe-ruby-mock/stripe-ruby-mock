@@ -98,16 +98,16 @@ shared_examples 'Transfer API' do
   end
 
   it "cancels a stripe transfer" do
-    if StripeMock::Compat.legacy?
-      original = Stripe::Transfer.create(amount:  "100", currency: "usd")
-      res, api_key = Stripe::StripeClient.active_client.execute_request(:post, "/v1/transfers/#{original.id}/cancel", api_key: 'api_key')
-
-      expect(res.data[:status]).to eq("canceled")
-    else
+    if StripeMock::Compat.stripe_gte_13?
       original = Stripe::Transfer.create(amount:  "100", currency: "usd")
       res, api_key = Stripe::APIRequestor.active_requestor.execute_request(:post, "/v1/transfers/#{original.id}/cancel", :api)
 
       expect(res.status).to eq("canceled")
+    else
+      original = Stripe::Transfer.create(amount:  "100", currency: "usd")
+      res, api_key = Stripe::StripeClient.active_client.execute_request(:post, "/v1/transfers/#{original.id}/cancel", api_key: 'api_key')
+
+      expect(res.data[:status]).to eq("canceled")
     end
   end
 

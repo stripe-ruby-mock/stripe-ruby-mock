@@ -203,7 +203,7 @@ shared_examples 'Customer Subscriptions with plans' do
 
       expect {
         Stripe::Subscription.create(plan: plan.id, customer: customer.id, promotion_code: promotion_code.id)
-      }.not_to raise_error(Stripe::InvalidRequestError)
+      }.not_to raise_error
     end
 
     it "does not permit both coupon and promotion code" do
@@ -939,9 +939,7 @@ shared_examples 'Customer Subscriptions with plans' do
       subscription.save
 
       expect(subscription.discount).not_to be_nil
-      if StripeMock::Compat.legacy?
-        expect(subscription.discount).to be_a(Stripe::Discount)
-      end
+      expect(subscription.discount).to be_a(Stripe::Discount)
       expect(subscription.discount.coupon.id).to eq(coupon.id)
     end
 

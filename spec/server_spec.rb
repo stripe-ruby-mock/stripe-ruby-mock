@@ -54,7 +54,7 @@ describe 'StripeMock Server', :mock_server => true do
 
 
   it "returns a response with symbolized hash keys" do
-    if StripeMock::Compat.legacy?
+    unless StripeMock::Compat.stripe_gte_13?
       stripe_helper.create_plan(id: 'x', product: product.id)
       response, api_key = StripeMock.redirect_to_mock_server('get', '/v1/plans/x', api_key: 'xxx')
       response.data.keys.each {|k| expect(k).to be_a(Symbol) }
@@ -62,7 +62,7 @@ describe 'StripeMock Server', :mock_server => true do
   end
 
   it "returns a Net::HttpResponse" do
-    unless StripeMock::Compat.legacy?
+    if StripeMock::Compat.stripe_gte_13?
       stripe_helper.create_plan(id: 'x', product: product.id)
       response, api_key = StripeMock.redirect_to_mock_server('get', '/v1/plans/x', 'https://api.stripe.com', {}, {}, 'normal')
       expect(response).to be_a(Net::HTTPResponse)

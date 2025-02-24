@@ -151,19 +151,19 @@ module StripeMock
           res = self.send(handler[:name], handler[:route], method_url, params, headers)
           puts "           [res]  #{res}" if @debug == true
 
-          if Compat.legacy?
-            [to_faraday_hash(res), api_key]
-          else
+          if Compat.stripe_gte_13?
             [to_net_http(res, headers), opts]
+          else
+            [to_faraday_hash(res), api_key]
           end
         end
       else
         puts "[StripeMock] Warning : Unrecognized endpoint + method : [#{method} #{url}]"
         puts "[StripeMock] params: #{params}" unless params.empty?
-        if Compat.legacy?
-          [{}, api_key]
-        else
+        if Compat.stripe_gte_13?
           [{}, opts]
+        else
+          [{}, api_key]
         end
       end
     end

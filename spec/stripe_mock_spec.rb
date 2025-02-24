@@ -4,49 +4,49 @@ describe StripeMock do
 
   it "overrides stripe's request method" do
     StripeMock.start
-    if StripeMock::Compat.legacy?
-      StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', api_key: 'abcde') # no error
-    else
+    if StripeMock::Compat.stripe_gte_13?
       StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', :api, {}, {}, []) # no error
+    else
+      StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', api_key: 'abcde') # no error
     end
     StripeMock.stop
   end
 
   it "overrides stripe's execute_request method in other threads" do
     StripeMock.start
-    if StripeMock::Compat.legacy?
-      Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method,:xtest, '/', api_key: 'abcde') }.join # no error
-    else
+    if StripeMock::Compat.stripe_gte_13?
       Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', :api, {}, {}, []) }.join # no error
+    else
+      Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method,:xtest, '/', api_key: 'abcde') }.join # no error
     end
     StripeMock.stop
   end
 
   it "reverts overriding stripe's request method" do
-    if StripeMock::Compat.legacy?
-      StripeMock.start
-      StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', api_key: 'abcde') # no error
-      StripeMock.stop
-      expect { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :x, '/', api_key: 'abcde') }.to raise_error Stripe::APIError
-    else
+    if StripeMock::Compat.stripe_gte_13?
       StripeMock.start
       StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', :api, {}, {}, []) # no error
       StripeMock.stop
       expect { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :x, '/', :api, {}, {}, []) }.to raise_error Stripe::APIError
+    else
+      StripeMock.start
+      StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', api_key: 'abcde') # no error
+      StripeMock.stop
+      expect { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :x, '/', api_key: 'abcde') }.to raise_error Stripe::APIError
     end
   end
 
   it "reverts overriding stripe's execute_request method in other threads" do
-    if StripeMock::Compat.legacy?
-      StripeMock.start
-      Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', api_key: 'abcde') }.join # no error
-      StripeMock.stop
-      expect { Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :x, '/', api_key: 'abcde') }.join }.to raise_error Stripe::APIError
-    else
+    if StripeMock::Compat.stripe_gte_13?
       StripeMock.start
       Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', :api, {}, {}, []) }.join # no error
       StripeMock.stop
       expect { Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :x, '/', :api, {}, {}, []) }.join }.to raise_error Stripe::APIError
+    else
+      StripeMock.start
+      Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', api_key: 'abcde') }.join # no error
+      StripeMock.stop
+      expect { Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :x, '/', api_key: 'abcde') }.join }.to raise_error Stripe::APIError
     end
   end
 
