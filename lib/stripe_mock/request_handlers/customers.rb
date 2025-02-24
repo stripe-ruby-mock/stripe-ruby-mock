@@ -10,6 +10,7 @@ module StripeMock
         klass.add_handler 'get /v1/customers',                      :list_customers
         klass.add_handler 'get /v1/customers/search',               :search_customers
         klass.add_handler 'delete /v1/customers/([^/]*)/discount',  :delete_customer_discount
+        klass.add_handler 'get /v1/customers/([^/]+)/payment_methods/([^/]+)', :retrieve_payment_method
       end
 
       def new_customer(route, method_url, params, headers)
@@ -159,6 +160,17 @@ module StripeMock
         cus[:discount] = nil
 
         cus
+      end
+
+      def retrieve_payment_method(route, method_url, params, headers)
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
+
+        route =~ method_url
+        customer_id, payment_method_id = $1, $2
+        customer = assert_existence(:customer, customer_id, customers[stripe_account][customer_id])
+        payment_method = customer[:sources][:data].find { |source| source[:id] == payment_method_id }
+        assert_existence(:payment_method, payment_method_id, payment_method)
+        payment_method
       end
     end
   end
