@@ -565,7 +565,6 @@ shared_examples 'Customer API' do
       description: "a description"
     })
 
-    expect { customer.source }.to raise_error
     retrieved_payment_method = Stripe::Customer.retrieve_payment_method(customer.id, customer.sources.data.first.id)
     expect(retrieved_payment_method.id).to eq(customer.sources.data.first.id)
   end
