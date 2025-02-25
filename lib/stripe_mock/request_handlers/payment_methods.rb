@@ -58,11 +58,19 @@ module StripeMock
         allowed_params = [:customer]
 
         id = method_url.match(route)[1]
-
-        assert_existence :customer, params[:customer], customers[stripe_account][params[:customer]]
-
+  
+        customer = assert_existence :customer, params[:customer], customers[stripe_account][params[:customer]]
+  
         payment_method = assert_existence :payment_method, id, payment_methods[id]
         payment_methods[id] = Util.rmerge(payment_method, params.select { |k, _v| allowed_params.include?(k) })
+  
+        customer[:sources] ||= { data: [], total_count: 0 }
+  
+        unless customer[:sources][:data].any? { |source| source[:id] == id }
+          customer[:sources][:data] << payment_methods[id]
+          customer[:sources][:total_count] += 1
+        end
+  
         payment_methods[id].clone
       end
 

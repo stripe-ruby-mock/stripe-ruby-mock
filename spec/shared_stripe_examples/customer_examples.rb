@@ -549,11 +549,10 @@ shared_examples 'Customer API' do
 
     customer = Stripe::Customer.create({
       email: 'johnny@appleseed.com',
-      invoice_settings: {
-        default_payment_method: payment_method.id
-      },
       description: "a description"
     })
+
+    payment_method.attach(customer: customer.id)
 
     retrieved_payment_method = Stripe::Customer.retrieve_payment_method(customer.id, payment_method.id)
     expect(retrieved_payment_method.id).to eq(payment_method.id)
