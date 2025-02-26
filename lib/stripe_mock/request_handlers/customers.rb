@@ -189,6 +189,7 @@ module StripeMock
           metadata: {},
           type: 'card'
         )
+        base
       end
 
       def retrieve_payment_method(route, method_url, params, headers)
