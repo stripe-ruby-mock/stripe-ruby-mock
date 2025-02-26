@@ -178,7 +178,7 @@ module StripeMock
         if customer[:sources] && customer[:sources][:data]
           source = customer[:sources][:data].detect { |src| src[:id] == payment_method_id }
           if source && source[:customer] == customer_id
-            return source
+            return source.is_a?(Hash) ? source.clone : source.to_h
           end
         end
 
