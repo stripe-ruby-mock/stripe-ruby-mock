@@ -162,6 +162,34 @@ module StripeMock
         cus
       end
 
+      # Helper to wrap a legacy source into a temporary PaymentMethod object
+      def legacy_source_to_payment_method(source)
+        {
+          id: source[:id],
+          object: 'payment_method',
+          allow_redisplay: 'unspecified',
+          billing_details: {
+            address: {
+              city: nil,
+              country: nil,
+              line1: nil,
+              line2: nil,
+              postal_code: nil,
+              state: nil
+            },
+            email: nil,
+            name: nil,
+            phone: nil,
+          },
+          card: source.clone,  # embed the legacy source data as the card subobject
+          created: Time.now.to_i,
+          customer: source[:customer],
+          livemode: false,
+          metadata: {},
+          type: 'card'
+        }
+      end
+
       def retrieve_payment_method(route, method_url, params, headers)
         stripe_account = headers && headers[:stripe_account] || Stripe.api_key
 
@@ -171,14 +199,15 @@ module StripeMock
         payment_method = payment_methods[payment_method_id]
         
         if payment_method && payment_method[:customer] == customer_id
-          return payment_method
+          return payment_method.clone
         end
 
-        # If not found or not attached correctly, attempt to find in the customer's legacy sources.
+        # If not found in payment_methods, attempt to find in the customer's legacy sources.
         if customer[:sources] && customer[:sources][:data]
           source = customer[:sources][:data].detect { |src| src[:id] == payment_method_id }
           if source && source[:customer] == customer_id
-            return source.is_a?(Hash) ? source.clone : source.to_h
+            # Convert legacy source to a temporary PaymentMethod structure
+            return legacy_source_to_payment_method(source)
           end
         end
 
