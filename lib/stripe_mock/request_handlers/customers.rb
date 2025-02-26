@@ -168,9 +168,25 @@ module StripeMock
         base.merge(
           id: source[:id],
           object: 'payment_method',
+          allow_redisplay: 'unspecified',
+          billing_details: {
+            address: {
+              city: nil,
+              country: nil,
+              line1: nil,
+              line2: nil,
+              postal_code: nil,
+              state: nil
+            },
+            email: nil,
+            name: nil,
+            phone: nil
+          },
           card: source.clone,    # overwrite with the legacy source as the card subobject
           created: Time.now.to_i,
           customer: source[:customer],
+          livemode: false,
+          metadata: {},
           type: 'card'
         )
       end
