@@ -28,7 +28,11 @@ module StripeMock
               get_card_or_bank_by_token(params.delete(:source))
             end
           sources << new_card
-          params[:default_source] = sources.first[:id]
+          if params[:expand] && params[:expand].include?(:default_source)
+            params[:default_source] = sources.first
+          else
+            params[:default_source] = sources.first[:id]
+          end
         end
 
         customers[stripe_account] ||= {}
@@ -93,7 +97,13 @@ module StripeMock
             new_card = card_from_params(params.delete(:source))
           end
           add_card_to_object(:customer, new_card, cus, true)
-          cus[:default_source] = new_card[:id]
+
+          if params[:expand] && params[:expand].include?('default_source')
+            cus[:default_source] = new_card
+          else
+            cus[:default_source] = new_card[:id]
+          end
+
         end
 
         if params[:coupon]
