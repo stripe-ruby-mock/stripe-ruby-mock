@@ -9,10 +9,15 @@ module StripeMock
 
       :execute_request_internal
     end
+
     def self.client
       return Stripe::StripeClient unless stripe_gte_13?
 
       Stripe::APIRequestor
+    end
+
+    def self.client_instance
+      @client ||= client.new
     end
 
     def self.active_client

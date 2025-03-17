@@ -119,7 +119,7 @@ module StripeMock
         headers = kwargs[:headers] || {}
       elsif args.length == 6 # New signature
         method, url, base_address, params, opts, usage = args
-        client = Compat.client.new
+        client = Compat.client_instance
         config = client.send(:config)
         opts = Stripe::RequestOptions.merge_config_and_opts(config, opts)
         headers = client.send(:request_headers, method, Stripe::Util.get_api_mode(url), opts)
