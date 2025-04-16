@@ -6,3 +6,5 @@ group :test do
 end
 
 gemspec
+
+gem 'appraisal'

@@ -28,5 +28,4 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency 'rspec', '~> 3.13.0'
   gem.add_development_dependency 'thin', '~> 1.8.1'
-  gem.add_development_dependency 'appraisal'
 end
