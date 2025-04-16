@@ -13,9 +13,9 @@ module StripeMock
       @state = 'ready'
     end
 
-    def mock_request(method, url, api_key: nil, params: {}, headers: {})
+    def mock_request(*args, **kwargs)
       timeout_wrap do
-        @pipe.mock_request(method, url, api_key: api_key, params: params, headers: headers).tap {|result|
+        @pipe.mock_request(*args, **kwargs).tap {|result|
           response, api_key = result
           if response.is_a?(Hash) && response[:error_raised] == 'invalid_request'
             args, keyword_args = response[:error_params].first(2), response[:error_params].last
@@ -124,5 +124,4 @@ module StripeMock
       end
     end
   end
-
 end

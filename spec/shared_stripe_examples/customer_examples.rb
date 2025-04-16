@@ -24,7 +24,7 @@ shared_examples 'Customer API' do
     expect(customer.default_source).to_not be_nil
     expect(customer.default_source).to eq customer.sources.data.first.id
 
-    expect { customer.source }.to raise_error
+    expect { customer.source }.to raise_error(NoMethodError)
   end
 
   it "creates a stripe customer with a default payment method" do

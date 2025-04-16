@@ -80,6 +80,10 @@ shared_examples 'SetupIntent API' do
 
     updated = Stripe::SetupIntent.retrieve(original.id)
 
-    expect(updated.metadata[:foo]).to eq(:bar)
+    if StripeMock::Compat.stripe_gte_13?
+      expect(updated.metadata[:foo]).to eq("bar")
+    else
+      expect(updated.metadata[:foo]).to eq(:bar)
+    end
   end
 end

@@ -40,5 +40,11 @@ module StripeMock
       old_param.merge(new_param)
     end
 
+    def self.snake_case(str)
+      str.gsub(/([a-z])([A-Z])/, '\1_\2')  # Convert camelCase to snake_case
+         .gsub(/[-]/, '_')                 # Convert kebab-case to snake_case
+         .downcase                         # Ensure all characters are lowercase
+    end
+
   end
 end

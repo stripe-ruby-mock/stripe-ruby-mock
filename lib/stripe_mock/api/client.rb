@@ -8,7 +8,9 @@ module StripeMock
     return false if @state == 'live'
     return @client unless @client.nil?
 
-    Stripe::StripeClient.send(:define_method, :execute_request) { |*args, **keyword_args| StripeMock.redirect_to_mock_server(*args, **keyword_args) }
+    Compat.client.send(:define_method, Compat.method) do |*args, **keyword_args|
+      StripeMock.redirect_to_mock_server(*args, **keyword_args)
+    end
     @client = StripeMock::Client.new(port)
     @state = 'remote'
     @client
@@ -27,7 +29,14 @@ module StripeMock
 
   private
 
-  def self.redirect_to_mock_server(method, url, api_key: nil, api_base: nil, usage: [], params: {}, headers: {})
+  def self.redirect_to_mock_server(*args, **kwargs)
+    if args.length == 2 && kwargs.key?(:api_key) # Legacy signature
+      method, url = args
+    elsif args.length == 6 # New signature
+      method, url, _base_address, _params, _opts, _usage = args
+    else
+      raise ArgumentError, "Invalid arguments for mock_request"
+    end
     handler = Instance.handler_for_method_url("#{method} #{url}")
 
     if mock_error = client.error_queue.error_for_handler_name(handler[:name])
@@ -35,7 +44,6 @@ module StripeMock
       raise mock_error
     end
 
-    Stripe::Util.symbolize_names client.mock_request(method, url, api_key: api_key, params: params, headers: headers)
+    Stripe::Util.symbolize_names client.mock_request(*args, **kwargs)
   end
-
 end
