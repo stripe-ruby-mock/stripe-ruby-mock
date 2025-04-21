@@ -3,6 +3,7 @@ PATH
   specs:
     stripe-ruby-mock (4.0.0)
       dante (>= 0.2.0)
+      drb (>= 2.0.4, < 3)
       multi_json (~> 1.0)
       stripe (> 5, < 14)
 
@@ -16,7 +17,8 @@ GEM
     daemons (1.4.1)
     dante (0.2.0)
     diff-lcs (1.6.1)
-    dotenv (3.1.8)
+    dotenv (2.8.1)
+    drb (2.2.1)
     eventmachine (1.2.7)
     multi_json (1.15.0)
     rack (2.2.13)
