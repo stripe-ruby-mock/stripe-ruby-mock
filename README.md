@@ -408,6 +408,10 @@ This will help ensure that the problem remains fixed in future updates.
 
 Note: You may need to `ulimit -n 4048` before running the test suite to get all tests to pass.
 
+### Dependency updates
+
+When modifications are made to dependencies in addition to the changes to the Gemfile, Gemfile.lock and stripe-ruby-mock.gemspec you must also run `bundle exec appraisal update` to update the gemfiles specific to Stripe version 12 and Stripe version 13.
+
 ## Copyright
 
 Copyright (c) 2013 Gilbert
