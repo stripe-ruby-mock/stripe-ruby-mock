@@ -1,5 +1,21 @@
 ### Unreleased
 
+### 4.1.0 (2025-04-24)
+- [#920](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/920) Adds DRB as a dependency in preparation to Ruby 3.4.0 [@lucascppessoa](https://github.com/lucascppessoa)
+- [#927](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/927) Allow :cancel_url nil in create Checkout Session [@shu-illy](https://github.com/shu-illy)
+- [#929](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/929) Actions uses only supported ruby versions [@alexmamonchik](https://github.com/alexmamonchik)
+- [#925](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/925) Fix github actions and add missing product attributes [@bettysteger](https://github.com/bettysteger)
+- [#928](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/928) Add tax ID endpoints and data [@lfittl](https://github.com/lfittl)
+- [#835](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/835) Account: replace deprecated verification hash by requirements [@fabianoarruda](https://github.com/fabianoarruda) 
+- [#903](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/903) Add require option to require additional file [@stevenharman](https://github.com/stevenharman)
+- [#904](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/904) Add has_more to Subscription.items data [@stevenharman](https://github.com/stevenharman)
+- [#843](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/843) Some updates around subscriptions [@donnguyen](https://github.com/donnguyen)
+- [#917](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/917) Removed charges on PI and added latest_charge [@espen](https://github.com/espen)
+- [#916](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/916) Better tests for payout [@espen](https://github.com/espen) 
+- [#862](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/862) Add simple support for us bank accounts [@smtlaissezfaire](https://github.com/smtlaissezfaire)
+- [#907](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/907) Fix calls to use raise instead of throw [@smtlaissezfaire](https://github.com/smtlaissezfaire)
+- [#908](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/908) Add update_payout [@espen](https://github.com/espen)
+
 ### 4.0.0 (2024-08-07)
 - [#905](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/905) Allow Stripe SDK v11 by [@stevenharman ](https://github.com/stevenharman)
 - [#830](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/830) Implement search API by [@adamstegman](https://github.com/adamstegman)
