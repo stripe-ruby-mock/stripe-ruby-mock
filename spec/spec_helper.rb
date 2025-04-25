@@ -5,6 +5,7 @@ require 'rspec'
 require 'stripe'
 require 'stripe_mock'
 require 'stripe_mock/server'
+require 'stripe_mock/compat'
 require 'dotenv'
 
 Dotenv.load('.env')

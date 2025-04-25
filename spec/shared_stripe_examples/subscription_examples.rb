@@ -203,7 +203,7 @@ shared_examples 'Customer Subscriptions with plans' do
 
       expect {
         Stripe::Subscription.create(plan: plan.id, customer: customer.id, promotion_code: promotion_code.id)
-      }.not_to raise_error(Stripe::InvalidRequestError)
+      }.not_to raise_error
     end
 
     it "does not permit both coupon and promotion code" do
