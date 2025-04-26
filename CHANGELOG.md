@@ -1,5 +1,9 @@
 ### Unreleased
 
+### 5.0.0
+- [#919](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/919) Add capabilities to mock account data [@cazwazacz](https://github.com/cazwazacz)
+- [#931](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/931) Support Stripe version 13 + 12 [@gabrieltaylor](https://github.com/gabrieltaylor)
+
 ### 4.1.0 (2025-04-24)
 - [#920](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/920) Adds DRB as a dependency in preparation to Ruby 3.4.0 [@lucascppessoa](https://github.com/lucascppessoa)
 - [#927](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/927) Allow :cancel_url nil in create Checkout Session [@shu-illy](https://github.com/shu-illy)

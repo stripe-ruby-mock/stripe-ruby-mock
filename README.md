@@ -18,6 +18,8 @@ In your gemfile:
 
 We have [changelog](https://github.com/stripe-ruby-mock/stripe-ruby-mock/blob/master/CHANGELOG.md). It's first attempt. Feel free to update it and suggest to a new format of it.
 
+version `5.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/931) - we support stripe > 5 and <= 13 for now and try to follow the newest API version.
+
 version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/658) - we support stripe > 5 and < 6 for now and try to follow the newest API version. But if you still use older versions please [read](https://github.com/stripe-ruby-mock/stripe-ruby-mock#specifications).
 
 ## Features
@@ -29,12 +31,12 @@ version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/strip
 
 ### Requirements
 
-* ruby >= 2.7.0
-* stripe > 5 & < 11
+* ruby >= 3.0.0
+* stripe > 5 & <= 13
 
 ### Specifications
 
-**STRIPE API TARGET VERSION:** 2019-08-20 (master) - we try, but some features are not implemented yet.
+**STRIPE API TARGET VERSION:** 2024-06-20 (master) - we try, but some features are not implemented yet.
 
 Older API version branches:
 
