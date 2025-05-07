@@ -1170,7 +1170,35 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(sub.billing_cycle_anchor).to be_a(Integer)
     end
 
+    it "accepts pause_collection with an explicit resumes_at set" do
+      customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
+      subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+      resumes_at = Time.now.utc.to_i + 3600
 
+      subscription.pause_collection = {
+        behavior: 'mark_uncollectible',
+        resumes_at: resumes_at
+      }
+
+      subscription.save
+
+      expect(subscription.pause_collection.behavior).to eq('mark_uncollectible')
+      expect(subscription.pause_collection.resumes_at).to eq(resumes_at)
+    end
+
+    it "accepts pause_collection without an explicit resumes_at set" do
+      customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
+      subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+
+      subscription.pause_collection = {
+        behavior: 'mark_uncollectible'
+      }
+
+      subscription.save
+
+      expect(subscription.pause_collection.behavior).to eq('mark_uncollectible')
+      expect(subscription.pause_collection.resumes_at).to be_nil
+    end
   end
 
   context "cancelling a subscription" do
