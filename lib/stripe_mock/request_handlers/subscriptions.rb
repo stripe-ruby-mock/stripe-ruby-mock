@@ -287,6 +287,10 @@ module StripeMock
           end
         end
 
+        if params[:pause_collection]
+          subscription[:pause_collection] = { resumes_at: nil }.merge(params[:pause_collection])
+        end
+
         if params[:trial_period_days]
           subscription[:status] = 'trialing'
         end
