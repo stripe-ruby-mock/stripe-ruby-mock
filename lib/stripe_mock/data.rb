@@ -420,6 +420,11 @@ module StripeMock
         cancel_at_period_end: false,
         canceled_at: nil,
         collection_method: 'charge_automatically',
+        cancellation_details: {
+          comment: nil,
+          feedback: nil,
+          reason: nil
+        },
         ended_at: nil,
         start_date: 1308595038,
         object: 'subscription',

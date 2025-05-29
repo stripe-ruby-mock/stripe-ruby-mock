@@ -1220,6 +1220,41 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(customer.subscriptions.count).to eq(0)
       expect(customer.subscriptions.data.length).to eq(0)
     end
+
+    it "supports adding a comment to cancellation_details" do
+      customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
+      subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+
+      result = Stripe::Subscription.update(
+        subscription.id,
+        cancel_at_period_end: true,
+        cancellation_details: { comment: 'Cancelled by user' }
+      )
+
+      expect(result.cancellation_details.comment).to eq('Cancelled by user')
+    end
+
+    it "supports adding feedback to cancellation_details" do
+      customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
+      subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+
+      result = Stripe::Subscription.update(
+        subscription.id,
+        cancel_at_period_end: true,
+        cancellation_details: { feedback: 'customer_service' }
+      )
+
+      expect(result.cancellation_details.feedback).to eq('customer_service')
+    end
+
+    it "raises an error if adding a comment to cancellation_details when not cancelling" do
+      customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
+      subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
+
+      expect do
+        Stripe::Subscription.update(subscription.id, cancellation_details: { comment: 'Cancelled by user' })
+      end.to raise_error Stripe::InvalidRequestError, /can only be set on subscriptions that are set to cancel./
+    end
   end
 
   it "supports 'cancelling' by updating cancel_at_period_end" do
@@ -1327,6 +1362,10 @@ shared_examples 'Customer Subscriptions with plans' do
 
     it "has a start_date attribute" do
       expect(subscription).to respond_to(:start_date)
+    end
+
+    it "has cancellation_details" do
+      expect(subscription).to respond_to(:cancellation_details)
     end
   end
 
