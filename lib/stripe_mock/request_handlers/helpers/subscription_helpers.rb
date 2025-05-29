@@ -46,6 +46,17 @@ module StripeMock
           params.merge!(cancel_at_period_end: false, canceled_at: nil)
         end
 
+        options.fetch(:cancellation_details, {}).each do |key, value|
+          next if value.nil?
+
+          if params[:cancel_at_period_end]
+            params[:cancellation_details] ||= {}
+            params[:cancellation_details][key] = value
+          else
+            raise Stripe::InvalidRequestError.new("`cancellation_details` can only be set on subscriptions that are set to cancel.", "cancellation_details", http_status: 400)
+          end
+        end
+
         # TODO: Implement coupon logic
 
         if (((plan && plan[:trial_period_days]) || 0) == 0 && options[:trial_end].nil?) || options[:trial_end] == "now"
