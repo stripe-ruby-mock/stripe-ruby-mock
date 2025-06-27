@@ -426,6 +426,7 @@ module StripeMock
           reason: nil
         },
         ended_at: nil,
+        schedule: nil,
         start_date: 1308595038,
         object: 'subscription',
         trial_start: 1308595038,
