@@ -1484,5 +1484,36 @@ module StripeMock
         success_url: 'https://example.com/success'
       }.merge(params)
     end
+
+    def self.mock_verification_session(params = {})
+      vs_id = params[:id] || "vs_test_default"
+      {
+        id: vs_id,
+        object: "identity.verification_session",
+        client_secret: "#{vs_id}_secret_#{SecureRandom.hex(8)}",
+        created: Time.now.to_i,
+        last_error: nil,
+        last_verification_report: nil,
+        livemode: false,
+        metadata: params[:metadata] || {},
+        next_action: nil,
+        options: {
+          document: {
+            allowed_types: ["driving_license", "passport", "id_card"],
+            require_id_number: false,
+            require_live_capture: false,
+            require_matching_selfie: false
+          },
+          id_number: {
+            require_id_number: false
+          }
+        },
+        redaction: nil,
+        status: "requires_input",
+        type: "document",
+        url: "https://verify.stripe.com/start/#{vs_id}",
+        verification_flow: nil
+      }.merge(params)
+    end
   end
 end
