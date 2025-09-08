@@ -3,7 +3,7 @@
 source "https://rubygems.org"
 
 gem "appraisal"
-gem "stripe", "14.0.0"
+gem "stripe", "15.5.0"
 
 group :test do
   gem "rake"

@@ -5,7 +5,7 @@ PATH
       dante (>= 0.2.0)
       drb (>= 2.0.4, < 3)
       multi_json (~> 1.0)
-      stripe (> 5, < 15)
+      stripe (> 5, < 16)
 
 GEM
   remote: https://rubygems.org/
@@ -36,7 +36,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.2)
-    stripe (14.0.0)
+    stripe (15.5.0)
     thin (1.8.2)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
@@ -52,7 +52,7 @@ DEPENDENCIES
   dotenv
   rake
   rspec (~> 3.13.0)
-  stripe (= 14.0.0)
+  stripe (= 15.5.0)
   stripe-ruby-mock!
   thin (~> 1.8.1)
 
