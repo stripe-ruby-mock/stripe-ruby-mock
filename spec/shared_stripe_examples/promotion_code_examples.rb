@@ -65,4 +65,21 @@ shared_examples "PromotionCode API" do
     expect(all.count).to eq(2)
     expect(all.map(&:code)).to include("10PERCENT", "20PERCENT")
   end
+
+  it "retrieves promotion codes with codes" do
+    promotion_codes = [
+      Stripe::PromotionCode.create({ coupon: coupon.id, code: '10PERCENT' }),
+      Stripe::PromotionCode.create({ coupon: coupon.id, code: '20PERCENT' }),
+    ]
+
+    one = Stripe::PromotionCode.list({ code: '10PERCENT' })
+    expect(one.count).to eq(1)
+    expect(one.map(&:id)).to include promotion_codes[0].id
+    expect(one.map(&:code)).to all(eq '10PERCENT')
+
+    two = Stripe::PromotionCode.list({ code: '20PERCENT' })
+    expect(two.count).to eq(1)
+    expect(two.map(&:id)).to include promotion_codes[1].id
+    expect(two.map(&:code)).to all(eq '20PERCENT')
+  end
 end
