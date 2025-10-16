@@ -36,7 +36,13 @@ module StripeMock
       end
 
       def list_promotion_code(route, method_url, params, headers)
-        Data.mock_list_object(promotion_codes.values, params)
+        promotion_code_data = promotion_codes.values
+
+        if params.key?(:code)
+          promotion_code_data.select! { |promotion_code| params[:code].downcase == promotion_code[:code].downcase }
+        end
+
+        Data.mock_list_object(promotion_code_data, params)
       end
     end
   end
