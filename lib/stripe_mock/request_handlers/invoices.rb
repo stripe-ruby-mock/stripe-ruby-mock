@@ -5,6 +5,7 @@ module StripeMock
       def Invoices.included(klass)
         klass.add_handler 'post /v1/invoices',               :new_invoice
         klass.add_handler 'get /v1/invoices/upcoming',       :upcoming_invoice
+        klass.add_handler 'post /v1/invoices/create_preview', :create_preview_invoice
         klass.add_handler 'get /v1/invoices/(.*)/lines',     :get_invoice_line_items
         klass.add_handler 'get /v1/invoices/((?!search).*)', :get_invoice
         klass.add_handler 'get /v1/invoices/search',         :search_invoices
@@ -168,6 +169,99 @@ module StripeMock
           period_start: prorating ? invoice_date : preview_subscription[:current_period_start],
           period_end: prorating ? invoice_date : preview_subscription[:current_period_end],
           next_payment_attempt: preview_subscription[:current_period_end] + 3600 )
+      end
+
+      def create_preview_invoice(route, method_url, params, headers = {})
+        stripe_account = headers && headers[:stripe_account] || Stripe.api_key
+        route =~ method_url
+        
+        # Validate required parameters
+        raise Stripe::InvalidRequestError.new('Missing required param: customer', nil, http_status: 400) if params[:customer].nil?
+        
+        customer = customers[stripe_account][params[:customer]]
+        assert_existence :customer, params[:customer], customer
+        
+        # If subscription is provided, use it as base for preview
+        subscription = nil
+        if params[:subscription]
+          subscription = customer[:subscriptions][:data].select{|s|s[:id] == params[:subscription]}.first
+          raise Stripe::InvalidRequestError.new("No such subscription: #{params[:subscription]}", nil, http_status: 404) unless subscription
+        elsif customer[:subscriptions][:data].length > 0
+          subscription = customer[:subscriptions][:data].min_by { |sub| sub[:current_period_end] }
+        end
+
+        invoice_lines = []
+        invoice_date = Time.now.to_i
+        preview_subscription = subscription
+
+        # Handle subscription items if provided
+        if params[:subscription_items] && subscription
+          # Calculate proration if needed
+          if params[:subscription_proration_date]
+            subscription_proration_date = params[:subscription_proration_date]
+
+            if !((subscription[:current_period_start]..subscription[:current_period_end]) === subscription_proration_date)
+              raise Stripe::InvalidRequestError.new('Cannot specify proration date outside of current subscription period', nil, http_status: 400)
+            end
+
+            # Add proration line items
+            plan_amount = subscription[:plan][:amount] || subscription[:plan][:unit_amount]
+            unused_amount = (
+              plan_amount.to_f *
+                subscription[:quantity] *
+                (subscription[:current_period_end] - subscription_proration_date.to_i) / (subscription[:current_period_end] - subscription[:current_period_start])
+              ).ceil
+
+            invoice_lines << Data.mock_line_item(
+              id: new_id('ii'),
+              amount: -unused_amount,
+              description: 'Unused time',
+              plan: subscription[:plan],
+              period: {
+                start: subscription_proration_date.to_i,
+                end: subscription[:current_period_end]
+              },
+              quantity: subscription[:quantity],
+              proration: true
+            )
+          end
+        end
+
+        # Add subscription line if subscription exists
+        if preview_subscription
+          subscription_line = get_mock_subscription_line_item(preview_subscription)
+          invoice_lines << subscription_line
+        end
+
+        # Add invoice items if provided
+        if params[:invoice_items]
+          params[:invoice_items].each do |item|
+            invoice_lines << Data.mock_line_item(
+              id: new_id('ii'),
+              amount: item[:amount] || 0,
+              description: item[:description] || 'Invoice item',
+              quantity: item[:quantity] || 1
+            )
+          end
+        end
+
+        # If no line items were added, add a default one
+        if invoice_lines.empty?
+          invoice_lines << Data.mock_line_item()
+        end
+
+        # Build preview invoice
+        Data.mock_invoice(invoice_lines,
+                          id: new_id('in'),
+                          customer: customer[:id],
+                        discount: customer[:discount],
+                        created: invoice_date,
+                        starting_balance: customer[:account_balance],
+                        subscription: preview_subscription ? preview_subscription[:id] : nil,
+                        period_start: preview_subscription ? preview_subscription[:current_period_start] : invoice_date,
+                        period_end: preview_subscription ? preview_subscription[:current_period_end] : invoice_date,
+                        next_payment_attempt: preview_subscription ? preview_subscription[:current_period_end] + 3600 : invoice_date + 3600
+        )
       end
 
       private

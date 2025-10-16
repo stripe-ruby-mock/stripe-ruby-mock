@@ -629,4 +629,139 @@ shared_examples 'Invoice API' do
     end
 
   end
+
+  context "creating a preview invoice" do
+    let(:customer) { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
+    let(:product)  { stripe_helper.create_product(id: "prod_preview") }
+    let(:plan)     { stripe_helper.create_plan(id: 'preview_plan', product: product.id, amount: 50_00, interval: 'month', currency: 'usd') }
+    
+    before(with_customer: true) { customer }
+    before(with_plan: true) { plan }
+
+    describe 'parameter validation' do
+      it 'fails without required customer parameter' do
+        expect { Stripe::Invoice.create_preview() }.to raise_error do |e|
+          expect(e).to be_a(Stripe::InvalidRequestError)
+          expect(e.http_status).to eq(400)
+          expect(e.message).to eq('Missing required param: customer')
+        end
+      end
+
+      it 'fails with invalid customer' do
+        expect { Stripe::Invoice.create_preview(customer: 'nonexistent') }.to raise_error do |e|
+          expect(e).to be_a(Stripe::InvalidRequestError)
+          expect(e.message).to eq('No such customer: nonexistent')
+        end
+      end
+    end
+
+    describe 'basic preview creation' do
+      it 'creates a preview invoice for a customer without subscription', with_customer: true do
+        preview = Stripe::Invoice.create_preview(customer: customer.id)
+
+        expect(preview).to be_a(Stripe::Invoice)
+        expect(preview.id).to match(/^test_in/)
+        expect(preview.customer).to eq(customer.id)
+        expect(preview.lines.data.length).to be > 0
+      end
+
+      it 'does not store the preview invoice in memory', with_customer: true do
+        preview = Stripe::Invoice.create_preview(customer: customer.id)
+        data = test_data_source(:invoices)
+        expect(data[preview.id]).to be_nil
+      end
+    end
+
+    describe 'with subscription' do
+      let(:subscription) { Stripe::Subscription.create(plan: plan.id, customer: customer.id) }
+
+      before(with_subscription: true) { subscription }
+
+      it 'creates a preview with existing subscription', with_subscription: true do
+        preview = Stripe::Invoice.create_preview(
+          customer: customer.id,
+          subscription: subscription.id
+        )
+
+        expect(preview).to be_a(Stripe::Invoice)
+        expect(preview.customer).to eq(customer.id)
+        expect(preview.subscription).to eq(subscription.id)
+        expect(preview.lines.data.length).to be > 0
+      end
+
+      it 'fails with non-existent subscription', with_customer: true do
+        expect { 
+          Stripe::Invoice.create_preview(
+            customer: customer.id,
+            subscription: 'sub_nonexistent'
+          )
+        }.to raise_error do |e|
+          expect(e).to be_a(Stripe::InvalidRequestError)
+          expect(e.http_status).to eq(404)
+          expect(e.message).to eq('No such subscription: sub_nonexistent')
+        end
+      end
+    end
+
+    describe 'with invoice items' do
+      it 'includes custom invoice items in the preview', with_customer: true do
+        preview = Stripe::Invoice.create_preview(
+          customer: customer.id,
+          invoice_items: [
+            { amount: 1000, description: 'Custom item 1', quantity: 1 },
+            { amount: 2000, description: 'Custom item 2', quantity: 2 }
+          ]
+        )
+
+        expect(preview).to be_a(Stripe::Invoice)
+        expect(preview.customer).to eq(customer.id)
+        expect(preview.lines.data.length).to be >= 2
+      end
+    end
+
+    describe 'with proration' do
+      let(:subscription) { Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: 1) }
+
+      before(with_subscription: true) { subscription }
+
+      it 'creates preview with proration date within subscription period', with_subscription: true do
+        proration_date = Time.now + 5 * 24 * 3600 # 5 days later
+
+        preview = Stripe::Invoice.create_preview(
+          customer: customer.id,
+          subscription: subscription.id,
+          subscription_proration_date: proration_date.to_i,
+          subscription_items: [
+            { plan: plan.id, quantity: 1 }
+          ]
+        )
+
+        expect(preview).to be_a(Stripe::Invoice)
+        expect(preview.customer).to eq(customer.id)
+        expect(preview.subscription).to eq(subscription.id)
+        # Should include proration line items
+        proration_lines = preview.lines.data.select { |line| line.proration }
+        expect(proration_lines.length).to be > 0
+      end
+
+      it 'fails with proration date outside subscription period', with_subscription: true do
+        proration_date = subscription.current_period_end + 1000
+
+        expect {
+          Stripe::Invoice.create_preview(
+            customer: customer.id,
+            subscription: subscription.id,
+            subscription_proration_date: proration_date,
+            subscription_items: [
+              { plan: plan.id, quantity: 1 }
+            ]
+          )
+        }.to raise_error do |e|
+          expect(e).to be_a(Stripe::InvalidRequestError)
+          expect(e.http_status).to eq(400)
+          expect(e.message).to eq('Cannot specify proration date outside of current subscription period')
+        end
+      end
+    end
+  end
 end
