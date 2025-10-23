@@ -22,7 +22,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ['lib']
 
-  gem.add_dependency 'stripe', '> 5', '< 14'
+  gem.add_dependency 'stripe', '> 5', '< 16'
   # logger is a dependency of stripe, but was removed from the
   # default gems in ruby 4 and only added explicitly to stripe in v19.
   gem.add_dependency 'logger'
