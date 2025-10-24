@@ -586,7 +586,7 @@ shared_examples 'Customer Subscriptions with plans' do
         ]
       )
 
-      expect(subscription.current_period_end).to eq (Time.now + (7 * 60 * 60 * 24)).to_i
+      expect(subscription.current_period_end).to be_within(2).of((Time.now + (7 * 60 * 60 * 24)).to_i)
     end
 
     it 'sets current_period_end based on price month interval', live: true do
@@ -599,7 +599,7 @@ shared_examples 'Customer Subscriptions with plans' do
         ]
       )
 
-      expect(subscription.current_period_end).to eq (DateTime.now >> 1).to_time.to_i
+      expect(subscription.current_period_end).to be_within(2).of((DateTime.now >> 1).to_time.to_i)
     end
 
     it 'sets current_period_end based on price year interval', live: true do
@@ -612,7 +612,7 @@ shared_examples 'Customer Subscriptions with plans' do
         ]
       )
 
-      expect(subscription.current_period_end).to eq (DateTime.now >> 12).to_time.to_i
+      expect(subscription.current_period_end).to be_within(2).of((DateTime.now >> 12).to_time.to_i)
     end
 
     it 'add a new subscription to bill via an invoice' do

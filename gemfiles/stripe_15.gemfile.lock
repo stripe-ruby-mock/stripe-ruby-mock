@@ -36,7 +36,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.6)
-    stripe (12.6.0)
+    stripe (15.3.0)
     thin (1.8.2)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
@@ -44,17 +44,17 @@ GEM
     thor (1.4.0)
 
 PLATFORMS
+  arm64-darwin-23
   ruby
-  x86_64-darwin-22
 
 DEPENDENCIES
   appraisal
   dotenv
   rake
   rspec (~> 3.13.0)
-  stripe (= 12.6.0)
+  stripe (= 15.3.0)
   stripe-ruby-mock!
   thin (~> 1.8.1)
 
 BUNDLED WITH
-   2.6.8
+   2.6.6
