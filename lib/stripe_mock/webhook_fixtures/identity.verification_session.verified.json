@@ -1,0 +1,42 @@
+{
+  "id": "evt_1F96eK2aLAadsDqo0AVIyPmC",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1566204936,
+  "data": {
+    "object": {
+      "id": "vs_1F96eK2aLAadsDqo0AVIyPmC",
+      "object": "identity.verification_session",
+      "client_secret": "vs_1F96eK2aLAadsDqo0AVIyPmC_secret_FePTYgOoPFxDOUL53fFMSoTAyiXsWAV",
+      "created": 1566204936,
+      "last_error": null,
+      "last_verification_report": "vr_1F96eK2aLAadsDqo0AVIyPmC",
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "options": {
+        "document": {
+          "allowed_types": ["driving_license", "passport", "id_card"],
+          "require_id_number": false,
+          "require_live_capture": false,
+          "require_matching_selfie": false
+        },
+        "id_number": {
+          "require_id_number": false
+        }
+      },
+      "redaction": null,
+      "status": "verified",
+      "type": "document",
+      "url": "https://verify.stripe.com/start/vs_1F96eK2aLAadsDqo0AVIyPmC",
+      "verification_flow": null
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": "req_1F96eK2aLAadsDqo0AVIyPmC",
+    "idempotency_key": null
+  },
+  "type": "identity.verification_session.verified"
+} 
