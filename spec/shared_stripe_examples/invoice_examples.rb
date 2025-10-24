@@ -210,7 +210,10 @@ shared_examples 'Invoice API' do
     end
   end
 
-  context "retrieving upcoming invoice" do
+  # Note: Invoice.upcoming was removed in Stripe 14.0.0
+  # https://github.com/stripe/stripe-ruby/blob/master/CHANGELOG.md#1400---2025-04-01
+  # Use Invoice.create_preview instead
+  context "retrieving upcoming invoice", skip: (Gem::Version.new(Stripe::VERSION) >= Gem::Version.new('14.0.0')) do
     let(:customer)      { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
     let(:coupon_amtoff) { stripe_helper.create_coupon(id: '100OFF', currency: 'usd', amount_off: 100_00, duration: 'repeating', duration_in_months: 6) }
     let(:coupon_pctoff) { stripe_helper.create_coupon(id: '50OFF', currency: 'usd', percent_off: 50, amount_off: nil, duration: 'repeating', duration_in_months: 6) }
