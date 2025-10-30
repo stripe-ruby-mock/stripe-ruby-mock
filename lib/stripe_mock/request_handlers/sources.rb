@@ -55,7 +55,6 @@ module StripeMock
         bank_account = assert_existence :bank_account, $2, verify_bank_account(customer, $2)
         bank_account
       end
-
     end
   end
 end
