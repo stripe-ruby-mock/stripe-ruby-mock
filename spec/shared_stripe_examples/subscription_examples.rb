@@ -4,6 +4,23 @@ require 'securerandom'
 shared_examples 'Customer Subscriptions with plans' do
   let(:gen_card_tk) { stripe_helper.generate_card_token }
 
+  # Stripe v6 uses #delete, v7+ uses #cancel
+  def cancel_subscription(sub, **opts)
+    if sub.respond_to?(:cancel)
+      sub.cancel(**opts)
+    else
+      sub.delete(**opts)
+    end
+  end
+
+  def cancel_subscription_by_id(id)
+    if Stripe::Subscription.respond_to?(:cancel)
+      Stripe::Subscription.cancel(id)
+    else
+      Stripe::Subscription.delete(id)
+    end
+  end
+
   let(:product) { stripe_helper.create_product }
   let(:plan_attrs) { {id: 'silver', product: product.id, amount: 4999, currency: 'usd'} }
   let(:plan) { stripe_helper.create_plan(plan_attrs) }
@@ -687,7 +704,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
 
       sub = Stripe::Subscription.create({ items: { '0' => { plan: 'silver' } }, customer: customer.id })
-      sub.cancel(at_period_end: true)
+      cancel_subscription(sub, at_period_end: true)
 
       expect(sub.cancel_at_period_end).to be_truthy
       expect(sub.save).to be_truthy
@@ -752,7 +769,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
 
       subscription = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
-      subscription.cancel
+      cancel_subscription(subscription)
 
       expect { subscription.save }.to raise_error { |e|
         expect(e).to be_a(Stripe::InvalidRequestError)
@@ -765,7 +782,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk)
 
       sub = Stripe::Subscription.create({ items: [ { plan: plan.id } ], customer: customer.id })
-      sub.cancel(at_period_end: true)
+      cancel_subscription(sub, at_period_end: true)
 
       expect(sub.cancel_at_period_end).to be_truthy
       expect(sub.save).to be_truthy
@@ -1208,7 +1225,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(source: gen_card_tk, plan: plan.id)
 
       sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
-      result = sub.cancel
+      result = cancel_subscription(sub)
 
       expect(result.status).to eq('canceled')
       expect(result.cancel_at_period_end).to eq false
@@ -1310,7 +1327,7 @@ shared_examples 'Customer Subscriptions with plans' do
     customer = Stripe::Customer.create(id: 'test_customer_sub', source: gen_card_tk, plan: "trial")
 
     sub = Stripe::Subscription.retrieve(customer.subscriptions.data.first.id)
-    result = sub.cancel(at_period_end: true)
+    result = cancel_subscription(sub, at_period_end: true)
 
     expect(result.status).to eq('trialing')
 
@@ -1398,7 +1415,7 @@ shared_examples 'Customer Subscriptions with plans' do
     it "does not include canceled subscriptions by default" do
       customer = Stripe::Customer.create(source: gen_card_tk)
       subscription = Stripe::Subscription.create({ plan: plan.id, customer: customer.id })
-      subscription.cancel
+      cancel_subscription(subscription)
 
       list = Stripe::Subscription.list({customer: customer.id})
 
@@ -1507,7 +1524,7 @@ shared_examples 'Customer Subscriptions with plans' do
       customer = Stripe::Customer.create(email: 'johnny@appleseed.com', source: gen_card_tk)
       one = Stripe::Subscription.create(customer: customer.id, items: [{plan: "Sample5"}], metadata: {key: 'uno'})
       two = Stripe::Subscription.create(customer: customer.id, items: [{plan: "Sample5"}], metadata: {key: 'dos'})
-      Stripe::Subscription.cancel(two.id)
+      cancel_subscription_by_id(two.id)
 
       response = Stripe::Subscription.search({query: 'status:"active"'}, stripe_version: '2020-08-27')
       expect(response.data.map(&:id)).to match_array([one.id])
