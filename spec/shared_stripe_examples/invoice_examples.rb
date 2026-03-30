@@ -235,10 +235,10 @@ shared_examples 'Invoice API' do
 
     describe 'parameter validation' do
       it 'fails without parameters' do
-        expect { Stripe::Invoice.upcoming() }.to raise_error {|e|
+        expect { Stripe::Invoice.upcoming({}) }.to raise_error {|e|
         expect(e).to be_a(Stripe::InvalidRequestError)
         expect(e.http_status).to eq(400)
-        expect(e.message).to eq('Missing required param: customer if subscription is not provided') 
+        expect(e.message).to eq('Missing required param: customer if subscription is not provided')
       }
       end
 
