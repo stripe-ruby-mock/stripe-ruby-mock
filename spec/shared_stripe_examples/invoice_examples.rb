@@ -630,7 +630,7 @@ shared_examples 'Invoice API' do
 
   end
 
-  context "creating a preview invoice" do
+  context "creating a preview invoice", skip: !Stripe::Invoice.respond_to?(:create_preview) && "Stripe::Invoice.create_preview not available in stripe #{Stripe::VERSION}" do
     let(:customer) { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
     let(:product)  { stripe_helper.create_product(id: "prod_preview") }
     let(:plan)     { stripe_helper.create_plan(id: 'preview_plan', product: product.id, amount: 50_00, interval: 'month', currency: 'usd') }
