@@ -220,6 +220,7 @@ module StripeMock
         livemode: false,
         paid: true,
         amount: 0,
+        amount_captured: params.has_key?(:capture) && !params[:capture] ? 0 : (params[:amount] || 0),
         application_fee: nil,
         application_fee_amount: nil,
         currency: currency,
