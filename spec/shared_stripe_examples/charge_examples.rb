@@ -81,6 +81,9 @@ shared_examples 'Charge API' do
     expect(charge.outcome.type).to eq('authorized')
     expect(charge.outcome.seller_message).to eq('Payment complete.')
     expect(charge.outcome.risk_level).to eq('normal')
+    expect(charge.payment_method).to match(/^test_pm/)
+    expect(charge.receipt_url).to include('https://pay.stripe.com/receipts/')
+    expect(charge.statement_descriptor).to be_nil
   end
 
   it "creates a stripe charge item with a bank token" do

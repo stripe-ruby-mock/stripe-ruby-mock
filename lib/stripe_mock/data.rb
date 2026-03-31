@@ -278,7 +278,7 @@ module StripeMock
         review: nil,
         shipping: {},
         source_transfer: nil,
-        statement_descriptor: "Charge #{charge_id}",
+        statement_descriptor: nil,
         statement_descriptor_suffix: nil,
         status: 'succeeded',
         source: {
