@@ -239,6 +239,7 @@ module StripeMock
         calculated_statement_descriptor: nil,
         currency: currency,
         destination: nil,
+        disputed: false,
         fraud_details: {},
         payment_method_details: {
           card: {
@@ -261,12 +262,24 @@ module StripeMock
           },
           type: "card"
         },
+        on_behalf_of: nil,
+        outcome: {
+          network_status: "approved_by_network",
+          reason: nil,
+          risk_level: "normal",
+          risk_score: 0,
+          seller_message: "Payment complete.",
+          type: "authorized"
+        },
         receipt_email: nil,
         receipt_number: nil,
-        receipt_url: nil,
+        receipt_url: "https://pay.stripe.com/receipts/test_#{charge_id}",
         refunded: false,
+        review: nil,
         shipping: {},
+        source_transfer: nil,
         statement_descriptor: "Charge #{charge_id}",
+        statement_descriptor_suffix: nil,
         status: 'succeeded',
         source: {
           object: "card",

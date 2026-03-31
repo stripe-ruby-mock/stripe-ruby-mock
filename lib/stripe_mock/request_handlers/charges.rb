@@ -197,6 +197,12 @@ module StripeMock
         end
         allowed << :billing_details if params.has_key?(:billing_details)
         allowed << :calculated_statement_descriptor if params.has_key?(:calculated_statement_descriptor)
+        allowed << :outcome if params.has_key?(:outcome) && (params[:outcome].nil? || params[:outcome].empty?)
+        allowed << :on_behalf_of if params.has_key?(:on_behalf_of)
+        allowed << :review if params.has_key?(:review)
+        allowed << :source_transfer if params.has_key?(:source_transfer)
+        allowed << :statement_descriptor_suffix if params.has_key?(:statement_descriptor_suffix)
+        allowed << :receipt_url if params.has_key?(:receipt_url)
 
         allowed
       end

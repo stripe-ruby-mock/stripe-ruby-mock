@@ -77,6 +77,10 @@ shared_examples 'Charge API' do
     expect(charge.billing_details.email).to be_nil
     expect(charge.billing_details.name).to be_nil
     expect(charge.billing_details.phone).to be_nil
+    expect(charge.outcome.network_status).to eq('approved_by_network')
+    expect(charge.outcome.type).to eq('authorized')
+    expect(charge.outcome.seller_message).to eq('Payment complete.')
+    expect(charge.outcome.risk_level).to eq('normal')
   end
 
   it "creates a stripe charge item with a bank token" do
