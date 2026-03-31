@@ -291,6 +291,9 @@ module StripeMock
         invoice: nil,
         description: nil,
         dispute: nil,
+        disputed: false,
+        payment_intent: nil,
+        payment_method: nil,
         metadata: {
         }
       }.merge(params)
