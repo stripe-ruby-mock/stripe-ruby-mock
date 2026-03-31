@@ -73,6 +73,10 @@ shared_examples 'Charge API' do
     expect(charge.description).to eq('card charge')
     expect(charge.captured).to eq(true)
     expect(charge.status).to eq('succeeded')
+    expect(charge.billing_details.address.city).to be_nil
+    expect(charge.billing_details.email).to be_nil
+    expect(charge.billing_details.name).to be_nil
+    expect(charge.billing_details.phone).to be_nil
   end
 
   it "creates a stripe charge item with a bank token" do

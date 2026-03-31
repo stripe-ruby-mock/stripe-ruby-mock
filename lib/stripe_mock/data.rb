@@ -223,6 +223,20 @@ module StripeMock
         amount_captured: params.has_key?(:capture) && !params[:capture] ? 0 : (params[:amount] || 0),
         application_fee: nil,
         application_fee_amount: nil,
+        billing_details: {
+          address: {
+            city: nil,
+            country: nil,
+            line1: nil,
+            line2: nil,
+            postal_code: nil,
+            state: nil
+          },
+          email: nil,
+          name: nil,
+          phone: nil
+        },
+        calculated_statement_descriptor: nil,
         currency: currency,
         destination: nil,
         fraud_details: {},

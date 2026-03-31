@@ -195,6 +195,8 @@ module StripeMock
            params[:payment_method_details][:card].has_key?(:checks) && params[:payment_method_details][:card][:checks].empty?))
           allowed << :payment_method_details
         end
+        allowed << :billing_details if params.has_key?(:billing_details)
+        allowed << :calculated_statement_descriptor if params.has_key?(:calculated_statement_descriptor)
 
         allowed
       end
