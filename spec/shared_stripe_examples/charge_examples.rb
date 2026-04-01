@@ -269,6 +269,7 @@ shared_examples 'Charge API' do
     updated = Stripe::Charge.retrieve(original.id)
 
     updated.description = "Netflix"
+    updated.fraud_details = {"user_report" => "safe"}
     updated.receipt_email = 'tom@example.com'
     updated.statement_descriptor = 'NETFLIX.COM CA Subscription'
 
@@ -277,6 +278,9 @@ shared_examples 'Charge API' do
     expect(updated.description).to eq('Netflix')
     expect(updated.receipt_email).to eq('tom@example.com')
     expect(updated.statement_descriptor).to eq('NETFLIX.COM CA Subscription')
+    expect(updated.fraud_details).to eq({
+      'user_report' => 'safe'
+    })
   end
 
   it "updates a stripe charge with no changes" do
