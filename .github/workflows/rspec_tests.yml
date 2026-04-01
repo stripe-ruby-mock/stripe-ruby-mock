@@ -23,20 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         ruby: ["3.1", "3.2", "3.3"]
-        gemfile: ["stripe_12", "stripe_13"]
-        include:
-          - ruby: "3.3"
-            gemfile: "stripe_6"
-          - ruby: "3.3"
-            gemfile: "stripe_7"
-          - ruby: "3.3"
-            gemfile: "stripe_8"
-          - ruby: "3.3"
-            gemfile: "stripe_9"
-          - ruby: "3.3"
-            gemfile: "stripe_10"
-          - ruby: "3.3"
-            gemfile: "stripe_11"
+        gemfile: ["stripe_6", "stripe_7", "stripe_8", "stripe_9", "stripe_10", "stripe_11", "stripe_12", "stripe_13"]
     env:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/${{ matrix.gemfile }}.gemfile
     steps:
