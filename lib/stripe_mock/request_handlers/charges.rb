@@ -53,7 +53,8 @@ module StripeMock
 
         charges[id] = Data.mock_charge(
             params.merge :id => id,
-            :balance_transaction => balance_transaction_id)
+            :balance_transaction => balance_transaction_id,
+            :payment_method => params[:payment_method] || new_id('pm'))
 
         charge = charges[id].clone
         if params[:expand] == ['balance_transaction']
