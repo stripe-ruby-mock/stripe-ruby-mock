@@ -237,7 +237,7 @@ module StripeMock
           phone: nil,
           tax_id: nil
         },
-        calculated_statement_descriptor: nil,
+        calculated_statement_descriptor: "Stripe",
         currency: currency,
         destination: nil,
         fraud_details: {},
