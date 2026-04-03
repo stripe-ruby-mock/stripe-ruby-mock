@@ -327,6 +327,8 @@ module StripeMock
         disputed: false,
         payment_intent: nil,
         payment_method: nil,
+        transfer_data: nil,
+        transfer_group: nil,
         metadata: {
         }
       }.merge(params)

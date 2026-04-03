@@ -92,6 +92,8 @@ shared_examples 'Charge API' do
     expect(charge.calculated_statement_descriptor).to eq('Stripe')
     expect(charge.shipping).to be_nil
     expect(charge.statement_descriptor).to be_nil
+    expect(charge.transfer_data).to be_nil
+    expect(charge.transfer_group).to be_nil
   end
 
   it "creates a stripe charge item with a bank token" do
