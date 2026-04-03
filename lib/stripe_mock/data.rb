@@ -264,6 +264,9 @@ module StripeMock
         },
         on_behalf_of: nil,
         outcome: {
+          advice_code: nil,
+          network_advice_code: nil,
+          network_decline_code: nil,
           network_status: "approved_by_network",
           reason: nil,
           risk_level: "normal",
