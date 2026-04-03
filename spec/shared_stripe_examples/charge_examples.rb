@@ -85,6 +85,7 @@ shared_examples 'Charge API' do
     expect(charge.payment_method).to match(/^test_pm/)
     expect(charge.receipt_url).to include('https://pay.stripe.com/receipts/')
     expect(charge.calculated_statement_descriptor).to eq('Stripe')
+    expect(charge.shipping).to be_nil
     expect(charge.statement_descriptor).to be_nil
   end
 

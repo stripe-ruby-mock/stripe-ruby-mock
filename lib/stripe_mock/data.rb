@@ -276,7 +276,7 @@ module StripeMock
         receipt_url: "https://pay.stripe.com/receipts/test_#{charge_id}",
         refunded: false,
         review: nil,
-        shipping: {},
+        shipping: nil,
         source_transfer: nil,
         statement_descriptor: nil,
         statement_descriptor_suffix: nil,
