@@ -77,6 +77,7 @@ shared_examples 'Charge API' do
     expect(charge.billing_details.email).to be_nil
     expect(charge.billing_details.name).to be_nil
     expect(charge.billing_details.phone).to be_nil
+    expect(charge.billing_details.tax_id).to be_nil
     expect(charge.outcome.network_status).to eq('approved_by_network')
     expect(charge.outcome.type).to eq('authorized')
     expect(charge.outcome.seller_message).to eq('Payment complete.')

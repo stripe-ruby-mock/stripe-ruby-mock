@@ -234,7 +234,8 @@ module StripeMock
           },
           email: nil,
           name: nil,
-          phone: nil
+          phone: nil,
+          tax_id: nil
         },
         calculated_statement_descriptor: nil,
         currency: currency,
