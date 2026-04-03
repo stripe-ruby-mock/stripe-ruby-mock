@@ -315,6 +315,7 @@ module StripeMock
         },
         transfer: nil,
         balance_transaction: params[:balance_transaction] || "txn_2dyYXXP90MN26R",
+        failure_balance_transaction: nil,
         failure_message: nil,
         failure_code: nil,
         amount_refunded: 0,

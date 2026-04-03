@@ -85,6 +85,7 @@ shared_examples 'Charge API' do
     expect(charge.outcome.type).to eq('authorized')
     expect(charge.outcome.seller_message).to eq('Payment complete.')
     expect(charge.outcome.risk_level).to eq('normal')
+    expect(charge.failure_balance_transaction).to be_nil
     expect(charge.payment_method).to match(/^test_pm/)
     expect(charge.receipt_url).to include('https://pay.stripe.com/receipts/')
     expect(charge.calculated_statement_descriptor).to eq('Stripe')
