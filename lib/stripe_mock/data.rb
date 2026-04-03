@@ -321,6 +321,7 @@ module StripeMock
         amount_refunded: 0,
         customer: nil,
         invoice: nil,
+        order: nil,
         description: nil,
         dispute: nil,
         disputed: false,
