@@ -1449,8 +1449,13 @@ shared_examples 'Customer Subscriptions with plans' do
       list = Stripe::Subscription.list({ current_period_end: { lte: subscription1.current_period_end }})
       expect(list.data).to contain_exactly(subscription1)
 
+      # subscription1 and subscription2 are created moments apart, so in some test runs have
+      # slightly different start times. Query by each start time in case they are different.
       list = Stripe::Subscription.list({ current_period_start: subscription1.current_period_start })
-      expect(list.data).to contain_exactly(subscription1, subscription2)
+      expect(list.data).to include(subscription1)
+
+      list = Stripe::Subscription.list({ current_period_start: subscription2.current_period_start })
+      expect(list.data).to include(subscription2)
 
       list = Stripe::Subscription.list({ current_period_end: subscription2.current_period_end })
       expect(list.data).to contain_exactly(subscription2)
