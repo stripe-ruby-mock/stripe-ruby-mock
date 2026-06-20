@@ -11,7 +11,7 @@ module StripeMock
       fixture_file = File.join(@webhook_fixture_fallback_path, "#{type}.json")
     end
 
-    json = MultiJson.load  File.read(fixture_file)
+    json = MultiJSON.parse  File.read(fixture_file)
 
     json = Stripe::Util.symbolize_names(json)
     params = Stripe::Util.symbolize_names(params)

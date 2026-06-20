@@ -16,32 +16,33 @@ GEM
       thor (>= 0.14.0)
     daemons (1.4.1)
     dante (0.2.0)
-    diff-lcs (1.6.1)
-    dotenv (2.8.1)
-    drb (2.2.1)
+    diff-lcs (1.6.2)
+    dotenv (3.2.0)
+    drb (2.2.3)
     eventmachine (1.2.7)
-    multi_json (1.15.0)
-    rack (2.2.13)
-    rake (13.2.1)
-    rspec (3.13.0)
+    logger (1.7.0)
+    multi_json (1.21.1)
+    rack (2.2.23)
+    rake (13.4.2)
+    rspec (3.13.2)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
       rspec-mocks (~> 3.13.0)
-    rspec-core (3.13.3)
+    rspec-core (3.13.6)
       rspec-support (~> 3.13.0)
-    rspec-expectations (3.13.3)
+    rspec-expectations (3.13.5)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-mocks (3.13.2)
+    rspec-mocks (3.13.8)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-support (3.13.2)
+    rspec-support (3.13.7)
     stripe (12.6.0)
     thin (1.8.2)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
       rack (>= 1, < 3)
-    thor (1.3.2)
+    thor (1.5.0)
 
 PLATFORMS
   ruby
@@ -50,6 +51,7 @@ PLATFORMS
 DEPENDENCIES
   appraisal
   dotenv
+  logger
   rake
   rspec (~> 3.13.0)
   stripe (= 12.6.0)
