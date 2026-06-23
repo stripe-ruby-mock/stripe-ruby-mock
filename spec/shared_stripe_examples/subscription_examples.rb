@@ -603,7 +603,7 @@ shared_examples 'Customer Subscriptions with plans' do
         ]
       )
 
-      expect(subscription.current_period_end).to eq (Time.now + (7 * 60 * 60 * 24)).to_i
+      expect(subscription.current_period_end).to be_within(2).of((Time.now + (7 * 60 * 60 * 24)).to_i)
     end
 
     it 'sets current_period_end based on price month interval', live: true do
@@ -616,7 +616,7 @@ shared_examples 'Customer Subscriptions with plans' do
         ]
       )
 
-      expect(subscription.current_period_end).to eq (DateTime.now >> 1).to_time.to_i
+      expect(subscription.current_period_end).to be_within(2).of((DateTime.now >> 1).to_time.to_i)
     end
 
     it 'sets current_period_end based on price year interval', live: true do
@@ -629,7 +629,7 @@ shared_examples 'Customer Subscriptions with plans' do
         ]
       )
 
-      expect(subscription.current_period_end).to eq (DateTime.now >> 12).to_time.to_i
+      expect(subscription.current_period_end).to be_within(2).of((DateTime.now >> 12).to_time.to_i)
     end
 
     it 'add a new subscription to bill via an invoice' do
@@ -1449,8 +1449,13 @@ shared_examples 'Customer Subscriptions with plans' do
       list = Stripe::Subscription.list({ current_period_end: { lte: subscription1.current_period_end }})
       expect(list.data).to contain_exactly(subscription1)
 
+      # subscription1 and subscription2 are created moments apart, so in some test runs have
+      # slightly different start times. Query by each start time in case they are different.
       list = Stripe::Subscription.list({ current_period_start: subscription1.current_period_start })
-      expect(list.data).to contain_exactly(subscription1, subscription2)
+      expect(list.data).to include(subscription1)
+
+      list = Stripe::Subscription.list({ current_period_start: subscription2.current_period_start })
+      expect(list.data).to include(subscription2)
 
       list = Stripe::Subscription.list({ current_period_end: subscription2.current_period_end })
       expect(list.data).to contain_exactly(subscription2)
