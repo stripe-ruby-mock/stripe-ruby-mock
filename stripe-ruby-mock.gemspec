@@ -23,6 +23,9 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
 
   gem.add_dependency 'stripe', '> 5', '< 14'
+  # logger is a dependency of stripe, but was removed from the
+  # default gems in ruby 4 and only added explicitly to stripe in v19.
+  gem.add_dependency 'logger'
   gem.add_dependency 'multi_json', '~> 1.0'
   gem.add_dependency 'dante', '>= 0.2.0'
   gem.add_dependency 'drb', '>= 2.0.4', '< 3'
