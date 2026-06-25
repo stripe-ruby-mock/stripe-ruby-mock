@@ -246,19 +246,41 @@ shared_examples 'Charge API' do
       description: 'Original description',
     })
     charge = Stripe::Charge.retrieve(original.id)
-
-    charge.description = "Updated description"
-    charge.metadata[:receipt_id] = 1234
-    charge.receipt_email = "newemail@email.com"
-    charge.fraud_details = {"user_report" => "safe"}
     charge.save
+
+    expect(charge.amount_captured).to eq(1099)
+    expect(charge.amount_refunded).to eq(1099)
+    expect(charge.balance_transaction).to eq('txn_1LxzKvJrL4BQxxcUR1DRp48I')
+    expect(charge.calculated_statement_descriptor).to eq('EXAMPLECOMPANY')
+    expect(charge.description).to eq('Test Charge')
+    expect(charge.fraud_details.to_hash).to eq({})
+
+    expect(charge.metadata.to_hash).to eq({})
+    
+    expect(charge.receipt_email).to eq(nil)
+    expect(charge.receipt_number).to eq(nil)
+    expect(charge.receipt_url).to eq(nil)
+    expect(charge.refunded).to eq(false)
+
+    expect(charge.shipping).to eq(nil)
+    expect(charge.statement_descriptor).to eq(nil)
+    expect(charge.status).to eq('succeeded')
 
     updated = Stripe::Charge.retrieve(original.id)
 
-    expect(updated.description).to eq(charge.description)
-    expect(updated.metadata.to_hash).to eq(charge.metadata.to_hash)
-    expect(updated.receipt_email).to eq(charge.receipt_email)
-    expect(updated.fraud_details.to_hash).to eq(charge.fraud_details.to_hash)
+    updated.description = "Netflix"
+    updated.fraud_details = {"user_report" => "safe"}
+    updated.receipt_email = 'tom@example.com'
+    updated.statement_descriptor = 'NETFLIX.COM CA Subscription'
+
+    updated.save
+
+    expect(updated.description).to eq('Netflix')
+    expect(updated.receipt_email).to eq('tom@example.com')
+    expect(updated.statement_descriptor).to eq('NETFLIX.COM CA Subscription')
+    expect(updated.fraud_details).to eq({
+      'user_report' => 'safe'
+    })
   end
 
   it "updates a stripe charge with no changes" do
