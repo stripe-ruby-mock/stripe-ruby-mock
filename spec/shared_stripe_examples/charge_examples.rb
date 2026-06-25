@@ -69,9 +69,31 @@ shared_examples 'Charge API' do
 
     expect(charge.id).to match(/^test_ch/)
     expect(charge.amount).to eq(999)
+    expect(charge.amount_captured).to eq(999)
     expect(charge.description).to eq('card charge')
     expect(charge.captured).to eq(true)
     expect(charge.status).to eq('succeeded')
+    expect(charge.billing_details.address.city).to be_nil
+    expect(charge.billing_details.email).to be_nil
+    expect(charge.billing_details.name).to be_nil
+    expect(charge.billing_details.phone).to be_nil
+    expect(charge.billing_details.tax_id).to be_nil
+    expect(charge.outcome.advice_code).to be_nil
+    expect(charge.outcome.network_advice_code).to be_nil
+    expect(charge.outcome.network_decline_code).to be_nil
+    expect(charge.outcome.network_status).to eq('approved_by_network')
+    expect(charge.outcome.type).to eq('authorized')
+    expect(charge.outcome.seller_message).to eq('Payment complete.')
+    expect(charge.outcome.risk_level).to eq('normal')
+    expect(charge.failure_balance_transaction).to be_nil
+    expect(charge.order).to be_nil
+    expect(charge.payment_method).to match(/^test_pm/)
+    expect(charge.receipt_url).to include('https://pay.stripe.com/receipts/')
+    expect(charge.calculated_statement_descriptor).to eq('Stripe')
+    expect(charge.shipping).to be_nil
+    expect(charge.statement_descriptor).to be_nil
+    expect(charge.transfer_data).to be_nil
+    expect(charge.transfer_group).to be_nil
   end
 
   it "creates a stripe charge item with a bank token" do
