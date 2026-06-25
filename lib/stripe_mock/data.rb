@@ -216,15 +216,38 @@ module StripeMock
       {
         id: charge_id,
         object: "charge",
-        created: 1366194027,
-        livemode: false,
-        paid: true,
         amount: 0,
+        amount_refunded: 0,
         application_fee: nil,
         application_fee_amount: nil,
+        balance_transaction: params[:balance_transaction] || "txn_2dyYXXP90MN26R",
+        billing_details: {
+          address: {
+            city: nil,
+            country: nil,
+            line1: nil,
+            line2: nil,
+            postal_code: nil,
+            state: nil
+          },
+          email: nil,
+          name: "name",
+          phone: nil
+        },
+        captured: params.has_key?(:capture) ? params.delete(:capture) : true,
+        created: 1366194027,
+        customer: nil,
         currency: currency,
         destination: nil,
+        description: nil,
+        dispute: nil,
+        failure_code: nil,
+        failure_message: nil,
         fraud_details: {},
+        invoice: nil,
+        livemode: false,
+        paid: true,
+        payment_method: params[:payment_method] || "card_19yUNL2eZvKYlo2CNGsN6EWH",
         payment_method_details: {
           card: {
             brand: "visa",
@@ -235,8 +258,8 @@ module StripeMock
             },
             country: "US",
             exp_month: 12,
-            exp_year: 2013,
-            fingerprint: "3TQGpK9JoY1GgXPw",
+            exp_year: 2020,
+            fingerprint: params.dig(:payment_method_details, :fingerprint) || "3TQGpK9JoY1GgXPw",
             funding: "credit",
             installments: nil,
             last4: "4242",
@@ -246,13 +269,18 @@ module StripeMock
           },
           type: "card"
         },
+        refunds: {
+          object: "list",
+          total_count: 0,
+          has_more: false,
+          url: "/v1/charges/#{charge_id}/refunds",
+          data: []
+        },
         receipt_email: nil,
         receipt_number: nil,
         receipt_url: nil,
         refunded: false,
         shipping: {},
-        statement_descriptor: "Charge #{charge_id}",
-        status: 'succeeded',
         source: {
           object: "card",
           last4: "4242",
@@ -260,8 +288,8 @@ module StripeMock
           brand: "Visa",
           funding: "credit",
           exp_month: 12,
-          exp_year: 2013,
-          fingerprint: "3TQGpK9JoY1GgXPw",
+          exp_year: 2020,
+          fingerprint: params.dig(:source, :fingerprint) || "3TQGpK9JoY1GgXPw",
           country: "US",
           name: "name",
           address_line1: nil,
@@ -274,23 +302,9 @@ module StripeMock
           address_line1_check: nil,
           address_zip_check: nil
         },
-        captured: params.has_key?(:capture) ? params.delete(:capture) : true,
-        refunds: {
-          object: "list",
-          total_count: 0,
-          has_more: false,
-          url: "/v1/charges/#{charge_id}/refunds",
-          data: []
-        },
+        statement_descriptor: "Charge #{charge_id}",
+        status: 'succeeded',
         transfer: nil,
-        balance_transaction: params[:balance_transaction] || "txn_2dyYXXP90MN26R",
-        failure_message: nil,
-        failure_code: nil,
-        amount_refunded: 0,
-        customer: nil,
-        invoice: nil,
-        description: nil,
-        dispute: nil,
         metadata: {
         }
       }.merge(params)
