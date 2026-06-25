@@ -124,7 +124,12 @@ module StripeMock
         'transfer.created',
         'transfer.failed',
         'transfer.paid',
-        'transfer.updated'
+        'transfer.updated',
+        'identity.verification_session.created',
+        'identity.verification_session.canceled',
+        'identity.verification_session.processing',
+        'identity.verification_session.requires_input',
+        'identity.verification_session.verified'
       ]
     end
   end
