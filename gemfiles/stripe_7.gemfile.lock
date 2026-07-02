@@ -4,6 +4,7 @@ PATH
     stripe-ruby-mock (5.0.0)
       dante (>= 0.2.0)
       drb (>= 2.0.4, < 3)
+      logger
       multi_json (~> 1.0)
       stripe (> 5, < 14)
 
@@ -20,6 +21,7 @@ GEM
     dotenv (3.2.0)
     drb (2.2.3)
     eventmachine (1.2.7)
+    logger (1.7.0)
     multi_json (1.19.1)
     rack (2.2.22)
     rake (13.3.1)
