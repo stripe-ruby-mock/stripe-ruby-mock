@@ -410,7 +410,7 @@ This will help ensure that the problem remains fixed in future updates.
 
 ### Dependency updates
 
-When modifications are made to dependencies in addition to the changes to the Gemfile, Gemfile.lock and stripe-ruby-mock.gemspec you must also run `bundle exec appraisal update` to update the gemfiles specific to Stripe version 12 and Stripe version 13.
+When modifications are made to dependencies, in addition to the changes to the Gemfile, Gemfile.lock and stripe-ruby-mock.gemspec you must also run `bundle exec appraisal update` to update the various gemfiles that are specific to the supported Stripe versions.
 
 ## Copyright
 
