@@ -303,5 +303,17 @@ shared_examples 'Webhook Events API' do
       expect(invoice_payment_succeeded.data.object.lines.data.first).to respond_to(:plan)
       expect(invoice_payment_succeeded.data.object.lines.data.first.id).to eq('il_000000000000000000000000')
     end
+
+    it "Checks for billing items in invoice.sent" do
+      invoice_sent = StripeMock.mock_webhook_event('invoice.sent')
+      expect(invoice_sent).to be_a(Stripe::Event)
+      expect(invoice_sent.id).to_not be_nil
+      expect(invoice_sent.type).to eq('invoice.sent')
+      expect(invoice_sent.data.object.status).to eq('paid')
+      expect(invoice_sent.data.object.lines.data.class).to be Array
+      expect(invoice_sent.data.object.lines.data.length).to be 1
+      expect(invoice_sent.data.object.lines.data.first).to respond_to(:price)
+      expect(invoice_sent.data.object.lines.data.first.id).to eq('il_000000000000000000000000')
+    end
   end
 end
