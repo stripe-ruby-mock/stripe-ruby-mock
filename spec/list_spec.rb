@@ -149,7 +149,7 @@ describe StripeMock::Data::List do
       255.times { data << Stripe::Charge.create(amount: 1, currency: 'usd', source: stripe_helper.generate_card_token) }
       list = StripeMock::Data::List.new(data, starting_after: "test_ch_unknown")
 
-      expect { list.to_h }.to raise_error
+      expect { list.to_h }.to raise_error(RuntimeError, "No such object id: test_ch_unknown")
     end
   end
 

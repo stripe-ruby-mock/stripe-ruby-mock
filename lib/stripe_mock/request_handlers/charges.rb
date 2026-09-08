@@ -5,7 +5,8 @@ module StripeMock
       def Charges.included(klass)
         klass.add_handler 'post /v1/charges',               :new_charge
         klass.add_handler 'get /v1/charges',                :get_charges
-        klass.add_handler 'get /v1/charges/(.*)',           :get_charge
+        klass.add_handler 'get /v1/charges/search',         :search_charges
+        klass.add_handler 'get /v1/charges/((?!search).*)', :get_charge
         klass.add_handler 'post /v1/charges/(.*)/capture',  :capture_charge
         klass.add_handler 'post /v1/charges/(.*)/refund',   :refund_charge
         klass.add_handler 'post /v1/charges/(.*)/refunds',  :refund_charge
@@ -88,6 +89,24 @@ module StripeMock
         end
 
         Data.mock_list_object(clone.values, params)
+      end
+
+      SEARCH_FIELDS = [
+        "amount",
+        "currency",
+        "customer",
+        "payment_method_details.card.brand",
+        "payment_method_details.card.exp_month",
+        "payment_method_details.card.exp_year",
+        "payment_method_details.card.fingerprint",
+        "payment_method_details.card.last4",
+        "status",
+      ].freeze
+      def search_charges(route, method_url, params, headers)
+        require_param(:query) unless params[:query]
+
+        results = search_results(charges.values, params[:query], fields: SEARCH_FIELDS, resource_name: "charges")
+        Data.mock_list_object(results, params)
       end
 
       def get_charge(route, method_url, params, headers)

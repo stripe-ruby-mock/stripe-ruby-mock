@@ -1,10 +1,11 @@
 require 'set'
 
-gem 'rspec', '~> 3.1'
+gem 'rspec', '~> 3.13'
 require 'rspec'
 require 'stripe'
 require 'stripe_mock'
 require 'stripe_mock/server'
+require 'stripe_mock/compat'
 require 'dotenv'
 
 Dotenv.load('.env')

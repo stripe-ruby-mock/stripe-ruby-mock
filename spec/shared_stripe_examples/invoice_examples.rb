@@ -14,6 +14,11 @@ shared_examples 'Invoice API' do
       expect(data[invoice.id]).to_not be_nil
       expect(data[invoice.id][:id]).to eq(invoice.id)
     end
+
+    it "supports invoice number" do
+      original = Stripe::Invoice.create
+      expect(original.number).to be
+    end
   end
 
   context "retrieving an invoice" do
@@ -71,6 +76,88 @@ shared_examples 'Invoice API' do
       it "gets that many invoices" do
         expect(Stripe::Invoice.list(limit: 1).count).to eq(1)
       end
+    end
+  end
+
+  context "searching invoices" do
+    # the Search API requires about a minute between writes and reads, so add sleeps accordingly when running live
+    it "searches invoices for exact matches", :aggregate_failures do
+      response = Stripe::Invoice.search({query: 'currency:"usd"'}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(0)
+
+      product = stripe_helper.create_product
+      stripe_helper.create_plan(
+        amount: 500,
+        interval: 'month',
+        product: product.id,
+        currency: 'usd',
+        id: 'Sample5',
+      )
+      customer = Stripe::Customer.create(email: 'johnny@appleseed.com', source: stripe_helper.generate_card_token)
+      subscription = Stripe::Subscription.create(customer: customer.id, items: [{plan: 'Sample5'}])
+      one = Stripe::Invoice.create(
+        customer: customer.id,
+        currency: 'usd',
+        subscription: subscription.id,
+        metadata: {key: 'uno'},
+        number: 'one-1',
+        receipt_number: '111',
+      )
+      two = Stripe::Invoice.create(
+        customer: customer.id,
+        currency: 'gbp',
+        subscription: subscription.id,
+        metadata: {key: 'dos'},
+        number: 'two-2',
+        receipt_number: '222',
+      )
+
+      response = Stripe::Invoice.search({query: 'currency:"gbp"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Invoice.search({query: %(customer:"#{customer.id}")}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id, two.id])
+
+      response = Stripe::Invoice.search({query: 'number:"one-1"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+
+      response = Stripe::Invoice.search({query: 'receipt_number:"222"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([two.id])
+
+      response = Stripe::Invoice.search({query: %(subscription:"#{subscription.id}")}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id, two.id])
+
+      response = Stripe::Invoice.search({query: 'total:1000'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id, two.id])
+
+      response = Stripe::Invoice.search({query: 'metadata["key"]:"uno"'}, stripe_version: '2020-08-27')
+      expect(response.data.map(&:id)).to match_array([one.id])
+    end
+
+    it "respects limit", :aggregate_failures do
+      customer = Stripe::Customer.create(email: 'one@one.com', name: 'one', phone: '1111111111', metadata: {key: 'uno'})
+      11.times do
+        Stripe::Invoice.create(customer: customer.id, currency: 'usd')
+      end
+
+      response = Stripe::Invoice.search({query: %(customer:"#{customer.id}")}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(10)
+      response = Stripe::Invoice.search({query: %(customer:"#{customer.id}"), limit: 1}, stripe_version: '2020-08-27')
+      expect(response.data.size).to eq(1)
+    end
+
+    it "reports search errors", :aggregate_failures do
+      expect {
+        Stripe::Invoice.search({limit: 1}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Missing required param: query./)
+
+      expect {
+        Stripe::Invoice.search({query: 'asdf'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /We were unable to parse your search query./)
+
+      expect {
+        Stripe::Invoice.search({query: 'foo:"bar"'}, stripe_version: '2020-08-27')
+      }.to raise_error(Stripe::InvalidRequestError, /Field `foo` is an unsupported search field for resource `invoices`./)
     end
   end
 
@@ -148,8 +235,11 @@ shared_examples 'Invoice API' do
 
     describe 'parameter validation' do
       it 'fails without parameters' do
-        expect { Stripe::Invoice.upcoming() }.to raise_error {|e|
-          expect(e).to be_a(ArgumentError) }
+        expect { Stripe::Invoice.upcoming({}) }.to raise_error {|e|
+        expect(e).to be_a(Stripe::InvalidRequestError)
+        expect(e.http_status).to eq(400)
+        expect(e.message).to eq('Missing required param: customer if subscription is not provided')
+      }
       end
 
       it 'fails without a valid customer' do
@@ -538,5 +628,140 @@ shared_examples 'Invoice API' do
       end
     end
 
+  end
+
+  context "creating a preview invoice", skip: !Stripe::Invoice.respond_to?(:create_preview) && "Stripe::Invoice.create_preview not available in stripe #{Stripe::VERSION}" do
+    let(:customer) { Stripe::Customer.create(source: stripe_helper.generate_card_token) }
+    let(:product)  { stripe_helper.create_product(id: "prod_preview") }
+    let(:plan)     { stripe_helper.create_plan(id: 'preview_plan', product: product.id, amount: 50_00, interval: 'month', currency: 'usd') }
+    
+    before(with_customer: true) { customer }
+    before(with_plan: true) { plan }
+
+    describe 'parameter validation' do
+      it 'fails without required customer parameter' do
+        expect { Stripe::Invoice.create_preview() }.to raise_error do |e|
+          expect(e).to be_a(Stripe::InvalidRequestError)
+          expect(e.http_status).to eq(400)
+          expect(e.message).to eq('Missing required param: customer')
+        end
+      end
+
+      it 'fails with invalid customer' do
+        expect { Stripe::Invoice.create_preview(customer: 'nonexistent') }.to raise_error do |e|
+          expect(e).to be_a(Stripe::InvalidRequestError)
+          expect(e.message).to eq('No such customer: nonexistent')
+        end
+      end
+    end
+
+    describe 'basic preview creation' do
+      it 'creates a preview invoice for a customer without subscription', with_customer: true do
+        preview = Stripe::Invoice.create_preview(customer: customer.id)
+
+        expect(preview).to be_a(Stripe::Invoice)
+        expect(preview.id).to match(/^test_in/)
+        expect(preview.customer).to eq(customer.id)
+        expect(preview.lines.data.length).to be > 0
+      end
+
+      it 'does not store the preview invoice in memory', with_customer: true do
+        preview = Stripe::Invoice.create_preview(customer: customer.id)
+        data = test_data_source(:invoices)
+        expect(data[preview.id]).to be_nil
+      end
+    end
+
+    describe 'with subscription' do
+      let(:subscription) { Stripe::Subscription.create(plan: plan.id, customer: customer.id) }
+
+      before(with_subscription: true) { subscription }
+
+      it 'creates a preview with existing subscription', with_subscription: true do
+        preview = Stripe::Invoice.create_preview(
+          customer: customer.id,
+          subscription: subscription.id
+        )
+
+        expect(preview).to be_a(Stripe::Invoice)
+        expect(preview.customer).to eq(customer.id)
+        expect(preview.subscription).to eq(subscription.id)
+        expect(preview.lines.data.length).to be > 0
+      end
+
+      it 'fails with non-existent subscription', with_customer: true do
+        expect { 
+          Stripe::Invoice.create_preview(
+            customer: customer.id,
+            subscription: 'sub_nonexistent'
+          )
+        }.to raise_error do |e|
+          expect(e).to be_a(Stripe::InvalidRequestError)
+          expect(e.http_status).to eq(404)
+          expect(e.message).to eq('No such subscription: sub_nonexistent')
+        end
+      end
+    end
+
+    describe 'with invoice items' do
+      it 'includes custom invoice items in the preview', with_customer: true do
+        preview = Stripe::Invoice.create_preview(
+          customer: customer.id,
+          invoice_items: [
+            { amount: 1000, description: 'Custom item 1', quantity: 1 },
+            { amount: 2000, description: 'Custom item 2', quantity: 2 }
+          ]
+        )
+
+        expect(preview).to be_a(Stripe::Invoice)
+        expect(preview.customer).to eq(customer.id)
+        expect(preview.lines.data.length).to be >= 2
+      end
+    end
+
+    describe 'with proration' do
+      let(:subscription) { Stripe::Subscription.create(plan: plan.id, customer: customer.id, quantity: 1) }
+
+      before(with_subscription: true) { subscription }
+
+      it 'creates preview with proration date within subscription period', with_subscription: true do
+        proration_date = Time.now + 5 * 24 * 3600 # 5 days later
+
+        preview = Stripe::Invoice.create_preview(
+          customer: customer.id,
+          subscription: subscription.id,
+          subscription_proration_date: proration_date.to_i,
+          subscription_items: [
+            { plan: plan.id, quantity: 1 }
+          ]
+        )
+
+        expect(preview).to be_a(Stripe::Invoice)
+        expect(preview.customer).to eq(customer.id)
+        expect(preview.subscription).to eq(subscription.id)
+        # Should include proration line items
+        proration_lines = preview.lines.data.select { |line| line.proration }
+        expect(proration_lines.length).to be > 0
+      end
+
+      it 'fails with proration date outside subscription period', with_subscription: true do
+        proration_date = subscription.current_period_end + 1000
+
+        expect {
+          Stripe::Invoice.create_preview(
+            customer: customer.id,
+            subscription: subscription.id,
+            subscription_proration_date: proration_date,
+            subscription_items: [
+              { plan: plan.id, quantity: 1 }
+            ]
+          )
+        }.to raise_error do |e|
+          expect(e).to be_a(Stripe::InvalidRequestError)
+          expect(e.http_status).to eq(400)
+          expect(e.message).to eq('Cannot specify proration date outside of current subscription period')
+        end
+      end
+    end
   end
 end

@@ -11,7 +11,6 @@ shared_examples "Checkout Session API" do
     session = Stripe::Checkout::Session.create(
       payment_method_types: ["card"],
       line_items: line_items,
-      cancel_url: "https://example.com/cancel",
       success_url: "https://example.com/success"
     )
 
@@ -28,7 +27,6 @@ shared_examples "Checkout Session API" do
         session = Stripe::Checkout::Session.create(
           customer: "customer_id",
           success_url: "localhost/nada",
-          cancel_url: "localhost/nada",
           payment_method_types: ["card"],
         )
       end.to raise_error(Stripe::InvalidRequestError, /line_items/i)
@@ -40,7 +38,6 @@ shared_examples "Checkout Session API" do
     session = Stripe::Checkout::Session.create(
       mode: "setup",
       payment_method_types: ["card"],
-      cancel_url: "https://example.com/cancel",
       success_url: "https://example.com/success"
     )
 
@@ -55,7 +52,6 @@ shared_examples "Checkout Session API" do
         session = Stripe::Checkout::Session.create(
           customer: "customer_id",
           success_url: "localhost/nada",
-          cancel_url: "localhost/nada",
           payment_method_types: ["card"],
           mode: "subscription",
         )
@@ -86,7 +82,6 @@ shared_examples "Checkout Session API" do
     it "can expand setup_intent" do
       initial_session = Stripe::Checkout::Session.create(
         mode: "setup",
-        cancel_url: "https://example.com",
         success_url: "https://example.com",
         payment_method_types: ["card"]
       )

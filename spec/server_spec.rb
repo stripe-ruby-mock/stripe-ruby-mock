@@ -54,11 +54,20 @@ describe 'StripeMock Server', :mock_server => true do
 
 
   it "returns a response with symbolized hash keys" do
-    stripe_helper.create_plan(id: 'x', product: product.id)
-    response, api_key = StripeMock.redirect_to_mock_server('get', '/v1/plans/x', api_key: 'xxx')
-    response.data.keys.each {|k| expect(k).to be_a(Symbol) }
+    unless StripeMock::Compat.stripe_gte_13?
+      stripe_helper.create_plan(id: 'x', product: product.id)
+      response, api_key = StripeMock.redirect_to_mock_server('get', '/v1/plans/x', api_key: 'xxx')
+      response.data.keys.each {|k| expect(k).to be_a(Symbol) }
+    end
   end
 
+  it "returns a Net::HttpResponse" do
+    if StripeMock::Compat.stripe_gte_13?
+      stripe_helper.create_plan(id: 'x', product: product.id)
+      response, api_key = StripeMock.redirect_to_mock_server('get', '/v1/plans/x', 'https://api.stripe.com', {}, {}, 'normal')
+      expect(response).to be_a(Net::HTTPResponse)
+    end
+  end
 
   it "can toggle debug" do
     StripeMock.toggle_debug(true)

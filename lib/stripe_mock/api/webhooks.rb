@@ -11,7 +11,7 @@ module StripeMock
       fixture_file = File.join(@webhook_fixture_fallback_path, "#{type}.json")
     end
 
-    json = MultiJson.load  File.read(fixture_file)
+    json = JSON.parse File.read(fixture_file)
 
     json = Stripe::Util.symbolize_names(json)
     params = Stripe::Util.symbolize_names(params)
@@ -94,6 +94,7 @@ module StripeMock
         'payment_link.created',
         'payment_link.updated',
         'payment_method.attached',
+        'payment_method.detached',
         'payout.created',
         'payout.paid',
         'payout.updated',
@@ -118,6 +119,8 @@ module StripeMock
         'subscription_schedule.created',
         'subscription_schedule.released',
         'subscription_schedule.updated',
+        'tax_rate.created',
+        'tax_rate.updated',
         'transfer.created',
         'transfer.failed',
         'transfer.paid',
