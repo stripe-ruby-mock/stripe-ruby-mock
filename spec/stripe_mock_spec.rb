@@ -4,28 +4,50 @@ describe StripeMock do
 
   it "overrides stripe's request method" do
     StripeMock.start
-    Stripe::StripeClient.active_client.execute_request(:xtest, '/', api_key: 'abcde') # no error
+    if StripeMock::Compat.stripe_gte_13?
+      StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', :api, {}, {}, []) # no error
+    else
+      StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', api_key: 'abcde') # no error
+    end
     StripeMock.stop
   end
 
   it "overrides stripe's execute_request method in other threads" do
     StripeMock.start
-    Thread.new { Stripe::StripeClient.active_client.execute_request(:xtest, '/', api_key: 'abcde') }.join # no error
+    if StripeMock::Compat.stripe_gte_13?
+      Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', :api, {}, {}, []) }.join # no error
+    else
+      Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method,:xtest, '/', api_key: 'abcde') }.join # no error
+    end
     StripeMock.stop
   end
 
   it "reverts overriding stripe's request method" do
-    StripeMock.start
-    Stripe::StripeClient.active_client.execute_request(:xtest, '/', api_key: 'abcde') # no error
-    StripeMock.stop
-    expect { Stripe::StripeClient.active_client.execute_request(:x, '/', api_key: 'abcde') }.to raise_error Stripe::APIError
+    if StripeMock::Compat.stripe_gte_13?
+      StripeMock.start
+      StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', :api, {}, {}, []) # no error
+      StripeMock.stop
+      expect { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :x, '/', :api, {}, {}, []) }.to raise_error Stripe::APIError
+    else
+      StripeMock.start
+      StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', api_key: 'abcde') # no error
+      StripeMock.stop
+      expect { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :x, '/', api_key: 'abcde') }.to raise_error Stripe::APIError
+    end
   end
 
   it "reverts overriding stripe's execute_request method in other threads" do
-    StripeMock.start
-    Thread.new { Stripe::StripeClient.active_client.execute_request(:xtest, '/', api_key: 'abcde') }.join # no error
-    StripeMock.stop
-    expect { Thread.new { Stripe::StripeClient.active_client.execute_request(:x, '/', api_key: 'abcde') }.join }.to raise_error Stripe::APIError
+    if StripeMock::Compat.stripe_gte_13?
+      StripeMock.start
+      Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', :api, {}, {}, []) }.join # no error
+      StripeMock.stop
+      expect { Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :x, '/', :api, {}, {}, []) }.join }.to raise_error Stripe::APIError
+    else
+      StripeMock.start
+      Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :xtest, '/', api_key: 'abcde') }.join # no error
+      StripeMock.stop
+      expect { Thread.new { StripeMock::Compat.active_client.send(StripeMock::Compat.method, :x, '/', api_key: 'abcde') }.join }.to raise_error Stripe::APIError
+    end
   end
 
   it "does not persist data between mock sessions" do
@@ -79,11 +101,11 @@ describe StripeMock do
 
     it "cannot be toggled when already started" do
       StripeMock.start
-      expect { StripeMock.toggle_live(true) }.to raise_error
+      expect { StripeMock.toggle_live(true) }.to raise_error(RuntimeError, "You cannot toggle StripeMock live when it has already started.")
       StripeMock.stop
 
       StripeMock.instance_variable_set(:@state, 'remote')
-      expect { StripeMock.toggle_live(true) }.to raise_error
+      expect { StripeMock.toggle_live(true) }.to raise_error(RuntimeError, "You cannot toggle StripeMock live when it has already started.")
     end
   end
 
@@ -104,7 +126,7 @@ describe StripeMock do
     end
 
     it "throws an error on an unknown strategy" do
-      expect { StripeMock.create_test_helper(:lol) }.to raise_error
+      expect { StripeMock.create_test_helper(:lol) }.to raise_error(RuntimeError, "Invalid test helper strategy: :lol")
     end
 
     it "can configure the default strategy" do

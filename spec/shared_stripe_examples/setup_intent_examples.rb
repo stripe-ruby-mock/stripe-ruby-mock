@@ -10,6 +10,14 @@ shared_examples 'SetupIntent API' do
     expect(setup_intent.status).to eq('requires_payment_method')
   end
 
+  it 'creates a stripe setup intent with payment method' do
+    setup_intent = Stripe::SetupIntent.create(payment_method: 'random')
+
+    expect(setup_intent.id).to match(/^test_si/)
+    expect(setup_intent.metadata.to_hash).to eq({})
+    expect(setup_intent.status).to eq('requires_action')
+  end
+
   describe "listing setup_intent" do
     before do
       3.times do
@@ -72,6 +80,10 @@ shared_examples 'SetupIntent API' do
 
     updated = Stripe::SetupIntent.retrieve(original.id)
 
-    expect(updated.metadata[:foo]).to eq(:bar)
+    if StripeMock::Compat.stripe_gte_13?
+      expect(updated.metadata[:foo]).to eq("bar")
+    else
+      expect(updated.metadata[:foo]).to eq(:bar)
+    end
   end
 end

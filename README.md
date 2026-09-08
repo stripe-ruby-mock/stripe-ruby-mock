@@ -1,4 +1,4 @@
-# stripe-ruby-mock [![Build Status](https://travis-ci.org/stripe-ruby-mock/stripe-ruby-mock.png?branch=master)](https://travis-ci.org/stripe-ruby-mock/stripe-ruby-mock) [![Gitter chat](https://badges.gitter.im/rebelidealist/stripe-ruby-mock.png)](https://gitter.im/rebelidealist/stripe-ruby-mock)
+# stripe-ruby-mock [![Tests](https://github.com/stripe-ruby-mock/stripe-ruby-mock/actions/workflows/rspec_tests.yml/badge.svg)](https://github.com/stripe-ruby-mock/stripe-ruby-mock/actions/workflows/rspec_tests.yml)
 
 * Homepage: https://github.com/stripe-ruby-mock/stripe-ruby-mock
 * Issues: https://github.com/stripe-ruby-mock/stripe-ruby-mock/issues
@@ -12,11 +12,13 @@ This gem has unexpectedly grown in popularity and I've gotten pretty busy, so I'
 
 In your gemfile:
 
-    gem 'stripe-ruby-mock', '~> 3.0.1', :require => 'stripe_mock'
+    gem 'stripe-ruby-mock'
 
 ## !!! Important
 
 We have [changelog](https://github.com/stripe-ruby-mock/stripe-ruby-mock/blob/master/CHANGELOG.md). It's first attempt. Feel free to update it and suggest to a new format of it.
+
+version `5.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/931) - we support stripe > 5 and <= 13 for now and try to follow the newest API version.
 
 version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/658) - we support stripe > 5 and < 6 for now and try to follow the newest API version. But if you still use older versions please [read](https://github.com/stripe-ruby-mock/stripe-ruby-mock#specifications).
 
@@ -29,12 +31,12 @@ version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/strip
 
 ### Requirements
 
-* ruby >= 2.4.0
-* stripe >= 5.0.0
+* ruby >= 3.0.0
+* stripe > 5 & <= 13
 
 ### Specifications
 
-**STRIPE API TARGET VERSION:** 2019-08-20 (master) - we try, but some features are not implemented yet.
+**STRIPE API TARGET VERSION:** 2024-06-20 (master) - we try, but some features are not implemented yet.
 
 Older API version branches:
 
@@ -406,7 +408,9 @@ Patches are welcome and greatly appreciated! If you're contributing to fix a pro
 be sure to write tests that illustrate the problem being fixed.
 This will help ensure that the problem remains fixed in future updates.
 
-Note: You may need to `ulimit -n 4048` before running the test suite to get all tests to pass.
+### Dependency updates
+
+When modifications are made to dependencies, in addition to the changes to the Gemfile, Gemfile.lock and stripe-ruby-mock.gemspec you must also run `bundle exec appraisal update` to update the various gemfiles that are specific to the supported Stripe versions.
 
 ## Copyright
 

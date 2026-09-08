@@ -6,7 +6,8 @@ module StripeMock
       def PaymentIntents.included(klass)
         klass.add_handler 'post /v1/payment_intents',               :new_payment_intent
         klass.add_handler 'get /v1/payment_intents',                :get_payment_intents
-        klass.add_handler 'get /v1/payment_intents/(.*)',           :get_payment_intent
+        klass.add_handler 'get /v1/payment_intents/((?!search).*)', :get_payment_intent
+        klass.add_handler 'get /v1/payment_intents/search',         :search_payment_intents
         klass.add_handler 'post /v1/payment_intents/(.*)/confirm',  :confirm_payment_intent
         klass.add_handler 'post /v1/payment_intents/(.*)/capture',  :capture_payment_intent
         klass.add_handler 'post /v1/payment_intents/(.*)/cancel',   :cancel_payment_intent
@@ -68,6 +69,14 @@ module StripeMock
 
         payment_intent = payment_intent.clone
         payment_intent
+      end
+
+      SEARCH_FIELDS = ["amount", "currency", "customer", "status"].freeze
+      def search_payment_intents(route, method_url, params, headers)
+        require_param(:query) unless params[:query]
+
+        results = search_results(payment_intents.values, params[:query], fields: SEARCH_FIELDS, resource_name: "payment_intents")
+        Data.mock_list_object(results, params)
       end
 
       def capture_payment_intent(route, method_url, params, headers)
@@ -173,12 +182,18 @@ module StripeMock
         payment_intent[:status] = 'succeeded'
         btxn = new_balance_transaction('txn', { source: payment_intent[:id] })
 
-        payment_intent[:charges][:data] << Data.mock_charge(
+        charge_id = new_id('ch')
+
+        charges[charge_id] = Data.mock_charge(
+          id: charge_id,
           balance_transaction: btxn,
+          payment_intent: payment_intent[:id],
           amount: payment_intent[:amount],
           currency: payment_intent[:currency],
           payment_method: payment_intent[:payment_method]
         )
+
+        payment_intent[:latest_charge] = charge_id
 
         payment_intent
       end
