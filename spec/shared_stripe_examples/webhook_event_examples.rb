@@ -2,6 +2,49 @@ require 'spec_helper'
 
 shared_examples 'Webhook Events API' do
 
+  it "includes payment and receipt details in charge.updated events" do
+    event = StripeMock.mock_webhook_event('charge.updated')
+    charge = event.data.object
+
+    expect(event.type).to eq('charge.updated')
+    expect(charge).to be_a(Stripe::Charge)
+    expect(charge.amount_captured).to eq(charge.amount)
+    expect(charge.amount_refunded).to eq(0)
+    expect(charge.refunded).to eq(false)
+    expect(charge.status).to eq('succeeded')
+    expect(charge.payment_intent).to start_with('pi_')
+    expect(charge.payment_method).to start_with('pm_')
+    expect(charge.payment_method_details.type).to eq('card')
+    expect(charge.payment_method_details.card.brand).to eq('visa')
+    expect(charge.billing_details.to_hash).to include(:address, :email, :name, :phone)
+    expect(charge.to_hash).to include(
+      receipt_email: nil, receipt_number: nil, receipt_url: nil,
+      transfer_data: nil, transfer_group: nil
+    )
+    expect(charge.refunds.object).to eq('list')
+    expect(charge.refunds.data).to eq([])
+    expect(charge.refunds.has_more).to eq(false)
+    expect(charge.refunds.url).to eq("/v1/charges/#{charge.id}/refunds")
+    expect(event.data.previous_attributes.to_hash).to eq(description: nil)
+  end
+
+  it "overrides charge.updated details and persists the event" do
+    event = StripeMock.mock_webhook_event('charge.updated', {
+      description: 'Updated description',
+      receipt_email: 'customer@example.com',
+      billing_details: { email: 'customer@example.com' },
+      transfer_group: 'order_123'
+    })
+    stored = Stripe::Event.retrieve(event.id)
+
+    expect(stored.data.object.description).to eq('Updated description')
+    expect(stored.data.object.receipt_email).to eq('customer@example.com')
+    expect(stored.data.object.billing_details.email).to eq('customer@example.com')
+    expect(stored.data.object.billing_details.to_hash).to have_key(:address)
+    expect(stored.data.object.transfer_group).to eq('order_123')
+    expect(StripeMock.mock_webhook_event('charge.updated').data.object.receipt_email).to be_nil
+  end
+
   it "matches the list of webhooks with the folder of fixtures" do
     events = StripeMock::Webhooks.event_list.to_set
     file_names = Dir['./lib/stripe_mock/webhook_fixtures/*'].map {|f| File.basename(f, '.json')}.to_set

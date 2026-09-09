@@ -245,13 +245,17 @@ shared_examples 'Charge API' do
       source: stripe_helper.generate_card_token,
       description: 'Original description',
     })
-    charge = Stripe::Charge.retrieve(original.id)
+    charge = Stripe::Charge.update(original.id, {
+      description: "Updated description",
+      metadata: { receipt_id: "1234" },
+      receipt_email: "newemail@email.com",
+      fraud_details: { user_report: "safe" }
+    })
 
-    charge.description = "Updated description"
-    charge.metadata[:receipt_id] = 1234
-    charge.receipt_email = "newemail@email.com"
-    charge.fraud_details = {"user_report" => "safe"}
-    charge.save
+    expect(charge.description).to eq("Updated description")
+    expect(charge.metadata.to_hash).to eq(receipt_id: "1234")
+    expect(charge.receipt_email).to eq("newemail@email.com")
+    expect(charge.fraud_details.to_hash).to eq(user_report: "safe")
 
     updated = Stripe::Charge.retrieve(original.id)
 
