@@ -1,27 +1,8 @@
 module StripeMock
   module Compat
+    # Subclasses define: target, method_name, active_client, respond, empty_response
     class Base
       Request = Struct.new(:method, :url, :params, :headers, :api_key, :opts, keyword_init: true)
-
-      def target
-        raise NotImplementedError
-      end
-
-      def method_name
-        raise NotImplementedError
-      end
-
-      def active_client
-        raise NotImplementedError
-      end
-
-      def respond(body, request)
-        raise NotImplementedError
-      end
-
-      def empty_response(request)
-        raise NotImplementedError
-      end
 
       def requestor
         @requestor ||= target.new
