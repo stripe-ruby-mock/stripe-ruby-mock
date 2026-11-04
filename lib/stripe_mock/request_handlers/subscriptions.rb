@@ -39,7 +39,6 @@ module StripeMock
         stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
-        apply_discounts_param(params)
         subscription_plans = get_subscription_plans_from_params(params)
         customer = assert_existence :customer, $1, customers[stripe_account][$1]
 
@@ -97,7 +96,6 @@ module StripeMock
         end
         route =~ method_url
 
-        apply_discounts_param(params)
         subscription_plans = get_subscription_plans_from_params(params)
 
         customer = params[:customer]
@@ -246,7 +244,6 @@ module StripeMock
           customer[:default_source] = new_card[:id]
         end
 
-        apply_discounts_param(params)
         subscription_plans = get_subscription_plans_from_params(params)
 
         # subscription plans are not being updated but load them for the response
@@ -264,7 +261,7 @@ module StripeMock
           if coupon
             add_coupon_to_object(subscription, coupon)
           elsif coupon_id == ""
-            delete_coupon_from_object(subscription)
+            subscription[:discount] = nil
           else
             raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
           end

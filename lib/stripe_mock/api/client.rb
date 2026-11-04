@@ -38,6 +38,7 @@ module StripeMock
       raise mock_error
     end
 
+    args, kwargs = Compat.adapter.pin_version(args, kwargs)
     Stripe::Util.symbolize_names client.mock_request(*args, **kwargs)
   end
 end

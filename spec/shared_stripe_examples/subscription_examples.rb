@@ -201,6 +201,9 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(subscriptions.data.first.discount.coupon.id).to eq(coupon.id)
     end
 
+    context "on basil" do
+      include_context "with API version", "2025-03-31.basil"
+
     it 'applies a coupon passed through discounts' do
       coupon = stripe_helper.create_coupon(id: 'discounts_coupon', duration: 'repeating', duration_in_months: 3)
       customer = Stripe::Customer.create(source: gen_card_tk)
@@ -217,6 +220,7 @@ shared_examples 'Customer Subscriptions with plans' do
 
       expect(item.current_period_start).to eq(subscription.current_period_start)
       expect(item.current_period_end).to eq(subscription.current_period_end)
+    end
     end
 
     it 'when coupon is not exist', live: true do
@@ -1237,6 +1241,7 @@ shared_examples 'Customer Subscriptions with plans' do
   end
 
   context "updating discounts" do
+    include_context "with API version", "2025-03-31.basil"
     let(:coupon) { stripe_helper.create_coupon(id: 'update_discounts_coupon', duration: 'repeating', duration_in_months: 3) }
     let(:customer) { Stripe::Customer.create(source: gen_card_tk) }
     let(:subscription) { Stripe::Subscription.create(plan: plan.id, customer: customer.id) }

@@ -46,6 +46,7 @@ shared_examples 'Webhook Events API' do
   end
 
   it "adds basil fields to fixtures recorded with older API versions" do
+    Stripe.api_version = '2025-03-31.basil'
     subscription = StripeMock.mock_webhook_event('customer.subscription.updated').data.object
     item = subscription.items.data.first
     expect(item.current_period_start).to eq(subscription.current_period_start)
@@ -55,11 +56,13 @@ shared_examples 'Webhook Events API' do
     expect(invoice.parent.subscription_details.subscription).to eq('sub_basil')
     expect(invoice.total_taxes).to eq([])
     line = invoice.lines.data.first
-    expect(line.parent.invoice_item_details.invoice_item).to eq(line.id)
+    expect(line.parent.invoice_item_details.invoice_item).to eq(line.invoice_item)
     expect(line.pricing.price_details.price).to eq(line.price.id)
 
     invoice_item = StripeMock.mock_webhook_event('invoiceitem.created').data.object
     expect(invoice_item.parent.subscription_details.subscription).to eq(invoice_item.subscription)
+  ensure
+    Stripe.api_version = nil
   end
 
   it "matches the list of webhooks with the folder of fixtures" do

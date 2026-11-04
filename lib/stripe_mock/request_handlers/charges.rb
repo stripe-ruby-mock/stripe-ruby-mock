@@ -127,7 +127,7 @@ module StripeMock
         route =~ method_url
         charge = assert_existence :charge, $1, charges[$1]
 
-        if params[:amount] && basil_api?(headers)
+        if params[:amount] && ApiVersions.at_least?(ApiVersions::Basil::VERSION, headers)
           charge[:amount_captured] = params[:amount]
         elsif params[:amount]
           refund = Data.mock_refund(

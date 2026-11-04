@@ -63,14 +63,6 @@ module StripeMock
         route =~ method_url
         invoice = assert_existence :invoice, $1, invoices[$1]
         charge = invoice_charge(invoice)
-        invoice[:payments][:data] << Data.mock_invoice_payment(
-          id: new_id('inpay'),
-          invoice: invoice[:id],
-          amount_paid: invoice[:amount_due],
-          amount_requested: invoice[:amount_due],
-          currency: invoice[:currency],
-          payment: { type: 'charge', charge: charge[:id] }
-        )
         invoice.merge!(
           :paid => true,
           :status => "paid",

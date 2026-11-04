@@ -38,6 +38,14 @@ module StripeMock
         args.first(2)
       end
 
+      def pin_version(args, kwargs)
+        return [args, kwargs] unless args.length == 6
+
+        args = args.dup
+        args[4] = { stripe_version: active_client.config.api_version }.merge(args[4] || {})
+        [args, kwargs]
+      end
+
       def respond(body, request)
         [http_response(body.to_json, request.headers.slice(*HEADERS)), request.opts]
       end

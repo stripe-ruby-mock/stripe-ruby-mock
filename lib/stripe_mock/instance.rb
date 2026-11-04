@@ -135,7 +135,9 @@ module StripeMock
           @error_queue.dequeue
           raise mock_error
         else
+          params = ApiVersions.params(handler[:name], params, headers)
           res = self.send(handler[:name], handler[:route], method_url, params, headers)
+          res = ApiVersions.response(res, headers)
           puts "           [res]  #{res}" if @debug == true
 
           Compat.adapter.respond(res, request)

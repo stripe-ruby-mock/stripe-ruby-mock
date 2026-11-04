@@ -24,32 +24,7 @@ module StripeMock
             Data.mock_subscription_item(params)
           end
         end
-        sync_item_periods(subscription)
-      end
-
-      # Basil moved current_period_start/end onto each subscription item.
-      def sync_item_periods(subscription)
-        subscription[:items][:data].each do |item|
-          item[:current_period_start] = subscription[:current_period_start]
-          item[:current_period_end] = subscription[:current_period_end]
-        end
         subscription
-      end
-
-      # Basil replaced the coupon and promotion_code params with discounts.
-      def apply_discounts_param(params)
-        return unless params.key?(:discounts)
-
-        discounts = params.delete(:discounts)
-        discounts = discounts.values if discounts.respond_to?(:values)
-        if discounts.nil? || discounts == "" || discounts.empty?
-          params[:coupon] = ""
-          return
-        end
-
-        discount = discounts.first
-        params[:coupon] ||= discount[:coupon] if discount[:coupon]
-        params[:promotion_code] ||= discount[:promotion_code] if discount[:promotion_code]
       end
 
       def custom_subscription_params(plans, cus, options = {})

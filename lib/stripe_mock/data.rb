@@ -413,9 +413,7 @@ module StripeMock
               created: 1504035972,
               currency: StripeMock.default_currency
             },
-            quantity: 1,
-            current_period_start: 1308595038,
-            current_period_end: 1308681468
+            quantity: 1
           }],
           has_more: false
         },
@@ -437,7 +435,6 @@ module StripeMock
         quantity: 1,
         tax_percent: nil,
         discount: nil,
-        discounts: [],
         metadata: {},
         default_tax_rates: nil,
         default_payment_method: nil,
@@ -498,10 +495,8 @@ module StripeMock
         charge: nil,
         discount: nil,
         subscription: nil,
-        number: "6C41730-0001",
-        payments: { object: "list", data: [], has_more: false, url: "/v1/invoice_payments?invoice=#{in_id}" }
+        number: "6C41730-0001"
       }.merge(params)
-      add_basil_fields(invoice)
       if invoice[:discount]
         invoice[:total] = [0, invoice[:subtotal] - invoice[:discount][:coupon][:amount_off]].max if invoice[:discount][:coupon][:amount_off]
         invoice[:total] = invoice[:subtotal] * invoice[:discount][:coupon][:percent_off] / 100 if invoice[:discount][:coupon][:percent_off]
@@ -516,7 +511,7 @@ module StripeMock
 
     def self.mock_line_item(params = {})
       currency = params[:currency] || StripeMock.default_currency
-      line = {
+      {
         id: "ii_test",
         object: "line_item",
         type: "invoiceitem",
@@ -540,105 +535,11 @@ module StripeMock
         description: "Test invoice item",
         metadata: {}
       }.merge(params)
-      add_basil_fields(line)
-    end
-
-    # Adds 2025-03-31.basil fields alongside the pre-basil ones.
-    def self.add_basil_fields(object)
-      case object[:object]
-      when "invoice"
-        object[:discounts] ||= object[:discount] ? [object[:discount][:id]].compact : []
-        object[:parent] ||= invoice_parent(object[:subscription])
-        object[:total_taxes] ||=
-          if object[:total_tax_amounts]
-            object[:total_tax_amounts].map { |tax| mock_tax(tax[:amount]) }
-          else
-            object[:tax] ? [mock_tax(object[:tax])] : []
-          end
-        (object.dig(:lines, :data) || []).each { |line| add_basil_fields(line) }
-      when "line_item"
-        object[:taxes] ||= (object[:tax_amounts] || []).map { |tax| mock_tax(tax[:amount]) }
-        object[:pricing] ||= pricing_for(object[:price] || object[:plan])
-        object[:parent] ||= line_item_parent(object)
-      when "invoiceitem"
-        object[:pricing] ||= pricing_for(object[:price] || object[:plan])
-        object[:parent] ||= object[:subscription] && {
-          type: "subscription_details",
-          subscription_details: { subscription: object[:subscription], subscription_item: object[:subscription_item] }
-        }
-      when "subscription"
-        object[:discounts] ||= object[:discount] ? [object[:discount][:id]].compact : []
-        (object.dig(:items, :data) || []).each do |item|
-          item[:current_period_start] ||= object[:current_period_start]
-          item[:current_period_end] ||= object[:current_period_end]
-        end
-      end
-      object
-    end
-
-    def self.invoice_parent(subscription)
-      return nil unless subscription
-
-      {
-        type: "subscription_details",
-        quote_details: nil,
-        subscription_details: { subscription: subscription, metadata: {} }
-      }
-    end
-
-    def self.line_item_parent(line)
-      proration_details = { credited_items: nil }
-      if line[:type] == "subscription"
-        {
-          type: "subscription_item_details",
-          invoice_item_details: nil,
-          subscription_item_details: {
-            invoice_item: nil,
-            proration: line[:proration],
-            proration_details: proration_details,
-            subscription: line[:subscription],
-            subscription_item: line[:subscription_item]
-          }
-        }
-      else
-        {
-          type: "invoice_item_details",
-          subscription_item_details: nil,
-          invoice_item_details: {
-            invoice_item: line[:id],
-            proration: line[:proration],
-            proration_details: proration_details,
-            subscription: line[:subscription]
-          }
-        }
-      end
-    end
-
-    def self.pricing_for(price)
-      return nil unless price
-
-      amount = price[:unit_amount] || price[:amount]
-      {
-        type: "price_details",
-        price_details: { price: price[:id], product: price[:product] },
-        unit_amount_decimal: amount&.to_s
-      }
-    end
-
-    def self.mock_tax(amount)
-      {
-        amount: amount,
-        tax_behavior: "exclusive",
-        tax_rate_details: nil,
-        taxability_reason: nil,
-        taxable_amount: nil,
-        type: "tax_rate_details"
-      }
     end
 
     def self.mock_invoice_item(params = {})
       currency = params[:currency] || StripeMock.default_currency
-      item = {
+      {
         id: "test_ii",
         object: "invoiceitem",
         created: 1349738920,
@@ -651,25 +552,6 @@ module StripeMock
         metadata: {},
         invoice: nil,
         subscription: nil
-      }.merge(params)
-      add_basil_fields(item)
-    end
-
-    def self.mock_invoice_payment(params = {})
-      now = Time.now.to_i
-      {
-        id: "inpay_test",
-        object: "invoice_payment",
-        amount_paid: 0,
-        amount_requested: 0,
-        created: now,
-        currency: StripeMock.default_currency,
-        invoice: "in_test_invoice",
-        is_default: true,
-        livemode: false,
-        payment: { type: "charge", charge: nil },
-        status: "paid",
-        status_transitions: { canceled_at: nil, paid_at: now }
       }.merge(params)
     end
 

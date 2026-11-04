@@ -23,6 +23,15 @@ module StripeMock
         )
       end
 
+      # Carries the caller's API version to a mock server in another process.
+      def pin_version(args, kwargs)
+        version = Stripe.api_version
+        return [args, kwargs] if version.nil? || !legacy_args?(args, kwargs)
+
+        headers = { "Stripe-Version" => version }.merge(kwargs[:headers] || {})
+        [args, kwargs.merge(headers: headers)]
+      end
+
       def route(args, kwargs)
         raise ArgumentError, "Invalid arguments for mock_request" unless legacy_args?(args, kwargs)
 

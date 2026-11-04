@@ -8,6 +8,8 @@ require 'stripe_mock/version'
 require 'stripe_mock/util'
 require 'stripe_mock/error_queue'
 require 'stripe_mock/compat'
+require 'stripe_mock/api_versions'
+require 'stripe_mock/api_versions/2025_03_31_basil'
 require 'stripe_mock/data'
 require 'stripe_mock/data/list'
 
@@ -36,7 +38,6 @@ require 'stripe_mock/api/live'
 require 'stripe_mock/api/test_helpers'
 require 'stripe_mock/api/webhooks'
 
-require 'stripe_mock/request_handlers/helpers/api_version_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/bank_account_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/external_account_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/card_helpers.rb'
@@ -96,10 +97,12 @@ module StripeMock
   lib_dir = File.expand_path(File.dirname(__FILE__), '../..')
   @webhook_fixture_path = './spec/fixtures/stripe_webhooks/'
   @webhook_fixture_fallback_path = File.join(lib_dir, 'stripe_mock/webhook_fixtures')
+  @strict_api_version = false
 
   class << self
     attr_accessor :default_currency
     attr_accessor :checkout_base
     attr_accessor :webhook_fixture_path
+    attr_accessor :strict_api_version
   end
 end
