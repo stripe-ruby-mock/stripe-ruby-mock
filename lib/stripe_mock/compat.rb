@@ -27,11 +27,11 @@ module StripeMock
     end
 
     def self.client
-      adapter.target
+      adapter.client
     end
 
     def self.client_instance
-      adapter.requestor
+      adapter.client_instance
     end
 
     def self.active_client

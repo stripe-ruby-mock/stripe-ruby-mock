@@ -4,7 +4,7 @@ module StripeMock
     class V13 < Base
       HEADERS = %w[request-id stripe-account-id stripe-version stripe-version-stabl idempotency-key content-type].freeze
 
-      def target
+      def client
         Stripe::APIRequestor
       end
 
@@ -13,15 +13,15 @@ module StripeMock
       end
 
       def active_client
-        target.active_requestor
+        client.active_requestor
       end
 
       def parse(args, kwargs)
         return super unless args.length == 6
 
         method, url, _base_address, params, opts, _usage = args
-        opts = Stripe::RequestOptions.merge_config_and_opts(requestor.send(:config), opts)
-        headers = requestor.send(:request_headers, method, Stripe::Util.get_api_mode(url), opts)
+        opts = Stripe::RequestOptions.merge_config_and_opts(client_instance.send(:config), opts)
+        headers = client_instance.send(:request_headers, method, Stripe::Util.get_api_mode(url), opts)
         Request.new(
           method: method,
           url: url,

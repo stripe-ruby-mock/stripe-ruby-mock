@@ -4,7 +4,7 @@ module StripeMock
     class Legacy < Base
       Response = Struct.new(:data)
 
-      def target
+      def client
         Stripe::StripeClient
       end
 
@@ -13,7 +13,7 @@ module StripeMock
       end
 
       def active_client
-        target.active_client
+        client.active_client
       end
 
       def respond(body, request)

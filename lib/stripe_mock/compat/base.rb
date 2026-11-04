@@ -1,11 +1,11 @@
 module StripeMock
   module Compat
-    # Subclasses define: target, method_name, active_client, respond, empty_response
+    # Subclasses define: client, method_name, active_client, respond, empty_response
     class Base
       Request = Struct.new(:method, :url, :params, :headers, :api_key, :opts, keyword_init: true)
 
-      def requestor
-        @requestor ||= target.new
+      def client_instance
+        @client_instance ||= client.new
       end
 
       # The legacy `(method, url, api_key:, params:, headers:)` form is accepted on
