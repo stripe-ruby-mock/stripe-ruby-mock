@@ -1,3 +1,7 @@
+appraise "stripe-14" do
+  gem "stripe", "14.0.1"
+end
+
 appraise "stripe-13" do
   gem "stripe", "13.4.0"
 end

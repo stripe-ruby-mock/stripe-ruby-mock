@@ -1,6 +1,6 @@
 module StripeMock
   module Compat
-    # stripe 13.x
+    # stripe >= 13
     class V13 < Base
       HEADERS = %w[request-id stripe-account-id stripe-version stripe-version-stabl idempotency-key content-type].freeze
 
