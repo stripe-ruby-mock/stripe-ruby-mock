@@ -36,6 +36,7 @@ require 'stripe_mock/api/live'
 require 'stripe_mock/api/test_helpers'
 require 'stripe_mock/api/webhooks'
 
+require 'stripe_mock/request_handlers/helpers/api_version_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/bank_account_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/external_account_helpers.rb'
 require 'stripe_mock/request_handlers/helpers/card_helpers.rb'

@@ -12,11 +12,13 @@ module StripeMock
         end
 
         object[:discount] = Stripe::Discount.construct_from(discount_attrs)
+        object[:discounts] = [discount_attrs[:id]] unless object[:object] == "customer"
         object
       end
 
       def delete_coupon_from_object(object)
         object[:discount] = nil
+        object[:discounts] = [] unless object[:object] == "customer"
         object
       end
     end

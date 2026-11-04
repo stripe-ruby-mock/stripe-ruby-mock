@@ -45,6 +45,23 @@ shared_examples 'Webhook Events API' do
     expect(StripeMock.mock_webhook_event('charge.updated').data.object.receipt_email).to be_nil
   end
 
+  it "adds basil fields to fixtures recorded with older API versions" do
+    subscription = StripeMock.mock_webhook_event('customer.subscription.updated').data.object
+    item = subscription.items.data.first
+    expect(item.current_period_start).to eq(subscription.current_period_start)
+    expect(item.current_period_end).to eq(subscription.current_period_end)
+
+    invoice = StripeMock.mock_webhook_event('invoice.paid', subscription: 'sub_basil').data.object
+    expect(invoice.parent.subscription_details.subscription).to eq('sub_basil')
+    expect(invoice.total_taxes).to eq([])
+    line = invoice.lines.data.first
+    expect(line.parent.invoice_item_details.invoice_item).to eq(line.id)
+    expect(line.pricing.price_details.price).to eq(line.price.id)
+
+    invoice_item = StripeMock.mock_webhook_event('invoiceitem.created').data.object
+    expect(invoice_item.parent.subscription_details.subscription).to eq(invoice_item.subscription)
+  end
+
   it "matches the list of webhooks with the folder of fixtures" do
     events = StripeMock::Webhooks.event_list.to_set
     file_names = Dir['./lib/stripe_mock/webhook_fixtures/*'].map {|f| File.basename(f, '.json')}.to_set

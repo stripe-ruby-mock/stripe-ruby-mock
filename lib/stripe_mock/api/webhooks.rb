@@ -16,7 +16,7 @@ module StripeMock
     json = Stripe::Util.symbolize_names(json)
     params = Stripe::Util.symbolize_names(params)
     json[:account] = params.delete(:account) if params.key?(:account)
-    json[:data][:object] = Util.rmerge(json[:data][:object], params)
+    json[:data][:object] = Data.add_basil_fields(Util.rmerge(json[:data][:object], params))
     json.delete(:id)
     json[:created] = params[:created] || Time.now.to_i
 
