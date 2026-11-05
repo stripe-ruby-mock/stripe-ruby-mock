@@ -112,28 +112,15 @@ module StripeMock
     end
 
     def mock_request(*args, **kwargs)
-      if args.length == 2 && kwargs.key?(:api_key) # Legacy signature
-        method, url = args
-        api_key = kwargs[:api_key]
-        params = kwargs[:params] || {}
-        headers = kwargs[:headers] || {}
-      elsif args.length == 6 # New signature
-        method, url, base_address, params, opts, usage = args
-        client = Compat.active_client
-        config = client.send(:config)
-        opts = Stripe::RequestOptions.merge_config_and_opts(config, opts)
-        headers = client.send(:request_headers, method, Stripe::Util.get_api_mode(url), opts)
-        headers = headers.transform_keys { |key| Util.snake_case(key).to_sym }
-      else
-        raise ArgumentError, "Invalid arguments for mock_request"
-      end
+      request = Compat.adapter.parse(args, kwargs)
+      method, url, headers = request.method, request.url, request.headers
 
       return {} if method == :xtest
 
-      api_key ||= (Stripe.api_key || DUMMY_API_KEY)
+      request.api_key ||= (Stripe.api_key || DUMMY_API_KEY)
 
       # Ensure params hash has symbols as keys
-      params = Stripe::Util.symbolize_names(params)
+      params = Stripe::Util.symbolize_names(request.params)
 
       method_url = "#{method} #{url}"
 
@@ -151,20 +138,12 @@ module StripeMock
           res = self.send(handler[:name], handler[:route], method_url, params, headers)
           puts "           [res]  #{res}" if @debug == true
 
-          if Compat.stripe_gte_13?
-            [to_net_http(res, headers), opts]
-          else
-            [to_faraday_hash(res), api_key]
-          end
+          Compat.adapter.respond(res, request)
         end
       else
         puts "[StripeMock] Warning : Unrecognized endpoint + method : [#{method} #{url}]"
         puts "[StripeMock] params: #{params}" unless params.empty?
-        if Compat.stripe_gte_13?
-          [{}, opts]
-        else
-          [{}, api_key]
-        end
+        Compat.adapter.empty_response(request)
       end
     end
 
@@ -243,27 +222,6 @@ module StripeMock
     def symbolize_names(hash)
       Stripe::Util.symbolize_names(hash)
     end
-
-    def to_faraday_hash(hash)
-      response = Struct.new(:data)
-      response.new(hash)
-    end
-
-    def to_net_http(hash, headers)
-      headers = headers.slice(*%w[request-id stripe-account-id stripe-version stripe-version-stabl idempotency-key content-type])
-      fake_net_http_response(code: "200", message: "OK", body: hash.to_json, headers: headers)
-    end
-
-    def fake_net_http_response(code: "200", message: "OK", body: "{}", headers: {})
-      response_class = Net::HTTPResponse::CODE_TO_OBJ[code]
-      response = response_class.new("1.1", code, message)
-      headers.each { |k, v| response[k] = v }
-      response.instance_variable_set(:@body, body)
-      response.instance_variable_set(:@read, true)
-
-      response
-    end
-
 
     def calculate_fees(params)
       application_fee = params[:application_fee] || 0
