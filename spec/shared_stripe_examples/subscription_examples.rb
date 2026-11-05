@@ -201,6 +201,28 @@ shared_examples 'Customer Subscriptions with plans' do
       expect(subscriptions.data.first.discount.coupon.id).to eq(coupon.id)
     end
 
+    context "on basil" do
+      include_context "with API version", "2025-03-31.basil"
+
+    it 'applies a coupon passed through discounts' do
+      coupon = stripe_helper.create_coupon(id: 'discounts_coupon', duration: 'repeating', duration_in_months: 3)
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      subscription = Stripe::Subscription.create(plan: plan.id, customer: customer.id, discounts: [{ coupon: coupon.id }])
+
+      expect(subscription.discount.coupon.id).to eq(coupon.id)
+      expect(subscription.discounts).to eq([subscription.discount.id])
+    end
+
+    it 'sets the current period on each subscription item' do
+      customer = Stripe::Customer.create(source: gen_card_tk)
+      subscription = Stripe::Subscription.create(plan: plan.id, customer: customer.id)
+      item = subscription.items.data.first
+
+      expect(item.current_period_start).to eq(subscription.current_period_start)
+      expect(item.current_period_end).to eq(subscription.current_period_end)
+    end
+    end
+
     it 'when coupon is not exist', live: true do
       customer = Stripe::Customer.create(source: gen_card_tk)
 
@@ -1215,6 +1237,23 @@ shared_examples 'Customer Subscriptions with plans' do
 
       expect(subscription.pause_collection.behavior).to eq('mark_uncollectible')
       expect(subscription.pause_collection.resumes_at).to be_nil
+    end
+  end
+
+  context "updating discounts" do
+    include_context "with API version", "2025-03-31.basil"
+    let(:coupon) { stripe_helper.create_coupon(id: 'update_discounts_coupon', duration: 'repeating', duration_in_months: 3) }
+    let(:customer) { Stripe::Customer.create(source: gen_card_tk) }
+    let(:subscription) { Stripe::Subscription.create(plan: plan.id, customer: customer.id) }
+
+    it 'applies and clears a coupon through discounts' do
+      updated = Stripe::Subscription.update(subscription.id, discounts: [{ coupon: coupon.id }])
+      expect(updated.discount.coupon.id).to eq(coupon.id)
+      expect(updated.discounts).to eq([updated.discount.id])
+
+      cleared = Stripe::Subscription.update(subscription.id, discounts: "")
+      expect(cleared.discount).to be_nil
+      expect(cleared.discounts).to eq([])
     end
   end
 

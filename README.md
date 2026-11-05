@@ -32,7 +32,7 @@ version `3.0.0` has [breaking changes](https://github.com/stripe-ruby-mock/strip
 ### Requirements
 
 * ruby >= 3.0.0
-* stripe > 5 & <= 13
+* stripe > 5 & < 15
 
 ### Specifications
 
@@ -392,6 +392,25 @@ StripeMock.global_id_prefix = false
 # Or you can set your own
 StripeMock.global_id_prefix = 'my_app_'
 ```
+
+## API Versions
+
+Responses are shaped for the API version of each request: the request's
+`stripe_version` option, then `Stripe.api_version`, then the version pinned by
+your stripe gem. For example, on `2025-03-31.basil` and later, subscription
+items carry `current_period_start`/`current_period_end` and invoices carry
+`parent`, `total_taxes` and `payments`.
+
+By default, fields an API version removed are kept alongside their replacements,
+so existing tests keep passing. To get exactly the fields Stripe returns for
+that version:
+
+```ruby
+StripeMock.strict_api_version = true
+```
+
+The per-version changes live in `lib/stripe_mock/api_versions/`, one file per
+release, as `StripeMock::ApiVersions::Change` subclasses.
 
 ## TODO
 

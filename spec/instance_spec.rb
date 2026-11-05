@@ -29,6 +29,34 @@ describe StripeMock::Instance do
     end
   end
 
+  context "with global Stripe configuration", skip: !StripeMock::Compat.stripe_gte_13? && "global config reaches request headers on stripe >= 13" do
+    after do
+      Stripe.stripe_account = nil
+      Stripe.api_version = nil
+    end
+
+    it "uses Stripe.stripe_account set after the first request" do
+      Stripe::Customer.create(email: 'before@example.com')
+      Stripe.stripe_account = 'acct_global'
+      customer = Stripe::Customer.create(email: 'after@example.com')
+
+      expect(StripeMock.instance.customers['acct_global']).to have_key(customer.id)
+    end
+
+    it "passes Stripe.api_version to handlers" do
+      Stripe.api_version = '2024-06-20'
+      headers = nil
+      allow(StripeMock.instance).to receive(:new_customer).and_wrap_original do |original, *args|
+        headers = args.last
+        original.call(*args)
+      end
+
+      Stripe::Customer.create(email: 'versioned@example.com')
+
+      expect(headers[:stripe_version]).to eq('2024-06-20')
+    end
+  end
+
   it "exits gracefully on an unrecognized handler url" do
     dummy_params = {
       "id" => "str_12345",

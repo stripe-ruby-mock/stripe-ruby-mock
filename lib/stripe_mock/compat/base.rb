@@ -1,0 +1,48 @@
+module StripeMock
+  module Compat
+    # Subclasses define: client, method_name, active_client, respond, empty_response
+    class Base
+      Request = Struct.new(:method, :url, :params, :headers, :api_key, :opts, keyword_init: true)
+
+      def client_instance
+        @client_instance ||= client.new
+      end
+
+      # The legacy `(method, url, api_key:, params:, headers:)` form is accepted on
+      # every version, since it is also used to call Instance#mock_request directly.
+      def parse(args, kwargs)
+        raise ArgumentError, "Invalid arguments for mock_request" unless legacy_args?(args, kwargs)
+
+        method, url = args
+        Request.new(
+          method: method,
+          url: url,
+          params: kwargs[:params] || {},
+          headers: kwargs[:headers] || {},
+          api_key: kwargs[:api_key]
+        )
+      end
+
+      # Carries the caller's API version to a mock server in another process.
+      def pin_version(args, kwargs)
+        version = Stripe.api_version
+        return [args, kwargs] if version.nil? || !legacy_args?(args, kwargs)
+
+        headers = { "Stripe-Version" => version }.merge(kwargs[:headers] || {})
+        [args, kwargs.merge(headers: headers)]
+      end
+
+      def route(args, kwargs)
+        raise ArgumentError, "Invalid arguments for mock_request" unless legacy_args?(args, kwargs)
+
+        args.first(2)
+      end
+
+      private
+
+      def legacy_args?(args, kwargs)
+        args.length == 2 && kwargs.key?(:api_key)
+      end
+    end
+  end
+end
