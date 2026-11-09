@@ -1247,6 +1247,40 @@ module StripeMock
       }.merge(params)
     end
 
+    def self.mock_subscription_schedule(params = {})
+      {
+        id: "sub_sched_test_schedule",
+        object: "subscription_schedule",
+        application: nil,
+        canceled_at: nil,
+        completed_at: nil,
+        created: 1700000000,
+        current_phase: nil,
+        customer: "cus_test_customer",
+        default_settings: {
+          application_fee_percent: nil,
+          automatic_tax: { enabled: false, liability: nil },
+          billing_cycle_anchor: "automatic",
+          billing_thresholds: nil,
+          collection_method: "charge_automatically",
+          default_payment_method: nil,
+          description: nil,
+          invoice_settings: { account_tax_ids: nil, days_until_due: nil, issuer: { type: "self" } },
+          on_behalf_of: nil,
+          transfer_data: nil
+        },
+        end_behavior: "release",
+        livemode: false,
+        metadata: {},
+        phases: [],
+        released_at: nil,
+        released_subscription: nil,
+        status: "not_started",
+        subscription: nil,
+        test_clock: nil
+      }.merge(params)
+    end
+
     def self.mock_subscription_item(params = {})
       id = params[:id] || 'test_si_default'
       {

@@ -343,6 +343,12 @@ module StripeMock
 
         unless cancelled_at_period_end
           delete_subscription_from_customer customer, subscription
+
+          # Canceling a subscription also cancels the schedule that manages it
+          schedule = subscription[:schedule] && subscription_schedules[subscription[:schedule]]
+          if schedule && %w(not_started active).include?(schedule[:status])
+            schedule.merge!(status: 'canceled', canceled_at: cancel_params[:canceled_at], current_phase: nil)
+          end
         end
 
         subscription
