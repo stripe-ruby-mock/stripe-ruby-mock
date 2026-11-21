@@ -24,7 +24,7 @@ module StripeMock
         customer = assert_existence :customer, $1, customers[stripe_account][$1]
         subscription = get_customer_subscription(customer, $2)
 
-        assert_existence :subscription, $2, subscription
+        renew_subscription(assert_existence(:subscription, $2, subscription))
       end
 
       def retrieve_customer_subscriptions(route, method_url, params, headers)
@@ -32,6 +32,7 @@ module StripeMock
         route =~ method_url
 
         customer = assert_existence :customer, $1, customers[stripe_account][$1]
+        customer[:subscriptions][:data].each { |subscription| renew_subscription(subscription) }
         customer[:subscriptions]
       end
 
@@ -196,14 +197,14 @@ module StripeMock
       def retrieve_subscription(route, method_url, params, headers)
         route =~ method_url
 
-        assert_existence :subscription, $1, subscriptions[$1]
+        renew_subscription(assert_existence(:subscription, $1, subscriptions[$1]))
       end
 
       def retrieve_subscriptions(route, method_url, params, headers)
         # stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
 
-        subs = subscriptions.values
+        subs = subscriptions.values.each { |subscription| renew_subscription(subscription) }
 
         case params[:status]
         when nil
@@ -233,6 +234,7 @@ module StripeMock
 
         subscription_id = $2 ? $2 : $1
         subscription = assert_existence :subscription, subscription_id, subscriptions[subscription_id]
+        renew_subscription(subscription)
         verify_active_status(subscription)
 
         customer_id = subscription[:customer]
@@ -325,6 +327,7 @@ module StripeMock
 
         subscription_id = $2 ? $2 : $1
         subscription = assert_existence :subscription, subscription_id, subscriptions[subscription_id]
+        renew_subscription(subscription)
 
         customer_id = subscription[:customer]
         customer = assert_existence :customer, customer_id, customers[stripe_account][customer_id]

@@ -125,6 +125,7 @@ module StripeMock
         stripe_account = headers && headers[:stripe_account] || Stripe.api_key
         route =~ method_url
         customer = assert_existence :customer, $1, customers[stripe_account][$1]
+        customer[:subscriptions][:data].each { |subscription| renew_subscription(subscription) } if customer[:subscriptions]
 
         customer = customer.clone
         if params[:expand] == ['default_source'] && customer[:sources][:data]
