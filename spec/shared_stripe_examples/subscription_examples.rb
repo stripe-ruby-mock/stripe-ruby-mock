@@ -1462,6 +1462,106 @@ shared_examples 'Customer Subscriptions with plans' do
     end
   end
 
+  describe 'renewing subscriptions' do
+    before { skip 'Time can only be moved forward in the local mock' unless StripeMock.state == 'local' }
+
+    let(:customer) { Stripe::Customer.create(source: gen_card_tk) }
+    let!(:subscription) { Stripe::Subscription.create(customer: customer.id, items: [{ plan: plan.id }]) }
+
+    def travel_to(timestamp)
+      allow(Time).to receive(:now).and_return(Time.at(timestamp))
+    end
+
+    def charges_for(customer)
+      Stripe::Charge.list(customer: customer.id).data.size
+    end
+
+    it 'renews an active subscription and charges the customer when the period ends' do
+      period_end = subscription.current_period_end
+      charges = charges_for(customer)
+      travel_to(period_end + 1)
+
+      renewed = Stripe::Subscription.retrieve(subscription.id)
+      expect(renewed.status).to eq 'active'
+      expect(renewed.current_period_start).to eq period_end
+      expect(renewed.current_period_end).to eq (Time.at(period_end).to_datetime >> 1).to_time.to_i
+      expect(charges_for(customer)).to eq charges + 1
+    end
+
+    it 'renews once for every period that has ended' do
+      first_period_end = subscription.current_period_end
+      charges = charges_for(customer)
+      travel_to((Time.at(first_period_end).to_datetime >> 2).to_time.to_i + 1)
+
+      renewed = Stripe::Subscription.retrieve(subscription.id)
+      expect(renewed.status).to eq 'active'
+      expect(renewed.current_period_start).to eq (Time.at(first_period_end).to_datetime >> 2).to_time.to_i
+      expect(charges_for(customer)).to eq charges + 3
+    end
+
+    it 'is past_due when the customer has no payment method at renewal (#286)' do
+      Stripe::Customer.delete_source(customer.id, customer.default_source)
+      travel_to(subscription.current_period_end + 1)
+
+      expect(Stripe::Subscription.retrieve(subscription.id).status).to eq 'past_due'
+      expect(Stripe::Customer.retrieve(customer.id).subscriptions.data.first.status).to eq 'past_due'
+      expect(Stripe::Subscription.list(customer: customer.id).data.map(&:status)).to eq ['past_due']
+    end
+
+    it 'stays past_due without renewing further periods' do
+      Stripe::Customer.delete_source(customer.id, customer.default_source)
+      period_end = subscription.current_period_end
+      travel_to(period_end + 1)
+      expect(Stripe::Subscription.retrieve(subscription.id).status).to eq 'past_due'
+
+      travel_to((Time.at(period_end).to_datetime >> 3).to_time.to_i)
+      past_due = Stripe::Subscription.retrieve(subscription.id)
+      expect(past_due.status).to eq 'past_due'
+      expect(past_due.current_period_start).to eq period_end
+    end
+
+    it 'cancels a subscription set to cancel at the end of the period' do
+      Stripe::Subscription.update(subscription.id, cancel_at_period_end: true)
+      period_end = subscription.current_period_end
+      charges = charges_for(customer)
+      travel_to(period_end + 1)
+
+      canceled = Stripe::Subscription.retrieve(subscription.id)
+      expect(canceled.status).to eq 'canceled'
+      expect(canceled.ended_at).to eq period_end
+      expect(Stripe::Subscription.list(customer: customer.id).data).to be_empty
+      expect(charges_for(customer)).to eq charges
+    end
+
+    it 'does not update a subscription that was canceled at the end of the period' do
+      Stripe::Subscription.update(subscription.id, cancel_at_period_end: true)
+      travel_to(subscription.current_period_end + 1)
+
+      expect { Stripe::Subscription.update(subscription.id, metadata: { foo: 'bar' }) }.to raise_error(Stripe::InvalidRequestError)
+    end
+
+    it 'becomes active and charges the customer when a trial ends' do
+      trial = Stripe::Subscription.create(customer: customer.id, items: [{ plan: plan_with_trial.id }])
+      expect(trial.status).to eq 'trialing'
+      charges = charges_for(customer)
+      travel_to(trial.trial_end + 1)
+
+      renewed = Stripe::Subscription.retrieve(trial.id)
+      expect(renewed.status).to eq 'active'
+      expect(renewed.current_period_start).to eq trial.trial_end
+      expect(charges_for(customer)).to eq charges + 1
+    end
+
+    it 'renews a free subscription without a payment method' do
+      free_plan = stripe_helper.create_plan(id: 'free', product: product.id, amount: 0)
+      customer_without_card = Stripe::Customer.create
+      free = Stripe::Subscription.create(customer: customer_without_card.id, items: [{ plan: free_plan.id }])
+      travel_to(free.current_period_end + 1)
+
+      expect(Stripe::Subscription.retrieve(free.id).status).to eq 'active'
+    end
+  end
+
   describe "metadata" do
 
     it "creates a stripe customer and subscribes them to a plan with meta data", live: true do

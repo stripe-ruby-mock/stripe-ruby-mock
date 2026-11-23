@@ -115,6 +115,34 @@ module StripeMock
         end
       end
 
+      # Brings a subscription up to date with the current time, the way Stripe's
+      # billing cycle would once its current period ends (for example after moving
+      # time forward in a test). A subscription set to cancel at period end is
+      # canceled. Otherwise it renews for the next period and the customer is
+      # charged; if there is no payment method to charge, it becomes past_due.
+      def renew_subscription(subscription)
+        now = Time.now.utc.to_i
+
+        while %w[active trialing].include?(subscription[:status]) &&
+              subscription[:current_period_end] && subscription[:current_period_end] <= now
+          period_end = subscription[:current_period_end]
+
+          if subscription[:cancel_at_period_end]
+            subscription.merge!(status: 'canceled', ended_at: period_end)
+            break
+          end
+
+          plan = subscription[:plan] || subscription.dig(:items, :data, 0, :plan)
+          next_period_end = get_ending_time(period_end, plan)
+          break if next_period_end <= period_end
+
+          subscription.merge!(current_period_start: period_end, current_period_end: next_period_end)
+          subscription[:status] = charge_subscription_renewal(subscription) ? 'active' : 'past_due'
+        end
+
+        subscription
+      end
+
       def verify_trial_end(trial_end)
         if trial_end != "now"
           if !trial_end.is_a? Integer
@@ -125,6 +153,22 @@ module StripeMock
             raise Stripe::InvalidRequestError.new('Invalid timestamp: can be no more than five years in the future', nil, http_status: 400)
           end
         end
+      end
+
+      # Charges the customer for a renewed subscription period. Returns false when the
+      # renewal requires a payment that can't be collected.
+      def charge_subscription_renewal(subscription)
+        amount = subscription[:plan] ? subscription[:plan][:amount] : total_items_amount(subscription[:items][:data])
+        return true if amount.to_i.zero?
+        return true if [subscription[:collection_method], subscription[:billing]].include?('send_invoice')
+
+        customer = customers.values.map { |account_customers| account_customers[subscription[:customer]] }.compact.first
+        return false unless subscription[:default_payment_method] ||
+                            (customer && (customer[:default_source] || customer.dig(:invoice_settings, :default_payment_method)))
+
+        id = new_id('ch')
+        charges[id] = Data.mock_charge(id: id, customer: subscription[:customer], amount: amount)
+        true
       end
 
       def total_items_amount(items)

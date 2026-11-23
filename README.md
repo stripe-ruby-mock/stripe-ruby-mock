@@ -370,6 +370,24 @@ it "generates a stripe card token" do
 end
 ```
 
+## Renewing Subscriptions
+
+When a subscription's current period has ended, for example after moving time forward with [Timecop](https://github.com/travisjeffery/timecop), the mock brings it up to date the next time it's read, the way Stripe's billing cycle would. A subscription set to cancel at period end is canceled. Otherwise it renews for each period that has ended and the customer is charged. If the customer has no payment method to charge, the subscription becomes `past_due`. Free and `send_invoice` subscriptions renew without a charge.
+
+```ruby
+it "marks a subscription past due when the card is removed" do
+  customer = Stripe::Customer.create(source: StripeMock.generate_card_token)
+  subscription = Stripe::Subscription.create(customer: customer.id, items: [{ plan: plan.id }])
+  Stripe::Customer.delete_source(customer.id, customer.default_source)
+
+  Timecop.travel(Time.at(subscription.current_period_end + 1)) do
+    expect(Stripe::Subscription.retrieve(subscription.id).status).to eq("past_due")
+  end
+end
+```
+
+This works with the local mock; the [mock server](#running-the-mock-server) keeps its own clock.
+
 ## Debugging
 
 To enable debug messages:

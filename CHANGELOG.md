@@ -1,4 +1,5 @@
 ### Unreleased
+- [#974](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/974) Renew subscriptions whose period has ended, marking them `past_due` when there is no payment method and canceling those set to cancel at period end [@dblock](https://github.com/dblock)
 
 ### 5.0.0
 - [#919](https://github.com/stripe-ruby-mock/stripe-ruby-mock/pull/919) Add capabilities to mock account data [@cazwazacz](https://github.com/cazwazacz)
