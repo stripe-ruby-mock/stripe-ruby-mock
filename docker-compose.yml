@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  ruby-3.1:
+    build:
+      context: .
+      dockerfile: Dockerfile-3.1
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bundle exec rspec
+
+  ruby-3.2:
+    build:
+      context: .
+      dockerfile: Dockerfile-3.2
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bundle exec rspec
+
+  ruby-3.3:
+    build:
+      context: .
+      dockerfile: Dockerfile-3.3
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bundle exec rspec
+
+  ruby-3.4:
+    build:
+      context: .
+      dockerfile: Dockerfile-3.4
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bundle exec rspec
