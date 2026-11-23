@@ -30,13 +30,7 @@ module StripeMock
   private
 
   def self.redirect_to_mock_server(*args, **kwargs)
-    if args.length == 2 && kwargs.key?(:api_key) # Legacy signature
-      method, url = args
-    elsif args.length == 6 # New signature
-      method, url, _base_address, _params, _opts, _usage = args
-    else
-      raise ArgumentError, "Invalid arguments for mock_request"
-    end
+    method, url = Compat.adapter.route(args, kwargs)
     handler = Instance.handler_for_method_url("#{method} #{url}")
 
     if mock_error = client.error_queue.error_for_handler_name(handler[:name])
