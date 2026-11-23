@@ -148,6 +148,18 @@ module StripeMock
         end
       end
 
+      def create_verification_session(params = {})
+        Stripe::Identity::VerificationSession.create create_verification_session_params(params)
+      end
+
+      def create_verification_session_params(params = {})
+        {
+          type: 'document',
+          return_url: 'https://example.com/return',
+          cancel_url: 'https://example.com/cancel'
+        }.merge(params)
+      end
+
       def create_coupon(params = {})
         Stripe::Coupon.create create_coupon_params(params)
       end
