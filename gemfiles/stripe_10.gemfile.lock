@@ -5,7 +5,7 @@ PATH
       dante (>= 0.2.0)
       drb (>= 2.0.4, < 3)
       logger
-      stripe (> 5, < 14)
+      stripe (> 5, < 15)
 
 GEM
   remote: https://rubygems.org/

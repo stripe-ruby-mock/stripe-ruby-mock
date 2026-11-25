@@ -458,7 +458,13 @@ shared_examples 'Charge API' do
 
       returned_charge = charge.capture({ amount: 677, application_fee: 123 })
       expect(charge.captured).to eq(true)
-      expect(returned_charge.amount_refunded).to eq(100)
+      if StripeMock::ApiVersions.at_least?("2025-03-31")
+        # Basil stopped creating a Refund for the uncaptured remainder.
+        expect(returned_charge.amount_refunded).to eq(0)
+        expect(returned_charge.amount_captured).to eq(677)
+      else
+        expect(returned_charge.amount_refunded).to eq(100)
+      end
       expect(returned_charge.application_fee).to eq(123)
       expect(returned_charge.id).to eq(charge.id)
       expect(returned_charge.captured).to eq(true)

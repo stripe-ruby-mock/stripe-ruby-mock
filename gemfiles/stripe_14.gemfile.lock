@@ -1,0 +1,82 @@
+PATH
+  remote: ..
+  specs:
+    stripe-ruby-mock (5.0.0)
+      dante (>= 0.2.0)
+      drb (>= 2.0.4, < 3)
+      logger
+      stripe (> 5, < 15)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    appraisal (2.5.0)
+      bundler
+      rake
+      thor (>= 0.14.0)
+    daemons (1.4.1)
+    dante (0.4.0)
+    diff-lcs (1.6.2)
+    dotenv (3.2.0)
+    drb (2.2.3)
+    eventmachine (1.2.7)
+    logger (1.7.0)
+    rack (2.2.25)
+    rake (13.4.2)
+    rspec (3.13.2)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.6)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.5)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.8)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.7)
+    stripe (14.0.1)
+    thin (1.8.2)
+      daemons (~> 1.0, >= 1.0.9)
+      eventmachine (~> 1.0, >= 1.0.4)
+      rack (>= 1, < 3)
+    thor (1.5.0)
+
+PLATFORMS
+  arm64-darwin-23
+  ruby
+
+DEPENDENCIES
+  appraisal
+  dotenv
+  rake
+  rspec (~> 3.13.0)
+  stripe (= 14.0.1)
+  stripe-ruby-mock!
+  thin (~> 1.8.1)
+
+CHECKSUMS
+  appraisal (2.5.0) sha256=36989221be127913b0dba8d114da2001e6b2dceea7bd4951200eaba764eed3ce
+  bundler (4.0.15) sha256=a4ceb882fe94a0e0ac63cd0813932bbfd631a14e5ac0b7975189b19a4d28d9e7
+  daemons (1.4.1) sha256=8fc76d76faec669feb5e455d72f35bd4c46dc6735e28c420afb822fac1fa9a1d
+  dante (0.4.0) sha256=b3ae39777ff2ccc68a4733ac68a7697ed338a9733f62efaf8b1bb9ef8578d983
+  diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
+  dotenv (3.2.0) sha256=e375b83121ea7ca4ce20f214740076129ab8514cd81378161f11c03853fe619d
+  drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
+  eventmachine (1.2.7) sha256=994016e42aa041477ba9cff45cbe50de2047f25dd418eba003e84f0d16560972
+  logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
+  rack (2.2.25) sha256=a5b3cd8f2df29c36ede21aa797c21e643f06792fae7487926102e06abe6da0b8
+  rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
+  rspec (3.13.2) sha256=206284a08ad798e61f86d7ca3e376718d52c0bc944626b2349266f239f820587
+  rspec-core (3.13.6) sha256=a8823c6411667b60a8bca135364351dda34cd55e44ff94c4be4633b37d828b2d
+  rspec-expectations (3.13.5) sha256=33a4d3a1d95060aea4c94e9f237030a8f9eae5615e9bd85718fe3a09e4b58836
+  rspec-mocks (3.13.8) sha256=086ad3d3d17533f4237643de0b5c42f04b66348c28bf6b9c2d3f4a3b01af1d47
+  rspec-support (3.13.7) sha256=0640e5570872aafefd79867901deeeeb40b0c9875a36b983d85f54fb7381c47c
+  stripe (14.0.1) sha256=5b58268cd82f2e5cc93cc3aeb86ffa1936679d3960d5c8be0b783221cbedfb18
+  stripe-ruby-mock (5.0.0)
+  thin (1.8.2) sha256=1c55251aba5bee7cf6936ea18b048f4d3c74ef810aa5e6906cf6edff0df6e121
+  thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
+
+BUNDLED WITH
+  4.0.15
