@@ -1182,7 +1182,13 @@ module StripeMock
               card: 25907032203,
               bank_account: 108476658,
               bitcoin_receiver: 1545182
-            }
+            },
+            net_available: [
+              {
+                amount: usd_balance,
+                destination: 'test_ba_default'
+              }
+            ]
           }],
         connect_reserved: [
           {
